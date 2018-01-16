@@ -1,0 +1,6 @@
+name: ViaRewind
+main: de.gerrygames.viarewind.BungeePlugin
+author: Gerrygames
+version: ${project.version}
+depends: [ViaVersion]
+softdepends: [ViaBackwards]

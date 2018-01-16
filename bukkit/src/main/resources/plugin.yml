@@ -1,0 +1,10 @@
+name: ViaRewind
+version: ${project.version}
+main: de.gerrygames.viarewind.BukkitPlugin
+
+authors: [Gerrygames]
+website: https://github.com/Gerrygames
+
+load: STARTUP
+depend: [ViaVersion]
+softdepend: [ViaBackwards]
