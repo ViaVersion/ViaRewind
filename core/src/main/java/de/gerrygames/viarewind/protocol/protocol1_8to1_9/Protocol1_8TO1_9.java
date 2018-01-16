@@ -60,7 +60,12 @@ public class Protocol1_8TO1_9 extends Protocol {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT);
-				map(Type.UUID, Type.NOTHING);
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						packetWrapper.read(Type.UUID);
+					}
+				});
 				map(Type.BYTE);
 				map(Type.DOUBLE, toOldInt);
 				map(Type.DOUBLE, toOldInt);
@@ -157,7 +162,12 @@ public class Protocol1_8TO1_9 extends Protocol {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT);
-				map(Type.UUID, Type.NOTHING);
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						packetWrapper.read(Type.UUID);
+					}
+				});
 				map(Type.UNSIGNED_BYTE);
 				map(Type.DOUBLE, toOldInt);
 				map(Type.DOUBLE, toOldInt);
@@ -203,7 +213,12 @@ public class Protocol1_8TO1_9 extends Protocol {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT);
-				map(Type.UUID, Type.NOTHING);
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						packetWrapper.read(Type.UUID);
+					}
+				});
 				map(Type.STRING);
 				map(Type.POSITION);
 				map(Type.BYTE, Type.UNSIGNED_BYTE);
@@ -465,7 +480,12 @@ public class Protocol1_8TO1_9 extends Protocol {
 						else packetWrapper.set(Type.STRING, 0, name);
 					}
 				});
-				map(Type.VAR_INT, Type.NOTHING);
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						packetWrapper.read(Type.VAR_INT);
+					}
+				});
 				map(Type.INT);
 				map(Type.INT);
 				map(Type.INT);
@@ -618,7 +638,12 @@ public class Protocol1_8TO1_9 extends Protocol {
 			public void registerMap() {
 				map(Type.VAR_INT);
 				map(Type.BYTE);
-				map(Type.BOOLEAN, Type.NOTHING);
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						packetWrapper.read(Type.BOOLEAN);
+					}
+				});
 			}
 		});
 
@@ -1101,7 +1126,12 @@ public class Protocol1_8TO1_9 extends Protocol {
 						else packetWrapper.write(Type.STRING, sound);
 					}
 				});
-				map(Type.VAR_INT, Type.NOTHING);
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						packetWrapper.read(Type.VAR_INT);
+					}
+				});
 				map(Type.INT);
 				map(Type.INT);
 				map(Type.INT);
