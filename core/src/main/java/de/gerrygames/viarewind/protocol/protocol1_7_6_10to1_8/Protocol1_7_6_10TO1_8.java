@@ -1,5 +1,7 @@
 package de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8;
 
+import de.gerrygames.viarewind.netty.EmptyChannelHandler;
+import de.gerrygames.viarewind.netty.ForwardMessageToByteEncoder;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.chunks.ChunkPacketTransformer;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.items.ItemReplacement;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.items.ItemRewriter;
@@ -1950,8 +1952,9 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 		CompressionSendStorage compressionSendStorage = packetWrapper.user().get(CompressionSendStorage.class);
 		if (compressionSendStorage.isCompressionSend()) {
 			Channel channel = packetWrapper.user().getChannel();
-			channel.pipeline().remove("decompress");
-			channel.pipeline().remove("compress");
+			channel.pipeline().replace("decompress", "decompress", new EmptyChannelHandler());
+			channel.pipeline().replace("compress", "compress", new ForwardMessageToByteEncoder());
+
 			compressionSendStorage.setCompressionSend(false);
 		}
 
