@@ -5,8 +5,8 @@ import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_1
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.Protocol;
+import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
-import us.myles.ViaVersion.api.remapper.ValueCreator;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
 
@@ -29,10 +29,10 @@ public class Protocol1_7_0_5to1_7_6_10 extends Protocol {
 				map(Type.VAR_INT);
 				map(Type.STRING, Types1_7_1_5.UUID);
 				map(Type.STRING);
-				create(new ValueCreator() {
+				handler(new PacketHandler() {
 					@Override
-					public void write(PacketWrapper packetWrapper) throws Exception {
-						packetWrapper.write(Type.VAR_INT, 0);
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						packetWrapper.read(Type.VAR_INT);
 					}
 				});
 				map(Type.INT);
