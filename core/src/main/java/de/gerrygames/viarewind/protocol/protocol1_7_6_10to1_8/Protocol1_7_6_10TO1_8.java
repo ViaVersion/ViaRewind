@@ -1908,6 +1908,7 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 			}
 		});
 
+		//Set Compression
 		this.registerOutgoing(State.LOGIN, 0x03, 0x03, new PacketRemapper() {
 			@Override
 			public void registerMap() {

@@ -54,7 +54,9 @@ public class Protocol1_8TO1_9 extends Protocol {
 
 	@Override
 	protected void registerPackets() {
-		this.registerOutgoing(State.PLAY, 0x00, 0x0E, new PacketRemapper() {  //Spawn Object
+
+		//Spawn Object
+		this.registerOutgoing(State.PLAY, 0x00, 0x0E, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT);
@@ -108,7 +110,8 @@ public class Protocol1_8TO1_9 extends Protocol {
 			}
 		});
 
-		this.registerOutgoing(State.PLAY, 0x01, 0x11, new PacketRemapper() {  //Spawn Experience Orb
+		//Spawn Experience Orb
+		this.registerOutgoing(State.PLAY, 0x01, 0x11, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT);
@@ -128,7 +131,8 @@ public class Protocol1_8TO1_9 extends Protocol {
 			}
 		});
 
-		this.registerOutgoing(State.PLAY, 0x02, 0x2C, new PacketRemapper() {  //Spawn Global Entity
+		//Spawn Global Entity
+		this.registerOutgoing(State.PLAY, 0x02, 0x2C, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT);
@@ -148,7 +152,8 @@ public class Protocol1_8TO1_9 extends Protocol {
 			}
 		});
 
-		this.registerOutgoing(State.PLAY, 0x03, 0x0F, new PacketRemapper() {  //Spawn Mob
+		//Spawn Mob
+		this.registerOutgoing(State.PLAY, 0x03, 0x0F, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT);
@@ -193,7 +198,8 @@ public class Protocol1_8TO1_9 extends Protocol {
 			}
 		});
 
-		this.registerOutgoing(State.PLAY, 0x04, 0x10, new PacketRemapper() {  //Spawn Painting
+		//Spawn Painting
+		this.registerOutgoing(State.PLAY, 0x04, 0x10, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT);
@@ -213,7 +219,8 @@ public class Protocol1_8TO1_9 extends Protocol {
 			}
 		});
 
-		this.registerOutgoing(State.PLAY, 0x05, 0x0C, new PacketRemapper() {  //Spawn Player
+		//Spawn Player
+		this.registerOutgoing(State.PLAY, 0x05, 0x0C, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT);
@@ -248,13 +255,17 @@ public class Protocol1_8TO1_9 extends Protocol {
 			}
 		});
 
+		//Animation
 		this.registerOutgoing(State.PLAY, 0x06, 0x0B);
 
+		//Statistics
 		this.registerOutgoing(State.PLAY, 0x07, 0x37);
 
+		//Block Break Animation
 		this.registerOutgoing(State.PLAY, 0x08, 0x25);
 
-		this.registerOutgoing(State.PLAY, 0x09, 0x35, new PacketRemapper() {  //Update Block Entity
+		//Update Block Entity
+		this.registerOutgoing(State.PLAY, 0x09, 0x35, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.POSITION);
@@ -291,9 +302,11 @@ public class Protocol1_8TO1_9 extends Protocol {
 			}
 		});
 
+		//Block Action
 		this.registerOutgoing(State.PLAY, 0x0A, 0x24);
 
-		this.registerOutgoing(State.PLAY, 0x0B, 0x23, new PacketRemapper() {  //Block Change
+		//Block Change
+		this.registerOutgoing(State.PLAY, 0x0B, 0x23, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.POSITION);
@@ -310,7 +323,8 @@ public class Protocol1_8TO1_9 extends Protocol {
 			}
 		});
 
-		this.registerOutgoing(State.PLAY, 0x0C, -1, new PacketRemapper() {  //Boss Bar
+		//Boss Bar
+		this.registerOutgoing(State.PLAY, 0x0C, -1, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				handler(new PacketHandler() {
@@ -339,19 +353,26 @@ public class Protocol1_8TO1_9 extends Protocol {
 			}
 		});
 
+		//Server Difficulty
 		this.registerOutgoing(State.PLAY, 0x0D, 0x41);
 
+		//Tab-Complete
 		this.registerOutgoing(State.PLAY, 0x0E, 0x3A);
 
+		//Chat Message
 		this.registerOutgoing(State.PLAY, 0x0F, 0x02);
 
+		//Multi Block Change
 		this.registerOutgoing(State.PLAY, 0x10, 0x22);
 
+		//Confirm Transaction
 		this.registerOutgoing(State.PLAY, 0x11, 0x32);
 
+		//Close Window
 		this.registerOutgoing(State.PLAY, 0x12, 0x2E);
 
-		this.registerOutgoing(State.PLAY, 0x13, 0x2D, new PacketRemapper() {  //Open Window
+		//Open Window
+		this.registerOutgoing(State.PLAY, 0x13, 0x2D, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.UNSIGNED_BYTE);
@@ -368,7 +389,8 @@ public class Protocol1_8TO1_9 extends Protocol {
 			}
 		});
 
-		this.registerOutgoing(State.PLAY, 0x14, 0x30, new PacketRemapper() {  //Window Items
+		//Window Items
+		this.registerOutgoing(State.PLAY, 0x14, 0x30, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.UNSIGNED_BYTE);
@@ -391,9 +413,11 @@ public class Protocol1_8TO1_9 extends Protocol {
 			}
 		});
 
-		this.registerOutgoing(State.PLAY, 0x15, 0x31);  //Window Property
+		//Window Property
+		this.registerOutgoing(State.PLAY, 0x15, 0x31);
 
-		this.registerOutgoing(State.PLAY, 0x16, 0x2F, new PacketRemapper() {  //Set Slot
+		//Set Slot
+		this.registerOutgoing(State.PLAY, 0x16, 0x2F, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.BYTE);
@@ -411,7 +435,8 @@ public class Protocol1_8TO1_9 extends Protocol {
 			}
 		});
 
-		this.registerOutgoing(State.PLAY, 0x17, -1, new PacketRemapper() {  //Set Cooldown
+		//Set Cooldown
+		this.registerOutgoing(State.PLAY, 0x17, -1, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				handler(new PacketHandler() {
@@ -423,9 +448,11 @@ public class Protocol1_8TO1_9 extends Protocol {
 			}
 		});
 
+		//Plugin Message
 		this.registerOutgoing(State.PLAY, 0x18, 0x3F);
 
-		this.registerOutgoing(State.PLAY, 0x19, 0x29, new PacketRemapper() {  //Named Sound Effect
+		//Named Sound Effect
+		this.registerOutgoing(State.PLAY, 0x19, 0x29, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.STRING);
@@ -447,9 +474,11 @@ public class Protocol1_8TO1_9 extends Protocol {
 			}
 		});
 
+		//Disconnect
 		this.registerOutgoing(State.PLAY, 0x1A, 0x40);
 
-		this.registerOutgoing(State.PLAY, 0x1B, 0x1A, new PacketRemapper() {  //Entity Status
+		//Entity Status
+		this.registerOutgoing(State.PLAY, 0x1B, 0x1A, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.INT);
@@ -467,7 +496,8 @@ public class Protocol1_8TO1_9 extends Protocol {
 			}
 		});
 
-		this.registerOutgoing(State.PLAY, 0x1C, 0x27, new PacketRemapper() {  //Explosion
+		//Explosion
+		this.registerOutgoing(State.PLAY, 0x1C, 0x27, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.FLOAT);
@@ -492,7 +522,8 @@ public class Protocol1_8TO1_9 extends Protocol {
 			}
 		});
 
-		this.registerOutgoing(State.PLAY, 0x1D, 0x21, new PacketRemapper() {  //Unload Chunk
+		//Unload Chunk
+		this.registerOutgoing(State.PLAY, 0x1D, 0x21, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.INT);
@@ -508,7 +539,8 @@ public class Protocol1_8TO1_9 extends Protocol {
 			}
 		});
 
-		this.registerOutgoing(State.PLAY, 0x1E, 0x2B, new PacketRemapper() {  //Change Game State
+		//Change Game State
+		this.registerOutgoing(State.PLAY, 0x1E, 0x2B, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.UNSIGNED_BYTE);
@@ -524,9 +556,11 @@ public class Protocol1_8TO1_9 extends Protocol {
 			}
 		});
 
-		this.registerOutgoing(State.PLAY, 0x1F, 0x00);  //Keep Alive
+		//Keep Alive
+		this.registerOutgoing(State.PLAY, 0x1F, 0x00);
 
-		this.registerOutgoing(State.PLAY, 0x20, 0x21, new PacketRemapper() {  //Chunk Data
+		//Chunk Data
+		this.registerOutgoing(State.PLAY, 0x20, 0x21, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				handler(new PacketHandler() {
@@ -538,9 +572,11 @@ public class Protocol1_8TO1_9 extends Protocol {
 			}
 		});
 
-		this.registerOutgoing(State.PLAY, 0x21, 0x28);  //Effect
+		//Effect
+		this.registerOutgoing(State.PLAY, 0x21, 0x28);
 
-		this.registerOutgoing(State.PLAY, 0x22, 0x2A, new PacketRemapper() {  //Particle
+		//Particle
+		this.registerOutgoing(State.PLAY, 0x22, 0x2A, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.INT);
@@ -554,7 +590,8 @@ public class Protocol1_8TO1_9 extends Protocol {
 			}
 		});
 
-		this.registerOutgoing(State.PLAY, 0x23, 0x01, new PacketRemapper() {  //Join Game
+		//Join Game
+		this.registerOutgoing(State.PLAY, 0x23, 0x01, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.INT);
@@ -575,7 +612,8 @@ public class Protocol1_8TO1_9 extends Protocol {
 			}
 		});
 
-		this.registerOutgoing(State.PLAY, 0x24, 0x34, new PacketRemapper() {  //Map
+		//Map
+		this.registerOutgoing(State.PLAY, 0x24, 0x34, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT);
@@ -584,7 +622,8 @@ public class Protocol1_8TO1_9 extends Protocol {
 			}
 		});
 
-		this.registerOutgoing(State.PLAY, 0x25, 0x15, new PacketRemapper() {  //Entity Relative Move
+		//Entity Relative Move
+		this.registerOutgoing(State.PLAY, 0x25, 0x15, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT);
@@ -622,7 +661,8 @@ public class Protocol1_8TO1_9 extends Protocol {
 			}
 		});
 
-		this.registerOutgoing(State.PLAY, 0x26, 0x17, new PacketRemapper() {  //Entity Relative Move And Look
+		//Entity Relative Move And Look
+		this.registerOutgoing(State.PLAY, 0x26, 0x17, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT);
@@ -664,7 +704,8 @@ public class Protocol1_8TO1_9 extends Protocol {
 			}
 		});
 
-		this.registerOutgoing(State.PLAY, 0x27, 0x16, new PacketRemapper() {  //Entity Look
+		//Entity Look
+		this.registerOutgoing(State.PLAY, 0x27, 0x16, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT);
@@ -674,9 +715,11 @@ public class Protocol1_8TO1_9 extends Protocol {
 			}
 		});
 
-		this.registerOutgoing(State.PLAY, 0x28, 0x14);  //Entity
+		//Entity
+		this.registerOutgoing(State.PLAY, 0x28, 0x14);
 
-		this.registerOutgoing(State.PLAY, 0x29, 0x18, new PacketRemapper() {  //Vehicle Move -> Entity Teleport
+		//Vehicle Move -> Entity Teleport
+		this.registerOutgoing(State.PLAY, 0x29, 0x18, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				create(new ValueCreator() {
@@ -713,15 +756,20 @@ public class Protocol1_8TO1_9 extends Protocol {
 			}
 		});
 
-		this.registerOutgoing(State.PLAY, 0x2A, 0x36);  //Open Sign Editor
+		//Open Sign Editor
+		this.registerOutgoing(State.PLAY, 0x2A, 0x36);
 
-		this.registerOutgoing(State.PLAY, 0x2B, 0x39);  //Player Abilities
+		//Player Abilities
+		this.registerOutgoing(State.PLAY, 0x2B, 0x39);
 
-		this.registerOutgoing(State.PLAY, 0x2C, 0x42);  //Combat Event
+		//Combat Event
+		this.registerOutgoing(State.PLAY, 0x2C, 0x42);
 
-		this.registerOutgoing(State.PLAY, 0x2D, 0x38);  //Player List Item
+		//Player List Item
+		this.registerOutgoing(State.PLAY, 0x2D, 0x38);
 
-		this.registerOutgoing(State.PLAY, 0x2E, 0x08, new PacketRemapper() {  //Player Position And Look
+		//Player Position And Look
+		this.registerOutgoing(State.PLAY, 0x2E, 0x08, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.DOUBLE);
@@ -744,9 +792,11 @@ public class Protocol1_8TO1_9 extends Protocol {
 			}
 		});
 
-		this.registerOutgoing(State.PLAY, 0x2F, 0x0A);  //Use Bed
+		//Use Bed
+		this.registerOutgoing(State.PLAY, 0x2F, 0x0A);
 
-		this.registerOutgoing(State.PLAY, 0x30, 0x13, new PacketRemapper() {  //Destroy Entities
+		//Destroy Entities
+		this.registerOutgoing(State.PLAY, 0x30, 0x13, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT_ARRAY);
@@ -760,7 +810,8 @@ public class Protocol1_8TO1_9 extends Protocol {
 			}
 		});
 
-		this.registerOutgoing(State.PLAY, 0x31, 0x1E, new PacketRemapper() {  //Remove Entity Effect
+		//Remove Entity Effect
+		this.registerOutgoing(State.PLAY, 0x31, 0x1E, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT);
@@ -779,9 +830,11 @@ public class Protocol1_8TO1_9 extends Protocol {
 			}
 		});
 
-		this.registerOutgoing(State.PLAY, 0x32, 0x48);  //Resource Pack Send
+		//Resource Pack Send
+		this.registerOutgoing(State.PLAY, 0x32, 0x48);
 
-		this.registerOutgoing(State.PLAY, 0x33, 0x07, new PacketRemapper() {  //Respawn
+		//Respawn
+		this.registerOutgoing(State.PLAY, 0x33, 0x07, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.INT);
@@ -804,17 +857,23 @@ public class Protocol1_8TO1_9 extends Protocol {
 			}
 		});
 
-		this.registerOutgoing(State.PLAY, 0x34, 0x19);  //Entity Head Look
+		//Entity Head Look
+		this.registerOutgoing(State.PLAY, 0x34, 0x19);
 
-		this.registerOutgoing(State.PLAY, 0x35, 0x44);  //World Border
+		//World Border
+		this.registerOutgoing(State.PLAY, 0x35, 0x44);
 
-		this.registerOutgoing(State.PLAY, 0x36, 0x43);  //Camera
+		//Camera
+		this.registerOutgoing(State.PLAY, 0x36, 0x43);
 
-		this.registerOutgoing(State.PLAY, 0x37, 0x09);  //Held Item Change
+		//Held Item Change
+		this.registerOutgoing(State.PLAY, 0x37, 0x09);
 
-		this.registerOutgoing(State.PLAY, 0x38, 0x3D);  //Display Scoreboard
+		//Display Scoreboard
+		this.registerOutgoing(State.PLAY, 0x38, 0x3D);
 
-		this.registerOutgoing(State.PLAY, 0x39, 0x1C, new PacketRemapper() {  //Entity Metadata
+		//Entity Metadata
+		this.registerOutgoing(State.PLAY, 0x39, 0x1C, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT);
@@ -836,7 +895,8 @@ public class Protocol1_8TO1_9 extends Protocol {
 			}
 		});
 
-		this.registerOutgoing(State.PLAY, 0x3A, 0x1B, new PacketRemapper() {  //Attach Entity
+		//Attach Entity
+		this.registerOutgoing(State.PLAY, 0x3A, 0x1B, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.INT);
@@ -850,9 +910,11 @@ public class Protocol1_8TO1_9 extends Protocol {
 			}
 		});
 
-		this.registerOutgoing(State.PLAY, 0x3B, 0x12);  //Entity Velocity
+		//Entity Velocity
+		this.registerOutgoing(State.PLAY, 0x3B, 0x12);
 
-		this.registerOutgoing(State.PLAY, 0x3C, 0x04, new PacketRemapper() {  //Entity Equipment
+		//Entity Equipment
+		this.registerOutgoing(State.PLAY, 0x3C, 0x04, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT);
@@ -878,11 +940,14 @@ public class Protocol1_8TO1_9 extends Protocol {
 			}
 		});
 
-		this.registerOutgoing(State.PLAY, 0x3D, 0x1F);  //Set Experience
+		//Set Experience
+		this.registerOutgoing(State.PLAY, 0x3D, 0x1F);
 
-		this.registerOutgoing(State.PLAY, 0x3E, 0x06);  //Update Health
+		//Update Health
+		this.registerOutgoing(State.PLAY, 0x3E, 0x06);
 
-		this.registerOutgoing(State.PLAY, 0x3F, 0x3B, new PacketRemapper() {  //Scoreboard Objective
+		//Scoreboard Objective
+		this.registerOutgoing(State.PLAY, 0x3F, 0x3B, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.STRING);
@@ -900,7 +965,8 @@ public class Protocol1_8TO1_9 extends Protocol {
 			}
 		});
 
-		this.registerOutgoing(State.PLAY, 0x40, 0x1B, new PacketRemapper() {  //Set Passengers
+		//Set Passengers
+		this.registerOutgoing(State.PLAY, 0x40, 0x1B, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				handler(new PacketHandler() {
@@ -941,7 +1007,8 @@ public class Protocol1_8TO1_9 extends Protocol {
 			}
 		});
 
-		this.registerOutgoing(State.PLAY, 0x41, 0x3E, new PacketRemapper() {  //Scoreboard Team
+		//Scoreboard Team
+		this.registerOutgoing(State.PLAY, 0x41, 0x3E, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.STRING);
@@ -972,9 +1039,11 @@ public class Protocol1_8TO1_9 extends Protocol {
 			}
 		});
 
-		this.registerOutgoing(State.PLAY, 0x42, 0x3C);  //Update Score
+		//Update Score
+		this.registerOutgoing(State.PLAY, 0x42, 0x3C);
 
-		this.registerOutgoing(State.PLAY, 0x43, 0x05, new PacketRemapper() {  //Spawn Position
+		//Spawn Position
+		this.registerOutgoing(State.PLAY, 0x43, 0x05, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.POSITION);
@@ -990,10 +1059,13 @@ public class Protocol1_8TO1_9 extends Protocol {
 			}
 		});
 
-		this.registerOutgoing(State.PLAY, 0x44, 0x03);  //Update Time
+		//Update Time
+		this.registerOutgoing(State.PLAY, 0x44, 0x03);
 
-		this.registerOutgoing(State.PLAY, 0x45, 0x45);  //Title
+		//Title
+		this.registerOutgoing(State.PLAY, 0x45, 0x45);
 
+		//Update Sign
 		this.registerOutgoing(State.PLAY, 0x46, 0x33, new PacketRemapper() {
 			@Override
 			public void registerMap() {
@@ -1014,9 +1086,10 @@ public class Protocol1_8TO1_9 extends Protocol {
 					}
 				});
 			}
-		});  //Update Sign
+		});
 
-		this.registerOutgoing(State.PLAY, 0x47, 0x29, new PacketRemapper() {  //Sound Effects
+		//Sound Effects
+		this.registerOutgoing(State.PLAY, 0x47, 0x29, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				handler(new PacketHandler() {
@@ -1037,11 +1110,14 @@ public class Protocol1_8TO1_9 extends Protocol {
 			}
 		});
 
-		this.registerOutgoing(State.PLAY, 0x48, 0x47);  //Player List Header And Footer
+		//Player List Header And Footer
+		this.registerOutgoing(State.PLAY, 0x48, 0x47);
 
-		this.registerOutgoing(State.PLAY, 0x49, 0x0D);  //Collect Item
+		//Collect Item
+		this.registerOutgoing(State.PLAY, 0x49, 0x0D);
 
-		this.registerOutgoing(State.PLAY, 0x4A, 0x18, new PacketRemapper() {  //Entity Teleport
+		//Entity Teleport
+		this.registerOutgoing(State.PLAY, 0x4A, 0x18, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT);
@@ -1054,7 +1130,8 @@ public class Protocol1_8TO1_9 extends Protocol {
 			}
 		});
 
-		this.registerOutgoing(State.PLAY, 0x4B, 0x20, new PacketRemapper() {  //Entity Properties
+		//Entity Properties
+		this.registerOutgoing(State.PLAY, 0x4B, 0x20, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT);
@@ -1095,7 +1172,8 @@ public class Protocol1_8TO1_9 extends Protocol {
 			}
 		});
 
-		this.registerOutgoing(State.PLAY, 0x4C, 0x1D, new PacketRemapper() {  //Entity Effect
+		//Entity Effect
+		this.registerOutgoing(State.PLAY, 0x4C, 0x1D, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT);
@@ -1118,11 +1196,14 @@ public class Protocol1_8TO1_9 extends Protocol {
 			}
 		});
 
-		this.registerIncoming(State.PLAY, 0x0B, 0x00);  //Keep Alive
+		//Keep Alive
+		this.registerIncoming(State.PLAY, 0x0B, 0x00);
 
-		this.registerIncoming(State.PLAY, 0x02, 0x01);  //Chat Message
+		//Chat Message
+		this.registerIncoming(State.PLAY, 0x02, 0x01);
 
-		this.registerIncoming(State.PLAY, 0x0A, 0x02, new PacketRemapper() {  //Use Entity
+		//Use Entity
+		this.registerIncoming(State.PLAY, 0x0A, 0x02, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT);
@@ -1144,7 +1225,8 @@ public class Protocol1_8TO1_9 extends Protocol {
 			}
 		});
 
-		this.registerIncoming(State.PLAY, 0x0F, 0x03, new PacketRemapper() {  //Player
+		//Player
+		this.registerIncoming(State.PLAY, 0x0F, 0x03, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.BOOLEAN);
@@ -1159,7 +1241,8 @@ public class Protocol1_8TO1_9 extends Protocol {
 			}
 		});
 
-		this.registerIncoming(State.PLAY, 0x0C, 0x04, new PacketRemapper() {  //Player Position
+		//Player Position
+		this.registerIncoming(State.PLAY, 0x0C, 0x04, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.DOUBLE);
@@ -1182,7 +1265,8 @@ public class Protocol1_8TO1_9 extends Protocol {
 			}
 		});
 
-		this.registerIncoming(State.PLAY, 0x0E, 0x05, new PacketRemapper() {  //Player Look
+		//Player Look
+		this.registerIncoming(State.PLAY, 0x0E, 0x05, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.FLOAT);
@@ -1205,7 +1289,8 @@ public class Protocol1_8TO1_9 extends Protocol {
 			}
 		});
 
-		this.registerIncoming(State.PLAY, 0x0D, 0x06, new PacketRemapper() {  //Player Position And Look
+		//Player Position And Look
+		this.registerIncoming(State.PLAY, 0x0D, 0x06, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.DOUBLE);
@@ -1232,7 +1317,8 @@ public class Protocol1_8TO1_9 extends Protocol {
 			}
 		});
 
-		this.registerIncoming(State.PLAY, 0x13, 0x07, new PacketRemapper() {  //Player Digging
+		//Player Digging
+		this.registerIncoming(State.PLAY, 0x13, 0x07, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.BYTE, Type.VAR_INT);
@@ -1253,7 +1339,8 @@ public class Protocol1_8TO1_9 extends Protocol {
 			}
 		});
 
-		this.registerIncoming(State.PLAY, 0x1C, 0x08, new PacketRemapper() {  //Player Block Placement
+		//Player Block Placement
+		this.registerIncoming(State.PLAY, 0x1C, 0x08, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.POSITION);
@@ -1291,7 +1378,8 @@ public class Protocol1_8TO1_9 extends Protocol {
 			}
 		});
 
-		this.registerIncoming(State.PLAY, 0x17, 0x09, new PacketRemapper() {  //Held Item Change
+		//Held Item Change
+		this.registerIncoming(State.PLAY, 0x17, 0x09, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				handler(new PacketHandler() {
@@ -1303,7 +1391,8 @@ public class Protocol1_8TO1_9 extends Protocol {
 			}
 		});
 
-		this.registerIncoming(State.PLAY, 0x1A, 0x0A, new PacketRemapper() {  //Animation
+		//Animation
+		this.registerIncoming(State.PLAY, 0x1A, 0x0A, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				create(new ValueCreator() {
@@ -1329,7 +1418,8 @@ public class Protocol1_8TO1_9 extends Protocol {
 			}
 		});
 
-		this.registerIncoming(State.PLAY, 0x14, 0x0B, new PacketRemapper() {  //Entity Action
+		//Entity Action
+		this.registerIncoming(State.PLAY, 0x14, 0x0B, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT);
@@ -1347,7 +1437,8 @@ public class Protocol1_8TO1_9 extends Protocol {
 			}
 		});
 
-		this.registerIncoming(State.PLAY, 0x15, 0x0C, new PacketRemapper() {  //Steer Vehicle
+		//Steer Vehicle
+		this.registerIncoming(State.PLAY, 0x15, 0x0C, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.FLOAT);
@@ -1372,9 +1463,11 @@ public class Protocol1_8TO1_9 extends Protocol {
 			}
 		});
 
-		this.registerIncoming(State.PLAY, 0x08, 0x0D);  //Close Window
+		//Close Window
+		this.registerIncoming(State.PLAY, 0x08, 0x0D);
 
-		this.registerIncoming(State.PLAY, 0x07, 0x0E, new PacketRemapper() {  //Click Window
+		//Click Window
+		this.registerIncoming(State.PLAY, 0x07, 0x0E, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.UNSIGNED_BYTE);
@@ -1392,8 +1485,10 @@ public class Protocol1_8TO1_9 extends Protocol {
 			}
 		});
 
-		this.registerIncoming(State.PLAY, 0x05, 0x0F);  //Confirm Transaction
+		//Confirm Transaction
+		this.registerIncoming(State.PLAY, 0x05, 0x0F);
 
+		//Creative Inventory Action
 		this.registerIncoming(State.PLAY, 0x18, 0x10, new PacketRemapper() {
 			@Override
 			public void registerMap() {
@@ -1406,15 +1501,19 @@ public class Protocol1_8TO1_9 extends Protocol {
 					}
 				});
 			}
-		});  //Creative Inventory Action
+		});
 
-		this.registerIncoming(State.PLAY, 0x06, 0x11);  //Enchant Item
+		//Enchant Item
+		this.registerIncoming(State.PLAY, 0x06, 0x11);
 
-		this.registerIncoming(State.PLAY, 0x19, 0x12);  //Update Sign
+		//Update Sign
+		this.registerIncoming(State.PLAY, 0x19, 0x12);
 
-		this.registerIncoming(State.PLAY, 0x12, 0x13);  //Player Abilities
+		//Player Abilities
+		this.registerIncoming(State.PLAY, 0x12, 0x13);
 
-		this.registerIncoming(State.PLAY, 0x01, 0x14, new PacketRemapper() {  //Tab Complete
+		//Tab Complete
+		this.registerIncoming(State.PLAY, 0x01, 0x14, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.STRING);
@@ -1435,7 +1534,8 @@ public class Protocol1_8TO1_9 extends Protocol {
 			}
 		});
 
-		this.registerIncoming(State.PLAY, 0x04, 0x15, new PacketRemapper() {  //Client Settings
+		//Client Settings
+		this.registerIncoming(State.PLAY, 0x04, 0x15, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.STRING);
@@ -1452,13 +1552,17 @@ public class Protocol1_8TO1_9 extends Protocol {
 			}
 		});
 
-		this.registerIncoming(State.PLAY, 0x03, 0x16);  //Client Status
+		//Client Status
+		this.registerIncoming(State.PLAY, 0x03, 0x16);
 
-		this.registerIncoming(State.PLAY, 0x09, 0x17);  //Plugin Message
+		//Plugin Message
+		this.registerIncoming(State.PLAY, 0x09, 0x17);
 
-		this.registerIncoming(State.PLAY, 0x1B, 0x18);  //Spectate
+		//Spectate
+		this.registerIncoming(State.PLAY, 0x1B, 0x18);
 
-		this.registerIncoming(State.PLAY, 0x16, 0x19);  //Resource Pack Status
+		//Resource Pack Status
+		this.registerIncoming(State.PLAY, 0x16, 0x19);
 	}
 
 	@Override
