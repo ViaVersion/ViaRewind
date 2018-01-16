@@ -1345,7 +1345,12 @@ public class Protocol1_8TO1_9 extends Protocol {
 			public void registerMap() {
 				map(Type.POSITION);
 				map(Type.BYTE, Type.VAR_INT);
-				map(Type.ITEM, Type.NOTHING);
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						packetWrapper.read(Type.ITEM);
+					}
+				});
 				create(new ValueCreator() {
 					@Override
 					public void write(PacketWrapper packetWrapper) throws Exception {
