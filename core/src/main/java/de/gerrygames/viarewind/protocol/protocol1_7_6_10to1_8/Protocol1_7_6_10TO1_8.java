@@ -225,6 +225,15 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 						packetWrapper.write(Type.BOOLEAN, playerPosition.isOnGround());
 					}
 				});
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
+						if (tracker.getSpectating()!=tracker.getPlayerId()) {
+							packetWrapper.cancel();
+						}
+					}
+				});
 			}
 		});
 
@@ -640,37 +649,6 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 						packetWrapper.read(Type.BOOLEAN);
 					}
 				});
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						int entityId = packetWrapper.get(Type.INT, 0);
-						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-						if (tracker.getSpectating()==entityId && entityId!=tracker.getPlayerId()) {
-
-							PacketWrapper unmount = new PacketWrapper(0x1B, null, packetWrapper.user());
-							unmount.write(Type.INT, tracker.getPlayerId());
-							unmount.write(Type.INT, -1);
-							unmount.write(Type.BOOLEAN, false);
-							unmount.send(Protocol1_7_6_10TO1_8.class, true, true);
-
-							PacketWrapper teleport = new PacketWrapper(0x18, null, packetWrapper.user());
-							teleport.write(Type.INT, tracker.getPlayerId());
-							teleport.write(Type.INT, packetWrapper.get(Type.INT, 1));
-							teleport.write(Type.INT, packetWrapper.get(Type.INT, 2));
-							teleport.write(Type.INT, packetWrapper.get(Type.INT, 3));
-							teleport.write(Type.BYTE, packetWrapper.get(Type.BYTE, 0));
-							teleport.write(Type.BYTE, packetWrapper.get(Type.BYTE, 1));
-
-							teleport.send(Protocol1_7_6_10TO1_8.class, true, true);
-
-							PacketWrapper mount = new PacketWrapper(0x1B, null, packetWrapper.user());
-							mount.write(Type.INT, tracker.getPlayerId());
-							mount.write(Type.INT, tracker.getSpectating());
-							mount.write(Type.BOOLEAN, false);
-							mount.send(Protocol1_7_6_10TO1_8.class, true, false);
-						}
-					}
-				});
 			}
 		});
 
@@ -695,8 +673,8 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						boolean leash = packetWrapper.get(Type.BOOLEAN, 0);
 						if (leash) return;
-						int vehicle = packetWrapper.get(Type.INT, 1);
 						int passenger = packetWrapper.get(Type.INT, 0);
+						int vehicle = packetWrapper.get(Type.INT, 1);
 						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
 						tracker.setPassenger(vehicle, passenger);
 					}

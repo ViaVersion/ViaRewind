@@ -78,10 +78,26 @@ public class EntityTracker extends StoredObject {
 	public void setPassenger(int vehicleId, int passengerId) {
 		if (vehicleId==this.spectating && this.spectating!=this.playerId) {
 			try {
+				PacketWrapper sneakPacket = new PacketWrapper(0x0B, null, getUser());
+				sneakPacket.write(Type.VAR_INT, playerId);
+				sneakPacket.write(Type.VAR_INT, 0);  //Start sneaking
+				sneakPacket.write(Type.VAR_INT, 0);  //Action Parameter
+
+				PacketWrapper unsneakPacket = new PacketWrapper(0x0B, null, getUser());
+				unsneakPacket.write(Type.VAR_INT, playerId);
+				unsneakPacket.write(Type.VAR_INT, 1);  //Stop sneaking
+				unsneakPacket.write(Type.VAR_INT, 0);  //Action Parameter
+
+				PacketUtil.sendToServer(sneakPacket, Protocol1_7_6_10TO1_8.class, true, true);
+				//PacketUtil.sendToServer(unsneakPacket, Protocol1_7_6_10TO1_8.class, true, false);
+
 				setSpectating(playerId);
 			} catch (Exception ex) {ex.printStackTrace();}
 		}
-		if (passengerId==-1) {
+		if (vehicleId==-1) {
+			int oldVehicleId = getVehicle(passengerId);
+			vehicles.remove(oldVehicleId);
+		} else if (passengerId==-1) {
 			vehicles.remove(vehicleId);
 		} else {
 			vehicles.put(vehicleId, passengerId);
