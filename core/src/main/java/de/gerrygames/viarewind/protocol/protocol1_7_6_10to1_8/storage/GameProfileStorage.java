@@ -35,6 +35,37 @@ public class GameProfileStorage extends StoredObject {
 		return properties.get(uuid);
 	}
 
+	public GameProfile get(String name, boolean ignoreCase) {
+		if (ignoreCase) name = name.toLowerCase();
+
+		for (GameProfile profile : properties.values()) {
+			if (profile.name==null) continue;
+
+			String n = ignoreCase ? profile.name.toLowerCase() : profile.name;
+
+			if (n.equals(name)) {
+				return profile;
+			}
+		}
+		return null;
+	}
+
+	public List<GameProfile> getAllWithPrefix(String prefix, boolean ignoreCase) {
+		if (ignoreCase) prefix = prefix.toLowerCase();
+
+		ArrayList<GameProfile> profiles = new ArrayList<>();
+
+		for (GameProfile profile : properties.values()) {
+			if (profile.name==null) continue;
+
+			String n = ignoreCase ? profile.name.toLowerCase() : profile.name;
+
+			if (n.startsWith(prefix)) profiles.add(profile);
+		}
+
+		return profiles;
+	}
+
 	public GameProfile remove(UUID uuid) {
 		return properties.remove(uuid);
 	}

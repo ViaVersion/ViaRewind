@@ -20,6 +20,7 @@ import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.Particle;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.chunks.BlockStorage;
 import de.gerrygames.viarewind.utils.ChatUtil;
+import de.gerrygames.viarewind.utils.PacketUtil;
 import de.gerrygames.viarewind.utils.Utils;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -47,6 +48,7 @@ import us.myles.viaversion.libs.opennbt.tag.builtin.CompoundTag;
 import us.myles.viaversion.libs.opennbt.tag.builtin.StringTag;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -78,6 +80,11 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						packetWrapper.read(Type.BOOLEAN);  //Reduced Debug Info
+						int gamemode = packetWrapper.get(Type.UNSIGNED_BYTE, 0);
+						int playerId = packetWrapper.get(Type.INT, 0);
+						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
+						tracker.setGamemode(gamemode);
+						tracker.setPlayerId(playerId);
 					}
 				});
 			}
@@ -145,6 +152,24 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 				map(Type.FLOAT);  //Health
 				map(Type.VAR_INT, Type.SHORT);  //Food
 				map(Type.FLOAT);  //Food Saturation
+			}
+		});
+
+		//Respawn
+		this.registerOutgoing(State.PLAY, 0x07, 0x07, new PacketRemapper() {
+			@Override
+			public void registerMap() {
+				map(Type.INT);
+				map(Type.UNSIGNED_BYTE);
+				map(Type.UNSIGNED_BYTE);
+				map(Type.STRING);
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						int gamemode = packetWrapper.get(Type.UNSIGNED_BYTE, 1);
+						packetWrapper.user().get(EntityTracker.class).setGamemode(gamemode);
+					}
+				});
 			}
 		});
 
@@ -330,6 +355,26 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 							packetWrapper.set(Type.BYTE, 2, yaw);
 						} else if (typeID==78) {
 							packetWrapper.cancel();
+							PacketWrapper spawnMob = new PacketWrapper(0x0F, null, packetWrapper.user());
+							spawnMob.write(Type.VAR_INT, packetWrapper.get(Type.VAR_INT, 0));
+							spawnMob.write(Type.UNSIGNED_BYTE, (short)51);
+							spawnMob.write(Type.INT, packetWrapper.get(Type.INT, 0));
+							spawnMob.write(Type.INT, packetWrapper.get(Type.INT, 1));
+							spawnMob.write(Type.INT, packetWrapper.get(Type.INT, 2));
+							spawnMob.write(Type.BYTE, packetWrapper.get(Type.BYTE, 2));
+							spawnMob.write(Type.BYTE, packetWrapper.get(Type.BYTE, 1));
+							spawnMob.write(Type.BYTE, (byte) 0);
+							short vX = 0, vY = 0, vZ = 0;
+							try {
+								vX = packetWrapper.read(Type.SHORT);
+								vY = packetWrapper.read(Type.SHORT);
+								vZ = packetWrapper.read(Type.SHORT);
+							} catch (Exception ignored) {}
+							spawnMob.write(Type.SHORT, vX);
+							spawnMob.write(Type.SHORT, vY);
+							spawnMob.write(Type.SHORT, vZ);
+							spawnMob.write(Types1_7_6_10.METADATA_LIST, new ArrayList<>());
+							spawnMob.send(Protocol1_7_6_10TO1_8.class, true, true);
 						}
 
 					}
@@ -349,6 +394,7 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
+						if (packetWrapper.isCancelled()) return;
 						int data = packetWrapper.get(Type.INT, 3);
 						short vX = 0, vY = 0, vZ = 0;
 						try {
@@ -397,6 +443,10 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 						if (typeID==67 || typeID==68 || typeID==101 || typeID==30 || typeID==255) {
 							packetWrapper.cancel();
 							return;
+						}
+						if (typeID==78) {
+							typeID = 51;
+							packetWrapper.set(Type.UNSIGNED_BYTE, 0, (short)51);
 						}
 						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
 						tracker.getClientEntityTypes().put(entityID, Entity1_10Types.getTypeFromId(typeID, false));
@@ -590,6 +640,39 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 						packetWrapper.read(Type.BOOLEAN);
 					}
 				});
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						int entityId = packetWrapper.get(Type.INT, 0);
+						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
+						if (tracker.getSpectating()==entityId && entityId!=tracker.getPlayerId()) {
+
+							System.out.println("hi");
+
+							PacketWrapper unmount = new PacketWrapper(0x1B, null, packetWrapper.user());
+							unmount.write(Type.INT, tracker.getPlayerId());
+							unmount.write(Type.INT, -1);
+							unmount.write(Type.BOOLEAN, false);
+							unmount.send(Protocol1_7_6_10TO1_8.class, true, true);
+
+							PacketWrapper teleport = new PacketWrapper(0x18, null, packetWrapper.user());
+							teleport.write(Type.INT, tracker.getPlayerId());
+							teleport.write(Type.INT, packetWrapper.get(Type.INT, 1));
+							teleport.write(Type.INT, packetWrapper.get(Type.INT, 2));
+							teleport.write(Type.INT, packetWrapper.get(Type.INT, 3));
+							teleport.write(Type.BYTE, packetWrapper.get(Type.BYTE, 0));
+							teleport.write(Type.BYTE, packetWrapper.get(Type.BYTE, 1));
+
+							teleport.send(Protocol1_7_6_10TO1_8.class, true, true);
+
+							PacketWrapper mount = new PacketWrapper(0x1B, null, packetWrapper.user());
+							mount.write(Type.INT, tracker.getPlayerId());
+							mount.write(Type.INT, tracker.getSpectating());
+							mount.write(Type.BOOLEAN, false);
+							mount.send(Protocol1_7_6_10TO1_8.class, true, false);
+						}
+					}
+				});
 			}
 		});
 
@@ -599,6 +682,27 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 			public void registerMap() {
 				map(Type.VAR_INT, Type.INT);  //Entity Id
 				map(Type.BYTE);  //Head yaw
+			}
+		});
+
+		//Attach Entity
+		this.registerOutgoing(State.PLAY, 0x1B, 0x1B, new PacketRemapper() {
+			@Override
+			public void registerMap() {
+				map(Type.INT);
+				map(Type.INT);
+				map(Type.BOOLEAN);
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						boolean leash = packetWrapper.get(Type.BOOLEAN, 0);
+						if (leash) return;
+						int vehicle = packetWrapper.get(Type.INT, 1);
+						int passenger = packetWrapper.get(Type.INT, 0);
+						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
+						tracker.setPassenger(vehicle, passenger);
+					}
+				});
 			}
 		});
 
@@ -861,6 +965,25 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 						for(int i = 0; i < particle.extra; ++i) {
 							int extra = packetWrapper.read(Type.VAR_INT);
 							//TODO
+						}
+					}
+				});
+			}
+		});
+
+		//Change Game State
+		this.registerOutgoing(State.PLAY, 0x2B, 0x2B, new PacketRemapper() {
+			@Override
+			public void registerMap() {
+				map(Type.UNSIGNED_BYTE);
+				map(Type.FLOAT);
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						int mode = packetWrapper.get(Type.UNSIGNED_BYTE, 0);
+						if (mode==3) {
+							int gamemode = packetWrapper.get(Type.FLOAT, 0).intValue();
+							packetWrapper.user().get(EntityTracker.class).setGamemode(gamemode);
 						}
 					}
 				});
@@ -1406,6 +1529,15 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						packetWrapper.cancel();
+
+						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
+
+						int entityId = packetWrapper.read(Type.VAR_INT);
+						int spectating = tracker.getSpectating();
+
+						if (spectating!=entityId) {
+							tracker.setSpectating(entityId);
+						}
 					}
 				});
 			}
@@ -1514,6 +1646,34 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 			@Override
 			public void registerMap() {
 				map(Type.INT, Type.VAR_INT);
+			}
+		});
+
+		//Chat Message
+		this.registerIncoming(State.PLAY, 0x01, 0x01, new PacketRemapper() {
+			@Override
+			public void registerMap() {
+				map(Type.STRING);
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						String msg = packetWrapper.get(Type.STRING, 0);
+						int gamemode = packetWrapper.user().get(EntityTracker.class).getGamemode();
+						if (gamemode==3 && msg.toLowerCase().startsWith("/stp ")) {
+							String username = msg.split(" ")[1];
+							GameProfileStorage storage = packetWrapper.user().get(GameProfileStorage.class);
+							GameProfileStorage.GameProfile profile = storage.get(username, true);
+							if (profile!=null && profile.uuid!=null) {
+								packetWrapper.cancel();
+
+								PacketWrapper teleportPacket = new PacketWrapper(0x18, null, packetWrapper.user());
+								teleportPacket.write(Type.UUID, profile.uuid);
+
+								PacketUtil.sendToServer(teleportPacket, Protocol1_7_6_10TO1_8.class, true, true);
+							}
+						}
+					}
+				});
 			}
 		});
 
@@ -1726,6 +1886,24 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 						if (jump) flags += 0x01;
 						if (unmount) flags += 0x02;
 						packetWrapper.write(Type.UNSIGNED_BYTE, flags);
+
+						if (unmount) {
+							EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
+							if (tracker.getSpectating()!=tracker.getPlayerId()) {
+								PacketWrapper sneakPacket = new PacketWrapper(0x0B, null, packetWrapper.user());
+								sneakPacket.write(Type.VAR_INT, tracker.getPlayerId());
+								sneakPacket.write(Type.VAR_INT, 0);  //Start sneaking
+								sneakPacket.write(Type.VAR_INT, 0);  //Action Parameter
+
+								PacketWrapper unsneakPacket = new PacketWrapper(0x0B, null, packetWrapper.user());
+								unsneakPacket.write(Type.VAR_INT, tracker.getPlayerId());
+								unsneakPacket.write(Type.VAR_INT, 1);  //Stop sneaking
+								unsneakPacket.write(Type.VAR_INT, 0);  //Action Parameter
+
+								PacketUtil.sendToServer(sneakPacket, Protocol1_7_6_10TO1_8.class, true, false);
+								//PacketUtil.sendToServer(unsneakPacket, Protocol1_7_6_10TO1_8.class, true, false);
+							}
+						}
 					}
 				});
 			}
@@ -1829,6 +2007,29 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 					@Override
 					public void write(PacketWrapper packetWrapper) throws Exception {
 						packetWrapper.write(Type.BOOLEAN, false);
+					}
+				});
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						String msg = packetWrapper.get(Type.STRING, 0);
+						if (msg.toLowerCase().startsWith("/stp ")) {
+							packetWrapper.cancel();
+							String[] args = msg.split(" ");
+							if (args.length<=2) {
+								String prefix = args.length==1 ? "" : args[1];
+								GameProfileStorage storage = packetWrapper.user().get(GameProfileStorage.class);
+								List<GameProfileStorage.GameProfile> profiles = storage.getAllWithPrefix(prefix, true);
+
+								PacketWrapper tabComplete = new PacketWrapper(0x3A, null, packetWrapper.user());
+								tabComplete.write(Type.VAR_INT, profiles.size());
+								for (GameProfileStorage.GameProfile profile : profiles) {
+									tabComplete.write(Type.STRING, profile.name);
+								}
+
+								tabComplete.send(Protocol1_7_6_10TO1_8.class, true, false);
+							}
+						}
 					}
 				});
 			}

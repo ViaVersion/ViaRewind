@@ -6,7 +6,12 @@ import us.myles.viaversion.libs.opennbt.tag.builtin.CompoundTag;
 import us.myles.viaversion.libs.opennbt.tag.builtin.StringTag;
 
 public enum ItemReplacement {
-	END_ROD(198, 85, "End Rod"),
+	END_ROD_DOWN(198, 0, 50, 0, "End Rod"),
+	END_ROD_UP(198, 1, 50, 0, "End Rod"),
+	END_ROD_NORTH(198, 2, 50, 4, "End Rod"),
+	END_ROD_SOUTH(198, 3, 50, 3, "End Rod"),
+	END_ROD_WEST(198, 4, 50, 2, "End Rod"),
+	END_ROD_EAST(198, 5, 50, 1, "End Rod"),
 	CHORUS_PLANT(199, 0, 35, 10, "Chorus Plant"),
 	CHORUS_FLOWER(200, 0, 35, 2, "Chorus Flower"),
 	PURPUR_BLOCK(201, 155, "Purpur Block"),
