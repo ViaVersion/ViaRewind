@@ -373,8 +373,8 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 							spawnMob.write(Type.SHORT, vX);
 							spawnMob.write(Type.SHORT, vY);
 							spawnMob.write(Type.SHORT, vZ);
-							spawnMob.write(Types1_7_6_10.METADATA_LIST, new ArrayList<>());
-							spawnMob.send(Protocol1_7_6_10TO1_8.class, true, true);
+							spawnMob.write(Types1_8.METADATA_LIST, new ArrayList<>());
+							spawnMob.send(Protocol1_7_6_10TO1_8.class, false, true);
 						}
 
 					}
@@ -646,8 +646,6 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 						int entityId = packetWrapper.get(Type.INT, 0);
 						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
 						if (tracker.getSpectating()==entityId && entityId!=tracker.getPlayerId()) {
-
-							System.out.println("hi");
 
 							PacketWrapper unmount = new PacketWrapper(0x1B, null, packetWrapper.user());
 							unmount.write(Type.INT, tracker.getPlayerId());
