@@ -14,11 +14,13 @@ import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage.LoadedChun
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage.PlayerPosition;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage.Scoreboard;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage.Windows;
+import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage.WorldBorder;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.CustomIntType;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.CustomStringType;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.Particle;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.chunks.BlockStorage;
+import de.gerrygames.viarewind.types.VarLongType;
 import de.gerrygames.viarewind.utils.ChatUtil;
 import de.gerrygames.viarewind.utils.PacketUtil;
 import de.gerrygames.viarewind.utils.Utils;
@@ -1563,6 +1565,38 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
+						int action = packetWrapper.read(Type.VAR_INT);
+						WorldBorder worldBorder = packetWrapper.user().get(WorldBorder.class);
+						if (action==0) {
+							worldBorder.setSize(packetWrapper.read(Type.DOUBLE));
+						} else if (action==1) {
+							worldBorder.lerpSize(
+									packetWrapper.read(Type.DOUBLE),
+									packetWrapper.read(Type.DOUBLE),
+									packetWrapper.read(VarLongType.VAR_LONG)
+							);
+						} else if (action==2) {
+							worldBorder.setCenter(
+									packetWrapper.read(Type.DOUBLE),
+									packetWrapper.read(Type.DOUBLE)
+							);
+						} else if (action==3) {
+							worldBorder.init(
+									packetWrapper.read(Type.DOUBLE),
+									packetWrapper.read(Type.DOUBLE),
+									packetWrapper.read(Type.DOUBLE),
+									packetWrapper.read(Type.DOUBLE),
+									packetWrapper.read(VarLongType.VAR_LONG),
+									packetWrapper.read(Type.VAR_INT),
+									packetWrapper.read(Type.VAR_INT),
+									packetWrapper.read(Type.VAR_INT)
+							);
+						} else if (action==4) {
+							worldBorder.setWarningTime(packetWrapper.read(Type.VAR_INT));
+						} else if (action==5) {
+							worldBorder.setWarningBlocks(packetWrapper.read(Type.VAR_INT));
+						}
+
 						packetWrapper.cancel();
 					}
 				});
@@ -2185,5 +2219,6 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 		userConnection.put(new LoadedChunks(userConnection));
 		userConnection.put(new Scoreboard(userConnection));
 		userConnection.put(new CompressionSendStorage(userConnection));
+		userConnection.put(new WorldBorder(userConnection));
 	}
 }
