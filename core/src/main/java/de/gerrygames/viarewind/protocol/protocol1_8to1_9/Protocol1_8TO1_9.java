@@ -464,7 +464,36 @@ public class Protocol1_8TO1_9 extends Protocol {
 		});
 
 		//Plugin Message
-		this.registerOutgoing(State.PLAY, 0x18, 0x3F);
+		this.registerOutgoing(State.PLAY, 0x18, 0x3F, new PacketRemapper() {
+			@Override
+			public void registerMap() {
+				map(Type.STRING);
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						String channel = packetWrapper.get(Type.STRING, 0);
+						if (channel.equalsIgnoreCase("MC|TrList")) {
+							packetWrapper.passthrough(Type.INT);  //Window Id
+
+							int size = packetWrapper.passthrough(Type.BYTE);  //Size
+							for (int i = 0; i < size; i++) {
+								packetWrapper.write(Type.ITEM, ItemRewriter.toClient(packetWrapper.read(Type.ITEM))); //Buy Item 1
+								packetWrapper.write(Type.ITEM, ItemRewriter.toClient(packetWrapper.read(Type.ITEM))); //Buy Item 3
+
+								boolean has3Items = packetWrapper.passthrough(Type.BOOLEAN);
+								if (has3Items) {
+									packetWrapper.write(Type.ITEM, ItemRewriter.toClient(packetWrapper.read(Type.ITEM))); //Buy Item 2
+								}
+
+								packetWrapper.passthrough(Type.BOOLEAN); //Unavailable
+								packetWrapper.passthrough(Type.INT); //Uses
+								packetWrapper.passthrough(Type.INT); //Max Uses
+							}
+						}
+					}
+				});
+			}
+		});
 
 		//Named Sound Effect
 		this.registerOutgoing(State.PLAY, 0x19, 0x29, new PacketRemapper() {

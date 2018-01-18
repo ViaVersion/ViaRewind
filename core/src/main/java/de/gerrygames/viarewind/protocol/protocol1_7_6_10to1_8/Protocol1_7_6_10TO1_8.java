@@ -1463,9 +1463,46 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
-						byte[] data = packetWrapper.read(Type.REMAINING_BYTES);
-						packetWrapper.write(Type.SHORT, (short)data.length);
-						packetWrapper.write(Type.REMAINING_BYTES, data);
+						String channel = packetWrapper.get(Type.STRING, 0);
+						if (channel.equalsIgnoreCase("MC|TrList")) {
+							packetWrapper.write(Type.SHORT, (short)0);  //Size Placeholder
+
+							ByteBuf buf = Unpooled.buffer();
+
+							Type.INT.write(buf, packetWrapper.passthrough(Type.INT));  //Window Id
+
+							int size = packetWrapper.passthrough(Type.BYTE);  //Size
+							Type.BYTE.write(buf, (byte)size);
+
+							for (int i = 0; i < size; i++) {
+								Item item = ItemRewriter.toClient(packetWrapper.read(Type.ITEM));
+								packetWrapper.write(Types1_7_6_10.COMPRESSED_NBT_ITEM, item); //Buy Item 1
+								Types1_7_6_10.COMPRESSED_NBT_ITEM.write(buf, item);
+
+								item = ItemRewriter.toClient(packetWrapper.read(Type.ITEM));
+								packetWrapper.write(Types1_7_6_10.COMPRESSED_NBT_ITEM, item); //Buy Item 3
+								Types1_7_6_10.COMPRESSED_NBT_ITEM.write(buf, item);
+
+								boolean has3Items = packetWrapper.passthrough(Type.BOOLEAN);
+								Type.BOOLEAN.write(buf, has3Items);
+								if (has3Items) {
+									item = ItemRewriter.toClient(packetWrapper.read(Type.ITEM));
+									packetWrapper.write(Types1_7_6_10.COMPRESSED_NBT_ITEM, item); //Buy Item 2
+									Types1_7_6_10.COMPRESSED_NBT_ITEM.write(buf, item);
+								}
+
+								Type.BOOLEAN.write(buf, packetWrapper.passthrough(Type.BOOLEAN)); //Unavailable
+								packetWrapper.read(Type.INT); //Uses
+								packetWrapper.read(Type.INT); //Max Uses
+							}
+
+							packetWrapper.set(Type.SHORT, 0, (short)buf.readableBytes());
+							buf.release();
+						} else {
+							byte[] data = packetWrapper.read(Type.REMAINING_BYTES);
+							packetWrapper.write(Type.SHORT, (short)data.length);
+							packetWrapper.write(Type.REMAINING_BYTES, data);
+						}
 					}
 				});
 			}
