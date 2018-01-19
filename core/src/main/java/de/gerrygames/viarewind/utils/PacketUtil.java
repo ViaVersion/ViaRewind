@@ -16,8 +16,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PacketUtil {
+	public static ServerSender serverSender = null;
 
 	public static void sendToServer(PacketWrapper packet, Class<? extends Protocol> packetProtocol, boolean skipCurrentPipeline, boolean currentThread) throws Exception {
+		if (serverSender!=null) {
+			serverSender.sendToServer(packet, packetProtocol, skipCurrentPipeline, currentThread);
+			return;
+		}
+
 		if (packet.isCancelled()) return;
 		ByteBuf raw = constructPacket(packet, packetProtocol, skipCurrentPipeline);
 

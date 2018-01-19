@@ -33,7 +33,7 @@ public class WorldBorder extends StoredObject {
 
 				sendPackets();
 			}
-		}, 20L);
+		}, 2L);
 	}
 
 	private enum Side {
