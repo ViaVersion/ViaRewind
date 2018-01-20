@@ -1124,21 +1124,10 @@ public class Protocol1_8TO1_9 extends Protocol {
 			@Override
 			public void registerMap() {
 				map(Type.POSITION);
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						for (int i = 0; i<4; i++) {
-							String line = packetWrapper.read(Type.STRING);
-							line = ChatUtil.jsonToLegacy(line);
-							line = ChatUtil.removeUnusedColor(line);
-							if (line.length()>15) {
-								line = ChatColor.stripColor(line);
-								if (line.length()>15) line = line.substring(0, 15);
-							}
-							packetWrapper.write(Type.STRING, line);
-						}
-					}
-				});
+				map(Type.STRING);
+				map(Type.STRING);
+				map(Type.STRING);
+				map(Type.STRING);
 			}
 		});
 
