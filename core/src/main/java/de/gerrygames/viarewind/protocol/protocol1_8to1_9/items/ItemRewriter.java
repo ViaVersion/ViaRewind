@@ -51,6 +51,23 @@ public class ItemRewriter {
 			viaVersionTag.put(tag.get("AttributeModifiers").clone());
 		}
 
+		if (item.getId()==383 && item.getData()==0) {
+			int data = 0;
+			if (tag.contains("EntityTag")) {
+				CompoundTag entityTag = tag.remove("EntityTag");
+				if (entityTag.contains("id")) {
+					StringTag id = entityTag.get("id");
+					if (ENTTIY_NAME_TO_ID.containsKey(id.getValue())) {
+						data = ENTTIY_NAME_TO_ID.get(id.getValue());
+					}
+				}
+			}
+
+			item.setData((short)data);
+		}
+
+		ItemReplacement.toClient(item);
+
 		if (item.getId()==373 || item.getId()==438) {
 			int data = 0;
 			if (tag.contains("Potion")) {
@@ -68,23 +85,6 @@ public class ItemRewriter {
 
 			item.setData((short)data);
 		}
-
-		if (item.getId()==383 && item.getData()==0) {
-			int data = 0;
-			if (tag.contains("EntityTag")) {
-				CompoundTag entityTag = tag.remove("EntityTag");
-				if (entityTag.contains("id")) {
-					StringTag id = entityTag.get("id");
-					if (ENTTIY_NAME_TO_ID.containsKey(id.getValue())) {
-						data = ENTTIY_NAME_TO_ID.get(id.getValue());
-					}
-				}
-			}
-
-			item.setData((short)data);
-		}
-
-		ItemReplacement.toClient(item);
 
 		if (tag.contains("AttributeModifiers")) {
 			ListTag attributes = tag.get("AttributeModifiers");
