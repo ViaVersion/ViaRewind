@@ -249,7 +249,7 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						Position position = packetWrapper.read(Type.POSITION);
 						packetWrapper.write(Type.INT, position.getX().intValue());
-						packetWrapper.write(Type.INT, position.getY().intValue());
+						packetWrapper.write(Type.UNSIGNED_BYTE, position.getY().shortValue());
 						packetWrapper.write(Type.INT, position.getZ().intValue());
 					}
 				});
