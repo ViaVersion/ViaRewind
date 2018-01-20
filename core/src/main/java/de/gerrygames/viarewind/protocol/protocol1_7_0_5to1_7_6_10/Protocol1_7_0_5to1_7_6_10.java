@@ -1,6 +1,5 @@
 package de.gerrygames.viarewind.protocol.protocol1_7_0_5to1_7_6_10;
 
-import de.gerrygames.viarewind.protocol.protocol1_7_0_5to1_7_6_10.types.Types1_7_1_5;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.data.UserConnection;
