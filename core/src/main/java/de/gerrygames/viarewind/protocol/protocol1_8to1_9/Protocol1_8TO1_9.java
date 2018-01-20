@@ -15,7 +15,6 @@ import de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage.PlayerPosition;
 import de.gerrygames.viarewind.utils.ChatUtil;
 import de.gerrygames.viarewind.utils.PacketUtil;
 import de.gerrygames.viarewind.utils.Utils;
-import net.md_5.bungee.api.ChatColor;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.data.UserConnection;
@@ -23,6 +22,7 @@ import us.myles.ViaVersion.api.entities.Entity1_10Types;
 import us.myles.ViaVersion.api.minecraft.Position;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
+import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_8;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
@@ -1600,6 +1600,22 @@ public class Protocol1_8TO1_9 extends Protocol {
 					@Override
 					public void write(PacketWrapper packetWrapper) throws Exception {
 						packetWrapper.write(Type.VAR_INT, 1);
+					}
+				});
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						short flags = packetWrapper.get(Type.UNSIGNED_BYTE, 0);
+
+						PacketWrapper updateSkin = new PacketWrapper(0x1C, null, packetWrapper.user());
+						updateSkin.write(Type.VAR_INT, packetWrapper.user().get(EntityTracker.class).getPlayerId());
+
+						ArrayList<Metadata> metadata = new ArrayList<>();
+						metadata.add(new Metadata(10, MetaType1_8.Byte, (byte)flags));
+
+						updateSkin.write(Types1_8.METADATA_LIST, metadata);
+
+						updateSkin.send(Protocol1_8TO1_9.class, true, false);
 					}
 				});
 			}

@@ -2,7 +2,6 @@ package de.gerrygames.viarewind.protocol.protocol1_8to1_9.metadata;
 
 import de.gerrygames.viarewind.ViaRewind;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.items.ItemRewriter;
-import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.entities.Entity1_10Types;
 import us.myles.ViaVersion.api.minecraft.EulerAngle;
 import us.myles.ViaVersion.api.minecraft.Vector;
