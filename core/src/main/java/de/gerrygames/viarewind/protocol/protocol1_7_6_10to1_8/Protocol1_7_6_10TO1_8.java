@@ -2096,7 +2096,7 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 						packetWrapper.read(Type.BYTE);
 
 						boolean cape = packetWrapper.read(Type.BOOLEAN);
-						packetWrapper.write(Type.UNSIGNED_BYTE, (short)(cape ? 1 : 0));
+						packetWrapper.write(Type.UNSIGNED_BYTE, (short)(cape ? 127 : 126));
 					}
 				});
 				handler(new PacketHandler() {
