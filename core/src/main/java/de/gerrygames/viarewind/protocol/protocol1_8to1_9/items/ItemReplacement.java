@@ -43,6 +43,12 @@ public enum ItemReplacement {
 	SHIELD(442, 425, "Shield"),
 	SPECTRAL_ARROW(439, 262, "Spectral Arrow"),
 	TIPPED_ARROW(440, 262, "Tipped Arrow"),
+	OAK_BOAT(333, 333, "Oak Boat"),
+	SPRUCE_BOAT(444, 333, "Spruce Boat"),
+	BIRCH_BOAT(445, 333, "Birch Boat"),
+	JUNGLE_BOAT(446, 333, "Jungle Boat"),
+	ACACIA_BOAT(446, 333, "Acacia Boat"),
+	DARK_OAK_BOAT(448, 333, "Dark Oak Boat"),
 	;
 
 	private int oldId, replacementId, oldData, replacementData;
