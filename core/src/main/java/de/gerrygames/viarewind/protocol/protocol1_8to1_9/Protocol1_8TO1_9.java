@@ -81,7 +81,7 @@ public class Protocol1_8TO1_9 extends Protocol {
 							yaw -= 64;
 							packetWrapper.set(Type.BYTE, 1, yaw);
 							int y = packetWrapper.get(Type.INT, 1);
-							y += 8;
+							y += 10;
 							packetWrapper.set(Type.INT, 1, y);
 						}
 					}
@@ -850,7 +850,7 @@ public class Protocol1_8TO1_9 extends Protocol {
 							yaw -= 64;
 							packetWrapper.set(Type.BYTE, 0, yaw);
 							int y = packetWrapper.get(Type.INT, 1);
-							y += 8;
+							y += 10;
 							packetWrapper.set(Type.INT, 1, y);
 						}
 					}
@@ -1243,7 +1243,7 @@ public class Protocol1_8TO1_9 extends Protocol {
 							yaw -= 64;
 							packetWrapper.set(Type.BYTE, 0, yaw);
 							int y = packetWrapper.get(Type.INT, 1);
-							y += 8;
+							y += 10;
 							packetWrapper.set(Type.INT, 1, y);
 						}
 					}
