@@ -75,6 +75,20 @@ public class Protocol1_8TO1_9 extends Protocol {
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
+						int typeID = packetWrapper.get(Type.BYTE, 0);
+						if (typeID==1) {
+							byte yaw = packetWrapper.get(Type.BYTE, 1);
+							yaw -= 64;
+							packetWrapper.set(Type.BYTE, 1, yaw);
+							int y = packetWrapper.get(Type.INT, 1);
+							y += 8;
+							packetWrapper.set(Type.INT, 1, y);
+						}
+					}
+				});
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
 						int data = packetWrapper.read(Type.INT);
 						packetWrapper.write(Type.INT, data);
 						short vX = packetWrapper.read(Type.SHORT);
@@ -743,6 +757,13 @@ public class Protocol1_8TO1_9 extends Protocol {
 						byte pitch = packetWrapper.passthrough(Type.BYTE);
 						boolean onGround = packetWrapper.passthrough(Type.BOOLEAN);
 
+						int entityId = packetWrapper.get(Type.VAR_INT, 0);
+						Entity1_10Types.EntityType type = packetWrapper.user().get(EntityTracker.class).getClientEntityTypes().get(entityId);
+						if (type==Entity1_10Types.EntityType.BOAT) {
+							yaw -= 64;
+							packetWrapper.set(Type.BYTE, 3, yaw);
+						}
+
 						PacketWrapper secondPacket = new PacketWrapper(0x17, null, packetWrapper.user());
 						secondPacket.write(Type.VAR_INT, packetWrapper.get(Type.VAR_INT, 0));
 						secondPacket.write(Type.BYTE, relX2);
@@ -766,6 +787,18 @@ public class Protocol1_8TO1_9 extends Protocol {
 				map(Type.BYTE);
 				map(Type.BYTE);
 				map(Type.BOOLEAN);
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						int entityId = packetWrapper.get(Type.VAR_INT, 0);
+						Entity1_10Types.EntityType type = packetWrapper.user().get(EntityTracker.class).getClientEntityTypes().get(entityId);
+						if (type==Entity1_10Types.EntityType.BOAT) {
+							byte yaw = packetWrapper.get(Type.BYTE, 0);
+							yaw -= 64;
+							packetWrapper.set(Type.BYTE, 0, yaw);
+						}
+					}
+				});
 			}
 		});
 
@@ -805,6 +838,21 @@ public class Protocol1_8TO1_9 extends Protocol {
 					@Override
 					public void write(PacketWrapper packetWrapper) throws Exception {
 						packetWrapper.write(Type.BOOLEAN, true);
+					}
+				});
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						int entityId = packetWrapper.get(Type.VAR_INT, 0);
+						Entity1_10Types.EntityType type = packetWrapper.user().get(EntityTracker.class).getClientEntityTypes().get(entityId);
+						if (type==Entity1_10Types.EntityType.BOAT) {
+							byte yaw = packetWrapper.get(Type.BYTE, 1);
+							yaw -= 64;
+							packetWrapper.set(Type.BYTE, 0, yaw);
+							int y = packetWrapper.get(Type.INT, 1);
+							y += 8;
+							packetWrapper.set(Type.INT, 1, y);
+						}
 					}
 				});
 			}
@@ -1185,6 +1233,21 @@ public class Protocol1_8TO1_9 extends Protocol {
 				map(Type.BYTE);
 				map(Type.BYTE);
 				map(Type.BOOLEAN);
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						int entityId = packetWrapper.get(Type.VAR_INT, 0);
+						Entity1_10Types.EntityType type = packetWrapper.user().get(EntityTracker.class).getClientEntityTypes().get(entityId);
+						if (type==Entity1_10Types.EntityType.BOAT) {
+							byte yaw = packetWrapper.get(Type.BYTE, 1);
+							yaw -= 64;
+							packetWrapper.set(Type.BYTE, 0, yaw);
+							int y = packetWrapper.get(Type.INT, 1);
+							y += 8;
+							packetWrapper.set(Type.INT, 1, y);
+						}
+					}
+				});
 			}
 		});
 
@@ -1513,13 +1576,13 @@ public class Protocol1_8TO1_9 extends Protocol {
 						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
 						int playerId = tracker.getPlayerId();
 						int vehicle = tracker.getVehicle(playerId);
-						if (vehicle!=-1 && tracker.getClientEntityTypes().getOrDefault(vehicle, Entity1_10Types.EntityType.SLIME)==Entity1_10Types.EntityType.BOAT) {
+						if (vehicle!=-1 && tracker.getClientEntityTypes().get(vehicle)==Entity1_10Types.EntityType.BOAT) {
 							PacketWrapper steerBoat = new PacketWrapper(0x11, null, packetWrapper.user());
 							float left = packetWrapper.get(Type.FLOAT, 0);
 							float forward = packetWrapper.get(Type.FLOAT, 1);
 							steerBoat.write(Type.BOOLEAN, forward!=0.0f || left<0.0f);
 							steerBoat.write(Type.BOOLEAN, forward!=0.0f || left>0.0f);
-							PacketUtil.sendToServer(steerBoat, Protocol1_8TO1_9.class, true, true);
+							PacketUtil.sendToServer(steerBoat, Protocol1_8TO1_9.class, true, false);
 						}
 					}
 				});
