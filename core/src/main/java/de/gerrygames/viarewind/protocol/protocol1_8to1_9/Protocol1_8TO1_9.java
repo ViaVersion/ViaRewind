@@ -1128,6 +1128,16 @@ public class Protocol1_8TO1_9 extends Protocol {
 				map(Type.STRING);
 				map(Type.STRING);
 				map(Type.STRING);
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						for (int i = 0; i<4; i++) {
+							String text = packetWrapper.get(Type.STRING, i);
+							text = text.replace("\\\"", "");
+							packetWrapper.set(Type.STRING, i, text);
+						}
+					}
+				});
 			}
 		});
 
