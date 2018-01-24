@@ -47,7 +47,7 @@ public enum ItemReplacement {
 	SPRUCE_BOAT(444, 333, "Spruce Boat"),
 	BIRCH_BOAT(445, 333, "Birch Boat"),
 	JUNGLE_BOAT(446, 333, "Jungle Boat"),
-	ACACIA_BOAT(446, 333, "Acacia Boat"),
+	ACACIA_BOAT(447, 333, "Acacia Boat"),
 	DARK_OAK_BOAT(448, 333, "Dark Oak Boat"),
 	;
 
