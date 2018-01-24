@@ -5,8 +5,12 @@ import us.myles.viaversion.libs.opennbt.tag.builtin.CompoundTag;
 import us.myles.viaversion.libs.opennbt.tag.builtin.ListTag;
 import us.myles.viaversion.libs.opennbt.tag.builtin.ShortTag;
 import us.myles.viaversion.libs.opennbt.tag.builtin.StringTag;
+import us.myles.viaversion.libs.opennbt.tag.builtin.Tag;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static us.myles.ViaVersion.protocols.protocol1_9to1_8.ItemRewriter.potionNameFromDamage;
@@ -18,6 +22,7 @@ public class ItemRewriter {
 	private static Map<String, Integer> POTION_NAME_TO_ID;
 	private static Map<Integer, String> POTION_ID_TO_NAME;
 	private static Map<Integer, Integer> POTION_INDEX;
+	private static Map<Short, String> ENCHANTMENTS = new HashMap<>();
 
 	static {
 		for (Field field : de.gerrygames.viarewind.protocol.protocol1_8to1_9.items.ItemRewriter.class.getDeclaredFields()) {
@@ -28,6 +33,17 @@ public class ItemRewriter {
 				field.set(null, other.get(null));
 			} catch (Exception ignored) {}
 		}
+
+		ENCHANTMENTS.put((short) 1, "I");
+		ENCHANTMENTS.put((short) 2, "II");
+		ENCHANTMENTS.put((short) 3, "III");
+		ENCHANTMENTS.put((short) 4, "IV");
+		ENCHANTMENTS.put((short) 5, "V");
+		ENCHANTMENTS.put((short) 6, "VI");
+		ENCHANTMENTS.put((short) 7, "VII");
+		ENCHANTMENTS.put((short) 8, "VIII");
+		ENCHANTMENTS.put((short) 9, "IX");
+		ENCHANTMENTS.put((short) 10, "X");
 	}
 
 	public static Item toClient(Item item) {
@@ -45,6 +61,36 @@ public class ItemRewriter {
 		CompoundTag display = tag.get("display");
 		if (display!=null && display.contains("Name")) {
 			viaVersionTag.put(new StringTag("displayName", (String) display.get("Name").getValue()));
+		}
+
+		if (display!=null && display.contains("Lore")) {
+			viaVersionTag.put(new ListTag("lore", ((ListTag)display.get("Lore")).getValue()));
+		}
+
+		if (tag.contains("ench")) {
+			List<Tag> lore = new ArrayList<>();
+			List<CompoundTag> enchants = (List<CompoundTag>) tag.get("ench").getValue();
+			for (CompoundTag ench : enchants) {
+				short id = (short) ench.get("id").getValue();
+				short lvl = (short) ench.get("lvl").getValue();
+				String s;
+				if (id==70) {
+					s  = "§r§7Mending ";
+				} else if (id==9) {
+					s  = "§r§7Frost Walker ";
+				} else {
+					continue;
+				}
+				s += ENCHANTMENTS.getOrDefault(lvl, "enchantment.level." + lvl);
+				lore.add(new StringTag("", s));
+			}
+			if (!lore.isEmpty()) {
+				if (display==null) tag.put(display = new CompoundTag("display"));
+				ListTag loreTag = display.get("Lore");
+				if (loreTag==null) display.put(loreTag = new ListTag("Lore", StringTag.class));
+				lore.addAll(loreTag.getValue());
+				loreTag.setValue(lore);
+			}
 		}
 
 		if (tag.contains("AttributeModifiers")) {
@@ -147,6 +193,16 @@ public class ItemRewriter {
 			else name.setValue((String) viaVersionTag.get("displayName").getValue());
 		} else if (tag.contains("display")) {
 			((CompoundTag)tag.get("display")).remove("Name");
+		}
+
+		if (viaVersionTag.contains("lore")) {
+			CompoundTag display = tag.get("display");
+			if (display==null) tag.put(display = new CompoundTag("display"));
+			ListTag lore = display.get("Lore");
+			if (lore==null) display.put(new ListTag("Lore", (List<Tag>) viaVersionTag.get("lore").getValue()));
+			else lore.setValue((List<Tag>) viaVersionTag.get("lore").getValue());
+		} else if (tag.contains("display")) {
+			((CompoundTag)tag.get("display")).remove("Lore");
 		}
 
 		tag.remove("AttributeModifiers");
