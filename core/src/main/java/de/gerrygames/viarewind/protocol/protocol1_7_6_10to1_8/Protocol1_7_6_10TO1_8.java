@@ -987,8 +987,10 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 						packetWrapper.write(Type.UNSIGNED_BYTE, windowTypeId);
 						packetWrapper.user().get(Windows.class).types.put(windowId, windowTypeId);
 						String title = packetWrapper.read(Type.STRING);  //Title
-						boolean useProvidedWindowTitle = title.startsWith("{");  //Use provided window title
+						boolean useProvidedWindowTitle = title.startsWith("\"");  //Use provided window title
 						if (useProvidedWindowTitle) {
+							title = title.substring(1, title.length()-1);
+						} else {
 							title = ChatUtil.jsonToLegacy(title);
 						}
 						if (title.length()>32) {
