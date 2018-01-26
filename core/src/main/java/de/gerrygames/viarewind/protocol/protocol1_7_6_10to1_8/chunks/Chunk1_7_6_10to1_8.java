@@ -18,7 +18,7 @@ public class Chunk1_7_6_10to1_8 {
 		int dataSize = 0;
 		for (int i = 0; i < this.storageArrays.length; i++) {
 			if ((primaryBitMask & 1 << i) != 0) {
-				if (this.storageArrays[i] == null) this.storageArrays[i] = new ExtendedBlockStorage(i << 4, skyLight);
+				this.storageArrays[i] = new ExtendedBlockStorage(i << 4, skyLight);
 				byte[] blockIds = this.storageArrays[i].getBlockLSBArray();
 				NibbleArray nibblearray = this.storageArrays[i].getMetadataArray();
 				byte[] handle = nibblearray.getHandle();
@@ -36,8 +36,6 @@ public class Chunk1_7_6_10to1_8 {
 						handle[j / 2] = (byte)(handle[j / 2] & 15 | (state.getData() & 15) << 4);
 					}
 				}
-			} else if (this.storageArrays[i] != null && groundUp) {
-				this.storageArrays[i] = null;
 			}
 		}
 		for (int i = 0; i < this.storageArrays.length; i++) {
@@ -101,14 +99,6 @@ public class Chunk1_7_6_10to1_8 {
 				}
 			}
 		}
-
-		/*for (int i = 0; i < storageArrays.length; ++i) {
-			if (storageArrays[i] != null && (primaryBitMask & 1 << i) != 0 && (!this.groundUp || storageArrays[i].isEmpty() && storageArrays[i].get)) {
-				nibblearray = storageArrays[i].getExtendedIdArray();
-				System.arraycopy(nibblearray.getHandle(), 0, buffer, finalSize, nibblearray.a.length);
-				finalSize += nibblearray.a.length;
-			}
-		}*/
 
 		if (this.groundUp) {
 			System.arraycopy(blockBiomeArray, 0, buffer, finalSize, blockBiomeArray.length);

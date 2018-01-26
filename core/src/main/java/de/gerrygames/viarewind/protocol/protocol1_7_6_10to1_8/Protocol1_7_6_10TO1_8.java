@@ -44,19 +44,17 @@ import us.myles.ViaVersion.api.type.types.CustomByteType;
 import us.myles.ViaVersion.api.type.types.version.Types1_8;
 import us.myles.ViaVersion.packets.Direction;
 import us.myles.ViaVersion.packets.State;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.providers.BulkChunkTranslatorProvider;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.ClientChunks;
 import us.myles.viaversion.libs.opennbt.tag.builtin.CompoundTag;
 import us.myles.viaversion.libs.opennbt.tag.builtin.StringTag;
 
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
 public class Protocol1_7_6_10TO1_8 extends Protocol {
-
-	private static final BulkChunkTranslatorProvider packetBulkChunkTranslator = new BulkChunkTranslatorProvider();
 
 	@Override
 	protected void registerPackets() {
@@ -274,7 +272,7 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 							packetWrapper.write(Type.STRING, "");
 							packetWrapper.write(Type.VAR_INT, 0);
 						} else {
-							packetWrapper.write(Type.STRING, gameProfile.name);
+							packetWrapper.write(Type.STRING, gameProfile.name.length()>16 ? gameProfile.name.substring(0, 16) : gameProfile.name);
 							packetWrapper.write(Type.VAR_INT, gameProfile.properties.size());
 							for (GameProfileStorage.Property property : gameProfile.properties) {
 								packetWrapper.write(Type.STRING, property.name);
@@ -873,20 +871,7 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
-						packetWrapper.cancel();
-						List<Object> list = packetBulkChunkTranslator.transformMapChunkBulk(packetWrapper, packetWrapper.user().get(ClientChunks.class));
-						for (Object obj : list) {
-							if (!(obj instanceof PacketWrapper)) {
-								throw new IOException("transformMapChunkBulk returned the wrong object type");
-							}
-
-							PacketWrapper output = (PacketWrapper) obj;
-							ByteBuf buffer = Unpooled.buffer();
-							output.setId(-1);
-							output.writeToBuffer(buffer);
-							PacketWrapper chunkPacket = new PacketWrapper(0x21, buffer, packetWrapper.user());
-							chunkPacket.send(Protocol1_7_6_10TO1_8.class, false, true);
-						}
+						ChunkPacketTransformer.transformChunkBulk(packetWrapper);
 					}
 				});
 			}
@@ -1299,19 +1284,7 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 								if (gameProfile==null || gameProfile.displayName==null && displayName==null) continue;
 
 								if (gameProfile.displayName==null && displayName!=null || gameProfile.displayName!=null && displayName==null || !gameProfile.displayName.equals(displayName)) {
-									/*PacketWrapper packet = new PacketWrapper(0x38, null, packetWrapper.user());
-									packet.write(Type.STRING, gameProfile.getDisplayName());
-									packet.write(Type.BOOLEAN, false);
-									packet.write(Type.SHORT, (short) gameProfile.ping);
-									packet.send(Protocol1_7_6_10TO1_8.class);*/
-
 									gameProfile.setDisplayName(displayName);
-
-									/*packet = new PacketWrapper(0x38, null, packetWrapper.user());
-									packet.write(Type.STRING, gameProfile.getDisplayName());
-									packet.write(Type.BOOLEAN, true);
-									packet.write(Type.SHORT, (short) gameProfile.ping);
-									packet.send(Protocol1_7_6_10TO1_8.class);*/
 								}
 							} else if (action==4) {
 								GameProfileStorage.GameProfile gameProfile = gameProfileStorage.remove(uuid);
@@ -1427,25 +1400,25 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 						}
 						if (mode==0 || mode==3 || mode==4 || mode==5) {
 							String[] entries = new String[packetWrapper.read(Type.VAR_INT)];
+							List<String> entryList = Arrays.asList(entries);
 
-							int removed = 0;
-							for (int i = 0; i<entries.length-removed; i++) {
-								String player = entries[i] = packetWrapper.read(Type.STRING);
+							Iterator<String> iterator = entryList.iterator();
+							while (iterator.hasNext()) {
+								String entry = iterator.next();
 								if (mode==4) {
-									if (!scoreboard.isPlayerInTeam(player, team)) {
-										entries[i--] = null;
-										removed++;
+									if (!scoreboard.isPlayerInTeam(entry, team)) {
+										iterator.remove();
 									} else {
-										scoreboard.removePlayerFromTeam(player, team);
+										scoreboard.removePlayerFromTeam(entry, team);
 									}
 								} else {
-									scoreboard.addPlayerToTeam(player, team);
+									scoreboard.addPlayerToTeam(entry, team);
 								}
 							}
-							if (removed>0) {
-								String[] temp = entries;
-								entries = new String[temp.length-removed];
-								System.arraycopy(temp, 0, entries, 0, temp.length-removed);
+
+							if (entries.length!=entryList.size()) {
+								entries = new String[entryList.size()];
+								entries = entryList.toArray(entries);
 							}
 
 							packetWrapper.write(Type.SHORT, (short)entries.length);

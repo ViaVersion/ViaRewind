@@ -10,8 +10,25 @@ import us.myles.ViaVersion.exception.CancelException;
 import java.util.ArrayList;
 
 public class LoadedChunks extends StoredObject {
-	private ArrayList<String> loaded = new ArrayList<>();
+	private ArrayList<ChunkCoords> loaded = new ArrayList<>();
 	private int playerViewDistance = 0;
+
+	public class ChunkCoords {
+		private int chunkX, chunkZ;
+
+		public ChunkCoords(int chunkX, int chunkZ) {
+			this.chunkX = chunkX;
+			this.chunkZ = chunkZ;
+		}
+
+		public int getChunkX() {
+			return chunkX;
+		}
+
+		public int getChunkZ() {
+			return chunkZ;
+		}
+	}
 
 	public LoadedChunks(UserConnection user) {
 		super(user);
@@ -20,14 +37,12 @@ public class LoadedChunks extends StoredObject {
 			@Override
 			public void run() {
 				for (int i = loaded.size() - 1; i >= 0; i--) {
-					String chunk = loaded.get(i);
-					int chunkX = Integer.parseInt(chunk.split("/")[0]);
-					int chunkZ = Integer.parseInt(chunk.split("/")[1]);
+					ChunkCoords chunk = loaded.get(i);
 
-					if (!isInViewDistance(chunkX, chunkZ)) {
+					if (!isInViewDistance(chunk.getChunkX(), chunk.getChunkZ())) {
 						loaded.remove(i);
 						try {
-							ChunkPacketTransformer.getUnloadPacket(chunkX, chunkZ, getUser())
+							ChunkPacketTransformer.getUnloadPacket(chunk.getChunkX(), chunk.getChunkZ(), getUser())
 									.send(Protocol1_7_6_10TO1_8.class, true, false);
 						} catch (CancelException ignored) {
 							;
@@ -57,18 +72,19 @@ public class LoadedChunks extends StoredObject {
 	}
 
 	public void load(int x, int z) {
-		String chunk = x + "/" + z;
+		ChunkCoords chunk = new ChunkCoords(x, z);
 		if (!loaded.contains(chunk)) loaded.add(chunk);
 	}
 
-	public void unload(int x, int z) {
-		String chunk = x + "/" + z;
-		loaded.remove(chunk);
+	public void unload(final int x, final int z) {
+		loaded.removeIf(chunk -> chunk.getChunkX()==x && chunk.getChunkZ()==z);
 	}
 
 	public boolean isLoaded(int x, int z) {
-		String chunk = x + "/" + z;
-		return loaded.contains(chunk);
+		for (ChunkCoords chunkCoords : loaded) {
+			if (chunkCoords.getChunkX()==x && chunkCoords.getChunkZ()==z) return true;
+		}
+		return false;
 	}
 
 	public void clear() {

@@ -164,7 +164,7 @@ public class ChunkPacketTransformer {
 		for (int i = 0; i < columnCount; i++) {
 			chunkX[i] = packetWrapper.read(Type.INT);
 			chunkZ[i] = packetWrapper.read(Type.INT);
-			primaryBitMask[i] = packetWrapper.read(Type.SHORT);
+			primaryBitMask[i] = packetWrapper.read(Type.UNSIGNED_SHORT);
 			size[i] = calcSize(Integer.bitCount(primaryBitMask[i]), skyLightSent, true);
 		}
 
@@ -198,6 +198,7 @@ public class ChunkPacketTransformer {
 		System.arraycopy(buffer, 0, finalBuffer, 0, compressedSize);
 
 		packetWrapper.write(Type.INT, compressedSize);
+		packetWrapper.write(Type.BOOLEAN, skyLightSent);
 
 		CustomByteType customByteType = new CustomByteType(compressedSize);
 		packetWrapper.write(customByteType, finalBuffer);
