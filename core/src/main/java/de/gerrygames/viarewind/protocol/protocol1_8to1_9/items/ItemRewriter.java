@@ -1,6 +1,7 @@
 package de.gerrygames.viarewind.protocol.protocol1_8to1_9.items;
 
 import us.myles.ViaVersion.api.minecraft.item.Item;
+import us.myles.viaversion.libs.opennbt.tag.builtin.ByteTag;
 import us.myles.viaversion.libs.opennbt.tag.builtin.CompoundTag;
 import us.myles.viaversion.libs.opennbt.tag.builtin.ListTag;
 import us.myles.viaversion.libs.opennbt.tag.builtin.ShortTag;
@@ -85,11 +86,30 @@ public class ItemRewriter {
 				lore.add(new StringTag("", s));
 			}
 			if (!lore.isEmpty()) {
-				if (display==null) tag.put(display = new CompoundTag("display"));
+				if (display==null) {
+					tag.put(display = new CompoundTag("display"));
+					viaVersionTag.put(new ByteTag("noDisplay"));
+				}
 				ListTag loreTag = display.get("Lore");
 				if (loreTag==null) display.put(loreTag = new ListTag("Lore", StringTag.class));
 				lore.addAll(loreTag.getValue());
 				loreTag.setValue(lore);
+			}
+		}
+
+		if (tag.contains("Unbreakable")) {
+			ByteTag unbreakable = tag.get("Unbreakable");
+			if (unbreakable.getValue()!=0) {
+				viaVersionTag.put(new ByteTag("Unbreakable", unbreakable.getValue()));
+				tag.remove("Unbreakable");
+
+				if (display==null) {
+					tag.put(display = new CompoundTag("display"));
+					viaVersionTag.put(new ByteTag("noDisplay"));
+				}
+				ListTag loreTag = display.get("Lore");
+				if (loreTag==null) display.put(loreTag = new ListTag("Lore", StringTag.class));
+				loreTag.add(new StringTag("", "§9Unbreakable"));
 			}
 		}
 
@@ -184,6 +204,12 @@ public class ItemRewriter {
 
 		item.setId((Short) viaVersionTag.get("id").getValue());
 		item.setData((Short) viaVersionTag.get("data").getValue());
+
+		if (viaVersionTag.contains("noDisplay")) tag.remove("display");
+
+		if (viaVersionTag.contains("Unbreakable")) {
+			tag.put(viaVersionTag.get("Unbreakable").clone());
+		}
 
 		if (viaVersionTag.contains("displayName")) {
 			CompoundTag display = tag.get("display");
