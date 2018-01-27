@@ -1,5 +1,6 @@
 package de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8;
 
+import com.google.common.base.Charsets;
 import de.gerrygames.viarewind.netty.EmptyChannelHandler;
 import de.gerrygames.viarewind.netty.ForwardMessageToByteEncoder;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.chunks.ChunkPacketTransformer;
@@ -10,7 +11,6 @@ import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.provider.TitleRend
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage.CompressionSendStorage;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage.EntityTracker;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage.GameProfileStorage;
-import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage.LoadedChunks;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage.PlayerPosition;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage.Scoreboard;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage.Windows;
@@ -1199,15 +1199,6 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 						});
 					}
 				});
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						LoadedChunks loadedChunks = packetWrapper.user().get(LoadedChunks.class);
-						int chunkX = packetWrapper.get(Type.INT, 0) >> 4;
-						int chunkZ = packetWrapper.get(Type.INT, 1) >> 4;
-						if (!loadedChunks.isLoaded(chunkX, chunkZ)) packetWrapper.cancel();
-					}
-				});
 			}
 		});
 
@@ -2074,14 +2065,6 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 						packetWrapper.write(Type.UNSIGNED_BYTE, (short)(cape ? 127 : 126));
 					}
 				});
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						int viewDistance = packetWrapper.get(Type.BYTE, 0);
-						LoadedChunks loadedChunks = packetWrapper.user().get(LoadedChunks.class);
-						loadedChunks.setPlayerViewDistance(viewDistance);
-					}
-				});
 			}
 		});
 
@@ -2093,10 +2076,24 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
-						int length = packetWrapper.read(Type.SHORT);
-						CustomByteType customByteType = new CustomByteType(length);
-						byte[] data = packetWrapper.read(customByteType);
-						packetWrapper.write(Type.REMAINING_BYTES, data);
+						String channel = packetWrapper.get(Type.STRING, 0);
+						if (channel.equalsIgnoreCase("MC|ItemName")) {
+							int length = packetWrapper.read(Type.SHORT);
+							CustomByteType customByteType = new CustomByteType(length);
+							byte[] data = packetWrapper.read(customByteType);
+							String name = new String(data, Charsets.UTF_8);
+							ByteBuf buf = Unpooled.buffer();
+							Type.STRING.write(buf, name);
+							data = new byte[buf.readableBytes()];
+							buf.readBytes(data);
+							buf.release();
+							packetWrapper.write(Type.REMAINING_BYTES, data);
+						} else {
+							int length = packetWrapper.read(Type.SHORT);
+							CustomByteType customByteType = new CustomByteType(length);
+							byte[] data = packetWrapper.read(customByteType);
+							packetWrapper.write(Type.REMAINING_BYTES, data);
+						}
 					}
 				});
 			}
@@ -2191,7 +2188,6 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 		userConnection.put(new PlayerPosition(userConnection));
 		userConnection.put(new GameProfileStorage(userConnection));
 		userConnection.put(new ClientChunks(userConnection));
-		userConnection.put(new LoadedChunks(userConnection));
 		userConnection.put(new Scoreboard(userConnection));
 		userConnection.put(new CompressionSendStorage(userConnection));
 		userConnection.put(new WorldBorder(userConnection));
