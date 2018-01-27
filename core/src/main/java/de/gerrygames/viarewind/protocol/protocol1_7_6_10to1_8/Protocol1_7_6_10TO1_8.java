@@ -16,7 +16,6 @@ import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage.Scoreboard
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage.Windows;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage.WorldBorder;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.CustomIntType;
-import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.CustomStringType;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.Particle;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.chunks.BlockStorage;
@@ -49,8 +48,6 @@ import us.myles.viaversion.libs.opennbt.tag.builtin.CompoundTag;
 import us.myles.viaversion.libs.opennbt.tag.builtin.StringTag;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
@@ -1364,6 +1361,10 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						String team = packetWrapper.get(Type.STRING, 0);
+						if (team==null) {
+							packetWrapper.cancel();
+							return;
+						}
 						byte mode = packetWrapper.passthrough(Type.BYTE);
 
 						Scoreboard scoreboard = packetWrapper.user().get(Scoreboard.class);
@@ -1392,31 +1393,25 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 							packetWrapper.read(Type.BYTE);
 						}
 						if (mode==0 || mode==3 || mode==4 || mode==5) {
-							String[] entries = new String[packetWrapper.read(Type.VAR_INT)];
-							List<String> entryList = Arrays.asList(entries);
+							int size = packetWrapper.read(Type.VAR_INT);
+							List<String> entryList = new ArrayList<>();
 
-							Iterator<String> iterator = entryList.iterator();
-							while (iterator.hasNext()) {
-								String entry = iterator.next();
-								if (mode==4) {
-									if (!scoreboard.isPlayerInTeam(entry, team)) {
-										iterator.remove();
-									} else {
-										scoreboard.removePlayerFromTeam(entry, team);
-									}
+							for (int i = 0; i<size; i++) {
+								String entry = packetWrapper.read(Type.STRING);
+								if (entry==null) continue;
+								if (mode == 4) {
+									if (!scoreboard.isPlayerInTeam(entry, team)) continue;
+									scoreboard.removePlayerFromTeam(entry, team);
 								} else {
 									scoreboard.addPlayerToTeam(entry, team);
 								}
+								entryList.add(entry);
 							}
 
-							if (entries.length!=entryList.size()) {
-								entries = new String[entryList.size()];
-								entries = entryList.toArray(entries);
+							packetWrapper.write(Type.SHORT, (short)entryList.size());
+							for (String entry : entryList) {
+								packetWrapper.write(Type.STRING, entry);
 							}
-
-							packetWrapper.write(Type.SHORT, (short)entries.length);
-							CustomStringType type = new CustomStringType(entries.length);
-							packetWrapper.write(type, entries);
 						}
 					}
 				});

@@ -1,6 +1,5 @@
 package de.gerrygames.viarewind.protocol.protocol1_7_0_5to1_7_6_10;
 
-import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.CustomStringType;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.data.UserConnection;
@@ -11,7 +10,7 @@ import us.myles.ViaVersion.api.remapper.ValueTransformer;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Protocol1_7_0_5to1_7_6_10 extends Protocol {
@@ -73,29 +72,22 @@ public class Protocol1_7_0_5to1_7_6_10 extends Protocol {
 						}
 						if (mode==0 || mode==3 || mode==4) {
 							int size = packetWrapper.passthrough(Type.SHORT);
-							CustomStringType stringType = new CustomStringType(size);
-							String[] entries = packetWrapper.read(stringType);
+							List<String> entryList = new ArrayList<>();
 
-							for (int i = 0; i < entries.length; i++) {
-								if (entries[i].length()>16) {
-									entries[i] = entries[i].substring(0,16);
+							for (int i = 0; i<size; i++) {
+								String entry = packetWrapper.read(Type.STRING);
+								if (entry==null) continue;
+								if (entry.length()>16) {
+									entry = entry.substring(0, 16);
 								}
+								if (entryList.contains(entry)) continue;
+								entryList.add(entry);
 							}
 
-							List<String> entryList = Arrays.asList(entries);
-							for (int i = 1; i < entryList.size(); i++) {
-								String entry = entryList.get(i);
-								if (entryList.indexOf(entry)<i) {
-									entryList.remove(i--);
-								}
+							packetWrapper.write(Type.SHORT, (short)entryList.size());
+							for (String entry : entryList) {
+								packetWrapper.write(Type.STRING, entry);
 							}
-
-							if (entries.length!=entryList.size()) {
-								entries = new String[entryList.size()];
-								entries = entryList.toArray(entries);
-							}
-
-							packetWrapper.write(stringType, entries);
 						}
 					}
 				});
