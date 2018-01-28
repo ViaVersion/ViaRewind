@@ -17,6 +17,7 @@ public class ChunkPacketTransformer {
 		Chunk1_8to1_9 chunk;
 		int chunkX, chunkZ, primaryBitMask;
 		boolean groundUp;
+
 		if (world!=null) {
 			Chunk chunk1_9 = packetWrapper.read(new Chunk1_9_1_2Type(world));
 			chunkX = chunk1_9.getX();
@@ -50,6 +51,11 @@ public class ChunkPacketTransformer {
 			byte[] biomes = groundUp ? packetWrapper.read(new CustomByteType(256)) : new byte[0];
 
 			chunk = new Chunk1_8to1_9(data, primaryBitMask, true, groundUp, biomes);
+		}
+
+		if (groundUp && primaryBitMask==0) {
+			chunk.primaryBitMask = primaryBitMask = 65535;
+			chunk.fillAir();
 		}
 
 		packetWrapper.write(Type.INT, chunkX);

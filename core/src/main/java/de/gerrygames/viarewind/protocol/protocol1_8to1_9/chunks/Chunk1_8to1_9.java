@@ -8,9 +8,9 @@ import us.myles.ViaVersion.api.minecraft.chunks.NibbleArray;
 public class Chunk1_8to1_9 {
 	public ExtendedBlockStorage[] storageArrays = new ExtendedBlockStorage[16];
 	public byte[] blockBiomeArray;
-	private boolean skyLight;
-	private int primaryBitMask;
-	private boolean groundUp;
+	public boolean skyLight;
+	public int primaryBitMask;
+	public boolean groundUp;
 
 	public Chunk1_8to1_9(byte[] data, int primaryBitMask, boolean skyLight, boolean groundUp, byte[] blockBiomeArray) {
 		this.blockBiomeArray = blockBiomeArray;
@@ -20,7 +20,7 @@ public class Chunk1_8to1_9 {
 		int dataSize = 0;
 		for (int i = 0; i < this.storageArrays.length; i++) {
 			if ((primaryBitMask & 1 << i) != 0) {
-				if (this.storageArrays[i] == null) this.storageArrays[i] = new ExtendedBlockStorage(i << 4, skyLight);
+				this.storageArrays[i] = new ExtendedBlockStorage(i << 4, skyLight);
 
 				ByteBuf buf = Unpooled.copiedBuffer(data, dataSize, data.length-dataSize);
 				try {
@@ -37,8 +37,6 @@ public class Chunk1_8to1_9 {
 					System.arraycopy(data, dataSize, skyLightArray, 0, skyLightArray.length);
 					dataSize += skyLightArray.length;
 				}
-			} else if (this.storageArrays[i] != null && groundUp) {
-				this.storageArrays[i] = null;
 			}
 		}
 	}
@@ -95,5 +93,16 @@ public class Chunk1_8to1_9 {
 		System.arraycopy(buffer, 0, finaldata, 0, finalsize);
 
 		return finaldata;
+	}
+
+	public void fillAir() {
+		for (int i = 0; i<storageArrays.length; i++) {
+			if ((this.primaryBitMask & 1 << i) != 0) {
+				this.storageArrays[i] = new ExtendedBlockStorage(i << 4, this.skyLight);
+				this.storageArrays[i].setBlockStorage(new BlockStorage());
+			} else {
+				this.storageArrays[i] = null;
+			}
+		}
 	}
 }

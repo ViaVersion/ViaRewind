@@ -54,8 +54,7 @@ public class Chunk1_7_6_10to1_8 {
 				}
 			}
 		}
-		if (dataSize==data.length) this.groundUp = groundUp = false;
-		if (groundUp) {
+		if (groundUp && dataSize!=data.length) {
 			System.arraycopy(data, dataSize, this.blockBiomeArray, 0, this.blockBiomeArray.length);
 		}
 	}
