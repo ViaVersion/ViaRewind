@@ -1263,7 +1263,8 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 								gameProfile.ping = ping;
 
 								PacketWrapper packet = new PacketWrapper(0x38, null, packetWrapper.user());
-								packet.write(Type.STRING, gameProfile.getDisplayName());
+								//packet.write(Type.STRING, gameProfile.getDisplayName());
+								packet.write(Type.STRING, gameProfile.name);
 								packet.write(Type.BOOLEAN, true);
 								packet.write(Type.SHORT, (short) ping);
 								packet.send(Protocol1_7_6_10TO1_8.class);
