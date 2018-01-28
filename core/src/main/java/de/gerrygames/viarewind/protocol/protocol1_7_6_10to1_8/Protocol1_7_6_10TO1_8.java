@@ -1912,13 +1912,11 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 						if (action==3 || action==4) {
 							PlayerAbilities abilities = packetWrapper.user().get(PlayerAbilities.class);
 							abilities.setSprinting(action==3);
-							if (abilities.isFlying() || !abilities.isSprinting()) {
-								PacketWrapper abilitiesPacket = new PacketWrapper(0x39, null, packetWrapper.user());
-								abilitiesPacket.write(Type.BYTE, abilities.getFlags());
-								abilitiesPacket.write(Type.FLOAT, abilities.isSprinting() ? abilities.getFlySpeed() * 2.0f : abilities.getFlySpeed());
-								abilitiesPacket.write(Type.FLOAT, abilities.getWalkSpeed());
-								abilitiesPacket.send(Protocol1_7_6_10TO1_8.class, true, false);
-							}
+							PacketWrapper abilitiesPacket = new PacketWrapper(0x39, null, packetWrapper.user());
+							abilitiesPacket.write(Type.BYTE, abilities.getFlags());
+							abilitiesPacket.write(Type.FLOAT, abilities.isSprinting() ? abilities.getFlySpeed() * 2.0f : abilities.getFlySpeed());
+							abilitiesPacket.write(Type.FLOAT, abilities.getWalkSpeed());
+							abilitiesPacket.send(Protocol1_7_6_10TO1_8.class, true, false);
 						}
 					}
 				});
@@ -2047,6 +2045,26 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 						packetWrapper.write(Type.STRING, "{\"text\": \"" + packetWrapper.read(Type.STRING) + "\"}");  //Line 2
 						packetWrapper.write(Type.STRING, "{\"text\": \"" + packetWrapper.read(Type.STRING) + "\"}");  //Line 3
 						packetWrapper.write(Type.STRING, "{\"text\": \"" + packetWrapper.read(Type.STRING) + "\"}");  //Line 4
+					}
+				});
+			}
+		});
+
+		//Player Abilities
+		this.registerIncoming(State.PLAY, 0x13, 0x13, new PacketRemapper() {
+			@Override
+			public void registerMap() {
+				map(Type.BYTE);
+				map(Type.FLOAT);
+				map(Type.FLOAT);
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						byte flags = packetWrapper.get(Type.BYTE, 0);
+						PlayerAbilities abilities = packetWrapper.user().get(PlayerAbilities.class);
+						abilities.setAllowFly((flags & 4) == 4);
+						abilities.setFlying((flags & 2) == 2);
+						packetWrapper.set(Type.FLOAT, 0, abilities.getFlySpeed());
 					}
 				});
 			}
