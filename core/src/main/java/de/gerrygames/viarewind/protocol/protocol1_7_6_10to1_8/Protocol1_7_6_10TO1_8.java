@@ -1909,7 +1909,6 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						int action = packetWrapper.get(Type.VAR_INT, 1);
-						System.out.println(action);
 						if (action==3 || action==4) {
 							PlayerAbilities abilities = packetWrapper.user().get(PlayerAbilities.class);
 							abilities.setSprinting(action==3);
