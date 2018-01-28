@@ -11,6 +11,7 @@ import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.provider.TitleRend
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage.CompressionSendStorage;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage.EntityTracker;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage.GameProfileStorage;
+import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage.PlayerAbilities;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage.PlayerPosition;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage.Scoreboard;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage.Windows;
@@ -1293,6 +1294,34 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 			}
 		});
 
+		//Player Abilities
+		this.registerOutgoing(State.PLAY, 0x39, 0x39, new PacketRemapper() {
+			@Override
+			public void registerMap() {
+				map(Type.BYTE);
+				map(Type.FLOAT);
+				map(Type.FLOAT);
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						byte flags = packetWrapper.get(Type.BYTE, 0);
+						float flySpeed = packetWrapper.get(Type.FLOAT, 0);
+						float walkSpeed = packetWrapper.get(Type.FLOAT, 1);
+						PlayerAbilities abilities = packetWrapper.user().get(PlayerAbilities.class);
+						abilities.setInvincible((flags & 8) == 8);
+						abilities.setAllowFly((flags & 4) == 4);
+						abilities.setFlying((flags & 2) == 2);
+						abilities.setCreative((flags & 1) == 1);
+						abilities.setFlySpeed(flySpeed);
+						abilities.setWalkSpeed(walkSpeed);
+						if (abilities.isSprinting() && abilities.isFlying()) {
+							packetWrapper.set(Type.FLOAT, 0, abilities.getFlySpeed() * 2.0f);
+						}
+					}
+				});
+			}
+		});
+
 		//Scoreboard Objective
 		this.registerOutgoing(State.PLAY, 0x3B, 0x3B, new PacketRemapper() {
 			@Override
@@ -1876,6 +1905,24 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 					}
 				});  //Action Id
 				map(Type.INT, Type.VAR_INT);  //Action Paramter
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						int action = packetWrapper.get(Type.VAR_INT, 1);
+						System.out.println(action);
+						if (action==3 || action==4) {
+							PlayerAbilities abilities = packetWrapper.user().get(PlayerAbilities.class);
+							abilities.setSprinting(action==3);
+							if (abilities.isFlying() || !abilities.isSprinting()) {
+								PacketWrapper abilitiesPacket = new PacketWrapper(0x39, null, packetWrapper.user());
+								abilitiesPacket.write(Type.BYTE, abilities.getFlags());
+								abilitiesPacket.write(Type.FLOAT, abilities.isSprinting() ? abilities.getFlySpeed() * 2.0f : abilities.getFlySpeed());
+								abilitiesPacket.write(Type.FLOAT, abilities.getWalkSpeed());
+								abilitiesPacket.send(Protocol1_7_6_10TO1_8.class, true, false);
+							}
+						}
+					}
+				});
 			}
 		});
 
@@ -2186,5 +2233,6 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 		userConnection.put(new Scoreboard(userConnection));
 		userConnection.put(new CompressionSendStorage(userConnection));
 		userConnection.put(new WorldBorder(userConnection));
+		userConnection.put(new PlayerAbilities(userConnection));
 	}
 }
