@@ -71,7 +71,7 @@ public class Protocol1_7_0_5to1_7_6_10 extends Protocol {
 							packetWrapper.passthrough(Type.BYTE);
 						}
 						if (mode==0 || mode==3 || mode==4) {
-							int size = packetWrapper.passthrough(Type.SHORT);
+							int size = packetWrapper.read(Type.SHORT);
 							List<String> entryList = new ArrayList<>();
 
 							for (int i = 0; i<size; i++) {
