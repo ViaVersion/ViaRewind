@@ -1872,6 +1872,7 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 						int animation = packetWrapper.read(Type.BYTE);  //Animation
 						if (animation==1) return;
 						packetWrapper.cancel();
+						//1.7 vanilla client is not sending this packet with animation!=1
 						switch (animation) {
 							case 104:
 								animation = 0;
@@ -1889,6 +1890,7 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 						entityAction.write(Type.VAR_INT, entityId);
 						entityAction.write(Type.VAR_INT, animation);
 						entityAction.write(Type.VAR_INT, 0);
+						entityAction.send(Protocol1_7_6_10TO1_8.class, true, true);
 					}
 				});
 			}
