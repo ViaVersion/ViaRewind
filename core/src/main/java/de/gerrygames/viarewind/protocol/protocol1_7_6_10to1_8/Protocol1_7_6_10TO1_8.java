@@ -78,11 +78,11 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						packetWrapper.read(Type.BOOLEAN);  //Reduced Debug Info
-						int gamemode = packetWrapper.get(Type.UNSIGNED_BYTE, 0);
-						int playerId = packetWrapper.get(Type.INT, 0);
+
 						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-						tracker.setGamemode(gamemode);
-						tracker.setPlayerId(playerId);
+						tracker.setGamemode(packetWrapper.get(Type.UNSIGNED_BYTE, 0));
+						tracker.setPlayerId(packetWrapper.get(Type.INT, 0));
+						tracker.getClientEntityTypes().put(tracker.getPlayerId(), Entity1_10Types.EntityType.ENTITY_HUMAN);
 					}
 				});
 			}
