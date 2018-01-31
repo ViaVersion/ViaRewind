@@ -31,6 +31,7 @@ import us.myles.ViaVersion.api.remapper.ValueTransformer;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.version.Types1_8;
 import us.myles.ViaVersion.api.type.types.version.Types1_9;
+import us.myles.ViaVersion.exception.CancelException;
 import us.myles.ViaVersion.packets.State;
 import us.myles.viaversion.libs.opennbt.tag.builtin.CompoundTag;
 import us.myles.viaversion.libs.opennbt.tag.builtin.StringTag;
@@ -724,7 +725,9 @@ public class Protocol1_8TO1_9 extends Protocol {
 						secondPacket.write(Type.BYTE, relZ2);
 						secondPacket.write(Type.BOOLEAN, onGround);
 
-						secondPacket.send(Protocol1_8TO1_9.class);
+						try {
+							secondPacket.send(Protocol1_8TO1_9.class, true, true);
+						} catch (CancelException ignored) {}
 					}
 				});
 			}
@@ -774,7 +777,9 @@ public class Protocol1_8TO1_9 extends Protocol {
 						secondPacket.write(Type.BYTE, pitch);
 						secondPacket.write(Type.BOOLEAN, onGround);
 
-						secondPacket.send(Protocol1_8TO1_9.class);
+						try {
+							secondPacket.send(Protocol1_8TO1_9.class, true, true);
+						} catch (CancelException ignored) {}
 					}
 				});
 			}
