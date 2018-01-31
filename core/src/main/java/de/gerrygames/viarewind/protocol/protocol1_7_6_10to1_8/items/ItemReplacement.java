@@ -59,10 +59,19 @@ public enum ItemReplacement {
 	RABBIT_STEW(413, 282, "Rabbit Stew"),
 	RABBITS_FOOT(414, 375, "Rabbit's Foot"),
 	RABBIT_HIDE(415, 334, "Rabbit Hide"),
+	STONE_BUTTON_DOWN_OFF(77, 5, 69, 6, "Button", false, true),
+	STONE_BUTTON_DOWN_ON(77, 13, 69, 14, "Button", false, true),
+	STONE_BUTTON_UP_OFF(77, 0, 69, 0, "Button", false, true),
+	STONE_BUTTON_UP_ON(77, 8, 69, 8, "Button", false, true),
+	WOOD_BUTTON_DOWN_OFF(143, 5, 69, 6, "Button", false, true),
+	WOOD_BUTTON_DOWN_ON(143, 13, 69, 14, "Button", false, true),
+	WOOD_BUTTON_UP_OFF(143, 0, 69, 0, "Button", false, true),
+	WOOD_BUTTON_UP_ON(143, 8, 69, 8, "Button", false, true),
 	;
 
 	private int oldId, replacementId, oldData, replacementData;
 	private String name, resetName, bracketName;
+	private boolean item, block;
 
 	ItemReplacement(int oldId, int replacementId) {
 		this(oldId, replacementId, null);
@@ -77,6 +86,10 @@ public enum ItemReplacement {
 	}
 
 	ItemReplacement(int oldId, int oldData, int replacementId, int replacementData, String name) {
+		this(oldId, oldData, replacementId, replacementData, name, true, true);
+	}
+
+	ItemReplacement(int oldId, int oldData, int replacementId, int replacementData, String name, boolean item, boolean block) {
 		this.oldId = oldId;
 		this.oldData = oldData;
 		this.replacementId = replacementId;
@@ -84,10 +97,13 @@ public enum ItemReplacement {
 		this.name = name;
 		this.resetName = "§r" + name;
 		this.bracketName = " §r§7(" + name + "§r§7)";
+		this.item = item;
+		this.block = block;
 	}
 
 	public static BlockStorage.BlockState replaceBlock(BlockStorage.BlockState block) {
 		for (ItemReplacement replacement : ItemReplacement.values()) {
+			if (!replacement.block) continue;
 			if (replacement.oldId==block.getId() && (replacement.oldData==-1 || replacement.oldData==block.getData())) {
 				return new BlockStorage.BlockState(replacement.replacementId, replacement.replacementData==-1 ? block.getData() : replacement.replacementData);
 			}
@@ -129,16 +145,7 @@ public enum ItemReplacement {
 	}
 
 	public boolean canReplace(Item item) {
-		return item != null && item.getId() == oldId && (oldData == -1 || item.getData() == oldData);
-	}
-
-	public boolean isReplacement(Item item) {
-		return item != null && item.getId() == replacementId && (replacementData == -1 || item.getData() == replacementData) && checkName(item);
-	}
-
-	private boolean checkName(Item item) {
-		String name = item.getTag() != null && item.getTag().contains("display") && ((CompoundTag)item.getTag().get("display")).contains("Name") ? (String) ((CompoundTag)item.getTag().get("display")).get("Name").getValue() : null;
-		return (name==null && this.name==null) || (name!=null && (name.equals(resetName) || name.endsWith(bracketName)));
+		return this.item && item != null && item.getId() == oldId && (oldData == -1 || item.getData() == oldData);
 	}
 
 	public int getOldId() {
