@@ -15,7 +15,7 @@ public class ItemRewriter {
 		CompoundTag tag = item.getTag();
 		if (tag==null) item.setTag(tag = new CompoundTag(""));
 
-		CompoundTag viaVersionTag = new CompoundTag("ViaRewind1_7_6to1_8");
+		CompoundTag viaVersionTag = new CompoundTag("ViaRewind1_7_6_10to1_8");
 		tag.put(viaVersionTag);
 
 		viaVersionTag.put(new ShortTag("id", item.getId()));
@@ -42,6 +42,11 @@ public class ItemRewriter {
 
 		ItemReplacement.toClient(item);
 
+		if (viaVersionTag.size()==2 && (short)viaVersionTag.get("id").getValue()==item.getId() && (short)viaVersionTag.get("data").getValue()==item.getData()) {
+			item.getTag().remove("ViaRewind1_7_6_10to1_8");
+			if (item.getTag().isEmpty()) item.setTag(null);
+		}
+
 		return item;
 	}
 
@@ -50,9 +55,9 @@ public class ItemRewriter {
 
 		CompoundTag tag = item.getTag();
 
-		if (tag==null || !item.getTag().contains("ViaRewind1_7_6to1_8")) return item;
+		if (tag==null || !item.getTag().contains("ViaRewind1_7_6_10to1_8")) return item;
 
-		CompoundTag viaVersionTag = tag.remove("ViaRewind1_7_6to1_8");
+		CompoundTag viaVersionTag = tag.remove("ViaRewind1_7_6_10to1_8");
 
 		item.setId((Short) viaVersionTag.get("id").getValue());
 		item.setData((Short) viaVersionTag.get("data").getValue());

@@ -34,6 +34,7 @@ import us.myles.ViaVersion.api.type.types.version.Types1_9;
 import us.myles.ViaVersion.exception.CancelException;
 import us.myles.ViaVersion.packets.State;
 import us.myles.viaversion.libs.opennbt.tag.builtin.CompoundTag;
+import us.myles.viaversion.libs.opennbt.tag.builtin.ListTag;
 import us.myles.viaversion.libs.opennbt.tag.builtin.StringTag;
 
 import java.util.ArrayList;
@@ -504,6 +505,8 @@ public class Protocol1_8TO1_9 extends Protocol {
 								packetWrapper.passthrough(Type.INT); //Uses
 								packetWrapper.passthrough(Type.INT); //Max Uses
 							}
+						} else if (channel.equalsIgnoreCase("MC|BOpen")) {
+							packetWrapper.read(Type.VAR_INT);
 						}
 					}
 				});
@@ -1704,7 +1707,34 @@ public class Protocol1_8TO1_9 extends Protocol {
 		this.registerIncoming(State.PLAY, 0x03, 0x16);
 
 		//Plugin Message
-		this.registerIncoming(State.PLAY, 0x09, 0x17);
+		this.registerIncoming(State.PLAY, 0x09, 0x17, new PacketRemapper() {
+			@Override
+			public void registerMap() {
+				map(Type.STRING);
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						String channel = packetWrapper.get(Type.STRING, 0);
+						if (channel.equalsIgnoreCase("MC|BSign")) {
+							packetWrapper.set(Type.STRING, 0, "MC|BSign");
+							Item book = packetWrapper.passthrough(Type.ITEM);
+							book.setId((short) 386);
+							CompoundTag tag = book.getTag();
+							if (tag.contains("pages")) {
+								ListTag pages = tag.get("pages");
+								for (int i = 0; i<pages.size(); i++) {
+									StringTag page = pages.get(i);
+									String value = page.getValue();
+									if (value.startsWith("\"") && value.endsWith("\"")) {
+										page.setValue(value.substring(1, value.length()-1));
+									}
+								}
+							}
+						}
+					}
+				});
+			}
+		});
 
 		//Spectate
 		this.registerIncoming(State.PLAY, 0x1B, 0x18);
