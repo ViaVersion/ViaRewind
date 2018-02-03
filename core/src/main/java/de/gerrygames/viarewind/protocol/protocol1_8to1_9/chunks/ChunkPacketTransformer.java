@@ -1,13 +1,17 @@
 package de.gerrygames.viarewind.protocol.protocol1_8to1_9.chunks;
 
+import de.gerrygames.viarewind.protocol.protocol1_8to1_9.Protocol1_8TO1_9;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import us.myles.ViaVersion.api.PacketWrapper;
+import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.Environment;
+import us.myles.ViaVersion.api.minecraft.Position;
 import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
 import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.CustomByteType;
+import us.myles.ViaVersion.exception.CancelException;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.types.Chunk1_9_1_2Type;
 
@@ -39,6 +43,37 @@ public class ChunkPacketTransformer {
 			data.release();
 
 			chunk = new Chunk1_8to1_9(rawdata, primaryBitMask, skyLight, groundUp = chunk1_9.isGroundUp(), chunk1_9.getBiomeData());
+
+			final UserConnection user = packetWrapper.user();
+			chunk1_9.getBlockEntities().forEach(nbt ->  {
+				if (!nbt.contains("x") || !nbt.contains("y") || !nbt.contains("z") || !nbt.contains("id")) return;
+				Position position = new Position((long)(int)nbt.get("x").getValue(), (long)(int)nbt.get("y").getValue(), (long)(int)nbt.get("z").getValue());
+				String id = (String)nbt.get("id").getValue();
+
+				short action;
+				switch (id) {
+					case "minecraft:mob_spawner": action = 1; break;
+					case "minecraft:command_block": action = 2; break;
+					case "minecraft:beacon": action = 3; break;
+					case "minecraft:skull": action = 4; break;
+					case "minecraft:flower_pot": action = 5; break;
+					case "minecraft:banner": action = 6; break;
+					default: return;
+				}
+
+				PacketWrapper updateTileEntity = new PacketWrapper(0x09, null, user);
+				updateTileEntity.write(Type.POSITION, position);
+				updateTileEntity.write(Type.UNSIGNED_BYTE, action);
+				updateTileEntity.write(Type.NBT, nbt);
+
+				try {
+					updateTileEntity.send(Protocol1_8TO1_9.class, false, false);
+				} catch (CancelException ignored) {
+					;
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
+			});
 		} else {
 			chunkX = packetWrapper.read(Type.INT);
 			chunkZ = packetWrapper.read(Type.INT);
