@@ -2234,10 +2234,10 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 						long z = packetWrapper.read(Type.INT);
 						packetWrapper.write(Type.POSITION, new Position(x, y, z));
 
-						packetWrapper.write(Type.STRING, "{\"text\": \"" + packetWrapper.read(Type.STRING) + "\"}");  //Line 1
-						packetWrapper.write(Type.STRING, "{\"text\": \"" + packetWrapper.read(Type.STRING) + "\"}");  //Line 2
-						packetWrapper.write(Type.STRING, "{\"text\": \"" + packetWrapper.read(Type.STRING) + "\"}");  //Line 3
-						packetWrapper.write(Type.STRING, "{\"text\": \"" + packetWrapper.read(Type.STRING) + "\"}");  //Line 4
+						packetWrapper.passthrough(Type.STRING);  //Line 1
+						packetWrapper.passthrough(Type.STRING);  //Line 2
+						packetWrapper.passthrough(Type.STRING);  //Line 3
+						packetWrapper.passthrough(Type.STRING);  //Line 4
 					}
 				});
 			}
