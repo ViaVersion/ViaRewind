@@ -125,6 +125,12 @@ public class ItemRewriter {
 					StringTag id = entityTag.get("id");
 					if (ENTTIY_NAME_TO_ID.containsKey(id.getValue())) {
 						data = ENTTIY_NAME_TO_ID.get(id.getValue());
+					} else {
+						if (display==null) {
+							tag.put(display = new CompoundTag("display"));
+							viaVersionTag.put(new ByteTag("noDisplay"));
+						}
+						display.put(new StringTag("Name", "§rSpawn " + id.getValue()));
 					}
 				}
 			}
