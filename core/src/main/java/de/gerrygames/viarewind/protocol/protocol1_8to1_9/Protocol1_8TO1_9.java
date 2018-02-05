@@ -490,7 +490,7 @@ public class Protocol1_8TO1_9 extends Protocol {
 							System.arraycopy(old, 0, items, 0, 45);
 						} else {
 							String type = packetWrapper.user().get(Windows.class).get(windowId);
-							if (type.equalsIgnoreCase("minecraft:brewing_stand")) {
+							if (type!=null && type.equalsIgnoreCase("minecraft:brewing_stand")) {
 								Item[] old = items;
 								items = new Item[old.length - 1];
 								for (int i = 0; i<4; i++) items[i] = old[0];
