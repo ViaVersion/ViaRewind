@@ -1236,6 +1236,7 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						for (int i = 0; i<4; i++) {
 							String line = packetWrapper.read(Type.STRING);
+							if (line.startsWith("\"") && line.endsWith("\"")) line = line.substring(1, line.length()-1);
 							line = ChatUtil.jsonToLegacy(line);
 							line = ChatUtil.removeUnusedColor(line);
 							if (line.length()>15) {
@@ -2235,6 +2236,7 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 						packetWrapper.write(Type.POSITION, new Position(x, y, z));
 						for (int i = 0; i<4; i++) {
 							String line = packetWrapper.read(Type.STRING);
+							line = line.replace("\"", "\\\"");
 							line = "\"" + line + "\"";
 							packetWrapper.write(Type.STRING, line);
 						}
