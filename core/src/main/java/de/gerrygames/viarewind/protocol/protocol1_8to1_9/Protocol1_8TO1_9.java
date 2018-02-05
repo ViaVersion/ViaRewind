@@ -479,7 +479,7 @@ public class Protocol1_8TO1_9 extends Protocol {
 			}
 		});
 
-		//Plugin Message
+		//Custom Payload
 		this.registerOutgoing(State.PLAY, 0x18, 0x3F, new PacketRemapper() {
 			@Override
 			public void registerMap() {
@@ -1706,7 +1706,7 @@ public class Protocol1_8TO1_9 extends Protocol {
 		//Client Status
 		this.registerIncoming(State.PLAY, 0x03, 0x16);
 
-		//Plugin Message
+		//Custom Payload
 		this.registerIncoming(State.PLAY, 0x09, 0x17, new PacketRemapper() {
 			@Override
 			public void registerMap() {

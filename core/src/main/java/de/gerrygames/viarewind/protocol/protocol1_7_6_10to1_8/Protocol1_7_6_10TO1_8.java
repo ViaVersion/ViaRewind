@@ -2285,6 +2285,10 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 							buf.readBytes(data);
 							buf.release();
 							packetWrapper.write(Type.REMAINING_BYTES, data);
+						} else if (channel.equalsIgnoreCase("MC|BEdit") || channel.equalsIgnoreCase("MC|BSign")) {
+							packetWrapper.read(Type.SHORT); //length
+							Item book = packetWrapper.read(Types1_7_6_10.COMPRESSED_NBT_ITEM);
+							packetWrapper.write(Type.ITEM, book);
 						} else {
 							int length = packetWrapper.read(Type.SHORT);
 							CustomByteType customByteType = new CustomByteType(length);
