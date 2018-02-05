@@ -335,7 +335,24 @@ public class Protocol1_8TO1_9 extends Protocol {
 		});
 
 		//Block Action
-		this.registerOutgoing(State.PLAY, 0x0A, 0x24);
+		this.registerOutgoing(State.PLAY, 0x0A, 0x24, new PacketRemapper() {
+			@Override
+			public void registerMap() {
+				map(Type.POSITION);
+				map(Type.UNSIGNED_BYTE);
+				map(Type.UNSIGNED_BYTE);
+				map(Type.VAR_INT);
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						int block = packetWrapper.get(Type.VAR_INT, 0);
+						if (block>=219 && block<=234) {
+							packetWrapper.set(Type.VAR_INT, 0, block = 130);
+						}
+					}
+				});
+			}
+		});
 
 		//Block Change
 		this.registerOutgoing(State.PLAY, 0x0B, 0x23, new PacketRemapper() {
@@ -436,6 +453,19 @@ public class Protocol1_8TO1_9 extends Protocol {
 						short windowId = packetWrapper.get(Type.UNSIGNED_BYTE, 0);
 						String windowType = packetWrapper.get(Type.STRING, 0);
 						packetWrapper.user().get(Windows.class).types.put(windowId, windowType);
+					}
+				});
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						String type = packetWrapper.get(Type.STRING, 0);
+						if (type.equalsIgnoreCase("minecraft:shulker_box")) {
+							packetWrapper.set(Type.STRING, 0, type = "minecraft:container");
+						}
+						String name = packetWrapper.get(Type.STRING, 1);
+						if (name.equalsIgnoreCase("{\"translate\":\"container.shulkerBox\"}")) {
+							packetWrapper.set(Type.STRING, 1, name = "{\"text\":\"Shulker Box\"}");
+						}
 					}
 				});
 			}
