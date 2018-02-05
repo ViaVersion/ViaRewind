@@ -1091,7 +1091,14 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 						short windowType = packetWrapper.user().get(Windows.class).get(windowId);
 						packetWrapper.write(Type.BYTE, (byte)windowId);
 						short slot = packetWrapper.read(Type.SHORT);
-						if (windowType==4 && slot>=2) slot -= 1;
+						if (windowType==4) {
+							if (slot==1) {
+								packetWrapper.cancel();
+								return;
+							} else if (slot>=2) {
+								slot -= 1;
+							}
+						}
 						packetWrapper.write(Type.SHORT, slot);  //Slot
 					}
 				});
@@ -2104,8 +2111,8 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 						short windowType = packetWrapper.user().get(Windows.class).get(windowId);
 						short slot = packetWrapper.read(Type.SHORT);
 						if (windowType==4) {
-							if (slot>2) {
-								slot -= 1;
+							if (slot>0) {
+								slot += 1;
 							}
 						}
 						packetWrapper.write(Type.SHORT, slot);
