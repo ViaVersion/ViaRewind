@@ -1080,6 +1080,21 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 			}
 		});
 
+		//Close Window
+		this.registerOutgoing(State.PLAY, 0x2E, 0x2E, new PacketRemapper() {
+			@Override
+			public void registerMap() {
+				map(Type.UNSIGNED_BYTE);
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						short windowsId = packetWrapper.get(Type.UNSIGNED_BYTE, 0);
+						packetWrapper.user().get(Windows.class).types.remove(windowsId);
+					}
+				});
+			}
+		});
+
 		//Set Slot
 		this.registerOutgoing(State.PLAY, 0x2F, 0x2F, new PacketRemapper() {
 			@Override
@@ -2094,6 +2109,21 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 								//PacketUtil.sendToServer(unsneakPacket, Protocol1_7_6_10TO1_8.class, true, false);
 							}
 						}
+					}
+				});
+			}
+		});
+
+		//Close Window
+		this.registerIncoming(State.PLAY, 0x0D, 0x0D, new PacketRemapper() {
+			@Override
+			public void registerMap() {
+				map(Type.UNSIGNED_BYTE);
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						short windowsId = packetWrapper.get(Type.UNSIGNED_BYTE, 0);
+						packetWrapper.user().get(Windows.class).types.remove(windowsId);
 					}
 				});
 			}

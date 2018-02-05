@@ -12,6 +12,7 @@ import de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage.Cooldown;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage.EntityTracker;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage.Levitation;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage.PlayerPosition;
+import de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage.Windows;
 import de.gerrygames.viarewind.utils.ChatUtil;
 import de.gerrygames.viarewind.utils.PacketUtil;
 import de.gerrygames.viarewind.utils.Utils;
@@ -400,7 +401,19 @@ public class Protocol1_8TO1_9 extends Protocol {
 		this.registerOutgoing(State.PLAY, 0x11, 0x32);
 
 		//Close Window
-		this.registerOutgoing(State.PLAY, 0x12, 0x2E);
+		this.registerOutgoing(State.PLAY, 0x12, 0x2E, new PacketRemapper() {
+			@Override
+			public void registerMap() {
+				map(Type.UNSIGNED_BYTE);
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						short windowsId = packetWrapper.get(Type.UNSIGNED_BYTE, 0);
+						packetWrapper.user().get(Windows.class).types.remove(windowsId);
+					}
+				});
+			}
+		});
 
 		//Open Window
 		this.registerOutgoing(State.PLAY, 0x13, 0x2D, new PacketRemapper() {
@@ -415,6 +428,14 @@ public class Protocol1_8TO1_9 extends Protocol {
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						String type = packetWrapper.get(Type.STRING, 0);
 						if (type.equals("EntityHorse")) packetWrapper.passthrough(Type.INT);
+					}
+				});
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						short windowId = packetWrapper.get(Type.UNSIGNED_BYTE, 0);
+						String windowType = packetWrapper.get(Type.STRING, 0);
+						packetWrapper.user().get(Windows.class).types.put(windowId, windowType);
 					}
 				});
 			}
@@ -437,6 +458,14 @@ public class Protocol1_8TO1_9 extends Protocol {
 							Item[] old = items;
 							items = new Item[45];
 							System.arraycopy(old, 0, items, 0, 45);
+						} else {
+							String type = packetWrapper.user().get(Windows.class).get(windowId);
+							if (type.equalsIgnoreCase("minecraft:brewing_stand")) {
+								Item[] old = items;
+								items = new Item[old.length - 1];
+								for (int i = 0; i<4; i++) items[i] = old[0];
+								System.arraycopy(old, 5, items, 4, old.length - 6);
+							}
 						}
 						packetWrapper.write(Type.ITEM_ARRAY, items);
 					}
@@ -460,7 +489,17 @@ public class Protocol1_8TO1_9 extends Protocol {
 						packetWrapper.set(Type.ITEM, 0, ItemRewriter.toClient(packetWrapper.get(Type.ITEM, 0)));
 						byte windowId = packetWrapper.get(Type.BYTE, 0);
 						short slot = packetWrapper.get(Type.SHORT, 0);
-						if (windowId==0 && slot==45) packetWrapper.cancel();
+						if (windowId==0 && slot==45) {
+							packetWrapper.cancel();
+							return;
+						}
+						String type = packetWrapper.user().get(Windows.class).get(windowId);
+						if (type==null) return;
+						if (type.equalsIgnoreCase("minecraft:brewing_stand")) {
+							if (slot>3) {
+								packetWrapper.set(Type.SHORT, 0, slot -= 1);
+							}
+						}
 					}
 				});
 			}
@@ -1599,7 +1638,19 @@ public class Protocol1_8TO1_9 extends Protocol {
 		});
 
 		//Close Window
-		this.registerIncoming(State.PLAY, 0x08, 0x0D);
+		this.registerIncoming(State.PLAY, 0x08, 0x0D, new PacketRemapper() {
+			@Override
+			public void registerMap() {
+				map(Type.UNSIGNED_BYTE);
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						short windowsId = packetWrapper.get(Type.UNSIGNED_BYTE, 0);
+						packetWrapper.user().get(Windows.class).types.remove(windowsId);
+					}
+				});
+			}
+		});
 
 		//Click Window
 		this.registerIncoming(State.PLAY, 0x07, 0x0E, new PacketRemapper() {
@@ -1615,6 +1666,21 @@ public class Protocol1_8TO1_9 extends Protocol {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						packetWrapper.set(Type.ITEM, 0, ItemRewriter.toServer(packetWrapper.get(Type.ITEM, 0)));
+					}
+				});
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						short windowId = packetWrapper.get(Type.UNSIGNED_BYTE, 0);
+						Windows windows = packetWrapper.user().get(Windows.class);
+						String type = windows.get(windowId);
+						if (type==null) return;
+						if (type.equalsIgnoreCase("minecraft:brewing_stand")) {
+							short slot = packetWrapper.get(Type.SHORT, 0);
+							if (slot>3) {
+								packetWrapper.set(Type.SHORT, 0, slot += 1);
+							}
+						}
 					}
 				});
 			}
@@ -1745,6 +1811,7 @@ public class Protocol1_8TO1_9 extends Protocol {
 
 	@Override
 	public void init(UserConnection userConnection) {
+		userConnection.put(new Windows(userConnection));
 		userConnection.put(new EntityTracker(userConnection));
 		userConnection.put(new Levitation(userConnection));
 		userConnection.put(new PlayerPosition(userConnection));
