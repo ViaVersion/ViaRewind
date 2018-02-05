@@ -67,6 +67,7 @@ public enum ItemReplacement {
 	WOOD_BUTTON_DOWN_ON(143, 13, 69, 14, "Button", false, true),
 	WOOD_BUTTON_UP_OFF(143, 0, 69, 0, "Button", false, true),
 	WOOD_BUTTON_UP_ON(143, 8, 69, 8, "Button", false, true),
+	DAYLIGHT_DETECTOR_INVERTED(178, 151, "Inverted Daylight Detector"),
 	;
 
 	private int oldId, replacementId, oldData, replacementData;
