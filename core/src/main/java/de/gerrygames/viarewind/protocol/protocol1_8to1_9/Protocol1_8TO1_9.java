@@ -1259,7 +1259,6 @@ public class Protocol1_8TO1_9 extends Protocol {
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						for (int i = 0; i<4; i++) {
 							String text = packetWrapper.get(Type.STRING, i);
-							text = text.replace("\\\"", "");
 							packetWrapper.set(Type.STRING, i, text);
 						}
 					}
@@ -1738,7 +1737,23 @@ public class Protocol1_8TO1_9 extends Protocol {
 		this.registerIncoming(State.PLAY, 0x06, 0x11);
 
 		//Update Sign
-		this.registerIncoming(State.PLAY, 0x19, 0x12);
+		this.registerIncoming(State.PLAY, 0x19, 0x12, new PacketRemapper() {
+			@Override
+			public void registerMap() {
+				map(Type.POSITION);
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						for (int i = 0; i<4; i++) {
+							String line = packetWrapper.read(Type.STRING);
+							if (line.startsWith("\"") && line.endsWith("\"")) line = line.substring(1, line.length()-1);
+							line = line.replace("\\\"", "\"");
+							packetWrapper.write(Type.STRING, line);
+						}
+					}
+				});
+			}
+		});
 
 		//Player Abilities
 		this.registerIncoming(State.PLAY, 0x12, 0x13);

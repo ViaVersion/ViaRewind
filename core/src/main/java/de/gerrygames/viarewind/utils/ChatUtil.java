@@ -9,7 +9,6 @@ public class ChatUtil {
 		if (json==null) return null;
 		String legacy = json.startsWith("{") ? TextComponent.toLegacyText(ComponentSerializer.parse(json)) : json;
 		while (legacy.startsWith("§f")) legacy = legacy.substring(2, legacy.length());
-		legacy = legacy.replaceAll("((§.)*)\"(.*)\"((§.)*)", "$1$3$4");
 		return legacy;
 	}
 
