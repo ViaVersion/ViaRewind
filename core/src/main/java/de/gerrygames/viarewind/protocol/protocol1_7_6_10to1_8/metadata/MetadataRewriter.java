@@ -48,7 +48,6 @@ public class MetadataRewriter {
 						}
 						if (metaIndex.getNewType() == MetaType1_8.Byte) {
 							if (metaIndex==MetaIndex1_8to1_7_6_10.ITEM_FRAME_ROTATION) {
-								System.out.println(value);
 								value = (Byte)((Integer)((Byte)value / 2)).byteValue();
 							}
 							entry.setValue(value);
