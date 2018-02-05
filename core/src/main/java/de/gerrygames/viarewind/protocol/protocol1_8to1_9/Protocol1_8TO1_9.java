@@ -1747,7 +1747,7 @@ public class Protocol1_8TO1_9 extends Protocol {
 						for (int i = 0; i<4; i++) {
 							String line = packetWrapper.read(Type.STRING);
 							if (line.startsWith("\"") && line.endsWith("\"")) line = line.substring(1, line.length()-1);
-							line = line.replace("\\\"", "\"");
+							line = line.replace("\\\"", "\"").replace("\\\\", "\\");
 							packetWrapper.write(Type.STRING, line);
 						}
 					}

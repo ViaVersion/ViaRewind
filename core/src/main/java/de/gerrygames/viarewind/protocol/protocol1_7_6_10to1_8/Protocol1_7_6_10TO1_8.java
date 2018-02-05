@@ -2236,7 +2236,7 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 						packetWrapper.write(Type.POSITION, new Position(x, y, z));
 						for (int i = 0; i<4; i++) {
 							String line = packetWrapper.read(Type.STRING);
-							line = line.replace("\"", "\\\"");
+							line = line.replace("\\", "\\\\").replace("\"", "\\\"");
 							line = "\"" + line + "\"";
 							packetWrapper.write(Type.STRING, line);
 						}
