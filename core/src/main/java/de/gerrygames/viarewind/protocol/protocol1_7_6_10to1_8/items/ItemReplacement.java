@@ -68,6 +68,12 @@ public enum ItemReplacement {
 	WOOD_BUTTON_UP_OFF(143, 0, 69, 0, "Button", false, true),
 	WOOD_BUTTON_UP_ON(143, 8, 69, 8, "Button", false, true),
 	DAYLIGHT_DETECTOR_INVERTED(178, 151, "Inverted Daylight Detector"),
+	POTION_OF_LEAPING(373, 8203, 373, 0, "Potion of Leaping"),
+	POTION_OF_LEAPING_2(373, 8235, 373, 0, "Potion of Leaping"),
+	POTION_OF_LEAPING_LONG(373, 8267, 373, 0, "Potion of Leaping"),
+	SPLASH_POTION_OF_LEAPING(373, 16395, 373, 0, "Splash Potion of Leaping"),
+	SPLASH_POTION_OF_LEAPING_2(373, 16427, 373, 0, "Splash Potion of Leaping"),
+	SPLASH_POTION_OF_LEAPING_LONG(373, 16459, 373, 0, "Splash Potion of Leaping"),
 	;
 
 	private int oldId, replacementId, oldData, replacementData;

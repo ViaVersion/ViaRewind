@@ -24,6 +24,7 @@ public class ItemRewriter {
 	private static Map<Integer, String> POTION_ID_TO_NAME;
 	private static Map<Integer, Integer> POTION_INDEX;
 	private static Map<Short, String> ENCHANTMENTS = new HashMap<>();
+	private static Map<String, String> POTION_NAME_INDEX = new HashMap<>();
 
 	static {
 		for (Field field : de.gerrygames.viarewind.protocol.protocol1_8to1_9.items.ItemRewriter.class.getDeclaredFields()) {
@@ -45,6 +46,11 @@ public class ItemRewriter {
 		ENCHANTMENTS.put((short) 8, "VIII");
 		ENCHANTMENTS.put((short) 9, "IX");
 		ENCHANTMENTS.put((short) 10, "X");
+
+		POTION_NAME_INDEX.put("water", "§rSplash Water Bottle");
+		POTION_NAME_INDEX.put("mundane", "§rMundane Splash Potion");
+		POTION_NAME_INDEX.put("thick", "§rThick Splash Potion");
+		POTION_NAME_INDEX.put("awkward", "§rAwkward Splash Potion");
 	}
 
 	public static Item toClient(Item item) {
@@ -125,11 +131,9 @@ public class ItemRewriter {
 					StringTag id = entityTag.get("id");
 					if (ENTTIY_NAME_TO_ID.containsKey(id.getValue())) {
 						data = ENTTIY_NAME_TO_ID.get(id.getValue());
-					} else {
-						if (display==null) {
-							tag.put(display = new CompoundTag("display"));
-							viaVersionTag.put(new ByteTag("noDisplay"));
-						}
+					} else if (display==null) {
+						tag.put(display = new CompoundTag("display"));
+						viaVersionTag.put(new ByteTag("noDisplay"));
 						display.put(new StringTag("Name", "§rSpawn " + id.getValue()));
 					}
 				}
@@ -147,6 +151,11 @@ public class ItemRewriter {
 				String potionName = potion.getValue().replace("minecraft:", "");
 				if (POTION_NAME_TO_ID.containsKey(potionName)) {
 					data = POTION_NAME_TO_ID.get(potionName);
+				}
+				if (display==null && POTION_NAME_INDEX.containsKey(potionName)) {
+					tag.put(display = new CompoundTag("display"));
+					viaVersionTag.put(new ByteTag("noDisplay"));
+					display.put(new StringTag("Name", POTION_NAME_INDEX.get(potionName)));
 				}
 			}
 
@@ -203,7 +212,7 @@ public class ItemRewriter {
 				item.setData((short)(item.getData() - 8192));
 			}
 
-			String name = potionNameFromDamage(item.getData());
+			String name = item.getData()==8192 ? "water" : potionNameFromDamage(item.getData());
 			tag.put(new StringTag("Potion", "minecraft:" + name));
 			item.setData((short)0);
 		}
