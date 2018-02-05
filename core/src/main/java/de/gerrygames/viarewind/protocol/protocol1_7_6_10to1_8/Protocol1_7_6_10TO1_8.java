@@ -43,6 +43,7 @@ import us.myles.ViaVersion.api.remapper.ValueCreator;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.CustomByteType;
 import us.myles.ViaVersion.api.type.types.version.Types1_8;
+import us.myles.ViaVersion.exception.CancelException;
 import us.myles.ViaVersion.packets.Direction;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.ClientChunks;
@@ -1089,7 +1090,7 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						short windowsId = packetWrapper.get(Type.UNSIGNED_BYTE, 0);
-						packetWrapper.user().get(Windows.class).types.remove(windowsId);
+						packetWrapper.user().get(Windows.class).remove(windowsId);
 					}
 				});
 			}
@@ -1153,6 +1154,7 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 			}
 		});
 
+		//Window Data
 		this.registerOutgoing(State.PLAY, 0x31, 0x31, new PacketRemapper() {
 			@Override
 			public void registerMap() {
@@ -1171,7 +1173,7 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 
 						if (windowType==-1) return;
 						if (windowType==2) {  //Furnace
-							Windows.Furnace furnace = windows.funace.computeIfAbsent(windowId, x -> new Windows.Furnace());
+							Windows.Furnace furnace = windows.furnace.computeIfAbsent(windowId, x -> new Windows.Furnace());
 							if (property==0 || property==1) {
 								if (property==0) furnace.setFuelLeft(value);
 								else furnace.setMaxFuel(value);
@@ -1198,6 +1200,9 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 								packetWrapper.cancel();
 								return;
 							}
+						} else if (windowType==8) {
+							windows.levelCost = value;
+							windows.anvilId = windowId;
 						}
 					}
 				});
@@ -2123,7 +2128,7 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						short windowsId = packetWrapper.get(Type.UNSIGNED_BYTE, 0);
-						packetWrapper.user().get(Windows.class).types.remove(windowsId);
+						packetWrapper.user().get(Windows.class).remove(windowsId);
 					}
 				});
 			}
@@ -2315,6 +2320,16 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 							buf.readBytes(data);
 							buf.release();
 							packetWrapper.write(Type.REMAINING_BYTES, data);
+
+							Windows windows = packetWrapper.user().get(Windows.class);
+							PacketWrapper updateCost = new PacketWrapper(0x31, null, packetWrapper.user());
+							updateCost.write(Type.UNSIGNED_BYTE, windows.anvilId);
+							updateCost.write(Type.SHORT, (short) 0);
+							updateCost.write(Type.SHORT, windows.levelCost);
+
+							try {
+								updateCost.send(Protocol1_7_6_10TO1_8.class, true, true);
+							} catch (CancelException ignored) {};
 						} else if (channel.equalsIgnoreCase("MC|BEdit") || channel.equalsIgnoreCase("MC|BSign")) {
 							packetWrapper.read(Type.SHORT); //length
 							Item book = packetWrapper.read(Types1_7_6_10.COMPRESSED_NBT_ITEM);

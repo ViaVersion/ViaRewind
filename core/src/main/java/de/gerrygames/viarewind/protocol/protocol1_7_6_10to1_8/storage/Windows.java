@@ -8,7 +8,9 @@ import java.util.HashMap;
 
 public class Windows extends StoredObject {
 	public HashMap<Short, Short> types = new HashMap<>();
-	public HashMap<Short, Furnace> funace = new HashMap<>();
+	public HashMap<Short, Furnace> furnace = new HashMap<>();
+	public short levelCost = 0;
+	public short anvilId = -1;
 
 	public Windows(UserConnection user) {
 		super(user);
@@ -16,6 +18,11 @@ public class Windows extends StoredObject {
 
 	public short get(short windowId) {
 		return types.getOrDefault(windowId, (short)-1);
+	}
+
+	public void remove(short windowId) {
+		types.remove(windowId);
+		furnace.remove(windowId);
 	}
 
 	public static int getInventoryType(String name) {
