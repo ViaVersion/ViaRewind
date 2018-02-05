@@ -1491,6 +1491,26 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 						}
 						byte mode = packetWrapper.read(Type.BYTE);
 
+						Scoreboard scoreboard = packetWrapper.user().get(Scoreboard.class);
+						if (mode==0) {
+							if (scoreboard.objectiveExists(name)) {
+								packetWrapper.cancel();
+								return;
+							}
+							scoreboard.addObjective(name);
+						} else if (mode==1) {
+							if (!scoreboard.objectiveExists(name)) {
+								packetWrapper.cancel();
+								return;
+							}
+							scoreboard.removeObjective(name);
+						} else if (mode==2) {
+							if (!scoreboard.objectiveExists(name)) {
+								packetWrapper.cancel();
+								return;
+							}
+						}
+
 						if (mode==0 || mode==2) {
 							String displayName = packetWrapper.passthrough(Type.STRING);
 							if (displayName.length()>32) {

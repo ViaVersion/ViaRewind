@@ -5,10 +5,12 @@ import us.myles.ViaVersion.api.data.UserConnection;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 public class Scoreboard extends StoredObject {
 	private HashMap<String, List<String>> teams = new HashMap<>();
+	private HashSet<String> objectives = new HashSet<>();
 
 	public Scoreboard(UserConnection user) {
 		super(user);
@@ -45,5 +47,17 @@ public class Scoreboard extends StoredObject {
 			if (teamPlayers.contains(player)) return true;
 		}
 		return false;
+	}
+
+	public void addObjective(String name) {
+		objectives.add(name);
+	}
+
+	public void removeObjective(String name) {
+		objectives.remove(name);
+	}
+
+	public boolean objectiveExists(String name) {
+		return objectives.contains(name);
 	}
 }
