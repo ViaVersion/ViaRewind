@@ -1487,7 +1487,7 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						String name = packetWrapper.passthrough(Type.STRING);
 						if (name.length()>16) {
-							packetWrapper.set(Type.STRING, 0, name.substring(0, 16));
+							packetWrapper.set(Type.STRING, 0, name = name.substring(0, 16));
 						}
 						byte mode = packetWrapper.read(Type.BYTE);
 
