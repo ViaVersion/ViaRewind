@@ -30,6 +30,11 @@ public class BlockStorage {
 		public int getData() {
 			return this.data;
 		}
+
+		@Override
+		public String toString() {
+			return "BlockState{id: " + id + ", data: " + data + "}";
+		}
 	}
 
 	private static final BlockState AIR = new BlockState(0, 0);

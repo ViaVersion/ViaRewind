@@ -6,8 +6,8 @@ import us.myles.viaversion.libs.opennbt.tag.builtin.CompoundTag;
 import us.myles.viaversion.libs.opennbt.tag.builtin.StringTag;
 
 public enum ItemReplacement {
-	END_ROD_DOWN(198, 0, 50, 0, "End Rod"),
-	END_ROD_UP(198, 1, 50, 0, "End Rod"),
+	END_ROD_DOWN(198, 0, 50, 5, "End Rod"),
+	END_ROD_UP(198, 1, 50, 5, "End Rod"),
 	END_ROD_NORTH(198, 2, 50, 4, "End Rod"),
 	END_ROD_SOUTH(198, 3, 50, 3, "End Rod"),
 	END_ROD_WEST(198, 4, 50, 2, "End Rod"),
