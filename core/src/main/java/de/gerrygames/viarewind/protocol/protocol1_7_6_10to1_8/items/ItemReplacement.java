@@ -29,7 +29,7 @@ public enum ItemReplacement {
 	SMOOTH_RED_SANDSTONE(179, 2, 24, 2, "Chiseled Red Sandstone"),
 	RED_SANDSTONE_SLAB(182, 0, 44, 1, "Red Sandstone Slab"),
 	DOUBLE_RED_SANDSTONE_SLAB(181, 0, 43, 1, "Double Red Sandstone Slab"),
-	RED_SANDSTONE_STAIRS(180, 0, 128, 0, "Red Sandstone Stairs"),
+	RED_SANDSTONE_STAIRS(180, 128, "Red Sandstone Stairs"),
 	ARMOR_STAND(416, 280, "Armor Stand"),
 	SPRUCE_FENCE(188, 85, "Spruce Fence"),
 	BIRCH_FENCE(189, 85, "Birch Fence"),
