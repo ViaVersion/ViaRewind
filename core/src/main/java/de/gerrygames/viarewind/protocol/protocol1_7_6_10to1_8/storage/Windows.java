@@ -1,13 +1,14 @@
 package de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage;
 
+import lombok.Data;
 import us.myles.ViaVersion.api.data.StoredObject;
 import us.myles.ViaVersion.api.data.UserConnection;
 
 import java.util.HashMap;
 
 public class Windows extends StoredObject {
-
 	public HashMap<Short, Short> types = new HashMap<>();
+	public HashMap<Short, Furnace> funace = new HashMap<>();
 
 	public Windows(UserConnection user) {
 		super(user);
@@ -48,5 +49,13 @@ public class Windows extends StoredObject {
 			default:
 				throw new IllegalArgumentException("Unknown type " + name);
 		}
+	}
+
+	@Data
+	public static class Furnace {
+		private short fuelLeft = 0;
+		private short maxFuel = 0;
+		private short progress = 0;
+		private short maxProgress = 200;
 	}
 }

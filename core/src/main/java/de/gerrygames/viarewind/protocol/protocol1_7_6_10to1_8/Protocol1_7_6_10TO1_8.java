@@ -1131,6 +1131,57 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 			}
 		});
 
+		this.registerOutgoing(State.PLAY, 0x31, 0x31, new PacketRemapper() {
+			@Override
+			public void registerMap() {
+				map(Type.UNSIGNED_BYTE);
+				map(Type.SHORT);
+				map(Type.SHORT);
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						short windowId  = packetWrapper.get(Type.UNSIGNED_BYTE, 0);
+						Windows windows = packetWrapper.user().get(Windows.class);
+						short windowType = windows.get(windowId);
+
+						short property = packetWrapper.get(Type.SHORT, 0);
+						short value = packetWrapper.get(Type.SHORT, 1);
+
+						if (windowType==-1) return;
+						if (windowType==2) {  //Furnace
+							Windows.Furnace furnace = windows.funace.computeIfAbsent(windowId, x -> new Windows.Furnace());
+							if (property==0 || property==1) {
+								if (property==0) furnace.setFuelLeft(value);
+								else furnace.setMaxFuel(value);
+								if (furnace.getMaxFuel()==0) {
+									packetWrapper.cancel();
+									return;
+								}
+								value = (short) (200 * furnace.getFuelLeft() / furnace.getMaxFuel());
+								packetWrapper.set(Type.SHORT, 0, (short) 1);
+								packetWrapper.set(Type.SHORT, 1, value);
+							} else if (property==2 || property==3) {
+								if (property==2) furnace.setProgress(value);
+								else furnace.setMaxProgress(value);
+								if (furnace.getMaxProgress()==0) {
+									packetWrapper.cancel();
+									return;
+								}
+								value = (short) (200 * furnace.getProgress() / furnace.getMaxProgress());
+								packetWrapper.set(Type.SHORT, 0, (short) 0);
+								packetWrapper.set(Type.SHORT, 1, value);
+							}
+						} else if (windowType==4) {  //Enchanting Table
+							if (property>2) {
+								packetWrapper.cancel();
+								return;
+							}
+						}
+					}
+				});
+			}
+		});
+
 		this.registerOutgoing(State.PLAY, 0x32, 0x32, new PacketRemapper() {
 			@Override
 			public void registerMap() {
