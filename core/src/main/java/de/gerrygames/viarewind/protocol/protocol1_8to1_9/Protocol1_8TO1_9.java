@@ -1749,8 +1749,7 @@ public class Protocol1_8TO1_9 extends Protocol {
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						for (int i = 0; i<4; i++) {
 							String line = packetWrapper.read(Type.STRING);
-							if (line.startsWith("\"") && line.endsWith("\"")) line = line.substring(1, line.length()-1);
-							line = line.replace("\\\"", "\"").replace("\\\\", "\\");
+							line = ChatUtil.jsonToLegacy(line);
 							packetWrapper.write(Type.STRING, line);
 						}
 					}
@@ -1839,9 +1838,8 @@ public class Protocol1_8TO1_9 extends Protocol {
 								for (int i = 0; i<pages.size(); i++) {
 									StringTag page = pages.get(i);
 									String value = page.getValue();
-									if (value.startsWith("\"") && value.endsWith("\"")) {
-										page.setValue(value.substring(1, value.length()-1));
-									}
+									value = ChatUtil.jsonToLegacy(value);
+									page.setValue(value);
 								}
 							}
 						}

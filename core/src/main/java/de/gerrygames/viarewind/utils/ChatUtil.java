@@ -7,9 +7,14 @@ public class ChatUtil {
 
 	public static String jsonToLegacy(String json) {
 		if (json==null) return null;
-		String legacy = json.startsWith("{") ? TextComponent.toLegacyText(ComponentSerializer.parse(json)) : json;
+		String legacy = TextComponent.toLegacyText(ComponentSerializer.parse(json));
 		while (legacy.startsWith("§f")) legacy = legacy.substring(2, legacy.length());
 		return legacy;
+	}
+
+	public static String legacyToJson(String legacy) {
+		if (legacy==null) return null;
+		return ComponentSerializer.toString(TextComponent.fromLegacyText(legacy));
 	}
 
 	public static String removeUnusedColor(String legacy) {

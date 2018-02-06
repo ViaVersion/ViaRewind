@@ -48,6 +48,7 @@ import us.myles.ViaVersion.packets.Direction;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.ClientChunks;
 import us.myles.viaversion.libs.opennbt.tag.builtin.CompoundTag;
+import us.myles.viaversion.libs.opennbt.tag.builtin.ListTag;
 import us.myles.viaversion.libs.opennbt.tag.builtin.StringTag;
 
 import java.util.ArrayList;
@@ -2236,8 +2237,7 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 						packetWrapper.write(Type.POSITION, new Position(x, y, z));
 						for (int i = 0; i<4; i++) {
 							String line = packetWrapper.read(Type.STRING);
-							line = line.replace("\\", "\\\\").replace("\"", "\\\"");
-							line = "\"" + line + "\"";
+							line = ChatUtil.legacyToJson(line);
 							packetWrapper.write(Type.STRING, line);
 						}
 					}
@@ -2355,6 +2355,16 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 						} else if (channel.equalsIgnoreCase("MC|BEdit") || channel.equalsIgnoreCase("MC|BSign")) {
 							packetWrapper.read(Type.SHORT); //length
 							Item book = packetWrapper.read(Types1_7_6_10.COMPRESSED_NBT_ITEM);
+							CompoundTag tag = book.getTag();
+							if (tag!=null && tag.contains("pages")) {
+								ListTag pages = tag.get("pages");
+								for (int i = 0; i<pages.size(); i++) {
+									StringTag page = pages.get(i);
+									String value = page.getValue();
+									value = ChatUtil.legacyToJson(value);
+									page.setValue(value);
+								}
+							}
 							packetWrapper.write(Type.ITEM, book);
 						} else {
 							int length = packetWrapper.read(Type.SHORT);
