@@ -1,6 +1,5 @@
 package de.gerrygames.viarewind.protocol.protocol1_8to1_9;
 
-import com.google.gson.stream.MalformedJsonException;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.chunks.BlockStorage;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.chunks.ChunkPacketTransformer;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.items.ItemReplacement;
