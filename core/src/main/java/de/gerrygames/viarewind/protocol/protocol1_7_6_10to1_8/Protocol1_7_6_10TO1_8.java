@@ -24,7 +24,6 @@ import de.gerrygames.viarewind.protocol.protocol1_8to1_9.chunks.BlockStorage;
 import de.gerrygames.viarewind.types.VarLongType;
 import de.gerrygames.viarewind.utils.ChatUtil;
 import de.gerrygames.viarewind.utils.PacketUtil;
-import de.gerrygames.viarewind.utils.Utils;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
@@ -1065,6 +1064,7 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 						packetWrapper.user().get(Windows.class).types.put(windowId, windowTypeId);
 						String title = packetWrapper.read(Type.STRING);  //Title
 						title = ChatUtil.jsonToLegacy(title);
+						title = ChatUtil.removeUnusedColor(title);
 						if (title.length()>32) {
 							title = title.substring(0, 32);
 						}
