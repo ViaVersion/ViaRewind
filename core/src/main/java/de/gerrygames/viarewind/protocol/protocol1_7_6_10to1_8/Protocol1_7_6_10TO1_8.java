@@ -1064,18 +1064,13 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 						packetWrapper.write(Type.UNSIGNED_BYTE, windowTypeId);
 						packetWrapper.user().get(Windows.class).types.put(windowId, windowTypeId);
 						String title = packetWrapper.read(Type.STRING);  //Title
-						boolean useProvidedWindowTitle = title.startsWith("\"");  //Use provided window title
-						if (useProvidedWindowTitle) {
-							title = title.substring(1, title.length()-1);
-						} else {
-							title = ChatUtil.jsonToLegacy(title);
-						}
+						title = ChatUtil.jsonToLegacy(title);
 						if (title.length()>32) {
 							title = title.substring(0, 32);
 						}
 						packetWrapper.write(Type.STRING, title);  //Window title
 						packetWrapper.passthrough(Type.UNSIGNED_BYTE);
-						packetWrapper.write(Type.BOOLEAN, useProvidedWindowTitle);
+						packetWrapper.write(Type.BOOLEAN, true);
 						if (windowTypeId==11) packetWrapper.passthrough(Type.INT);  //Entity Id
 					}
 				});
