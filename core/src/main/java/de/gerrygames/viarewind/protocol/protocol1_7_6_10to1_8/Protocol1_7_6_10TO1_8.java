@@ -1237,7 +1237,6 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						for (int i = 0; i<4; i++) {
 							String line = packetWrapper.read(Type.STRING);
-							if (line.startsWith("\"") && line.endsWith("\"")) line = line.substring(1, line.length()-1);
 							line = ChatUtil.jsonToLegacy(line);
 							line = ChatUtil.removeUnusedColor(line);
 							if (line.length()>15) {
@@ -1339,21 +1338,6 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 				});
 				map(Type.UNSIGNED_BYTE);  //Action
 				map(Type.NBT, Types1_7_6_10.COMPRESSED_NBT);
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						if (packetWrapper.get(Type.UNSIGNED_BYTE, 0)==2) return;
-						CompoundTag nbt = packetWrapper.get(Types1_7_6_10.COMPRESSED_NBT, 0);
-						Utils.iterateCompountTagRecursive(nbt, tag -> {
-							if (tag instanceof StringTag) {
-								String value = (String) tag.getValue();
-								value = ChatUtil.jsonToLegacy(value);
-								value = ChatUtil.removeUnusedColor(value);
-								((StringTag) tag).setValue(value);
-							}
-						});
-					}
-				});
 			}
 		});
 

@@ -15,7 +15,6 @@ import de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage.PlayerPosition;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage.Windows;
 import de.gerrygames.viarewind.utils.ChatUtil;
 import de.gerrygames.viarewind.utils.PacketUtil;
-import de.gerrygames.viarewind.utils.Utils;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.data.UserConnection;
@@ -315,23 +314,6 @@ public class Protocol1_8TO1_9 extends Protocol {
 								tag.put(new StringTag("EntityId", entity));
 							}
 						}
-					}
-				});
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						if (packetWrapper.get(Type.UNSIGNED_BYTE, 0)==2) return;
-						CompoundTag nbt = packetWrapper.get(Type.NBT, 0);
-						Utils.iterateCompountTagRecursive(nbt, tag -> {
-							if (tag instanceof StringTag) {
-								String value = (String) tag.getValue();
-								try {
-									value = ChatUtil.jsonToLegacy(value);
-								} catch (Exception ignored) {} //not nice .-.
-								value = ChatUtil.removeUnusedColor(value);
-								((StringTag) tag).setValue(value);
-							}
-						});
 					}
 				});
 			}
