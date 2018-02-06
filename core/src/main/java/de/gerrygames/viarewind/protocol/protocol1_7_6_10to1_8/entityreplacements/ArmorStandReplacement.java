@@ -77,15 +77,15 @@ public class ArmorStandReplacement {
 		byte flags = 0;
 		byte armorStandFlags = 0;
 		for (Metadata metadata : datawatcher) {
-			if (metadata.getId()==0) {
+			if (metadata.getId()==0 && metadata.getMetaType()==MetaType1_8.Byte) {
 				flags = (byte) metadata.getValue();
-			} else if (metadata.getId()==2) {
+			} else if (metadata.getId()==2 && metadata.getMetaType()==MetaType1_8.String) {
 				name = (String) metadata.getValue();
 				if (name!=null && name.equals("")) name = null;
-			} else if (metadata.getId()==10) {
+			} else if (metadata.getId()==10 && metadata.getMetaType()==MetaType1_8.Byte) {
 				armorStandFlags = (byte) metadata.getValue();
-			} else if (metadata.getId()==3) {
-				nameTagVisible = (byte)metadata.getId()!=0;
+			} else if (metadata.getId()==3 && metadata.getMetaType()==MetaType1_8.Byte) {
+				nameTagVisible = (byte) metadata.getId()!=0;
 			}
 		}
 		invisible = (flags & 0x20) == 0x20;
