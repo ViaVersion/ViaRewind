@@ -526,8 +526,11 @@ public class Protocol1_8TO1_9 extends Protocol {
 						String type = packetWrapper.user().get(Windows.class).get(windowId);
 						if (type==null) return;
 						if (type.equalsIgnoreCase("minecraft:brewing_stand")) {
-							if (slot>3) {
+							if (slot>4) {
 								packetWrapper.set(Type.SHORT, 0, slot -= 1);
+							} else if (slot==4) {
+								packetWrapper.cancel();
+								return;
 							}
 						}
 					}
