@@ -1,5 +1,6 @@
 package de.gerrygames.viarewind.protocol.protocol1_8to1_9;
 
+import com.google.gson.stream.MalformedJsonException;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.chunks.BlockStorage;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.chunks.ChunkPacketTransformer;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.items.ItemReplacement;
@@ -325,7 +326,9 @@ public class Protocol1_8TO1_9 extends Protocol {
 						Utils.iterateCompountTagRecursive(nbt, tag -> {
 							if (tag instanceof StringTag) {
 								String value = (String) tag.getValue();
-								value = ChatUtil.jsonToLegacy(value);
+								try {
+									value = ChatUtil.jsonToLegacy(value);
+								} catch (Exception ignored) {} //not nice .-.
 								value = ChatUtil.removeUnusedColor(value);
 								((StringTag) tag).setValue(value);
 							}
