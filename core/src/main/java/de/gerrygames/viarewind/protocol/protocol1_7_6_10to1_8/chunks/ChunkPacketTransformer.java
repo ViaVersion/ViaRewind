@@ -3,13 +3,17 @@ package de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.chunks;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.items.ItemReplacement;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.chunks.BlockStorage;
 import us.myles.ViaVersion.api.PacketWrapper;
+import us.myles.ViaVersion.api.minecraft.Environment;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.CustomByteType;
+import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
 import java.util.zip.Deflater;
 
 public class ChunkPacketTransformer {
 	public static void transformChunk(PacketWrapper packetWrapper) throws Exception {
+		ClientWorld world = packetWrapper.user().get(ClientWorld.class);
+
 		int chunkX = packetWrapper.read(Type.INT);
 		int chunkZ = packetWrapper.read(Type.INT);
 		boolean groundUp = packetWrapper.read(Type.BOOLEAN);
@@ -18,7 +22,7 @@ public class ChunkPacketTransformer {
 		CustomByteType customByteType = new CustomByteType(size);
 		byte[] data = packetWrapper.read(customByteType);
 
-		Chunk1_7_6_10to1_8 chunk = new Chunk1_7_6_10to1_8(data, primaryBitMask, true, groundUp);
+		Chunk1_7_6_10to1_8 chunk = new Chunk1_7_6_10to1_8(data, primaryBitMask, world==null || world.getEnvironment()==Environment.NORMAL, groundUp);
 
 		packetWrapper.write(Type.INT, chunkX);
 		packetWrapper.write(Type.INT, chunkZ);

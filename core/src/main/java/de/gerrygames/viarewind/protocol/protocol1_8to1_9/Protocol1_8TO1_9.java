@@ -34,6 +34,7 @@ import us.myles.ViaVersion.api.type.types.version.Types1_8;
 import us.myles.ViaVersion.api.type.types.version.Types1_9;
 import us.myles.ViaVersion.exception.CancelException;
 import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import us.myles.viaversion.libs.opennbt.tag.builtin.CompoundTag;
 import us.myles.viaversion.libs.opennbt.tag.builtin.ListTag;
 import us.myles.viaversion.libs.opennbt.tag.builtin.StringTag;
@@ -749,6 +750,13 @@ public class Protocol1_8TO1_9 extends Protocol {
 						tracker.getClientEntityTypes().put(tracker.getPlayerId(), Entity1_10Types.EntityType.ENTITY_HUMAN);
 					}
 				});
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						ClientWorld world = packetWrapper.user().get(ClientWorld.class);
+						world.setEnvironment(packetWrapper.get(Type.BYTE, 0));
+					}
+				});
 			}
 		});
 
@@ -1035,6 +1043,13 @@ public class Protocol1_8TO1_9 extends Protocol {
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						packetWrapper.user().get(BossBarStorage.class).updateLocation();
 						packetWrapper.user().get(BossBarStorage.class).changeWorld();
+					}
+				});
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						ClientWorld world = packetWrapper.user().get(ClientWorld.class);
+						world.setEnvironment(packetWrapper.get(Type.INT, 0));
 					}
 				});
 			}
@@ -1864,5 +1879,6 @@ public class Protocol1_8TO1_9 extends Protocol {
 		userConnection.put(new Cooldown(userConnection));
 		userConnection.put(new BlockPlaceDestroyTracker(userConnection));
 		userConnection.put(new BossBarStorage(userConnection));
+		userConnection.put(new ClientWorld(userConnection));
 	}
 }
