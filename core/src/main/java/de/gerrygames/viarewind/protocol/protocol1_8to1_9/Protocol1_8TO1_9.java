@@ -1841,6 +1841,8 @@ public class Protocol1_8TO1_9 extends Protocol {
 									page.setValue(value);
 								}
 							}
+						} else if (channel.equalsIgnoreCase("MC|AdvCdm")) {
+							packetWrapper.set(Type.STRING, 0, channel = "MC|AdvCmd");
 						}
 					}
 				});
