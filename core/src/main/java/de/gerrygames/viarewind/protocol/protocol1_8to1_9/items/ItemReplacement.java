@@ -15,7 +15,7 @@ public enum ItemReplacement {
 	CHORUS_PLANT(199, -1, 35, 10, "Chorus Plant"),
 	CHORUS_FLOWER(200, -1, 35, 2, "Chorus Flower"),
 	PURPUR_BLOCK(201, 155, "Purpur Block"),
-	PURPUR_PILLAR(202, 0, 155, 2, "Purpur Pillar"),
+	PURPUR_PILLAR(202, 155, "Purpur Pillar"),
 	PURPUR_STAIRS(203, 156, "Purpur Stairs"),
 	PURPUR_DOUBLE_SLAB(204, 0, 43, 7, "Purpur Double Slab"),
 	PURPUR_SLAB(205, 0, 44, 7, "Purpur Slab"),
