@@ -24,6 +24,7 @@ public class EntityTracker extends StoredObject {
 	private int gamemode = 0;
 	private int playerId = -1;
 	private int spectating = -1;
+	private int dimension = 0;
 
 	public EntityTracker(UserConnection user) {
 		super(user);
@@ -180,5 +181,20 @@ public class EntityTracker extends StoredObject {
 	public void setPlayerId(int playerId) {
 		if (this.playerId!=-1) throw new IllegalStateException("playerId was already set!");
 		this.playerId = this.spectating = playerId;
+	}
+
+	public void clearEntities() {
+		clientEntityTypes.clear();
+		armorStands.clear();
+		vehicles.clear();
+		metadataBuffer.clear();
+	}
+
+	public int getDimension() {
+		return dimension;
+	}
+
+	public void setDimension(int dimension) {
+		this.dimension = dimension;
 	}
 }
