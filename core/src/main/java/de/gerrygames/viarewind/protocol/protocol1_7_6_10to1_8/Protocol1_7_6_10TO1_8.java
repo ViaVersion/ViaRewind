@@ -5,8 +5,8 @@ import de.gerrygames.viarewind.netty.EmptyChannelHandler;
 import de.gerrygames.viarewind.netty.ForwardMessageToByteEncoder;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.chunks.ChunkPacketTransformer;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.entityreplacements.ArmorStandReplacement;
-import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.items.ItemReplacement;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.items.ItemRewriter;
+import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.items.ReplacementRegistry1_7_6_10to1_8;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.metadata.MetadataRewriter;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.provider.TitleRenderProvider;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage.CompressionSendStorage;
@@ -20,7 +20,7 @@ import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage.WorldBorde
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.CustomIntType;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.Particle;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
-import de.gerrygames.viarewind.protocol.protocol1_8to1_9.chunks.BlockStorage;
+import de.gerrygames.viarewind.storage.BlockStorage;
 import de.gerrygames.viarewind.types.VarLongType;
 import de.gerrygames.viarewind.utils.ChatUtil;
 import de.gerrygames.viarewind.utils.PacketUtil;
@@ -915,7 +915,7 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 						int blockId = data >> 4;
 						int meta = data & 0xF;
 
-						BlockStorage.BlockState state = ItemReplacement.replaceBlock(new BlockStorage.BlockState(blockId, meta));
+						BlockStorage.BlockState state = ReplacementRegistry1_7_6_10to1_8.replace(new BlockStorage.BlockState(blockId, meta));
 
 						blockId = state.getId();
 						meta = state.getData();

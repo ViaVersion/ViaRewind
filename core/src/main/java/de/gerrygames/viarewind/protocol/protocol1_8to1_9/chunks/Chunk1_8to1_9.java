@@ -1,8 +1,9 @@
 package de.gerrygames.viarewind.protocol.protocol1_8to1_9.chunks;
 
+import de.gerrygames.viarewind.protocol.protocol1_8to1_9.items.ReplacementRegistry1_8to1_9;
+import de.gerrygames.viarewind.storage.BlockStorage;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import de.gerrygames.viarewind.protocol.protocol1_8to1_9.items.ItemReplacement;
 import us.myles.ViaVersion.api.minecraft.chunks.NibbleArray;
 
 public class Chunk1_8to1_9 {
@@ -55,7 +56,7 @@ public class Chunk1_8to1_9 {
 					int py = ind >> 8 & 15;
 					int pz = ind >> 4 & 15;
 					BlockStorage.BlockState state = blockStorage.get(px, py, pz);
-					state = ItemReplacement.replaceBlock(state);
+					state = ReplacementRegistry1_8to1_9.replace(state);
 					int id = state.getId();
 					int data = state.getData();
 

@@ -1,5 +1,6 @@
 package de.gerrygames.viarewind.protocol.protocol1_8to1_9.chunks;
 
+import de.gerrygames.viarewind.storage.BlockStorage;
 import us.myles.ViaVersion.api.minecraft.chunks.NibbleArray;
 
 public class ExtendedBlockStorage {

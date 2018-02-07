@@ -1,7 +1,7 @@
 package de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.chunks;
 
-import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.items.ItemReplacement;
-import de.gerrygames.viarewind.protocol.protocol1_8to1_9.chunks.BlockStorage;
+import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.items.ReplacementRegistry1_7_6_10to1_8;
+import de.gerrygames.viarewind.storage.BlockStorage;
 import us.myles.ViaVersion.api.minecraft.chunks.NibbleArray;
 
 public class Chunk1_7_6_10to1_8 {
@@ -26,7 +26,7 @@ public class Chunk1_7_6_10to1_8 {
 					short blockData = (short) ((data[(dataSize + 1)] & 0xFF) << 8 | data[dataSize] & 0xFF);
 					dataSize += 2;
 
-					BlockStorage.BlockState state = ItemReplacement.replaceBlock(BlockStorage.rawToState(blockData));
+					BlockStorage.BlockState state = ReplacementRegistry1_7_6_10to1_8.replace(BlockStorage.rawToState(blockData));
 
 					blockIds[j] = (byte) state.getId();
 

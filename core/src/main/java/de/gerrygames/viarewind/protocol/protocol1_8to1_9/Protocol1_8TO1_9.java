@@ -1,9 +1,9 @@
 package de.gerrygames.viarewind.protocol.protocol1_8to1_9;
 
-import de.gerrygames.viarewind.protocol.protocol1_8to1_9.chunks.BlockStorage;
+import de.gerrygames.viarewind.storage.BlockStorage;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.chunks.ChunkPacketTransformer;
-import de.gerrygames.viarewind.protocol.protocol1_8to1_9.items.ItemReplacement;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.items.ItemRewriter;
+import de.gerrygames.viarewind.protocol.protocol1_8to1_9.items.ReplacementRegistry1_8to1_9;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.metadata.MetadataRewriter;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.sound.SoundRemapper;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage.BlockPlaceDestroyTracker;
@@ -350,7 +350,7 @@ public class Protocol1_8TO1_9 extends Protocol {
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						int combined = packetWrapper.get(Type.VAR_INT, 0);
 						BlockStorage.BlockState state = BlockStorage.rawToState(combined);
-						state = ItemReplacement.replaceBlock(state);
+						state = ReplacementRegistry1_8to1_9.replace(state);
 						packetWrapper.set(Type.VAR_INT, 0, BlockStorage.stateToRaw(state));
 					}
 				});

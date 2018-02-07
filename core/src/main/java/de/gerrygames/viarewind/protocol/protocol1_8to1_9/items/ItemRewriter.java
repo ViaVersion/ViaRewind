@@ -142,7 +142,7 @@ public class ItemRewriter {
 			item.setData((short)data);
 		}
 
-		ItemReplacement.toClient(item);
+		ReplacementRegistry1_8to1_9.replace(item);
 
 		if (item.getId()==373 || item.getId()==438) {
 			int data = 0;

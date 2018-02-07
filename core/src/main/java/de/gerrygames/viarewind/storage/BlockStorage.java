@@ -1,4 +1,4 @@
-package de.gerrygames.viarewind.protocol.protocol1_8to1_9.chunks;
+package de.gerrygames.viarewind.storage;
 
 /*
  *https://github.com/Steveice10/MCProtocolLib/blob/4ed72deb75f2acb0a81d641717b7b8074730f701/src/main/java/org/spacehq/mc/protocol/data/game/chunk/BlockStorage.java#L42

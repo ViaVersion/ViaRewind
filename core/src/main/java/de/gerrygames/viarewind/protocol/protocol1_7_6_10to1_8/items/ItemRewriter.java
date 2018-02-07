@@ -2,22 +2,12 @@ package de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.items;
 
 import de.gerrygames.viarewind.utils.ChatUtil;
 import us.myles.ViaVersion.api.minecraft.item.Item;
-import us.myles.viaversion.libs.opennbt.tag.builtin.ByteTag;
 import us.myles.viaversion.libs.opennbt.tag.builtin.CompoundTag;
 import us.myles.viaversion.libs.opennbt.tag.builtin.ListTag;
 import us.myles.viaversion.libs.opennbt.tag.builtin.ShortTag;
 import us.myles.viaversion.libs.opennbt.tag.builtin.StringTag;
 
-import java.util.HashMap;
-
 public class ItemRewriter {
-	private static final HashMap<Short, String> ENTITY_SPAWN_EGG_NAMES = new HashMap<>();
-	static {
-		ENTITY_SPAWN_EGG_NAMES.put((short) 30, "ArmorStand");
-		ENTITY_SPAWN_EGG_NAMES.put((short) 67, "Endermite");
-		ENTITY_SPAWN_EGG_NAMES.put((short) 68, "Guardian");
-		ENTITY_SPAWN_EGG_NAMES.put((short) 101, "Rabbit");
-	}
 
 	public static Item toClient(Item item) {
 		if (item==null) return null;
@@ -50,15 +40,7 @@ public class ItemRewriter {
 			}
 		}
 
-		if (item.getId()==383 && ENTITY_SPAWN_EGG_NAMES.containsKey(item.getData())) {
-			if (display==null) {
-				tag.put(display = new CompoundTag("display"));
-				viaVersionTag.put(new ByteTag("noDisplay"));
-			}
-			display.put(new StringTag("Name", "§rSpawn " + ENTITY_SPAWN_EGG_NAMES.get(item.getData())));
-		}
-
-		ItemReplacement.toClient(item);
+		ReplacementRegistry1_7_6_10to1_8.replace(item);
 
 		if (viaVersionTag.size()==2 && (short)viaVersionTag.get("id").getValue()==item.getId() && (short)viaVersionTag.get("data").getValue()==item.getData()) {
 			item.getTag().remove("ViaRewind1_7_6_10to1_8");
