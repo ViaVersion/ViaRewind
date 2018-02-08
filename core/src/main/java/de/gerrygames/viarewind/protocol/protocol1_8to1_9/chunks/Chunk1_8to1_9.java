@@ -61,8 +61,8 @@ public class Chunk1_8to1_9 {
 					int data = state.getData();
 
 					char val = (char) (id << 4 | data);
-					buffer[finalsize++] = (byte) (val & 255);
-					buffer[finalsize++] = (byte) (val >> 8 & 255);
+					buffer[finalsize++] = (byte) val;
+					buffer[finalsize++] = (byte) (val >> 8);
 				}
 			}
 		}
