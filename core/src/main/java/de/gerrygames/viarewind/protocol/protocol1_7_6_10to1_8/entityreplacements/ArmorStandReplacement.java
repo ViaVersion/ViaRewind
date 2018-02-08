@@ -57,8 +57,11 @@ public class ArmorStandReplacement {
 	}
 
 	public void setYawPitch(float yaw, float pitch) {
-		this.yaw = yaw;
-		this.pitch = pitch;
+		if (this.yaw!=yaw && this.pitch!=pitch) {
+			this.yaw = yaw;
+			this.pitch = pitch;
+			updateLocation();
+		}
 	}
 
 	public void setYaw(float yaw) {

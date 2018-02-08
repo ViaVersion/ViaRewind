@@ -91,7 +91,7 @@ public class WorldBorder extends StoredObject {
 			double b = 2.5;
 
 			PacketWrapper particles = new PacketWrapper(0x2A, null, getUser());
-			particles.write(Type.STRING, "reddust");
+			particles.write(Type.STRING, "fireworksSpark");
 			particles.write(Type.FLOAT, (float)(side.modX!=0 ? x + (radius * side.modX) : centerH));
 			particles.write(Type.FLOAT, (float)centerV);
 			particles.write(Type.FLOAT, (float)(side.modX==0 ? z + (radius * side.modZ) : centerH));
