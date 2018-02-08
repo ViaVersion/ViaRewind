@@ -1796,7 +1796,7 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 								titleRenderProvider.setTimings(packetWrapper.user(), packetWrapper.read(Type.INT), packetWrapper.read(Type.INT), packetWrapper.read(Type.INT));
 								break;
 							case 3:
-								titleRenderProvider.hide(packetWrapper.user());
+								titleRenderProvider.clear(packetWrapper.user());
 								break;
 							case 4:
 								titleRenderProvider.reset(packetWrapper.user());
