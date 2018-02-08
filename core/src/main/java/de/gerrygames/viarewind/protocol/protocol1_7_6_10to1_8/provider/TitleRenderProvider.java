@@ -26,6 +26,7 @@ public abstract class TitleRenderProvider implements Provider {
 
 	public void reset(UserConnection user) {
 		this.titles.remove(user);
+		this.subTitles.remove(user);
 		getTime(user).set(0);
 		fadeIn.remove(user);
 		stay.remove(user);
