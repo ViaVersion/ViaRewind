@@ -24,6 +24,7 @@ import de.gerrygames.viarewind.storage.BlockStorage;
 import de.gerrygames.viarewind.types.VarLongType;
 import de.gerrygames.viarewind.utils.ChatUtil;
 import de.gerrygames.viarewind.utils.PacketUtil;
+import de.gerrygames.viarewind.utils.Utils;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
@@ -1785,21 +1786,22 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 						TitleRenderProvider titleRenderProvider = Via.getManager().getProviders().get(TitleRenderProvider.class);
 						if (titleRenderProvider==null) return;
 						int action = packetWrapper.read(Type.VAR_INT);
+						UUID uuid = Utils.getUUID(packetWrapper.user());
 						switch (action) {
 							case 0:
-								titleRenderProvider.setTitle(packetWrapper.user(), packetWrapper.read(Type.STRING));
+								titleRenderProvider.setTitle(uuid, packetWrapper.read(Type.STRING));
 								break;
 							case 1:
-								titleRenderProvider.setSubTitle(packetWrapper.user(), packetWrapper.read(Type.STRING));
+								titleRenderProvider.setSubTitle(uuid, packetWrapper.read(Type.STRING));
 								break;
 							case 2:
-								titleRenderProvider.setTimings(packetWrapper.user(), packetWrapper.read(Type.INT), packetWrapper.read(Type.INT), packetWrapper.read(Type.INT));
+								titleRenderProvider.setTimings(uuid, packetWrapper.read(Type.INT), packetWrapper.read(Type.INT), packetWrapper.read(Type.INT));
 								break;
 							case 3:
-								titleRenderProvider.clear(packetWrapper.user());
+								titleRenderProvider.clear(uuid);
 								break;
 							case 4:
-								titleRenderProvider.reset(packetWrapper.user());
+								titleRenderProvider.reset(uuid);
 								break;
 						}
 					}
