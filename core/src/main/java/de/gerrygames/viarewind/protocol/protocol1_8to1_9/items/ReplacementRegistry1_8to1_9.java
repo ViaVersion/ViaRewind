@@ -9,6 +9,7 @@ public class ReplacementRegistry1_8to1_9 {
 	private static final ReplacementRegistry registry = new ReplacementRegistry();
 
 	static {
+		registry.registerItem(198, new Replacement(50, 0, "End Rod"));
 		registry.registerItem(434, new Replacement(391, "Beetroot"));
 		registry.registerItem(435, new Replacement(361, "Beetroot Seeds"));
 		registry.registerItem(436, new Replacement(282, "Beetroot Soup"));
