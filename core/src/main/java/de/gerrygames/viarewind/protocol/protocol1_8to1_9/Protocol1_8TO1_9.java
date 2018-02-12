@@ -32,6 +32,7 @@ import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.remapper.ValueCreator;
 import us.myles.ViaVersion.api.remapper.ValueTransformer;
 import us.myles.ViaVersion.api.type.Type;
+import us.myles.ViaVersion.api.type.types.VarIntType;
 import us.myles.ViaVersion.api.type.types.version.Types1_8;
 import us.myles.ViaVersion.api.type.types.version.Types1_9;
 import us.myles.ViaVersion.exception.CancelException;
@@ -734,12 +735,29 @@ public class Protocol1_8TO1_9 extends Protocol {
 		this.registerOutgoing(State.PLAY, 0x22, 0x2A, new PacketRemapper() {
 			@Override
 			public void registerMap() {
-				map(Type.INT);
+				map(Type.INT); //ID
+				map(Type.BOOLEAN); // Long Distance
+				map(Type.FLOAT); // X
+				map(Type.FLOAT); // Y
+				map(Type.FLOAT); // Z
+				map(Type.FLOAT); // Offset X
+				map(Type.FLOAT); // Offset Y
+				map(Type.FLOAT); // Offset Z
+				map(Type.FLOAT); // Particle Data
+				map(Type.INT); // Particle Count
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						int type = packetWrapper.get(Type.INT, 0);
-						if (type>41) packetWrapper.cancel();
+						if (type == 42) { // Dragon Breath
+							packetWrapper.set(Type.INT, 0, 24); // Portal
+						} else if (type == 43) { // End Rod
+							packetWrapper.set(Type.INT, 0, 3); // Firework Spark
+						} else if (type == 44) { // Damage Indicator
+							packetWrapper.set(Type.INT, 0, 34); // Heart
+						} else if (type == 45) { // Sweep Attack
+							packetWrapper.set(Type.INT, 0, 1); // Large Explosion
+						}
 					}
 				});
 			}
@@ -1362,7 +1380,33 @@ public class Protocol1_8TO1_9 extends Protocol {
 		this.registerOutgoing(State.PLAY, 0x48, 0x47);
 
 		//Collect Item
-		this.registerOutgoing(State.PLAY, 0x49, 0x0D);
+		this.registerOutgoing(State.PLAY, 0x49, 0x0D, new PacketRemapper() {
+			@Override
+			public void registerMap() {
+				map(Type.VAR_INT); // Collected Entity
+				map(Type.VAR_INT); // Collector Entity
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						int collected = packetWrapper.get(Type.VAR_INT, 0);
+						int collector = packetWrapper.get(Type.VAR_INT, 1);
+						EntityTracker entityTracker = packetWrapper.user().get(EntityTracker.class);
+						PlayerPosition playerPosition = packetWrapper.user().get(PlayerPosition.class);
+						if (collector == entityTracker.getPlayerId() && entityTracker.getClientEntityTypes()
+								.get(collected) == Entity1_10Types.EntityType.DROPPED_ITEM){
+							PacketWrapper sound = new PacketWrapper(0x29,null,packetWrapper.user());
+							sound.write(Type.STRING,"random.pop");
+							sound.write(Type.INT,(int)(playerPosition.getPosX() * 8));
+							sound.write(Type.INT,(int)(playerPosition.getPosY() * 8));
+							sound.write(Type.INT,(int)(playerPosition.getPosZ() * 8));
+							sound.write(Type.FLOAT,0.2f);
+							sound.write(Type.UNSIGNED_BYTE, (short) 127);
+							sound.send(Protocol1_8TO1_9.class);
+						}
+					}
+				});
+			}
+		});
 
 		//Entity Teleport
 		this.registerOutgoing(State.PLAY, 0x4A, 0x18, new PacketRemapper() {
