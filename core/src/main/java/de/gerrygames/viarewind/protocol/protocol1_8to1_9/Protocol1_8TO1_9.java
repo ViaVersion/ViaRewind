@@ -734,12 +734,46 @@ public class Protocol1_8TO1_9 extends Protocol {
 		this.registerOutgoing(State.PLAY, 0x22, 0x2A, new PacketRemapper() {
 			@Override
 			public void registerMap() {
-				map(Type.INT);
+				map(Type.INT); //ID
+				map(Type.BOOLEAN); // Long Distance
+				map(Type.FLOAT); // X
+				map(Type.FLOAT); // Y
+				map(Type.FLOAT); // Z
+				map(Type.FLOAT); // Offset X
+				map(Type.FLOAT); // Offset Y
+				map(Type.FLOAT); // Offset Z
+				map(Type.FLOAT); // Particle Data
+				map(Type.INT); // Particle Count
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						int type = packetWrapper.get(Type.INT, 0);
-						if (type>41) packetWrapper.cancel();
+						if (type == 36) { // Icon Crack
+							Item r = ReplacementRegistry1_8to1_9.replace(new Item(packetWrapper.get(Type.VAR_INT,0)
+									.shortValue(), (byte) 1,packetWrapper.get(Type.VAR_INT,1).shortValue(),null));
+							packetWrapper.set(Type.VAR_INT, 0, (int) r.getId());
+							packetWrapper.set(Type.VAR_INT, 1, (int) r.getData());
+						} else if (type == 37) { // Block Crack
+							int data = packetWrapper.get(Type.VAR_INT, 0);
+							BlockStorage.BlockState r = ReplacementRegistry1_8to1_9.replace(
+									new BlockStorage.BlockState(data & 0x3FF,data >>> 12)
+							);
+							packetWrapper.set(Type.VAR_INT, 0, r.getId() | (r.getData() << 12));
+						} else if (type == 38) { // Block Dust
+							int data = packetWrapper.get(Type.VAR_INT, 0);
+							BlockStorage.BlockState r = ReplacementRegistry1_8to1_9.replace(
+									new BlockStorage.BlockState(data,0)
+							);
+							packetWrapper.set(Type.VAR_INT, 0, r.getId());
+						} else if (type == 42) { // Dragon Breath
+							packetWrapper.set(Type.INT, 0, 3); // Firework Spark
+						} else if (type == 43) { // End Rod
+							packetWrapper.set(Type.INT, 0, 3); // Firework Spark
+						} else if (type == 44) { // Damage Indicator
+							packetWrapper.set(Type.INT, 0, 34); // Heart
+						} else if (type == 45) { // Sweep Attack
+							packetWrapper.set(Type.INT, 0, 1); // Large Explosion
+						}
 					}
 				});
 			}
