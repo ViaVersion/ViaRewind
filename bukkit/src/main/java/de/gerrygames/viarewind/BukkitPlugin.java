@@ -15,6 +15,11 @@ public class BukkitPlugin extends JavaPlugin implements ViaRewindPlatform {
 			public CooldownIndicator getCooldownIndicator() {
 				return CooldownIndicator.valueOf(config.getString("cooldown-indicator").toUpperCase());
 			}
+
+			@Override
+			public boolean isReplaceAdventureMode() {
+				return config.getBoolean("replace-adventure");
+			}
 		});
 	}
 

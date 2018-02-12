@@ -66,6 +66,11 @@ public class SpongePlugin implements ViaRewindPlatform {
 			public CooldownIndicator getCooldownIndicator() {
 				return CooldownIndicator.valueOf(config.getString("cooldown-indicator", "TITLE").toUpperCase());
 			}
+
+			@Override
+			public boolean isReplaceAdventureMode() {
+				return config.getBoolean("replace-adventure", false);
+			}
 		});
 	}
 
