@@ -401,6 +401,24 @@ public class SoundRemapper {
 		registerSoundRemapping("block.chest.close", "random.chestclosed");
 		registerSoundRemapping("entity.player.hurt_on_fire", "game.player.hurt");
 		registerSoundRemapping("entity.player.hurt_drown", "game.player.hurt");
+		registerSoundRemapping("entity.generic.swim", "game.neutral.swim");
+		registerSoundRemapping("entity.hostile.swim", "game.hostile.swim");
+		registerSoundRemapping("entity.player.swim", "game.player.swim");
+		registerSoundRemapping("entity.player.splash", "game.player.swim.splash");
+		registerSoundRemapping("entity.hostile.splash", "game.hostile.swim.splash");
+		registerSoundRemapping("entity.generic.splash", "game.neutral.swim.splash");
+		registerSoundRemapping("entity.generic.death", "game.neutral.die");
+		registerSoundRemapping("entity.hostile.hurt", "game.hostile.hurt");
+		registerSoundRemapping("entity.player.hurt", "game.player.hurt");
+		registerSoundRemapping("entity.hostile.death", "game.hostile.die");
+		registerSoundRemapping("entity.generic.hurt", "game.neutral.hurt");
+		registerSoundRemapping("entity.player.death", "game.player.die");
+		registerSoundRemapping("entity.player.big_fall", "game.player.hurt.fall.big");
+		registerSoundRemapping("entity.generic.big_fall", "game.neutral.hurt.fall.big");
+		registerSoundRemapping("entity.hostile.big_fall", "game.hostile.hurt.fall.big");
+		registerSoundRemapping("entity.hostile.small_fall", "game.hostile.hurt.fall.small");
+		registerSoundRemapping("entity.player.small_fall", "game.player.hurt.fall.small");
+		registerSoundRemapping("entity.generic.small_fall", "game.neutral.hurt.fall.small");
 
 		register1_9Sound("ambient.cave");
 		register1_9Sound("block.anvil.break");
