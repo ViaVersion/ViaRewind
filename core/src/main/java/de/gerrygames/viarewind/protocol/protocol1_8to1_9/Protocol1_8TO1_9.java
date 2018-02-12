@@ -2,6 +2,7 @@ package de.gerrygames.viarewind.protocol.protocol1_8to1_9;
 
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.entityreplacement.ShulkerBulletReplacement;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.entityreplacement.ShulkerReplacement;
+import de.gerrygames.viarewind.protocol.protocol1_8to1_9.sound.Effect;
 import de.gerrygames.viarewind.replacement.EntityReplacement;
 import de.gerrygames.viarewind.storage.BlockStorage;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.chunks.ChunkPacketTransformer;
@@ -728,7 +729,32 @@ public class Protocol1_8TO1_9 extends Protocol {
 		});
 
 		//Effect
-		this.registerOutgoing(State.PLAY, 0x21, 0x28);
+		this.registerOutgoing(State.PLAY, 0x21, 0x28, new PacketRemapper() {
+			@Override
+			public void registerMap() {
+				map(Type.INT);
+				map(Type.POSITION);
+				map(Type.INT);
+				map(Type.BOOLEAN);
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						int id = packetWrapper.get(Type.INT, 0);
+						id = Effect.getOldId(id);
+						if (id==-1) {
+							packetWrapper.cancel();
+							return;
+						}
+						packetWrapper.set(Type.INT, 0, id);
+						if (id==2001) {
+							BlockStorage.BlockState state = BlockStorage.rawToState(packetWrapper.get(Type.INT, 1));
+							state = ReplacementRegistry1_8to1_9.replace(state);
+							packetWrapper.set(Type.INT, 1, BlockStorage.stateToRaw(state));
+						}
+					}
+				});
+			}
+		});
 
 		//Particle
 		this.registerOutgoing(State.PLAY, 0x22, 0x2A, new PacketRemapper() {
