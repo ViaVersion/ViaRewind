@@ -179,9 +179,17 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
-						int gamemode = packetWrapper.get(Type.UNSIGNED_BYTE, 1);
+						if (!ViaRewind.getConfig().isReplaceAdventureMode()) return;
+						if (packetWrapper.get(Type.UNSIGNED_BYTE, 1)==2) {
+							packetWrapper.set(Type.UNSIGNED_BYTE, 1, (short) 0);
+						}
+					}
+				});
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
 						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-						tracker.setGamemode(gamemode);
+						tracker.setGamemode(packetWrapper.get(Type.UNSIGNED_BYTE, 1));
 						if (tracker.getDimension()!=packetWrapper.get(Type.INT, 0)) {
 							tracker.setDimension(packetWrapper.get(Type.INT, 0));
 							tracker.clearEntities();
