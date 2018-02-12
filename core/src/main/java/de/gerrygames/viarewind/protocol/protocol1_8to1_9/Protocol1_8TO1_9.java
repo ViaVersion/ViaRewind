@@ -888,6 +888,9 @@ public class Protocol1_8TO1_9 extends Protocol {
 							replacement.setYawPitch(packetWrapper.read(Type.BYTE) * 360f / 256, packetWrapper.read(Type.BYTE) * 360f / 256);
 							return;
 						}
+						if (tracker.getClientEntityTypes().get(entityId) == Entity1_10Types.EntityType.PLAYER){
+							tracker.playerRelMove(entityId, relX / 4096.0, relY / 4096.0, relZ / 4096.0);
+						}
 
 						byte relX1 = (byte)(relX / 256);
 						byte relX2 = (byte)((relX - relX1 * 128) / 128);
@@ -1460,7 +1463,10 @@ public class Protocol1_8TO1_9 extends Protocol {
 							replacement.setLocation(x / 32.0, y / 32.0, z / 32.0);
 							replacement.setYawPitch(yaw * 360f / 256, pitch * 360f / 256);
 						} else if (tracker.getClientEntityTypes().get(entityId) == Entity1_10Types.EntityType.PLAYER) {
-							tracker.setPlayerPosition(entityId, new EntityTracker.Position(x/32.0, y/32.0, z/32.0));
+							EntityTracker.Position p = tracker.getPlayerPosition(entityId);
+							p.setX(x/32.0);
+							p.setY(y/32.0);
+							p.setZ(z/32.0);
 						}
 					}
 				});
@@ -1591,6 +1597,11 @@ public class Protocol1_8TO1_9 extends Protocol {
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						PlayerPosition pos = packetWrapper.user().get(PlayerPosition.class);
 						pos.setPos(packetWrapper.get(Type.DOUBLE, 0), packetWrapper.get(Type.DOUBLE, 1), packetWrapper.get(Type.DOUBLE, 2));
+						EntityTracker entityTracker = packetWrapper.user().get(EntityTracker.class);
+						EntityTracker.Position p = entityTracker.getPlayerPosition(entityTracker.getPlayerId());
+						p.setX(packetWrapper.get(Type.DOUBLE, 0));
+						p.setY(packetWrapper.get(Type.DOUBLE, 1));
+						p.setZ(packetWrapper.get(Type.DOUBLE, 2));
 					}
 				});
 				handler(new PacketHandler() {
@@ -1643,6 +1654,11 @@ public class Protocol1_8TO1_9 extends Protocol {
 						pos.setPos(packetWrapper.get(Type.DOUBLE, 0), packetWrapper.get(Type.DOUBLE, 1), packetWrapper.get(Type.DOUBLE, 2));
 						pos.setYaw(packetWrapper.get(Type.FLOAT, 0));
 						pos.setPitch(packetWrapper.get(Type.FLOAT, 1));
+						EntityTracker entityTracker = packetWrapper.user().get(EntityTracker.class);
+						EntityTracker.Position p = entityTracker.getPlayerPosition(entityTracker.getPlayerId());
+						p.setX(packetWrapper.get(Type.DOUBLE, 0));
+						p.setY(packetWrapper.get(Type.DOUBLE, 1));
+						p.setZ(packetWrapper.get(Type.DOUBLE, 2));
 					}
 				});
 				handler(new PacketHandler() {
