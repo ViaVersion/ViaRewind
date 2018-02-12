@@ -1414,7 +1414,8 @@ public class Protocol1_8TO1_9 extends Protocol {
 							sound.write(Type.INT,(int)(position.getY() * 8));
 							sound.write(Type.INT,(int)(position.getZ() * 8));
 							sound.write(Type.FLOAT,0.2f);
-							sound.write(Type.UNSIGNED_BYTE, (short) 127);
+							float pitch = (float) ((Math.random() - Math.random()) * 0.7f + 1.0f) * 2.0f;
+							sound.write(Type.UNSIGNED_BYTE, (short) (pitch * 64 - 1));
 							sound.send(Protocol1_8TO1_9.class);
 						}
 					}
