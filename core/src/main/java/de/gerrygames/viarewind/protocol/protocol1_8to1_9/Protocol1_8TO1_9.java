@@ -748,24 +748,7 @@ public class Protocol1_8TO1_9 extends Protocol {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						int type = packetWrapper.get(Type.INT, 0);
-						if (type == 36) { // Icon Crack
-							Item r = ReplacementRegistry1_8to1_9.replace(new Item(packetWrapper.get(Type.VAR_INT,0)
-									.shortValue(), (byte) 1,packetWrapper.get(Type.VAR_INT,1).shortValue(),null));
-							packetWrapper.set(Type.VAR_INT, 0, (int) r.getId());
-							packetWrapper.set(Type.VAR_INT, 1, (int) r.getData());
-						} else if (type == 37) { // Block Crack
-							int data = packetWrapper.get(Type.VAR_INT, 0);
-							BlockStorage.BlockState r = ReplacementRegistry1_8to1_9.replace(
-									new BlockStorage.BlockState(data & 0x3FF,data >>> 12)
-							);
-							packetWrapper.set(Type.VAR_INT, 0, r.getId() | (r.getData() << 12));
-						} else if (type == 38) { // Block Dust
-							int data = packetWrapper.get(Type.VAR_INT, 0);
-							BlockStorage.BlockState r = ReplacementRegistry1_8to1_9.replace(
-									new BlockStorage.BlockState(data,0)
-							);
-							packetWrapper.set(Type.VAR_INT, 0, r.getId());
-						} else if (type == 42) { // Dragon Breath
+						if (type == 42) { // Dragon Breath
 							packetWrapper.set(Type.INT, 0, 3); // Firework Spark
 						} else if (type == 43) { // End Rod
 							packetWrapper.set(Type.INT, 0, 3); // Firework Spark
