@@ -785,7 +785,6 @@ public class Protocol1_8TO1_9 extends Protocol {
 						tracker.setPlayerId(packetWrapper.get(Type.INT, 0));
 						tracker.setPlayerGamemode(packetWrapper.get(Type.UNSIGNED_BYTE, 0));
 						tracker.getClientEntityTypes().put(tracker.getPlayerId(), Entity1_10Types.EntityType.PLAYER);
-						tracker.getClientEntityTypes().put(tracker.getPlayerId(), Entity1_10Types.EntityType.ENTITY_HUMAN);
 						tracker.setPlayerPosition(tracker.getPlayerId(),new EntityTracker.Position(0,0,0));
 					}
 				});
