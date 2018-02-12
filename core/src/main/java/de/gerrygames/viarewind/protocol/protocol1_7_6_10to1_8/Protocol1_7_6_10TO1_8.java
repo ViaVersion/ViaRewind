@@ -1,6 +1,7 @@
 package de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8;
 
 import com.google.common.base.Charsets;
+import de.gerrygames.viarewind.ViaRewind;
 import de.gerrygames.viarewind.netty.EmptyChannelHandler;
 import de.gerrygames.viarewind.netty.ForwardMessageToByteEncoder;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.chunks.ChunkPacketTransformer;
@@ -78,6 +79,15 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 				map(Type.UNSIGNED_BYTE);  //Difficulty
 				map(Type.UNSIGNED_BYTE);  //Max players
 				map(Type.STRING);  //Level Type
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						if (!ViaRewind.getConfig().isReplaceAdventureMode()) return;
+						if (packetWrapper.get(Type.UNSIGNED_BYTE, 0)==2) {
+							packetWrapper.set(Type.UNSIGNED_BYTE, 0, (short) 0);
+						}
+					}
+				});
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
@@ -1049,6 +1059,10 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 						int mode = packetWrapper.get(Type.UNSIGNED_BYTE, 0);
 						if (mode==3) {
 							int gamemode = packetWrapper.get(Type.FLOAT, 0).intValue();
+							if (gamemode==2 && ViaRewind.getConfig().isReplaceAdventureMode()) {
+								gamemode = 0;
+								packetWrapper.set(Type.FLOAT, 0, 0.0f);
+							}
 							packetWrapper.user().get(EntityTracker.class).setGamemode(gamemode);
 						}
 					}
