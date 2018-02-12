@@ -20,6 +20,7 @@ import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage.WorldBorde
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.CustomIntType;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.Particle;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
+import de.gerrygames.viarewind.replacement.EntityReplacement;
 import de.gerrygames.viarewind.storage.BlockStorage;
 import de.gerrygames.viarewind.types.VarLongType;
 import de.gerrygames.viarewind.utils.ChatUtil;
@@ -346,6 +347,7 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 						int z = packetWrapper.get(Type.INT, 2);
 						byte pitch = packetWrapper.get(Type.BYTE, 1);
 						byte yaw = packetWrapper.get(Type.BYTE, 2);
+
 						if (typeId==71) {
 							int data = packetWrapper.get(Type.INT, 3);
 
@@ -378,7 +380,7 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 							ArmorStandReplacement armorStand = new ArmorStandReplacement(entityId, packetWrapper.user());
 							armorStand.setLocation(x / 32.0, y / 32.0, z / 32.0);
 							armorStand.setYawPitch(yaw * 360f / 256, pitch * 360f / 256);
-							tracker.addArmorStand(armorStand);
+							tracker.addEntityReplacement(armorStand);
 						}
 					}
 				});
@@ -442,20 +444,20 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						int entityId = packetWrapper.get(Type.VAR_INT, 0);
 						int typeId = packetWrapper.get(Type.UNSIGNED_BYTE, 0);
+						int x = packetWrapper.get(Type.INT, 0);
+						int y = packetWrapper.get(Type.INT, 1);
+						int z = packetWrapper.get(Type.INT, 2);
+						byte pitch = packetWrapper.get(Type.BYTE, 1);
+						byte yaw = packetWrapper.get(Type.BYTE, 0);
+
 						if (typeId==78) {
 							packetWrapper.cancel();
-
-							int x = packetWrapper.get(Type.INT, 0);
-							int y = packetWrapper.get(Type.INT, 1);
-							int z = packetWrapper.get(Type.INT, 2);
-							byte pitch = packetWrapper.get(Type.BYTE, 1);
-							byte yaw = packetWrapper.get(Type.BYTE, 0);
 
 							EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
 							ArmorStandReplacement armorStand = new ArmorStandReplacement(entityId, packetWrapper.user());
 							armorStand.setLocation(x / 32.0, y / 32.0, z / 32.0);
 							armorStand.setYawPitch(yaw * 360f / 256, pitch * 360f / 256);
-							tracker.addArmorStand(armorStand);
+							tracker.addEntityReplacement(armorStand);
 						} else if (typeId==67 || typeId==68 || typeId==101 || typeId==30 || typeId==255) {
 							packetWrapper.cancel();
 						}
@@ -476,8 +478,8 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 						List<Metadata> metadataList = wrapper.get(Types1_7_6_10.METADATA_LIST, 0);
 						int entityId = wrapper.get(Type.VAR_INT, 0);
 						EntityTracker tracker = wrapper.user().get(EntityTracker.class);
-						if (tracker.getArmorStand(entityId)!=null) {
-							tracker.getArmorStand(entityId).updateMetadata(metadataList);
+						if (tracker.getEntityReplacement(entityId)!=null) {
+							tracker.getEntityReplacement(entityId).updateMetadata(metadataList);
 						} else if (tracker.getClientEntityTypes().containsKey(entityId)) {
 							MetadataRewriter.transform(tracker.getClientEntityTypes().get(entityId), metadataList);
 						} else {
@@ -611,13 +613,13 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						int entityId = packetWrapper.get(Type.INT, 0);
 						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-						ArmorStandReplacement armorStand = tracker.getArmorStand(entityId);
-						if (armorStand!=null) {
+						EntityReplacement replacement = tracker.getEntityReplacement(entityId);
+						if (replacement!=null) {
 							packetWrapper.cancel();
 							int x = packetWrapper.get(Type.BYTE, 0);
 							int y = packetWrapper.get(Type.BYTE, 1);
 							int z = packetWrapper.get(Type.BYTE, 2);
-							armorStand.relMove(x / 32.0, y / 32.0, z / 32.0);
+							replacement.relMove(x / 32.0, y / 32.0, z / 32.0);
 						}
 					}
 				});
@@ -642,12 +644,12 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						int entityId = packetWrapper.get(Type.INT, 0);
 						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-						ArmorStandReplacement armorStand = tracker.getArmorStand(entityId);
-						if (armorStand!=null) {
+						EntityReplacement replacement = tracker.getEntityReplacement(entityId);
+						if (replacement!=null) {
 							packetWrapper.cancel();
 							int yaw = packetWrapper.get(Type.BYTE, 0);
 							int pitch = packetWrapper.get(Type.BYTE, 1);
-							armorStand.setYawPitch(yaw * 360f / 256, pitch * 360f / 256);
+							replacement.setYawPitch(yaw * 360f / 256, pitch * 360f / 256);
 						}
 					}
 				});
@@ -675,16 +677,16 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						int entityId = packetWrapper.get(Type.INT, 0);
 						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-						ArmorStandReplacement armorStand = tracker.getArmorStand(entityId);
-						if (armorStand!=null) {
+						EntityReplacement replacement = tracker.getEntityReplacement(entityId);
+						if (replacement!=null) {
 							packetWrapper.cancel();
 							int x = packetWrapper.get(Type.BYTE, 0);
 							int y = packetWrapper.get(Type.BYTE, 1);
 							int z = packetWrapper.get(Type.BYTE, 2);
 							int yaw = packetWrapper.get(Type.BYTE, 3);
 							int pitch = packetWrapper.get(Type.BYTE, 4);
-							armorStand.relMove(x / 32.0, y / 32.0, z / 32.0);
-							armorStand.setYawPitch(yaw * 360f / 256, pitch * 360f / 256);
+							replacement.relMove(x / 32.0, y / 32.0, z / 32.0);
+							replacement.setYawPitch(yaw * 360f / 256, pitch * 360f / 256);
 						}
 					}
 				});
@@ -712,16 +714,16 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						int entityId = packetWrapper.get(Type.INT, 0);
 						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-						ArmorStandReplacement armorStand = tracker.getArmorStand(entityId);
-						if (armorStand!=null) {
+						EntityReplacement replacement = tracker.getEntityReplacement(entityId);
+						if (replacement!=null) {
 							packetWrapper.cancel();
 							int x = packetWrapper.get(Type.INT, 1);
 							int y = packetWrapper.get(Type.INT, 2);
 							int z = packetWrapper.get(Type.INT, 3);
 							int yaw = packetWrapper.get(Type.BYTE, 0);
 							int pitch = packetWrapper.get(Type.BYTE, 1);
-							armorStand.setLocation(x / 32.0, y / 32.0, z / 32.0);
-							armorStand.setYawPitch(yaw * 360f / 256, pitch * 360f / 256);
+							replacement.setLocation(x / 32.0, y / 32.0, z / 32.0);
+							replacement.setYawPitch(yaw * 360f / 256, pitch * 360f / 256);
 						}
 					}
 				});
@@ -739,11 +741,11 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						int entityId = packetWrapper.get(Type.INT, 0);
 						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-						ArmorStandReplacement armorStand = tracker.getArmorStand(entityId);
-						if (armorStand!=null) {
+						EntityReplacement replacement = tracker.getEntityReplacement(entityId);
+						if (replacement!=null) {
 							packetWrapper.cancel();
 							int yaw = packetWrapper.get(Type.BYTE, 0);
-							armorStand.setYaw(yaw * 360f / 256);
+							replacement.setYaw(yaw * 360f / 256);
 						}
 					}
 				});
@@ -784,10 +786,10 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 						int entityId = wrapper.get(Type.INT, 0);
 						EntityTracker tracker = wrapper.user().get(EntityTracker.class);
 						if (tracker.getClientEntityTypes().containsKey(entityId)) {
-							ArmorStandReplacement armorStand = tracker.getArmorStand(entityId);
-							if (armorStand!=null) {
+							EntityReplacement replacement = tracker.getEntityReplacement(entityId);
+							if (replacement!=null) {
 								wrapper.cancel();
-								armorStand.updateMetadata(metadataList);
+								replacement.updateMetadata(metadataList);
 							} else {
 								MetadataRewriter.transform(tracker.getClientEntityTypes().get(entityId), metadataList);
 								if (metadataList.isEmpty()) wrapper.cancel();
@@ -847,7 +849,7 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						int entityId = packetWrapper.get(Type.INT, 0);
 						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-						if (tracker.getArmorStand(entityId)!=null) {
+						if (tracker.getEntityReplacement(entityId)!=null) {
 							packetWrapper.cancel();
 							return;
 						}

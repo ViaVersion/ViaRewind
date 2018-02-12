@@ -4,6 +4,7 @@ import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10TO
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.metadata.MetadataRewriter;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.MetaType1_7_6_10;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
+import de.gerrygames.viarewind.replacement.EntityReplacement;
 import lombok.Getter;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.data.UserConnection;
@@ -15,7 +16,7 @@ import us.myles.ViaVersion.api.type.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ArmorStandReplacement {
+public class ArmorStandReplacement implements EntityReplacement {
 	@Getter
 	private int entityId;
 	private List<Metadata> datawatcher = new ArrayList<>();

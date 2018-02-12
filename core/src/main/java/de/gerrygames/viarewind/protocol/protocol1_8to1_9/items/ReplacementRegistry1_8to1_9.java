@@ -13,7 +13,7 @@ public class ReplacementRegistry1_8to1_9 {
 		registry.registerItem(434, new Replacement(391, "Beetroot"));
 		registry.registerItem(435, new Replacement(361, "Beetroot Seeds"));
 		registry.registerItem(436, new Replacement(282, "Beetroot Soup"));
-		registry.registerItem(432, new Replacement(392, "Chorus Fruit"));
+		registry.registerItem(432, new Replacement(322, "Chorus Fruit"));
 		registry.registerItem(433, new Replacement(393, "Popped Chorus Fruit"));
 		registry.registerItem(437, new Replacement(373, "Dragons Breath"));
 		registry.registerItem(443, new Replacement(299, "Elytra"));

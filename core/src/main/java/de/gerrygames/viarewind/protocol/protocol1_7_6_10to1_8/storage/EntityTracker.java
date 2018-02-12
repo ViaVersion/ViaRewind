@@ -1,8 +1,8 @@
 package de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage;
 
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10TO1_8;
-import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.entityreplacements.ArmorStandReplacement;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.metadata.MetadataRewriter;
+import de.gerrygames.viarewind.replacement.EntityReplacement;
 import de.gerrygames.viarewind.utils.PacketUtil;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.data.StoredObject;
@@ -20,7 +20,7 @@ public class EntityTracker extends StoredObject {
 	private final Map<Integer, Entity1_10Types.EntityType> clientEntityTypes = new ConcurrentHashMap();
 	private final Map<Integer, List<Metadata>> metadataBuffer = new ConcurrentHashMap();
 	private final Map<Integer, Integer> vehicles = new ConcurrentHashMap<>();
-	private final Map<Integer, ArmorStandReplacement> armorStands = new ConcurrentHashMap<>();
+	private final Map<Integer, EntityReplacement> entityReplacements = new ConcurrentHashMap<>();
 	private int gamemode = 0;
 	private int playerId = -1;
 	private int spectating = -1;
@@ -32,8 +32,8 @@ public class EntityTracker extends StoredObject {
 
 	public void removeEntity(int entityId) {
 		clientEntityTypes.remove(entityId);
-		if (armorStands.containsKey(entityId)) {
-			armorStands.remove(entityId).despawn();
+		if (entityReplacements.containsKey(entityId)) {
+			entityReplacements.remove(entityId).despawn();
 		}
 	}
 
@@ -49,12 +49,12 @@ public class EntityTracker extends StoredObject {
 		}
 	}
 
-	public void addArmorStand(ArmorStandReplacement armorStandReplacement) {
-		armorStands.put(armorStandReplacement.getEntityId(), armorStandReplacement);
+	public void addEntityReplacement(EntityReplacement entityReplacement) {
+		entityReplacements.put(entityReplacement.getEntityId(), entityReplacement);
 	}
 
-	public ArmorStandReplacement getArmorStand(int entityId) {
-		return armorStands.get(entityId);
+	public EntityReplacement getEntityReplacement(int entityId) {
+		return entityReplacements.get(entityId);
 	}
 
 	public List<Metadata> getBufferedMetadata(int entityId) {
@@ -63,12 +63,11 @@ public class EntityTracker extends StoredObject {
 
 	public void sendMetadataBuffer(int entityId) {
 		if (!this.metadataBuffer.containsKey(entityId)) return;
-		PacketWrapper wrapper = new PacketWrapper(0x1C, null, this.getUser());
-		Entity1_10Types.EntityType type = this.getClientEntityTypes().get(entityId);
-		if (type==Entity1_10Types.EntityType.ARMOR_STAND) {
-			if (!armorStands.containsKey(entityId)) return;
-			armorStands.get(entityId).updateMetadata(this.metadataBuffer.remove(entityId));
+		if (entityReplacements.containsKey(entityId)) {
+			entityReplacements.get(entityId).updateMetadata(this.metadataBuffer.remove(entityId));
 		} else {
+			Entity1_10Types.EntityType type = this.getClientEntityTypes().get(entityId);
+			PacketWrapper wrapper = new PacketWrapper(0x1C, null, this.getUser());
 			wrapper.write(Type.VAR_INT, entityId);
 			wrapper.write(Types1_8.METADATA_LIST, this.metadataBuffer.get(entityId));
 			MetadataRewriter.transform(type, this.metadataBuffer.get(entityId));
@@ -185,7 +184,7 @@ public class EntityTracker extends StoredObject {
 
 	public void clearEntities() {
 		clientEntityTypes.clear();
-		armorStands.clear();
+		entityReplacements.clear();
 		vehicles.clear();
 		metadataBuffer.clear();
 	}

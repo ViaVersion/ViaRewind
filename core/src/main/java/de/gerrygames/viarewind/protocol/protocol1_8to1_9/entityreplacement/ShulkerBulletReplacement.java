@@ -1,0 +1,104 @@
+package de.gerrygames.viarewind.protocol.protocol1_8to1_9.entityreplacement;
+
+import de.gerrygames.viarewind.protocol.protocol1_8to1_9.Protocol1_8TO1_9;
+import de.gerrygames.viarewind.replacement.EntityReplacement;
+import lombok.Getter;
+import us.myles.ViaVersion.api.PacketWrapper;
+import us.myles.ViaVersion.api.data.UserConnection;
+import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
+import us.myles.ViaVersion.api.type.Type;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class ShulkerBulletReplacement implements EntityReplacement {
+	@Getter
+	private int entityId;
+	private List<Metadata> datawatcher = new ArrayList<>();
+	private double locX, locY, locZ;
+	private float yaw, pitch;
+	private UserConnection user;
+
+	public ShulkerBulletReplacement(int entityId, UserConnection user) {
+		this.entityId = entityId;
+		this.user = user;
+		spawn();
+	}
+
+	public void setLocation(double x, double y, double z) {
+		if (x!=this.locX || y!=this.locY || z!=this.locZ) {
+			this.locX = x;
+			this.locY = y;
+			this.locZ = z;
+			updateLocation();
+		}
+	}
+
+	public void relMove(double x, double y, double z) {
+		if (x==0.0 && y==0.0 && z==0.0) return;
+		this.locX += x;
+		this.locY += y;
+		this.locZ += z;
+		updateLocation();
+	}
+
+	public void setYawPitch(float yaw, float pitch) {
+		if (this.yaw!=yaw && this.pitch!=pitch) {
+			this.yaw = yaw;
+			this.pitch = pitch;
+			updateLocation();
+		}
+	}
+
+	public void setYaw(float yaw) {
+		this.yaw = yaw;
+	}
+
+	public void updateMetadata(List<Metadata> metadataList) {
+	}
+
+	public void updateLocation() {
+		PacketWrapper teleport = new PacketWrapper(0x18, null, user);
+		teleport.write(Type.VAR_INT, entityId);
+		teleport.write(Type.INT, (int) (locX * 32.0));
+		teleport.write(Type.INT, (int) (locY * 32.0));
+		teleport.write(Type.INT, (int) (locZ * 32.0));
+		//teleport.write(Type.BYTE, (byte)((yaw / 360f) * 256));
+		teleport.write(Type.BYTE, (byte) 0);
+		//teleport.write(Type.BYTE, (byte)((pitch / 360f) * 256));
+		teleport.write(Type.BYTE, (byte) 0);
+		teleport.write(Type.BOOLEAN, true);
+
+		try {
+			teleport.send(Protocol1_8TO1_9.class, true, true);
+		} catch (Exception ex) {ex.printStackTrace();}
+	}
+
+	@Override
+	public void spawn() {
+		PacketWrapper spawn = new PacketWrapper(0x0E, null, user);
+		spawn.write(Type.VAR_INT, entityId);
+		spawn.write(Type.BYTE, (byte) 61);
+		spawn.write(Type.INT, 0);
+		spawn.write(Type.INT, 0);
+		spawn.write(Type.INT, 0);
+		spawn.write(Type.BYTE, (byte) 0);
+		spawn.write(Type.BYTE, (byte) 0);
+		spawn.write(Type.INT, 0);
+
+		try {
+			spawn.send(Protocol1_8TO1_9.class, true, true);
+		} catch (Exception ex) {ex.printStackTrace();}
+	}
+
+	@Override
+	public void despawn() {
+		PacketWrapper despawn = new PacketWrapper(0x13, null, user);
+		despawn.write(Type.VAR_INT_ARRAY, new Integer[] {entityId});
+
+		try {
+			despawn.send(Protocol1_8TO1_9.class, true, true);
+		} catch (Exception ex) {ex.printStackTrace();}
+
+	}
+}

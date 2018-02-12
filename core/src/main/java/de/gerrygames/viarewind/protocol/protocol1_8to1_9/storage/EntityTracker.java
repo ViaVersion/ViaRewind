@@ -2,6 +2,7 @@ package de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage;
 
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.Protocol1_8TO1_9;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.metadata.MetadataRewriter;
+import de.gerrygames.viarewind.replacement.EntityReplacement;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.data.StoredObject;
 import us.myles.ViaVersion.api.data.UserConnection;
@@ -19,6 +20,7 @@ public class EntityTracker extends StoredObject {
 	private final Map<Integer, ArrayList<Integer>> vehicleMap = new ConcurrentHashMap();
 	private final Map<Integer, Entity1_10Types.EntityType> clientEntityTypes = new ConcurrentHashMap();
 	private final Map<Integer, List<Metadata>> metadataBuffer = new ConcurrentHashMap();
+	private final Map<Integer, EntityReplacement> entityReplacements = new ConcurrentHashMap<>();
 	private int playerId;
 	private int playerGamemode = 0;
 
@@ -47,6 +49,9 @@ public class EntityTracker extends StoredObject {
 		vehicleMap.forEach((vehicle, passengers) -> passengers.remove((Integer)entityId));
 		vehicleMap.entrySet().removeIf(entry -> entry.getValue().isEmpty());
 		clientEntityTypes.remove(entityId);
+		if (entityReplacements.containsKey(entityId)) {
+			entityReplacements.remove(entityId).despawn();
+		}
 	}
 
 	public ArrayList<Integer> getPassengers(int entityId) {
@@ -55,6 +60,14 @@ public class EntityTracker extends StoredObject {
 
 	public void setPassengers(int entityId, ArrayList<Integer> passengers) {
 		vehicleMap.put(entityId, passengers);
+	}
+
+	public void addEntityReplacement(EntityReplacement entityReplacement) {
+		entityReplacements.put(entityReplacement.getEntityId(), entityReplacement);
+	}
+
+	public EntityReplacement getEntityReplacement(int entityId) {
+		return entityReplacements.get(entityId);
 	}
 
 	public Map<Integer, Entity1_10Types.EntityType> getClientEntityTypes() {
@@ -93,18 +106,22 @@ public class EntityTracker extends StoredObject {
 
 	public void sendMetadataBuffer(int entityId) {
 		if (!this.metadataBuffer.containsKey(entityId)) return;
-		PacketWrapper wrapper = new PacketWrapper(0x1C, null, this.getUser());
-		wrapper.write(Type.VAR_INT, entityId);
-		wrapper.write(Types1_8.METADATA_LIST, this.metadataBuffer.get(entityId));
-		MetadataRewriter.transform(this.getClientEntityTypes().get(entityId), this.metadataBuffer.get(entityId));
-		if (!this.metadataBuffer.get(entityId).isEmpty()) {
-			try {
-				wrapper.send(Protocol1_8TO1_9.class);
-			} catch (Exception ex) {
-				ex.printStackTrace();
+		if (entityReplacements.containsKey(entityId)) {
+			entityReplacements.get(entityId).updateMetadata(this.metadataBuffer.remove(entityId));
+		} else {
+			PacketWrapper wrapper = new PacketWrapper(0x1C, null, this.getUser());
+			wrapper.write(Type.VAR_INT, entityId);
+			wrapper.write(Types1_8.METADATA_LIST, this.metadataBuffer.get(entityId));
+			MetadataRewriter.transform(this.getClientEntityTypes().get(entityId), this.metadataBuffer.get(entityId));
+			if (!this.metadataBuffer.get(entityId).isEmpty()) {
+				try {
+					wrapper.send(Protocol1_8TO1_9.class);
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
 			}
-		}
 
-		this.metadataBuffer.remove(entityId);
+			this.metadataBuffer.remove(entityId);
+		}
 	}
 }
