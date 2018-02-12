@@ -313,9 +313,9 @@ public class Protocol1_8TO1_9 extends Protocol {
 						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
 						tracker.getClientEntityTypes().put(entityId, Entity1_10Types.EntityType.PLAYER);
 						tracker.setPlayerPosition(entityId, new EntityTracker.Position(
-								packetWrapper.get(Type.INT,0),
-								packetWrapper.get(Type.INT,1),
-								packetWrapper.get(Type.INT,2)
+								packetWrapper.get(Type.INT,0) / 32.0,
+								packetWrapper.get(Type.INT,1) / 32.0,
+								packetWrapper.get(Type.INT,2) / 32.0
 						));
 						tracker.sendMetadataBuffer(entityId);
 					}
