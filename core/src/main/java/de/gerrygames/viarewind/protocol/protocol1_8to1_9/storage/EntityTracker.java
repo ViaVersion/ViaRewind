@@ -3,6 +3,7 @@ package de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.Protocol1_8TO1_9;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.metadata.MetadataRewriter;
 import de.gerrygames.viarewind.replacement.EntityReplacement;
+import lombok.*;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.data.StoredObject;
 import us.myles.ViaVersion.api.data.UserConnection;
@@ -17,31 +18,41 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class EntityTracker extends StoredObject {
+	@AllArgsConstructor
+	@Data
+	@Getter
+	@Setter
+	@ToString
+	@EqualsAndHashCode
+	public static class Position{
+		private double x,y,z;
+	}
 	private final Map<Integer, ArrayList<Integer>> vehicleMap = new ConcurrentHashMap();
 	private final Map<Integer, Entity1_10Types.EntityType> clientEntityTypes = new ConcurrentHashMap();
 	private final Map<Integer, List<Metadata>> metadataBuffer = new ConcurrentHashMap();
 	private final Map<Integer, EntityReplacement> entityReplacements = new ConcurrentHashMap<>();
-	private int playerId;
-	private int playerGamemode = 0;
+	private final Map<Integer, Position> playerPositions = new ConcurrentHashMap<>();
+	@Getter
+	@Setter
+	private int playerId, playerGamemode;
+
+	public void setPlayerPosition(int playerEntityId, Position position){
+		playerPositions.put(playerEntityId, position);
+	}
+
+	public Position getPlayerPosition(int playerEntityId){
+		return playerPositions.get(playerEntityId);
+	}
+
+	public void playerRelMove(int playerEntityId, double x, double y, double z){
+		Position p = playerPositions.get(playerEntityId);
+		p.x += x;
+		p.y += y;
+		p.z += z;
+	}
 
 	public EntityTracker(UserConnection user) {
 		super(user);
-	}
-
-	public void setPlayerId(int entityId) {
-		playerId = entityId;
-	}
-
-	public int getPlayerId() {
-		return playerId;
-	}
-
-	public int getPlayerGamemode() {
-		return playerGamemode;
-	}
-
-	public void setPlayerGamemode(int playerGamemode) {
-		this.playerGamemode = playerGamemode;
 	}
 
 	public void removeEntity(int entityId) {
@@ -49,6 +60,7 @@ public class EntityTracker extends StoredObject {
 		vehicleMap.forEach((vehicle, passengers) -> passengers.remove((Integer)entityId));
 		vehicleMap.entrySet().removeIf(entry -> entry.getValue().isEmpty());
 		clientEntityTypes.remove(entityId);
+		playerPositions.remove(entityId);
 		if (entityReplacements.containsKey(entityId)) {
 			entityReplacements.remove(entityId).despawn();
 		}

@@ -312,6 +312,11 @@ public class Protocol1_8TO1_9 extends Protocol {
 						int entityId = packetWrapper.get(Type.VAR_INT, 0);
 						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
 						tracker.getClientEntityTypes().put(entityId, Entity1_10Types.EntityType.PLAYER);
+						tracker.setPlayerPosition(entityId, new EntityTracker.Position(
+								packetWrapper.get(Type.INT,0),
+								packetWrapper.get(Type.INT,1),
+								packetWrapper.get(Type.INT,2)
+						));
 						tracker.sendMetadataBuffer(entityId);
 					}
 				});
@@ -827,6 +832,10 @@ public class Protocol1_8TO1_9 extends Protocol {
 							packetWrapper.cancel();
 							replacement.relMove(relX / 4096.0, relY / 4096.0, relZ / 4096.0);
 							return;
+						}
+
+						if (tracker.getClientEntityTypes().get(entityId) == Entity1_10Types.EntityType.PLAYER){
+							tracker.playerRelMove(entityId, relX / 4096.0, relY / 4096.0, relZ / 4096.0);
 						}
 
 						byte relX1 = (byte)(relX / 256);
@@ -1391,13 +1400,15 @@ public class Protocol1_8TO1_9 extends Protocol {
 						int collector = packetWrapper.get(Type.VAR_INT, 1);
 						EntityTracker entityTracker = packetWrapper.user().get(EntityTracker.class);
 						PlayerPosition playerPosition = packetWrapper.user().get(PlayerPosition.class);
-						if (collector == entityTracker.getPlayerId() && entityTracker.getClientEntityTypes()
-								.get(collected) == Entity1_10Types.EntityType.DROPPED_ITEM){
+						if (entityTracker.getClientEntityTypes().get(collector) == Entity1_10Types.EntityType.PLAYER
+								&& entityTracker.getClientEntityTypes().get(collected)
+								== Entity1_10Types.EntityType.DROPPED_ITEM){
+							EntityTracker.Position position = entityTracker.getPlayerPosition(collector);
 							PacketWrapper sound = new PacketWrapper(0x29,null,packetWrapper.user());
 							sound.write(Type.STRING,"random.pop");
-							sound.write(Type.INT,(int)(playerPosition.getPosX() * 8));
-							sound.write(Type.INT,(int)(playerPosition.getPosY() * 8));
-							sound.write(Type.INT,(int)(playerPosition.getPosZ() * 8));
+							sound.write(Type.INT,(int)(position.getX() * 8));
+							sound.write(Type.INT,(int)(position.getY() * 8));
+							sound.write(Type.INT,(int)(position.getZ() * 8));
 							sound.write(Type.FLOAT,0.2f);
 							sound.write(Type.UNSIGNED_BYTE, (short) 127);
 							sound.send(Protocol1_8TO1_9.class);
@@ -1439,15 +1450,17 @@ public class Protocol1_8TO1_9 extends Protocol {
 						int entityId = packetWrapper.get(Type.VAR_INT, 0);
 						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
 						EntityReplacement replacement = tracker.getEntityReplacement(entityId);
+						int x = packetWrapper.get(Type.INT, 0);
+						int y = packetWrapper.get(Type.INT, 1);
+						int z = packetWrapper.get(Type.INT, 2);
 						if (replacement!=null) {
 							packetWrapper.cancel();
-							int x = packetWrapper.get(Type.INT, 0);
-							int y = packetWrapper.get(Type.INT, 1);
-							int z = packetWrapper.get(Type.INT, 2);
 							int yaw = packetWrapper.get(Type.BYTE, 0);
 							int pitch = packetWrapper.get(Type.BYTE, 1);
 							replacement.setLocation(x / 32.0, y / 32.0, z / 32.0);
 							replacement.setYawPitch(yaw * 360f / 256, pitch * 360f / 256);
+						} else if (tracker.getClientEntityTypes().get(entityId) == Entity1_10Types.EntityType.PLAYER) {
+							tracker.setPlayerPosition(entityId, new EntityTracker.Position(x/32.0, y/32.0, z/32.0));
 						}
 					}
 				});
