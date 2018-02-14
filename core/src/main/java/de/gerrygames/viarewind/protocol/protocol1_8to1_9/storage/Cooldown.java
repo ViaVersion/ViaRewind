@@ -35,6 +35,7 @@ public class Cooldown extends StoredObject {
 					Via.getPlatform().cancelTask(taskId);
 					return;
 				}
+
 				if (!hasCooldown()) {
 					if (lastSend) {
 						hide();
@@ -42,28 +43,29 @@ public class Cooldown extends StoredObject {
 					}
 					return;
 				}
+
 				BlockPlaceDestroyTracker tracker = getUser().get(BlockPlaceDestroyTracker.class);
-				if (tracker.isMining() || System.currentTimeMillis()-tracker.getLastMining()<50) {
+				if (tracker.isMining()) {
 					lastHit = 0;
 					hide();
+					lastSend = false;
 					return;
 				}
 
 				String title = getTitle();
-
 				if (cooldownIndicator==ViaRewindConfig.CooldownIndicator.TITLE) {
 					sendTitle("", title, 0, 2, 5);
 				} else if (cooldownIndicator==ViaRewindConfig.CooldownIndicator.ACTION_BAR) {
 					sendActionBar(title);
-					lastSend = true;
 				}
+				lastSend = true;
 			}
 		}, 1L);
 	}
 
 	private void hide() {
 		if (cooldownIndicator==ViaRewindConfig.CooldownIndicator.ACTION_BAR) {
-			sendActionBar("§r");
+			sendActionBar("§rnichts");
 		} if (cooldownIndicator==ViaRewindConfig.CooldownIndicator.TITLE) {
 			hideTitle();
 		}
@@ -163,8 +165,6 @@ public class Cooldown extends StoredObject {
 	}
 
 	public void hit() {
-		BlockPlaceDestroyTracker tracker = getUser().get(BlockPlaceDestroyTracker.class);
-		if (tracker.isMining() || System.currentTimeMillis()-tracker.getBlockPlaced()<100 || System.currentTimeMillis()-tracker.getLastMining()<100) return;
 		lastHit = System.currentTimeMillis();
 	}
 

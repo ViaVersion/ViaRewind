@@ -1656,12 +1656,19 @@ public class Protocol1_8TO1_9 extends Protocol {
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
-						int state = packetWrapper.get(Type.BYTE, 0);
-						if (state==0) packetWrapper.user().get(BlockPlaceDestroyTracker.class).setMining(true);
-						else if (state==2) packetWrapper.user().get(BlockPlaceDestroyTracker.class).setMining(false);
-						else if (state==1) {
-							packetWrapper.user().get(BlockPlaceDestroyTracker.class).setMining(false);
-							packetWrapper.user().get(Cooldown.class).setLastHit(System.currentTimeMillis());
+						int state = packetWrapper.get(Type.VAR_INT, 0);
+						if (state==0) {
+							packetWrapper.user().get(BlockPlaceDestroyTracker.class).setMining(true);
+						} else if (state==2) {
+							BlockPlaceDestroyTracker tracker = packetWrapper.user().get(BlockPlaceDestroyTracker.class);
+							tracker.setMining(false);
+							tracker.setLastMining(System.currentTimeMillis()+100);
+							packetWrapper.user().get(Cooldown.class).setLastHit(0);
+						} else if (state==1) {
+							BlockPlaceDestroyTracker tracker = packetWrapper.user().get(BlockPlaceDestroyTracker.class);
+							tracker.setMining(false);
+							tracker.setLastMining(0);
+							packetWrapper.user().get(Cooldown.class).hit();
 						}
 					}
 				});

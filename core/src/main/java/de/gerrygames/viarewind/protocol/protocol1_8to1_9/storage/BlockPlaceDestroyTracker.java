@@ -20,7 +20,8 @@ public class BlockPlaceDestroyTracker extends StoredObject {
 	}
 
 	public boolean isMining() {
-		return mining;
+		long time = System.currentTimeMillis()-lastMining;
+		return mining && time<75 || time<75;
 	}
 
 	public void setMining(boolean mining) {
@@ -33,8 +34,12 @@ public class BlockPlaceDestroyTracker extends StoredObject {
 	}
 
 	public void updateMinig() {
-		if (this.mining) {
+		if (this.isMining()) {
 			lastMining = System.currentTimeMillis();
 		}
+	}
+
+	public void setLastMining(long lastMining) {
+		this.lastMining = lastMining;
 	}
 }
