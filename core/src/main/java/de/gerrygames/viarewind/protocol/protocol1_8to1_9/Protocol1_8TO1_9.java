@@ -21,6 +21,7 @@ import de.gerrygames.viarewind.utils.ChatUtil;
 import de.gerrygames.viarewind.utils.PacketUtil;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Pair;
+import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.entities.Entity1_10Types;
 import us.myles.ViaVersion.api.minecraft.Position;
@@ -1725,7 +1726,15 @@ public class Protocol1_8TO1_9 extends Protocol {
 						//the cooldown value gets reset by this packet
 						//1.8 sends it before the use entity packet
 						//1.9 afterwards
-						PacketUtil.sendToServer(delayedPacket, Protocol1_8TO1_9.class, true, false);
+						Via.getPlatform().runSync(() -> {
+							try {
+								PacketUtil.sendToServer(delayedPacket, Protocol1_8TO1_9.class, true, false);
+							} catch (CancelException ignored) {
+
+							} catch (Exception ex) {
+								ex.printStackTrace();
+							}
+						});
 					}
 				});
 				handler(new PacketHandler() {
