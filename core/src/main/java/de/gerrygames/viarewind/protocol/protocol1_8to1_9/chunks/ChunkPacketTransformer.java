@@ -14,7 +14,6 @@ import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.CustomByteType;
 import us.myles.ViaVersion.exception.CancelException;
-import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.chunks.ChunkSection1_9_1_2;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.types.Chunk1_9_1_2Type;
 
@@ -27,15 +26,6 @@ public class ChunkPacketTransformer {
 		int primaryBitMask = chunk1_9.getBitmask();
 
 		ByteBuf buf = Unpooled.buffer();
-
-		if (chunk1_9.isGroundUp() && primaryBitMask == 0) {
-			primaryBitMask = 65535;
-			for (int i = 0; i<chunk1_9.getSections().length; i++) {
-				ChunkSection1_9_1_2 chunkSection = new ChunkSection1_9_1_2();
-				chunk1_9.getSections()[i] = chunkSection;
-				if (skyLight) chunkSection.setSkyLight(new byte[ChunkSection1_9_1_2.LIGHT_LENGTH]);
-			}
-		}
 
 		for (int i = 0; i < chunk1_9.getSections().length; i++) {
 			if ((primaryBitMask & 1 << i) == 0) continue;
@@ -67,6 +57,11 @@ public class ChunkPacketTransformer {
 				ChunkSection section = chunk1_9.getSections()[i];
 				section.writeSkyLight(buf);
 			}
+		}
+
+		if (chunk1_9.isGroundUp() && primaryBitMask == 0) {
+			primaryBitMask = 65535;
+			buf.writeBytes(new byte[2 * 16 * 4096 + 16 * 4096 / 2 + (skyLight ? 16 * 4096 / 2 : 0)]);
 		}
 
 		if (chunk1_9.isGroundUp()) {
