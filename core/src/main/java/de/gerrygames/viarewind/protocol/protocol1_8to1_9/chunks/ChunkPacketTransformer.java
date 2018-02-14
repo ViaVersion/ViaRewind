@@ -3,6 +3,7 @@ package de.gerrygames.viarewind.protocol.protocol1_8to1_9.chunks;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.Protocol1_8TO1_9;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.items.ReplacementRegistry1_8to1_9;
 import de.gerrygames.viarewind.storage.BlockStorage;
+import de.gerrygames.viarewind.utils.PacketUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import us.myles.ViaVersion.api.PacketWrapper;
@@ -13,7 +14,6 @@ import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
 import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.CustomByteType;
-import us.myles.ViaVersion.exception.CancelException;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.types.Chunk1_9_1_2Type;
 
@@ -103,13 +103,7 @@ public class ChunkPacketTransformer {
 			updateTileEntity.write(Type.UNSIGNED_BYTE, action);
 			updateTileEntity.write(Type.NBT, nbt);
 
-			try {
-				updateTileEntity.send(Protocol1_8TO1_9.class, false, false);
-			} catch (CancelException ignored) {
-				;
-			} catch (Exception ex) {
-				ex.printStackTrace();
-			}
+			PacketUtil.sendPacket(updateTileEntity, Protocol1_8TO1_9.class, false, false);
 		});
 
 		byte[] finaldata = new byte[buf.readableBytes()];

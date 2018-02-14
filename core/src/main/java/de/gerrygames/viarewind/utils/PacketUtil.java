@@ -9,6 +9,7 @@ import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.type.Type;
+import us.myles.ViaVersion.exception.CancelException;
 import us.myles.ViaVersion.packets.Direction;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 
@@ -63,6 +64,26 @@ public class PacketUtil {
 		Type.VAR_INT.write(output, PacketWrapper.PASSTHROUGH_ID);
 		packet.writeToBuffer(output);
 		return output;
+	}
+
+	public static boolean sendPacket(PacketWrapper packet, Class<? extends Protocol> packetProtocol) {
+		return sendPacket(packet, packetProtocol, true);
+	}
+
+	public static boolean sendPacket(PacketWrapper packet, Class<? extends Protocol> packetProtocol, boolean skipCurrentPipeline) {
+		return sendPacket(packet, packetProtocol, true, false);
+	}
+
+	public static boolean sendPacket(PacketWrapper packet, Class<? extends Protocol> packetProtocol, boolean skipCurrentPipeline, boolean currentThread) {
+		try {
+			packet.send(packetProtocol, skipCurrentPipeline, currentThread);
+			return true;
+		} catch (CancelException ignored) {
+			;
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		return false;
 	}
 
 }

@@ -1,6 +1,7 @@
 package de.gerrygames.viarewind.protocol.protocol1_8to1_9.bossbar;
 
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.Protocol1_8TO1_9;
+import de.gerrygames.viarewind.utils.PacketUtil;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.boss.BossBar;
 import us.myles.ViaVersion.api.boss.BossColor;
@@ -171,13 +172,7 @@ public class WitherBossBar extends BossBar {
 
 		packetWrapper.write(Types1_8.METADATA_LIST, metadata);
 
-		try {
-			packetWrapper.send(Protocol1_8TO1_9.class, true, true);
-		} catch (CancelException ex) {
-			;
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
+		PacketUtil.sendPacket(packetWrapper, Protocol1_8TO1_9.class, true, true);
 	}
 
 	private void updateLocation() {
@@ -190,13 +185,7 @@ public class WitherBossBar extends BossBar {
 		packetWrapper.write(Type.BYTE, (byte)0);
 		packetWrapper.write(Type.BOOLEAN, false);
 
-		try {
-			packetWrapper.send(Protocol1_8TO1_9.class, true, true);
-		} catch (CancelException ex) {
-			;
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
+		PacketUtil.sendPacket(packetWrapper, Protocol1_8TO1_9.class, true, true);
 	}
 
 	private void updateMetadata() {
@@ -209,26 +198,14 @@ public class WitherBossBar extends BossBar {
 
 		packetWrapper.write(Types1_8.METADATA_LIST, metadata);
 
-		try {
-			packetWrapper.send(Protocol1_8TO1_9.class, true, true);
-		} catch (CancelException ex) {
-			;
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
+		PacketUtil.sendPacket(packetWrapper, Protocol1_8TO1_9.class, true, true);
 	}
 
 	private void despawnWither() {
 		PacketWrapper packetWrapper = new PacketWrapper(0x13, null, this.connection);
 		packetWrapper.write(Type.VAR_INT_ARRAY, new Integer[] {entityId});
 
-		try {
-			packetWrapper.send(Protocol1_8TO1_9.class, true, true);
-		} catch (CancelException ex) {
-			;
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
+		PacketUtil.sendPacket(packetWrapper, Protocol1_8TO1_9.class, true, true);
 	}
 
 	public void setPlayerLocation(double posX, double posY, double posZ, float yaw, float pitch) {

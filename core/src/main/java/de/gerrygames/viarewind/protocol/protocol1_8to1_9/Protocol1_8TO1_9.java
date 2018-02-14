@@ -123,9 +123,7 @@ public class Protocol1_8TO1_9 extends Protocol {
 							velocity.write(Type.SHORT, vX);
 							velocity.write(Type.SHORT, vY);
 							velocity.write(Type.SHORT, vZ);
-							try {
-								velocity.send(Protocol1_8TO1_9.class, true, false);
-							} catch (Exception ex) {ex.printStackTrace();}
+							PacketUtil.sendPacket(velocity, Protocol1_8TO1_9.class);
 						}
 					}
 				});
@@ -872,9 +870,7 @@ public class Protocol1_8TO1_9 extends Protocol {
 						secondPacket.write(Type.BYTE, relZ2);
 						secondPacket.write(Type.BOOLEAN, onGround);
 
-						try {
-							secondPacket.send(Protocol1_8TO1_9.class, true, true);
-						} catch (CancelException ignored) {}
+						PacketUtil.sendPacket(secondPacket, Protocol1_8TO1_9.class);
 					}
 				});
 			}
@@ -933,9 +929,7 @@ public class Protocol1_8TO1_9 extends Protocol {
 						secondPacket.write(Type.BYTE, pitch);
 						secondPacket.write(Type.BOOLEAN, onGround);
 
-						try {
-							secondPacket.send(Protocol1_8TO1_9.class, true, true);
-						} catch (CancelException ignored) {}
+						PacketUtil.sendPacket(secondPacket, Protocol1_8TO1_9.class);
 					}
 				});
 			}
@@ -1064,7 +1058,22 @@ public class Protocol1_8TO1_9 extends Protocol {
 
 						confirm.write(Type.VAR_INT, id);
 
-						PacketUtil.sendToServer(confirm, Protocol1_8TO1_9.class, true, true);
+						try {
+							PacketUtil.sendToServer(confirm, Protocol1_8TO1_9.class, true, false);
+						} catch (CancelException ignored) {
+							;
+						} catch (Exception ex) {
+							ex.printStackTrace();
+						}
+					}
+				});
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						PlayerPosition pos = packetWrapper.user().get(PlayerPosition.class);
+						pos.setPos(packetWrapper.get(Type.DOUBLE, 0), packetWrapper.get(Type.DOUBLE, 1), packetWrapper.get(Type.DOUBLE, 2));
+						pos.setYaw(packetWrapper.get(Type.FLOAT, 0));
+						pos.setPitch(packetWrapper.get(Type.FLOAT, 1));
 					}
 				});
 			}
@@ -1271,9 +1280,7 @@ public class Protocol1_8TO1_9 extends Protocol {
 								detach.write(Type.INT, passenger);
 								detach.write(Type.INT, -1);
 								detach.write(Type.BOOLEAN, false);
-								try {
-									detach.send(Protocol1_8TO1_9.class, true, false);
-								} catch (Exception ex) {ex.printStackTrace();}
+								PacketUtil.sendPacket(detach, Protocol1_8TO1_9.class);
 							}
 						}
 						for (int i = 0; i<count; i++) {
@@ -1283,9 +1290,7 @@ public class Protocol1_8TO1_9 extends Protocol {
 							attach.write(Type.INT, p);
 							attach.write(Type.INT, v);
 							attach.write(Type.BOOLEAN, false);
-							try {
-								attach.send(Protocol1_8TO1_9.class, true, false);
-							} catch (Exception ex) {ex.printStackTrace();}
+							PacketUtil.sendPacket(attach, Protocol1_8TO1_9.class);
 						}
 					}
 				});
@@ -1575,6 +1580,7 @@ public class Protocol1_8TO1_9 extends Protocol {
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						PlayerPosition pos = packetWrapper.user().get(PlayerPosition.class);
 						pos.setPos(packetWrapper.get(Type.DOUBLE, 0), packetWrapper.get(Type.DOUBLE, 1), packetWrapper.get(Type.DOUBLE, 2));
+						pos.setOnGround(packetWrapper.get(Type.BOOLEAN, 0));
 					}
 				});
 				handler(new PacketHandler() {
@@ -1599,6 +1605,7 @@ public class Protocol1_8TO1_9 extends Protocol {
 						PlayerPosition pos = packetWrapper.user().get(PlayerPosition.class);
 						pos.setYaw(packetWrapper.get(Type.FLOAT, 0));
 						pos.setPitch(packetWrapper.get(Type.FLOAT, 1));
+						pos.setOnGround(packetWrapper.get(Type.BOOLEAN, 0));
 					}
 				});
 				handler(new PacketHandler() {
@@ -1627,6 +1634,7 @@ public class Protocol1_8TO1_9 extends Protocol {
 						pos.setPos(packetWrapper.get(Type.DOUBLE, 0), packetWrapper.get(Type.DOUBLE, 1), packetWrapper.get(Type.DOUBLE, 2));
 						pos.setYaw(packetWrapper.get(Type.FLOAT, 0));
 						pos.setPitch(packetWrapper.get(Type.FLOAT, 1));
+						pos.setOnGround(packetWrapper.get(Type.BOOLEAN, 0));
 					}
 				});
 				handler(new PacketHandler() {
@@ -1689,7 +1697,13 @@ public class Protocol1_8TO1_9 extends Protocol {
 							PacketWrapper useItem = new PacketWrapper(0x1D, null, packetWrapper.user());
 							useItem.write(Type.VAR_INT, 0);
 
-							PacketUtil.sendToServer(useItem, Protocol1_8TO1_9.class, true, true);
+							try {
+								PacketUtil.sendToServer(useItem, Protocol1_8TO1_9.class, true, true);
+							} catch (CancelException ignored) {
+								;
+							} catch (Exception ex) {
+								ex.printStackTrace();
+							}
 						}
 					}
 				});
@@ -1765,6 +1779,15 @@ public class Protocol1_8TO1_9 extends Protocol {
 						int action = packetWrapper.get(Type.VAR_INT, 1);
 						if (action==6) {
 							packetWrapper.set(Type.VAR_INT, 1, 7);
+						} else if (action==0) {
+							PlayerPosition pos = packetWrapper.user().get(PlayerPosition.class);
+							if (!pos.isOnGround()) {
+								PacketWrapper elytra = new PacketWrapper(0x14, null, packetWrapper.user());
+								elytra.write(Type.VAR_INT, packetWrapper.get(Type.VAR_INT, 0));
+								elytra.write(Type.VAR_INT, 8);
+								elytra.write(Type.VAR_INT, 0);
+								PacketUtil.sendToServer(elytra, Protocol1_8TO1_9.class, true, false);
+							}
 						}
 					}
 				});
@@ -1790,7 +1813,13 @@ public class Protocol1_8TO1_9 extends Protocol {
 							float forward = packetWrapper.get(Type.FLOAT, 1);
 							steerBoat.write(Type.BOOLEAN, forward!=0.0f || left<0.0f);
 							steerBoat.write(Type.BOOLEAN, forward!=0.0f || left>0.0f);
-							PacketUtil.sendToServer(steerBoat, Protocol1_8TO1_9.class, true, false);
+							try {
+								PacketUtil.sendToServer(steerBoat, Protocol1_8TO1_9.class, true, false);
+							} catch (CancelException ignored) {
+								;
+							} catch (Exception ex) {
+								ex.printStackTrace();
+							}
 						}
 					}
 				});
@@ -1938,7 +1967,7 @@ public class Protocol1_8TO1_9 extends Protocol {
 
 						updateSkin.write(Types1_8.METADATA_LIST, metadata);
 
-						updateSkin.send(Protocol1_8TO1_9.class, true, false);
+						PacketUtil.sendPacket(updateSkin, Protocol1_8TO1_9.class);
 					}
 				});
 			}

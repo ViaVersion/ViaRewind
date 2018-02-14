@@ -434,7 +434,7 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 							velocity.write(Type.SHORT, vX);
 							velocity.write(Type.SHORT, vY);
 							velocity.write(Type.SHORT, vZ);
-							velocity.send(Protocol1_7_6_10TO1_8.class);
+							PacketUtil.sendPacket(velocity, Protocol1_7_6_10TO1_8.class);
 						}
 					}
 				});
@@ -592,7 +592,7 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 							destroy.write(Type.BYTE, (byte)127);
 							CustomIntType customIntType = new CustomIntType(127);
 							destroy.write(customIntType, entityIds2);
-							destroy.send(Protocol1_7_6_10TO1_8.class);
+							PacketUtil.sendPacket(destroy, Protocol1_7_6_10TO1_8.class);
 						}
 
 						packetWrapper.write(Type.BYTE, ((Integer)entityIds.length).byteValue());
@@ -1336,8 +1336,7 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 								columnUpdate.write(Type.SHORT, (short)columnData.length);
 								columnUpdate.write(new CustomByteType(columnData.length), columnData);
 
-								//packetWrapper.user().get(MapPacketCache.class).add(columnUpdate);
-								columnUpdate.send(Protocol1_7_6_10TO1_8.class, true, true);
+								PacketUtil.sendPacket(columnUpdate, Protocol1_7_6_10TO1_8.class, true, true);
 							}
 						}
 
@@ -1354,14 +1353,14 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 							iconUpdate.write(Type.SHORT, (short)iconData.length);
 							CustomByteType customByteType = new CustomByteType(iconData.length);
 							iconUpdate.write(customByteType, iconData);
-							iconUpdate.send(Protocol1_7_6_10TO1_8.class, true, true);
+							PacketUtil.sendPacket(iconUpdate, Protocol1_7_6_10TO1_8.class, true, true);
 						}
 
 						PacketWrapper scaleUpdate = new PacketWrapper(0x34, null, packetWrapper.user());
 						scaleUpdate.write(Type.VAR_INT, id);
 						scaleUpdate.write(Type.SHORT, (short)2);
 						scaleUpdate.write(new CustomByteType(2), new byte[] {2, scale});
-						scaleUpdate.send(Protocol1_7_6_10TO1_8.class, true, true);
+						PacketUtil.sendPacket(scaleUpdate, Protocol1_7_6_10TO1_8.class, true, true);
 					}
 				});
 			}
@@ -1438,7 +1437,7 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 								packet.write(Type.STRING, gameProfile.name);
 								packet.write(Type.BOOLEAN, true);
 								packet.write(Type.SHORT, (short) ping);
-								packet.send(Protocol1_7_6_10TO1_8.class);
+								PacketUtil.sendPacket(packet, Protocol1_7_6_10TO1_8.class);
 							} else if (action==2) {
 								int ping = packetWrapper.read(Type.VAR_INT);
 
@@ -1452,7 +1451,7 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 								packet.write(Type.STRING, gameProfile.name);
 								packet.write(Type.BOOLEAN, true);
 								packet.write(Type.SHORT, (short) ping);
-								packet.send(Protocol1_7_6_10TO1_8.class);
+								PacketUtil.sendPacket(packet, Protocol1_7_6_10TO1_8.class);
 							} else if (action==3) {
 								String displayName = packetWrapper.read(Type.BOOLEAN) ? packetWrapper.read(Type.STRING) : null;
 								if (displayName!=null) displayName = GameProfileStorage.GameProfile.fixDisplayName(displayName);
@@ -1472,7 +1471,7 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 								packet.write(Type.STRING, gameProfile.name);
 								packet.write(Type.BOOLEAN, false);
 								packet.write(Type.SHORT, (short) gameProfile.ping);
-								packet.send(Protocol1_7_6_10TO1_8.class);
+								PacketUtil.sendPacket(packet, Protocol1_7_6_10TO1_8.class);
 							}
 						}
 					}
@@ -1613,7 +1612,7 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 							PacketWrapper remove = new PacketWrapper(0x3E, null, packetWrapper.user());
 							remove.write(Type.STRING, team);
 							remove.write(Type.BYTE, (byte)1);
-							remove.send(Protocol1_7_6_10TO1_8.class, true, true);
+							PacketUtil.sendPacket(remove, Protocol1_7_6_10TO1_8.class, true, true);
 						}
 
 						if (mode==0) scoreboard.addTeam(team);
@@ -1913,7 +1912,13 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 								PacketWrapper teleportPacket = new PacketWrapper(0x18, null, packetWrapper.user());
 								teleportPacket.write(Type.UUID, profile.uuid);
 
-								PacketUtil.sendToServer(teleportPacket, Protocol1_7_6_10TO1_8.class, true, true);
+								try {
+									PacketUtil.sendToServer(teleportPacket, Protocol1_7_6_10TO1_8.class, true, true);
+								} catch (CancelException ignored) {
+									;
+								} catch (Exception ex) {
+									ex.printStackTrace();
+								}
 							}
 						}
 					}
@@ -2096,7 +2101,7 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 						entityAction.write(Type.VAR_INT, entityId);
 						entityAction.write(Type.VAR_INT, animation);
 						entityAction.write(Type.VAR_INT, 0);
-						entityAction.send(Protocol1_7_6_10TO1_8.class, true, true);
+						PacketUtil.sendPacket(entityAction, Protocol1_7_6_10TO1_8.class, true, true);
 					}
 				});
 			}
@@ -2125,7 +2130,7 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 							abilitiesPacket.write(Type.BYTE, abilities.getFlags());
 							abilitiesPacket.write(Type.FLOAT, abilities.isSprinting() ? abilities.getFlySpeed() * 2.0f : abilities.getFlySpeed());
 							abilitiesPacket.write(Type.FLOAT, abilities.getWalkSpeed());
-							abilitiesPacket.send(Protocol1_7_6_10TO1_8.class, true, false);
+							PacketUtil.sendPacket(abilitiesPacket, Protocol1_7_6_10TO1_8.class);
 						}
 					}
 				});
@@ -2161,8 +2166,13 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 								unsneakPacket.write(Type.VAR_INT, 1);  //Stop sneaking
 								unsneakPacket.write(Type.VAR_INT, 0);  //Action Parameter
 
-								PacketUtil.sendToServer(sneakPacket, Protocol1_7_6_10TO1_8.class, true, false);
-								//PacketUtil.sendToServer(unsneakPacket, Protocol1_7_6_10TO1_8.class, true, false);
+								try {
+									PacketUtil.sendToServer(sneakPacket, Protocol1_7_6_10TO1_8.class, true, false);
+								} catch (CancelException ignored) {
+									;
+								} catch (Exception ex) {
+									ex.printStackTrace();
+								}
 							}
 						}
 					}
@@ -2323,7 +2333,7 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 									tabComplete.write(Type.STRING, profile.name);
 								}
 
-								tabComplete.send(Protocol1_7_6_10TO1_8.class, true, false);
+								PacketUtil.sendPacket(tabComplete, Protocol1_7_6_10TO1_8.class);
 							}
 						}
 					}
@@ -2378,9 +2388,7 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 							updateCost.write(Type.SHORT, (short) 0);
 							updateCost.write(Type.SHORT, windows.levelCost);
 
-							try {
-								updateCost.send(Protocol1_7_6_10TO1_8.class, true, true);
-							} catch (CancelException ignored) {};
+							PacketUtil.sendPacket(updateCost, Protocol1_7_6_10TO1_8.class, true, true);
 						} else if (channel.equalsIgnoreCase("MC|BEdit") || channel.equalsIgnoreCase("MC|BSign")) {
 							packetWrapper.read(Type.SHORT); //length
 							Item book = packetWrapper.read(Types1_7_6_10.COMPRESSED_NBT_ITEM);

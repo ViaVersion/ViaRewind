@@ -11,6 +11,7 @@ import us.myles.ViaVersion.api.entities.Entity1_10Types;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.version.Types1_8;
+import us.myles.ViaVersion.exception.CancelException;
 
 import java.util.List;
 import java.util.Map;
@@ -72,11 +73,7 @@ public class EntityTracker extends StoredObject {
 			wrapper.write(Types1_8.METADATA_LIST, this.metadataBuffer.get(entityId));
 			MetadataRewriter.transform(type, this.metadataBuffer.get(entityId));
 			if (!this.metadataBuffer.get(entityId).isEmpty()) {
-				try {
-					wrapper.send(Protocol1_7_6_10TO1_8.class);
-				} catch (Exception ex) {
-					ex.printStackTrace();
-				}
+				PacketUtil.sendPacket(wrapper, Protocol1_7_6_10TO1_8.class);
 			}
 
 			this.metadataBuffer.remove(entityId);
@@ -108,7 +105,6 @@ public class EntityTracker extends StoredObject {
 				unsneakPacket.write(Type.VAR_INT, 0);  //Action Parameter
 
 				PacketUtil.sendToServer(sneakPacket, Protocol1_7_6_10TO1_8.class, true, true);
-				//PacketUtil.sendToServer(unsneakPacket, Protocol1_7_6_10TO1_8.class, true, false);
 
 				setSpectating(playerId);
 			} catch (Exception ex) {ex.printStackTrace();}
@@ -127,7 +123,7 @@ public class EntityTracker extends StoredObject {
 		return spectating;
 	}
 
-	public boolean setSpectating(int spectating) throws Exception {
+	public boolean setSpectating(int spectating) {
 		if (spectating!=this.playerId && getPassenger(spectating)!=-1) {
 
 			PacketWrapper sneakPacket = new PacketWrapper(0x0B, null, getUser());
@@ -140,8 +136,13 @@ public class EntityTracker extends StoredObject {
 			unsneakPacket.write(Type.VAR_INT, 1);  //Stop sneaking
 			unsneakPacket.write(Type.VAR_INT, 0);  //Action Parameter
 
-			PacketUtil.sendToServer(sneakPacket, Protocol1_7_6_10TO1_8.class, true, true);
-			//PacketUtil.sendToServer(unsneakPacket, Protocol1_7_6_10TO1_8.class, true, false);
+			try {
+				PacketUtil.sendToServer(sneakPacket, Protocol1_7_6_10TO1_8.class, true, true);
+			} catch (CancelException ignored) {
+				;
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
 
 			setSpectating(this.playerId);
 			return false;  //Entity has Passenger
@@ -152,7 +153,7 @@ public class EntityTracker extends StoredObject {
 			unmount.write(Type.INT, this.playerId);
 			unmount.write(Type.INT, -1);
 			unmount.write(Type.BOOLEAN, false);
-			unmount.send(Protocol1_7_6_10TO1_8.class, true, false);
+			PacketUtil.sendPacket(unmount, Protocol1_7_6_10TO1_8.class);
 		}
 		this.spectating = spectating;
 		if (spectating!=this.playerId) {
@@ -160,7 +161,7 @@ public class EntityTracker extends StoredObject {
 			mount.write(Type.INT, this.playerId);
 			mount.write(Type.INT, this.spectating);
 			mount.write(Type.BOOLEAN, false);
-			mount.send(Protocol1_7_6_10TO1_8.class, true, false);
+			PacketUtil.sendPacket(mount, Protocol1_7_6_10TO1_8.class);
 		}
 		return true;
 	}

@@ -2,6 +2,7 @@ package de.gerrygames.viarewind.protocol.protocol1_8to1_9.entityreplacement;
 
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.Protocol1_8TO1_9;
 import de.gerrygames.viarewind.replacement.EntityReplacement;
+import de.gerrygames.viarewind.utils.PacketUtil;
 import lombok.Getter;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.data.UserConnection;
@@ -63,15 +64,11 @@ public class ShulkerBulletReplacement implements EntityReplacement {
 		teleport.write(Type.INT, (int) (locX * 32.0));
 		teleport.write(Type.INT, (int) (locY * 32.0));
 		teleport.write(Type.INT, (int) (locZ * 32.0));
-		//teleport.write(Type.BYTE, (byte)((yaw / 360f) * 256));
 		teleport.write(Type.BYTE, (byte) 0);
-		//teleport.write(Type.BYTE, (byte)((pitch / 360f) * 256));
 		teleport.write(Type.BYTE, (byte) 0);
 		teleport.write(Type.BOOLEAN, true);
 
-		try {
-			teleport.send(Protocol1_8TO1_9.class, true, true);
-		} catch (Exception ex) {ex.printStackTrace();}
+		PacketUtil.sendPacket(teleport, Protocol1_8TO1_9.class, true, true);
 	}
 
 	@Override
@@ -86,9 +83,7 @@ public class ShulkerBulletReplacement implements EntityReplacement {
 		spawn.write(Type.BYTE, (byte) 0);
 		spawn.write(Type.INT, 0);
 
-		try {
-			spawn.send(Protocol1_8TO1_9.class, true, true);
-		} catch (Exception ex) {ex.printStackTrace();}
+		PacketUtil.sendPacket(spawn, Protocol1_8TO1_9.class, true, true);
 	}
 
 	@Override
@@ -96,9 +91,6 @@ public class ShulkerBulletReplacement implements EntityReplacement {
 		PacketWrapper despawn = new PacketWrapper(0x13, null, user);
 		despawn.write(Type.VAR_INT_ARRAY, new Integer[] {entityId});
 
-		try {
-			despawn.send(Protocol1_8TO1_9.class, true, true);
-		} catch (Exception ex) {ex.printStackTrace();}
-
+		PacketUtil.sendPacket(despawn, Protocol1_8TO1_9.class, true, true);
 	}
 }

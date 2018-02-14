@@ -3,6 +3,7 @@ package de.gerrygames.viarewind.protocol.protocol1_8to1_9.entityreplacement;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.Protocol1_8TO1_9;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.metadata.MetadataRewriter;
 import de.gerrygames.viarewind.replacement.EntityReplacement;
+import de.gerrygames.viarewind.utils.PacketUtil;
 import lombok.Getter;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.data.UserConnection;
@@ -11,7 +12,6 @@ import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
 import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_9;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.version.Types1_8;
-import us.myles.ViaVersion.exception.CancelException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,9 +65,7 @@ public class ShulkerReplacement implements EntityReplacement {
 		teleport.write(Type.BYTE, (byte) 0);
 		teleport.write(Type.BOOLEAN, true);
 
-		try {
-			teleport.send(Protocol1_8TO1_9.class, true, true);
-		} catch (Exception ex) {ex.printStackTrace();}
+		PacketUtil.sendPacket(teleport, Protocol1_8TO1_9.class, true, true);
 	}
 
 	public void updateMetadata() {
@@ -85,11 +83,7 @@ public class ShulkerReplacement implements EntityReplacement {
 
 		metadataPacket.write(Types1_8.METADATA_LIST, metadataList);
 
-		try {
-			metadataPacket.send(Protocol1_8TO1_9.class, true, false);
-		} catch (CancelException ignored) {
-
-		} catch (Exception ex) {ex.printStackTrace();}
+		PacketUtil.sendPacket(metadataPacket, Protocol1_8TO1_9.class);
 	}
 
 	@Override
@@ -108,9 +102,7 @@ public class ShulkerReplacement implements EntityReplacement {
 		spawn.write(Type.SHORT, (short) 0);
 		spawn.write(Types1_8.METADATA_LIST, new ArrayList<>());
 
-		try {
-			spawn.send(Protocol1_8TO1_9.class, true, true);
-		} catch (Exception ex) {ex.printStackTrace();}
+		PacketUtil.sendPacket(spawn, Protocol1_8TO1_9.class, true, true);
 	}
 
 	@Override
@@ -118,9 +110,6 @@ public class ShulkerReplacement implements EntityReplacement {
 		PacketWrapper despawn = new PacketWrapper(0x13, null, user);
 		despawn.write(Type.VAR_INT_ARRAY, new Integer[] {entityId});
 
-		try {
-			despawn.send(Protocol1_8TO1_9.class, true, true);
-		} catch (Exception ex) {ex.printStackTrace();}
-
+		PacketUtil.sendPacket(despawn, Protocol1_8TO1_9.class, true, true);
 	}
 }

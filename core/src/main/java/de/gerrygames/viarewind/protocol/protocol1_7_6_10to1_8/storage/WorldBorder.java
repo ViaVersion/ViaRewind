@@ -1,6 +1,7 @@
 package de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage;
 
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10TO1_8;
+import de.gerrygames.viarewind.utils.PacketUtil;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.StoredObject;
@@ -101,11 +102,7 @@ public class WorldBorder extends StoredObject {
 			particles.write(Type.FLOAT, 0f);
 			particles.write(Type.INT, a);
 
-			try {
-				particles.send(Protocol1_7_6_10TO1_8.class, true, true);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			PacketUtil.sendPacket(particles, Protocol1_7_6_10TO1_8.class, true, true);
 		}
 	}
 

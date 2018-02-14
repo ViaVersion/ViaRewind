@@ -1,6 +1,7 @@
 package de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage;
 
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.Protocol1_8TO1_9;
+import de.gerrygames.viarewind.utils.PacketUtil;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.StoredObject;
@@ -31,9 +32,7 @@ public class Levitation extends StoredObject {
 				packet.write(Type.SHORT, (short)0);
 				packet.write(Type.SHORT, (short)vY);
 				packet.write(Type.SHORT, (short)0);
-				try {
-					packet.send(Protocol1_8TO1_9.class, true, false);
-				} catch (Exception ex) {ex.printStackTrace();}
+				PacketUtil.sendPacket(packet, Protocol1_8TO1_9.class);
 			}
 		}, 1L);
 	}

@@ -3,6 +3,7 @@ package de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage;
 import de.gerrygames.viarewind.ViaRewind;
 import de.gerrygames.viarewind.api.ViaRewindConfig;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.Protocol1_8TO1_9;
+import de.gerrygames.viarewind.utils.PacketUtil;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.Via;
@@ -10,7 +11,6 @@ import us.myles.ViaVersion.api.data.StoredObject;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.platform.TaskId;
 import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.exception.CancelException;
 
 import java.util.ArrayList;
 
@@ -72,13 +72,7 @@ public class Cooldown extends StoredObject {
 	private void hideTitle() {
 		PacketWrapper hide = new PacketWrapper(0x45, null, getUser());
 		hide.write(Type.VAR_INT, 3);
-		try {
-			hide.send(Protocol1_8TO1_9.class, true, false);
-		} catch (CancelException ignored) {
-			;
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
+		PacketUtil.sendPacket(hide, Protocol1_8TO1_9.class);
 	}
 
 	private void sendTitle(String title, String subTitle, int fadeIn, int stay, int fadeOut) {
@@ -93,28 +87,18 @@ public class Cooldown extends StoredObject {
 		PacketWrapper subtitlePacket = new PacketWrapper(0x45, null, getUser());
 		subtitlePacket.write(Type.VAR_INT, 1);
 		subtitlePacket.write(Type.STRING, subTitle);
-		try {
-			titlePacket.send(Protocol1_8TO1_9.class, true, true);
-			subtitlePacket.send(Protocol1_8TO1_9.class, true, true);
-			timePacket.send(Protocol1_8TO1_9.class, true, true);
-		} catch (CancelException ignored) {
-			;
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
+
+		PacketUtil.sendPacket(titlePacket, Protocol1_8TO1_9.class);
+		PacketUtil.sendPacket(subtitlePacket, Protocol1_8TO1_9.class);
+		PacketUtil.sendPacket(timePacket, Protocol1_8TO1_9.class);
 	}
 
 	private void sendActionBar(String bar) {
 		PacketWrapper actionBarPacket = new PacketWrapper(0x02, null, getUser());
 		actionBarPacket.write(Type.STRING, bar);
 		actionBarPacket.write(Type.BYTE, (byte) 2);
-		try {
-			actionBarPacket.send(Protocol1_8TO1_9.class, true, true);
-		} catch (CancelException ignored) {
-			;
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
+
+		PacketUtil.sendPacket(actionBarPacket, Protocol1_8TO1_9.class);
 	}
 
 	public boolean hasCooldown() {

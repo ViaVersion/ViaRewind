@@ -5,6 +5,7 @@ import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.metadata.MetadataR
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.MetaType1_7_6_10;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
 import de.gerrygames.viarewind.replacement.EntityReplacement;
+import de.gerrygames.viarewind.utils.PacketUtil;
 import lombok.Getter;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.data.UserConnection;
@@ -123,9 +124,7 @@ public class ArmorStandReplacement implements EntityReplacement {
 			teleport.write(Type.BYTE, (byte)((yaw / 360f) * 256));
 			teleport.write(Type.BYTE, (byte)((pitch / 360f) * 256));
 
-			try {
-				teleport.send(Protocol1_7_6_10TO1_8.class, true, true);
-			} catch (Exception ex) {ex.printStackTrace();}
+			PacketUtil.sendPacket(teleport, Protocol1_7_6_10TO1_8.class, true, true);
 		} else if (currentState==State.HOLOGRAM) {
 			PacketWrapper detach = new PacketWrapper(0x1B, null, user);
 			detach.write(Type.INT, entityIds[1]);
@@ -153,12 +152,10 @@ public class ArmorStandReplacement implements EntityReplacement {
 			attach.write(Type.INT, entityIds[0]);
 			attach.write(Type.BOOLEAN, false);
 
-			try {
-				detach.send(Protocol1_7_6_10TO1_8.class, true, true);
-				teleportSkull.send(Protocol1_7_6_10TO1_8.class, true, true);
-				teleportHorse.send(Protocol1_7_6_10TO1_8.class, true, true);
-				attach.send(Protocol1_7_6_10TO1_8.class, true, true);
-			} catch (Exception ex) {ex.printStackTrace();}
+			PacketUtil.sendPacket(detach, Protocol1_7_6_10TO1_8.class, true, true);
+			PacketUtil.sendPacket(teleportSkull, Protocol1_7_6_10TO1_8.class, true, true);
+			PacketUtil.sendPacket(teleportHorse, Protocol1_7_6_10TO1_8.class, true, true);
+			PacketUtil.sendPacket(attach, Protocol1_7_6_10TO1_8.class, true, true);
 		}
 	}
 
@@ -192,9 +189,7 @@ public class ArmorStandReplacement implements EntityReplacement {
 			return;
 		}
 
-		try {
-			metadataPacket.send(Protocol1_7_6_10TO1_8.class, true, false);
-		} catch (Exception ex) {ex.printStackTrace();}
+		PacketUtil.sendPacket(metadataPacket, Protocol1_7_6_10TO1_8.class);
 	}
 
 	public void spawn() {
@@ -215,9 +210,7 @@ public class ArmorStandReplacement implements EntityReplacement {
 			spawn.write(Type.SHORT, (short) 0);
 			spawn.write(Types1_7_6_10.METADATA_LIST, new ArrayList<>());
 
-			try {
-				spawn.send(Protocol1_7_6_10TO1_8.class, true, true);
-			} catch (Exception ex) {ex.printStackTrace();}
+			PacketUtil.sendPacket(spawn, Protocol1_7_6_10TO1_8.class, true, true);
 
 			entityIds = new int[] {entityId};
 			updateMetadata();
@@ -249,10 +242,8 @@ public class ArmorStandReplacement implements EntityReplacement {
 			spawnHorse.write(Type.SHORT, (short) 0);
 			spawnHorse.write(Types1_7_6_10.METADATA_LIST, new ArrayList<>());
 
-			try {
-				spawnSkull.send(Protocol1_7_6_10TO1_8.class, true, true);
-				spawnHorse.send(Protocol1_7_6_10TO1_8.class, true, true);
-			} catch (Exception ex) {ex.printStackTrace();}
+			PacketUtil.sendPacket(spawnSkull, Protocol1_7_6_10TO1_8.class, true, true);
+			PacketUtil.sendPacket(spawnHorse, Protocol1_7_6_10TO1_8.class, true, true);
 
 			this.entityIds = entityIds;
 			updateMetadata();
@@ -268,8 +259,6 @@ public class ArmorStandReplacement implements EntityReplacement {
 			despawn.write(Type.INT, id);
 		}
 		entityIds = null;
-		try {
-			despawn.send(Protocol1_7_6_10TO1_8.class, true, true);
-		} catch (Exception ex) {ex.printStackTrace();}
+		PacketUtil.sendPacket(despawn, Protocol1_7_6_10TO1_8.class, true, true);
 	}
 }
