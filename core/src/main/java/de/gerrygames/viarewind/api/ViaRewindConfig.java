@@ -9,4 +9,6 @@ public interface ViaRewindConfig {
 	CooldownIndicator getCooldownIndicator();
 
 	boolean isReplaceAdventureMode();
+
+	boolean isReplaceParticles();
 }

@@ -7,3 +7,6 @@ cooldown-indicator: 'TITLE'
 #Enable this option if your server is using the 'CanDestroy'
 #or 'CanPlaceOn' flags on items
 replace-adventure: false
+#Wether 1.9 particles should be replaced by similar ones in
+#1.8 and lower
+replace-particles: false

@@ -1,5 +1,6 @@
 package de.gerrygames.viarewind.protocol.protocol1_8to1_9;
 
+import de.gerrygames.viarewind.ViaRewind;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.entityreplacement.ShulkerBulletReplacement;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.entityreplacement.ShulkerReplacement;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.sound.Effect;
@@ -766,6 +767,10 @@ public class Protocol1_8TO1_9 extends Protocol {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						int type = packetWrapper.get(Type.INT, 0);
+						if (type>41 && !ViaRewind.getConfig().isReplaceParticles()) {
+							packetWrapper.cancel();
+							return;
+						}
 						if (type == 42) { // Dragon Breath
 							packetWrapper.set(Type.INT, 0, 24); // Portal
 						} else if (type == 43) { // End Rod
@@ -773,7 +778,7 @@ public class Protocol1_8TO1_9 extends Protocol {
 						} else if (type == 44) { // Damage Indicator
 							packetWrapper.set(Type.INT, 0, 34); // Heart
 						} else if (type == 45) { // Sweep Attack
-							packetWrapper.set(Type.INT, 0, 1); // Large Explosion
+							packetWrapper.set(Type.INT, 0, 0); // Large Explosion
 						}
 					}
 				});

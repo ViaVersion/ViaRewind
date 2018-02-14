@@ -20,6 +20,11 @@ public class BukkitPlugin extends JavaPlugin implements ViaRewindPlatform {
 			public boolean isReplaceAdventureMode() {
 				return config.getBoolean("replace-adventure");
 			}
+
+			@Override
+			public boolean isReplaceParticles() {
+				return config.getBoolean("replace-particles");
+			}
 		});
 	}
 
