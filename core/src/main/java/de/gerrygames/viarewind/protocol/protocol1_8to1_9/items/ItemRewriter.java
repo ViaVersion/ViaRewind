@@ -1,5 +1,6 @@
 package de.gerrygames.viarewind.protocol.protocol1_8to1_9.items;
 
+import de.gerrygames.viarewind.api.Enchantments;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.viaversion.libs.opennbt.tag.builtin.ByteTag;
 import us.myles.viaversion.libs.opennbt.tag.builtin.CompoundTag;
@@ -23,7 +24,6 @@ public class ItemRewriter {
 	private static Map<String, Integer> POTION_NAME_TO_ID;
 	private static Map<Integer, String> POTION_ID_TO_NAME;
 	private static Map<Integer, Integer> POTION_INDEX;
-	private static Map<Short, String> ENCHANTMENTS = new HashMap<>();
 	private static Map<String, String> POTION_NAME_INDEX = new HashMap<>();
 
 	static {
@@ -35,17 +35,6 @@ public class ItemRewriter {
 				field.set(null, other.get(null));
 			} catch (Exception ignored) {}
 		}
-
-		ENCHANTMENTS.put((short) 1, "I");
-		ENCHANTMENTS.put((short) 2, "II");
-		ENCHANTMENTS.put((short) 3, "III");
-		ENCHANTMENTS.put((short) 4, "IV");
-		ENCHANTMENTS.put((short) 5, "V");
-		ENCHANTMENTS.put((short) 6, "VI");
-		ENCHANTMENTS.put((short) 7, "VII");
-		ENCHANTMENTS.put((short) 8, "VIII");
-		ENCHANTMENTS.put((short) 9, "IX");
-		ENCHANTMENTS.put((short) 10, "X");
 
 		POTION_NAME_INDEX.put("water", "§rSplash Water Bottle");
 		POTION_NAME_INDEX.put("mundane", "§rMundane Splash Potion");
@@ -88,7 +77,7 @@ public class ItemRewriter {
 				} else {
 					continue;
 				}
-				s += ENCHANTMENTS.getOrDefault(lvl, "enchantment.level." + lvl);
+				s += Enchantments.ENCHANTMENTS.getOrDefault(lvl, "enchantment.level." + lvl);
 				lore.add(new StringTag("", s));
 			}
 			if (!lore.isEmpty()) {

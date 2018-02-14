@@ -1,11 +1,17 @@
 package de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.items;
 
+import de.gerrygames.viarewind.api.Enchantments;
 import de.gerrygames.viarewind.utils.ChatUtil;
 import us.myles.ViaVersion.api.minecraft.item.Item;
+import us.myles.viaversion.libs.opennbt.tag.builtin.ByteTag;
 import us.myles.viaversion.libs.opennbt.tag.builtin.CompoundTag;
 import us.myles.viaversion.libs.opennbt.tag.builtin.ListTag;
 import us.myles.viaversion.libs.opennbt.tag.builtin.ShortTag;
 import us.myles.viaversion.libs.opennbt.tag.builtin.StringTag;
+import us.myles.viaversion.libs.opennbt.tag.builtin.Tag;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ItemRewriter {
 
@@ -24,6 +30,37 @@ public class ItemRewriter {
 		CompoundTag display = tag.get("display");
 		if (display!=null && display.contains("Name")) {
 			viaVersionTag.put(new StringTag("displayName", (String) display.get("Name").getValue()));
+		}
+
+		if (display!=null && display.contains("Lore")) {
+			viaVersionTag.put(new ListTag("lore", ((ListTag)display.get("Lore")).getValue()));
+		}
+
+		if (tag.contains("ench")) {
+			List<Tag> lore = new ArrayList<>();
+			List<CompoundTag> enchants = (List<CompoundTag>) tag.get("ench").getValue();
+			for (CompoundTag ench : enchants) {
+				short id = (short) ench.get("id").getValue();
+				short lvl = (short) ench.get("lvl").getValue();
+				String s;
+				if (id==8) {
+					s  = "§r§7Depth Strider ";
+				} else {
+					continue;
+				}
+				s += Enchantments.ENCHANTMENTS.getOrDefault(lvl, "enchantment.level." + lvl);
+				lore.add(new StringTag("", s));
+			}
+			if (!lore.isEmpty()) {
+				if (display==null) {
+					tag.put(display = new CompoundTag("display"));
+					viaVersionTag.put(new ByteTag("noDisplay"));
+				}
+				ListTag loreTag = display.get("Lore");
+				if (loreTag==null) display.put(loreTag = new ListTag("Lore", StringTag.class));
+				lore.addAll(loreTag.getValue());
+				loreTag.setValue(lore);
+			}
 		}
 
 		if (item.getId()==387 && tag.contains("pages")) {
