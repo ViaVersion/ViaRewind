@@ -65,7 +65,7 @@ public class Cooldown extends StoredObject {
 
 	private void hide() {
 		if (cooldownIndicator==ViaRewindConfig.CooldownIndicator.ACTION_BAR) {
-			sendActionBar("§rnichts");
+			sendActionBar("§r");
 		} if (cooldownIndicator==ViaRewindConfig.CooldownIndicator.TITLE) {
 			hideTitle();
 		}
