@@ -3,6 +3,10 @@ package de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage;
 import de.gerrygames.viarewind.utils.ChatUtil;
 import us.myles.ViaVersion.api.data.StoredObject;
 import us.myles.ViaVersion.api.data.UserConnection;
+import us.myles.ViaVersion.api.minecraft.item.Item;
+import us.myles.viaversion.libs.opennbt.tag.builtin.CompoundTag;
+import us.myles.viaversion.libs.opennbt.tag.builtin.ListTag;
+import us.myles.viaversion.libs.opennbt.tag.builtin.StringTag;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -77,10 +81,34 @@ public class GameProfileStorage extends StoredObject {
 		public int ping;
 		public UUID uuid;
 		public List<Property> properties = new ArrayList<>();
+		public int gamemode = 0;
 
 		public GameProfile(UUID uuid, String name) {
 			this.name = name;
 			this.uuid = uuid;
+		}
+
+		public Item getSkull() {
+			CompoundTag tag = new CompoundTag("");
+			CompoundTag ownerTag = new CompoundTag("SkullOwner");
+			tag.put(ownerTag);
+			ownerTag.put(new StringTag("Id", uuid.toString()));
+			CompoundTag properties = new CompoundTag("Properties");
+			ownerTag.put(properties);
+			ListTag textures = new ListTag("textures", CompoundTag.class);
+			properties.put(textures);
+			for (GameProfileStorage.Property property : this.properties) {
+				if (property.name.equals("textures")) {
+					CompoundTag textureTag = new CompoundTag("");
+					textureTag.put(new StringTag("Value", property.value));
+					if (property.signature!=null) {
+						textureTag.put(new StringTag("Signature", property.signature));
+					}
+					textures.add(textureTag);
+				}
+			}
+
+			return new Item((short) 397, (byte) 1, (short) 3, tag);
 		}
 
 		public String getDisplayName() {

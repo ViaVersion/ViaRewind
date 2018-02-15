@@ -6,6 +6,8 @@ import de.gerrygames.viarewind.netty.EmptyChannelHandler;
 import de.gerrygames.viarewind.netty.ForwardMessageToByteEncoder;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.chunks.ChunkPacketTransformer;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.entityreplacements.ArmorStandReplacement;
+import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.entityreplacements.EndermiteReplacement;
+import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.entityreplacements.GuardianReplacement;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.items.ItemRewriter;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.items.ReplacementRegistry1_7_6_10to1_8;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.metadata.MetadataRewriter;
@@ -137,6 +139,21 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						if (packetWrapper.get(Type.SHORT, 0)>4) packetWrapper.cancel();
+					}
+				});
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						if (packetWrapper.isCancelled()) return;
+						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
+						UUID uuid = tracker.getPlayerUUID(packetWrapper.get(Type.INT, 0));
+						if (uuid==null) return;
+						Item[] equipment = tracker.getPlayerEquipment(uuid);
+						if (equipment==null) tracker.setPlayerEquipment(uuid, equipment = new Item[5]);
+						equipment[packetWrapper.get(Type.SHORT, 0)] = packetWrapper.get(Types1_7_6_10.COMPRESSED_NBT_ITEM, 0);
+						GameProfileStorage storage = packetWrapper.user().get(GameProfileStorage.class);
+						GameProfileStorage.GameProfile profile = storage.get(uuid);
+						if (profile!=null && profile.gamemode==3) packetWrapper.cancel();
 					}
 				});
 			}
@@ -306,6 +323,28 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 								packetWrapper.write(Type.STRING, property.signature==null ? "" : property.signature);
 							}
 						}
+
+						if (gameProfile!=null && gameProfile.gamemode==3) {
+							int entityId = packetWrapper.get(Type.VAR_INT, 0);
+
+							PacketWrapper equipmentPacket = new PacketWrapper(0x04, null, packetWrapper.user());
+							equipmentPacket.write(Type.INT, entityId);
+							equipmentPacket.write(Type.SHORT, (short) 4);
+							equipmentPacket.write(Types1_7_6_10.COMPRESSED_NBT_ITEM, gameProfile.getSkull());
+
+							PacketUtil.sendPacket(equipmentPacket, Protocol1_7_6_10TO1_8.class);
+
+							for (short i = 0; i<4; i++) {
+								equipmentPacket = new PacketWrapper(0x04, null, packetWrapper.user());
+								equipmentPacket.write(Type.INT, entityId);
+								equipmentPacket.write(Type.SHORT, i);
+								equipmentPacket.write(Types1_7_6_10.COMPRESSED_NBT_ITEM, null);
+								PacketUtil.sendPacket(equipmentPacket, Protocol1_7_6_10TO1_8.class);
+							}
+						}
+
+						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
+						tracker.addPlayer(packetWrapper.get(Type.VAR_INT, 0), uuid);
 					}
 				});
 				map(Type.INT);
@@ -398,6 +437,7 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 							ArmorStandReplacement armorStand = new ArmorStandReplacement(entityId, packetWrapper.user());
 							armorStand.setLocation(x / 32.0, y / 32.0, z / 32.0);
 							armorStand.setYawPitch(yaw * 360f / 256, pitch * 360f / 256);
+							armorStand.setHeadYaw(yaw * 360f / 256);
 							tracker.addEntityReplacement(armorStand);
 						}
 					}
@@ -467,6 +507,7 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 						int z = packetWrapper.get(Type.INT, 2);
 						byte pitch = packetWrapper.get(Type.BYTE, 1);
 						byte yaw = packetWrapper.get(Type.BYTE, 0);
+						byte headYaw = packetWrapper.get(Type.BYTE, 2);
 
 						if (typeId==78) {
 							packetWrapper.cancel();
@@ -475,8 +516,27 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 							ArmorStandReplacement armorStand = new ArmorStandReplacement(entityId, packetWrapper.user());
 							armorStand.setLocation(x / 32.0, y / 32.0, z / 32.0);
 							armorStand.setYawPitch(yaw * 360f / 256, pitch * 360f / 256);
+							armorStand.setHeadYaw(headYaw * 360f / 256);
 							tracker.addEntityReplacement(armorStand);
-						} else if (typeId==67 || typeId==68 || typeId==101 || typeId==30 || typeId==255) {
+						} else if (typeId==68) {
+							packetWrapper.cancel();
+
+							EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
+							GuardianReplacement guardian = new GuardianReplacement(entityId, packetWrapper.user());
+							guardian.setLocation(x / 32.0, y / 32.0, z / 32.0);
+							guardian.setYawPitch(yaw * 360f / 256, pitch * 360f / 256);
+							guardian.setHeadYaw(headYaw * 360f / 256);
+							tracker.addEntityReplacement(guardian);
+						} else if (typeId==67) {
+							packetWrapper.cancel();
+
+							EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
+							EndermiteReplacement endermite = new EndermiteReplacement(entityId, packetWrapper.user());
+							endermite.setLocation(x / 32.0, y / 32.0, z / 32.0);
+							endermite.setYawPitch(yaw * 360f / 256, pitch * 360f / 256);
+							endermite.setHeadYaw(headYaw * 360f / 256);
+							tracker.addEntityReplacement(endermite);
+						} else if (typeId==101 || typeId==30 || typeId==255) {
 							packetWrapper.cancel();
 						}
 					}
@@ -763,7 +823,7 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 						if (replacement!=null) {
 							packetWrapper.cancel();
 							int yaw = packetWrapper.get(Type.BYTE, 0);
-							replacement.setYaw(yaw * 360f / 256);
+							replacement.setHeadYaw(yaw * 360f / 256);
 						}
 					}
 				});
@@ -1409,7 +1469,6 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						packetWrapper.cancel();
 						int action = packetWrapper.read(Type.VAR_INT);
-						if (action==1) return;
 						int count = packetWrapper.read(Type.VAR_INT);
 						GameProfileStorage gameProfileStorage = packetWrapper.user().get(GameProfileStorage.class);
 						for (int i = 0; i<count; i++) {
@@ -1425,19 +1484,57 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 									gameProfile.properties.add(new GameProfileStorage.Property(packetWrapper.read(Type.STRING), packetWrapper.read(Type.STRING),
 											packetWrapper.read(Type.BOOLEAN) ? packetWrapper.read(Type.STRING) : null));
 								}
-								packetWrapper.read(Type.VAR_INT);  //Gamemode
+								int gamemode = packetWrapper.read(Type.VAR_INT);
 								int ping = packetWrapper.read(Type.VAR_INT);
 								gameProfile.ping = ping;
+								gameProfile.gamemode = gamemode;
 								if (packetWrapper.read(Type.BOOLEAN)) {
 									gameProfile.setDisplayName(packetWrapper.read(Type.STRING));
 								}
 
 								PacketWrapper packet = new PacketWrapper(0x38, null, packetWrapper.user());
-								//packet.write(Type.STRING, gameProfile.getDisplayName());
 								packet.write(Type.STRING, gameProfile.name);
 								packet.write(Type.BOOLEAN, true);
 								packet.write(Type.SHORT, (short) ping);
 								PacketUtil.sendPacket(packet, Protocol1_7_6_10TO1_8.class);
+							} else if (action==1) {
+								int gamemode = packetWrapper.read(Type.VAR_INT);
+
+								GameProfileStorage.GameProfile gameProfile = gameProfileStorage.get(uuid);
+								if (gameProfile==null || gameProfile.gamemode==gamemode) continue;
+
+								if (gamemode==3 || gameProfile.gamemode==3) {
+									EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
+									int entityId = tracker.getPlayerEntityId(uuid);
+									if (entityId!=-1) {
+										Item[] equipment;
+										if (gamemode==3) {
+											equipment = new Item[5];
+											equipment[4] = gameProfile.getSkull();
+										} else {
+											equipment = tracker.getPlayerEquipment(uuid);
+											if (equipment==null) equipment = new Item[5];
+										}
+
+
+										PacketWrapper equipmentPacket = new PacketWrapper(0x04, null, packetWrapper.user());
+										equipmentPacket.write(Type.INT, entityId);
+										equipmentPacket.write(Type.SHORT, (short) 4);
+										equipmentPacket.write(Types1_7_6_10.COMPRESSED_NBT_ITEM, equipment[4]);
+
+										PacketUtil.sendPacket(equipmentPacket, Protocol1_7_6_10TO1_8.class);
+
+										for (short slot = 0; slot<4; slot++) {
+											equipmentPacket = new PacketWrapper(0x04, null, packetWrapper.user());
+											equipmentPacket.write(Type.INT, entityId);
+											equipmentPacket.write(Type.SHORT, slot);
+											equipmentPacket.write(Types1_7_6_10.COMPRESSED_NBT_ITEM, equipment[slot]);
+											PacketUtil.sendPacket(equipmentPacket, Protocol1_7_6_10TO1_8.class);
+										}
+									}
+								}
+
+								gameProfile.gamemode = gamemode;
 							} else if (action==2) {
 								int ping = packetWrapper.read(Type.VAR_INT);
 
@@ -1447,7 +1544,6 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 								gameProfile.ping = ping;
 
 								PacketWrapper packet = new PacketWrapper(0x38, null, packetWrapper.user());
-								//packet.write(Type.STRING, gameProfile.getDisplayName());
 								packet.write(Type.STRING, gameProfile.name);
 								packet.write(Type.BOOLEAN, true);
 								packet.write(Type.SHORT, (short) ping);

@@ -219,6 +219,7 @@ public class Protocol1_8TO1_9 extends Protocol {
 						int z = packetWrapper.get(Type.INT, 2);
 						byte pitch = packetWrapper.get(Type.BYTE, 1);
 						byte yaw = packetWrapper.get(Type.BYTE, 0);
+						byte headYaw = packetWrapper.get(Type.BYTE, 2);
 
 						if (typeId==69) {
 							packetWrapper.cancel();
@@ -226,6 +227,7 @@ public class Protocol1_8TO1_9 extends Protocol {
 							ShulkerReplacement shulkerReplacement = new ShulkerReplacement(entityId, packetWrapper.user());
 							shulkerReplacement.setLocation(x / 32.0, y / 32.0, z / 32.0);
 							shulkerReplacement.setYawPitch(yaw * 360f / 256, pitch * 360f / 256);
+							shulkerReplacement.setHeadYaw(headYaw * 360f / 256);
 							tracker.addEntityReplacement(shulkerReplacement);
 						}
 					}
@@ -510,8 +512,8 @@ public class Protocol1_8TO1_9 extends Protocol {
 							if (type!=null && type.equalsIgnoreCase("minecraft:brewing_stand")) {
 								Item[] old = items;
 								items = new Item[old.length - 1];
-								for (int i = 0; i<4; i++) items[i] = old[0];
-								System.arraycopy(old, 5, items, 4, old.length - 6);
+								System.arraycopy(old, 0, items, 0, 4);
+								System.arraycopy(old, 5, items, 4, old.length - 5);
 							}
 						}
 						packetWrapper.write(Type.ITEM_ARRAY, items);
@@ -1526,7 +1528,27 @@ public class Protocol1_8TO1_9 extends Protocol {
 		this.registerIncoming(State.PLAY, 0x0B, 0x00);
 
 		//Chat Message
-		this.registerIncoming(State.PLAY, 0x02, 0x01);
+		this.registerIncoming(State.PLAY, 0x02, 0x01, new PacketRemapper() {
+			@Override
+			public void registerMap() {
+				map(Type.STRING);
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						String msg = packetWrapper.get(Type.STRING, 0);
+						if (msg.toLowerCase().startsWith("/offhand")) {
+							packetWrapper.cancel();
+							PacketWrapper swapItems = new PacketWrapper(0x13, null, packetWrapper.user());
+							swapItems.write(Type.VAR_INT, 6);
+							swapItems.write(Type.POSITION, new Position(0L, 0L, 0L));
+							swapItems.write(Type.BYTE, (byte) 255);
+
+							PacketUtil.sendToServer(swapItems, Protocol1_8TO1_9.class, true, true);
+						}
+					}
+				});
+			}
+		});
 
 		//Use Entity
 		this.registerIncoming(State.PLAY, 0x0A, 0x02, new PacketRemapper() {

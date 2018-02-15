@@ -29,6 +29,7 @@ public class ArmorStandReplacement implements EntityReplacement {
 	private String name = null;
 	private UserConnection user;
 	private float yaw, pitch;
+	private float headYaw;
 	private boolean small = false;
 	private static int ENTITY_ID = Integer.MAX_VALUE - 16000;
 
@@ -59,15 +60,19 @@ public class ArmorStandReplacement implements EntityReplacement {
 	}
 
 	public void setYawPitch(float yaw, float pitch) {
-		if (this.yaw!=yaw && this.pitch!=pitch) {
+		if (this.yaw!=yaw && this.pitch!=pitch || this.headYaw!=yaw) {
 			this.yaw = yaw;
+			this.headYaw = yaw;
 			this.pitch = pitch;
 			updateLocation();
 		}
 	}
 
-	public void setYaw(float yaw) {
-		this.yaw = yaw;
+	public void setHeadYaw(float yaw) {
+		if (this.headYaw!=yaw) {
+			this.headYaw = yaw;
+			updateLocation();
+		}
 	}
 
 	public void updateMetadata(List<Metadata> metadataList) {
@@ -124,7 +129,12 @@ public class ArmorStandReplacement implements EntityReplacement {
 			teleport.write(Type.BYTE, (byte)((yaw / 360f) * 256));
 			teleport.write(Type.BYTE, (byte)((pitch / 360f) * 256));
 
+			PacketWrapper head = new PacketWrapper(0x19, null, user);
+			head.write(Type.INT, entityId);
+			head.write(Type.BYTE, (byte)((headYaw / 360f) * 256));
+
 			PacketUtil.sendPacket(teleport, Protocol1_7_6_10TO1_8.class, true, true);
+			PacketUtil.sendPacket(head, Protocol1_7_6_10TO1_8.class, true, true);
 		} else if (currentState==State.HOLOGRAM) {
 			PacketWrapper detach = new PacketWrapper(0x1B, null, user);
 			detach.write(Type.INT, entityIds[1]);

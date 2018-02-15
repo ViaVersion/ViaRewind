@@ -8,13 +8,16 @@ import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.data.StoredObject;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.entities.Entity1_10Types;
+import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.version.Types1_8;
 import us.myles.ViaVersion.exception.CancelException;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class EntityTracker extends StoredObject {
@@ -22,6 +25,9 @@ public class EntityTracker extends StoredObject {
 	private final Map<Integer, List<Metadata>> metadataBuffer = new ConcurrentHashMap();
 	private final Map<Integer, Integer> vehicles = new ConcurrentHashMap<>();
 	private final Map<Integer, EntityReplacement> entityReplacements = new ConcurrentHashMap<>();
+	private final Map<Integer, UUID> playersByEntityId = new HashMap<>();
+	private final Map<UUID, Integer> playersByUniqueId = new HashMap<>();
+	private final Map<UUID, Item[]> playerEquipment = new HashMap<>();
 	private int gamemode = 0;
 	private int playerId = -1;
 	private int spectating = -1;
@@ -36,6 +42,30 @@ public class EntityTracker extends StoredObject {
 		if (entityReplacements.containsKey(entityId)) {
 			entityReplacements.remove(entityId).despawn();
 		}
+		if (playersByEntityId.containsKey(entityId)) {
+			playersByUniqueId.remove(playersByEntityId.remove(entityId));
+		}
+	}
+
+	public void addPlayer(Integer entityId, UUID uuid) {
+		playersByUniqueId.put(uuid, entityId);
+		playersByEntityId.put(entityId, uuid);
+	}
+
+	public UUID getPlayerUUID(int entityId) {
+		return playersByEntityId.get(entityId);
+	}
+
+	public int getPlayerEntityId(UUID uuid) {
+		return playersByUniqueId.getOrDefault(uuid, -1);
+	}
+
+	public Item[] getPlayerEquipment(UUID uuid) {
+		return playerEquipment.get(uuid);
+	}
+
+	public void setPlayerEquipment(UUID uuid, Item[] equipment) {
+		playerEquipment.put(uuid, equipment);
 	}
 
 	public Map<Integer, Entity1_10Types.EntityType> getClientEntityTypes() {

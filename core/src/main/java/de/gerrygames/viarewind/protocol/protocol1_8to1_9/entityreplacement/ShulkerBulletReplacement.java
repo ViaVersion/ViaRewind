@@ -51,7 +51,7 @@ public class ShulkerBulletReplacement implements EntityReplacement {
 		}
 	}
 
-	public void setYaw(float yaw) {
+	public void setHeadYaw(float yaw) {
 		this.yaw = yaw;
 	}
 

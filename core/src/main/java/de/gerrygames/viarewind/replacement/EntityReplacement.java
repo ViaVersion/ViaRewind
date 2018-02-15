@@ -14,7 +14,7 @@ public interface EntityReplacement {
 
 	public void setYawPitch(float yaw, float pitch);
 
-	public void setYaw(float yaw);
+	public void setHeadYaw(float yaw);
 
 	public void spawn();
 
