@@ -34,6 +34,11 @@ public class MetadataRewriter {
 					case Int:
 						if (metaIndex.getNewType() == MetaType1_8.Byte) {
 							entry.setValue(((Byte) value).intValue());
+							if (metaIndex==MetaIndex1_8to1_7_6_10.ENTITY_AGEABLE_AGE) {
+								if ((Integer) entry.getValue() < 0) {
+									entry.setValue(-25000);
+								}
+							}
 						}
 						if (metaIndex.getNewType() == MetaType1_8.Short) {
 							entry.setValue(((Short) value).intValue());

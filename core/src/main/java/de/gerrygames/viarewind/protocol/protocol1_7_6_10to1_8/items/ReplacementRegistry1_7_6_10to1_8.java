@@ -47,6 +47,7 @@ public class ReplacementRegistry1_7_6_10to1_8 {
 		registry.registerItem(383, 67, new Replacement(383, "Spawn Endermite"));
 		registry.registerItem(383, 68, new Replacement(383, "Spawn Guardian"));
 		registry.registerItem(383, 101, new Replacement(383, "Spawn Rabbit"));
+		registry.registerItem(19, 1, new Replacement(19, 0, "Wet Sponge"));
 
 		registry.registerItemBlock(166, new Replacement(20, "Barrier"));
 		registry.registerItemBlock(167, new Replacement(96, "Iron Trapdoor"));
