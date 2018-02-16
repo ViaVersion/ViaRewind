@@ -18,6 +18,7 @@ public class ShulkerBulletReplacement implements EntityReplacement {
 	private List<Metadata> datawatcher = new ArrayList<>();
 	private double locX, locY, locZ;
 	private float yaw, pitch;
+	private float headYaw;
 	private UserConnection user;
 
 	public ShulkerBulletReplacement(int entityId, UserConnection user) {
@@ -52,7 +53,7 @@ public class ShulkerBulletReplacement implements EntityReplacement {
 	}
 
 	public void setHeadYaw(float yaw) {
-		this.yaw = yaw;
+		this.headYaw = yaw;
 	}
 
 	public void updateMetadata(List<Metadata> metadataList) {
@@ -64,18 +65,23 @@ public class ShulkerBulletReplacement implements EntityReplacement {
 		teleport.write(Type.INT, (int) (locX * 32.0));
 		teleport.write(Type.INT, (int) (locY * 32.0));
 		teleport.write(Type.INT, (int) (locZ * 32.0));
-		teleport.write(Type.BYTE, (byte) 0);
-		teleport.write(Type.BYTE, (byte) 0);
+		teleport.write(Type.BYTE, (byte) ((yaw / 360f) * 256));
+		teleport.write(Type.BYTE, (byte) ((pitch / 360f) * 256));
 		teleport.write(Type.BOOLEAN, true);
 
+		PacketWrapper head = new PacketWrapper(0x19, null, user);
+		head.write(Type.VAR_INT, entityId);
+		head.write(Type.BYTE, (byte)((headYaw / 360f) * 256));
+
 		PacketUtil.sendPacket(teleport, Protocol1_8TO1_9.class, true, true);
+		PacketUtil.sendPacket(head, Protocol1_8TO1_9.class, true, true);
 	}
 
 	@Override
 	public void spawn() {
 		PacketWrapper spawn = new PacketWrapper(0x0E, null, user);
 		spawn.write(Type.VAR_INT, entityId);
-		spawn.write(Type.BYTE, (byte) 61);
+		spawn.write(Type.BYTE, (byte) 66);
 		spawn.write(Type.INT, 0);
 		spawn.write(Type.INT, 0);
 		spawn.write(Type.INT, 0);

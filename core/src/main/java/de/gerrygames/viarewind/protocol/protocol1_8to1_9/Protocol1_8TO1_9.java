@@ -1154,7 +1154,26 @@ public class Protocol1_8TO1_9 extends Protocol {
 		});
 
 		//Entity Head Look
-		this.registerOutgoing(State.PLAY, 0x34, 0x19);
+		this.registerOutgoing(State.PLAY, 0x34, 0x19, new PacketRemapper() {
+			@Override
+			public void registerMap() {
+				map(Type.VAR_INT);
+				map(Type.BYTE);
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						int entityId = packetWrapper.get(Type.VAR_INT, 0);
+						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
+						EntityReplacement replacement = tracker.getEntityReplacement(entityId);
+						if (replacement!=null) {
+							packetWrapper.cancel();
+							int yaw = packetWrapper.get(Type.BYTE, 0);
+							replacement.setHeadYaw(yaw * 360f / 256);
+						}
+					}
+				});
+			}
+		});
 
 		//World Border
 		this.registerOutgoing(State.PLAY, 0x35, 0x44);
