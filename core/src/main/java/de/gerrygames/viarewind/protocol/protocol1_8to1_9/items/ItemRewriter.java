@@ -92,7 +92,7 @@ public class ItemRewriter {
 			}
 		}
 
-		if (tag.contains("Unbreakable")) {
+		if (item.getData()!=0 && tag.contains("Unbreakable")) {
 			ByteTag unbreakable = tag.get("Unbreakable");
 			if (unbreakable.getValue()!=0) {
 				viaVersionTag.put(new ByteTag("Unbreakable", unbreakable.getValue()));
