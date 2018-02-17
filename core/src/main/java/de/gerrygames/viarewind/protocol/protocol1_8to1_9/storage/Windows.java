@@ -46,14 +46,14 @@ public class Windows extends StoredObject {
 		PacketWrapper openWindow = new PacketWrapper(0x2D, null, user);
 		openWindow.write(Type.UNSIGNED_BYTE, windowId);
 		openWindow.write(Type.STRING, "minecraft:brewing_stand");
-		openWindow.write(Type.STRING, "[{\"translate\":\"container.brewing\"},{\"text\":\": §4" + amount + " \"},{\"translate\":\"item.blazePowder.name\"}]");
+		openWindow.write(Type.STRING, "[{\"translate\":\"container.brewing\"},{\"text\":\": \",\"color\":\"dark_gray\"},{\"text\":\"§4" + amount + " \",\"color\":\"dark_red\"},{\"translate\":\"item.blazePowder.name\",\"color\":\"dark_red\"}]");
 		openWindow.write(Type.UNSIGNED_BYTE, (short) 420);
 		PacketUtil.sendPacket(openWindow, Protocol1_8TO1_9.class);
 
 		Item[] items = user.get(Windows.class).getBrewingItems(windowId);
 		for (int i = 0; i < items.length; i++) {
 			PacketWrapper setSlot = new PacketWrapper(0x2F, null, user);
-			setSlot.write(Type.UNSIGNED_BYTE, windowId);
+			setSlot.write(Type.BYTE, (byte) windowId);
 			setSlot.write(Type.SHORT, (short) i);
 			setSlot.write(Type.ITEM, items[i]);
 			PacketUtil.sendPacket(setSlot, Protocol1_8TO1_9.class);

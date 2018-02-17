@@ -1203,7 +1203,7 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 						packetWrapper.user().get(Windows.class).types.put(windowId, windowtypeId);
 						String title = packetWrapper.read(Type.STRING);  //Title
 						title = ChatUtil.jsonToLegacy(title);
-						title = ChatUtil.removeUnusedColor(title);
+						title = ChatUtil.removeUnusedColor(title, '8');
 						if (title.length()>32) {
 							title = title.substring(0, 32);
 						}
@@ -1412,7 +1412,7 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 						for (int i = 0; i<4; i++) {
 							String line = packetWrapper.read(Type.STRING);
 							line = ChatUtil.jsonToLegacy(line);
-							line = ChatUtil.removeUnusedColor(line);
+							line = ChatUtil.removeUnusedColor(line, '0');
 							if (line.length()>15) {
 								line = ChatColor.stripColor(line);
 								if (line.length()>15) line = line.substring(0, 15);

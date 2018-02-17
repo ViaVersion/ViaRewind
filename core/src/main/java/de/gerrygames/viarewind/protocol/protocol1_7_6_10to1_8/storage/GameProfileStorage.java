@@ -123,7 +123,7 @@ public class GameProfileStorage extends StoredObject {
 
 		public static String fixDisplayName(String displayName) {
 			displayName = ChatUtil.jsonToLegacy(displayName);
-			displayName = ChatUtil.removeUnusedColor(displayName);
+			displayName = ChatUtil.removeUnusedColor(displayName, 'f');
 			return displayName;
 		}
 	}

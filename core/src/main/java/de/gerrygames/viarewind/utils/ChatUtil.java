@@ -20,8 +20,21 @@ public class ChatUtil {
 		return ComponentSerializer.toString(TextComponent.fromLegacyText(legacy));
 	}
 
-	public static String removeUnusedColor(String legacy) {
+	public static String removeUnusedColor(String legacy, char last) {
 		if (legacy==null) return null;
-		return unusedColorPattern.matcher(legacy).replaceAll("$1$2");
+		legacy = unusedColorPattern.matcher(legacy).replaceAll("$1$2");
+		StringBuilder builder = new StringBuilder();
+		for (int i = 0; i<legacy.length(); i++) {
+			char current = legacy.charAt(i);
+			if (current!='§' || i==legacy.length()-1) {
+				builder.append(current);
+				continue;
+			}
+			current = legacy.charAt(++i);
+			if (current==last) continue;
+			builder.append('§').append(current);
+			last = current;
+		}
+		return builder.toString();
 	}
 }
