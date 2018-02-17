@@ -4,6 +4,9 @@ import com.google.inject.Inject;
 import de.gerrygames.viarewind.api.ViaRewindConfig;
 import de.gerrygames.viarewind.api.ViaRewindPlatform;
 import de.gerrygames.viarewind.sponge.VersionInfo;
+import ninja.leaping.configurate.ConfigurationNode;
+import ninja.leaping.configurate.loader.ConfigurationLoader;
+import ninja.leaping.configurate.yaml.YAMLConfigurationLoader;
 import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
@@ -12,13 +15,13 @@ import org.spongepowered.api.plugin.Dependency;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
 import us.myles.ViaVersion.sponge.util.LoggerWrapper;
-import us.myles.ViaVersion.util.Config;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.net.URLConnection;
 import java.util.logging.Logger;
 
 @Plugin(id = "viarewind",
@@ -40,43 +43,64 @@ public class SpongePlugin implements ViaRewindPlatform {
 	@DefaultConfig(sharedRoot = false)
 	private File defaultConfig;
 
+	private ConfigurationLoader<ConfigurationNode> loader;
+	private ConfigurationNode rootNode;
+
 	@Listener(order = Order.LATE)
 	public void onServerStart(GameAboutToStartServerEvent e) {
 		// Setup Logger
 		this.logger = new LoggerWrapper(container.getLogger());
 		// Init!
 
-		Config config = new Config(new File(defaultConfig, "config.yml")) {
-			@Override
-			public URL getDefaultConfigURL() {
-				return container.getAsset("config.yml").get().getUrl();
-			}
+		File configFile = new File(defaultConfig.getParentFile(), "config.yml");
+		if (!configFile.exists()) {
+			saveDefaultConfig(configFile);
+		}
 
-			@Override
-			protected void handleConfig(Map<String, Object> map) { }
-
-			@Override
-			public List<String> getUnsupportedOptions() {
-				return Collections.emptyList();
-			}
-		};
+		try {
+			loader = YAMLConfigurationLoader.builder().setFile(configFile).build();
+			rootNode = loader.load();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
 
 		this.init(new ViaRewindConfig() {
 			@Override
 			public CooldownIndicator getCooldownIndicator() {
-				return CooldownIndicator.valueOf(config.getString("cooldown-indicator", "TITLE").toUpperCase());
+				return CooldownIndicator.valueOf(rootNode.getNode("cooldown-indicator").getString("TITLE"));
 			}
 
 			@Override
 			public boolean isReplaceAdventureMode() {
-				return config.getBoolean("replace-adventure", false);
+				return rootNode.getNode("replace-adventure").getBoolean(false);
 			}
 
 			@Override
 			public boolean isReplaceParticles() {
-				return config.getBoolean("replace-particles", false);
+				return rootNode.getNode("replace-particles").getBoolean(false);
 			}
 		});
+	}
+
+	private void saveDefaultConfig(File file) {
+		try {
+			URL url = getClass().getClassLoader().getResource("config.yml");
+			URLConnection connection = url.openConnection();
+			connection.setUseCaches(false);
+			InputStream in = connection.getInputStream();
+			OutputStream out = new FileOutputStream(file);
+			byte[] buf = new byte[1024];
+
+			int len;
+			while((len = in.read(buf)) > 0) {
+				out.write(buf, 0, len);
+			}
+
+			out.close();
+			in.close();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
 	}
 
 	@Override
