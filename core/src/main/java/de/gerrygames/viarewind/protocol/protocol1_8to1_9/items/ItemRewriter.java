@@ -36,10 +36,14 @@ public class ItemRewriter {
 			} catch (Exception ignored) {}
 		}
 
-		POTION_NAME_INDEX.put("water", "§rSplash Water Bottle");
-		POTION_NAME_INDEX.put("mundane", "§rMundane Splash Potion");
-		POTION_NAME_INDEX.put("thick", "§rThick Splash Potion");
-		POTION_NAME_INDEX.put("awkward", "§rAwkward Splash Potion");
+		POTION_NAME_INDEX.put("water", "§rWater Bottle");
+		POTION_NAME_INDEX.put("mundane", "§rMundane Potion");
+		POTION_NAME_INDEX.put("thick", "§rThick Potion");
+		POTION_NAME_INDEX.put("awkward", "§rAwkward Potion");
+		POTION_NAME_INDEX.put("water_splash", "§rSplash Water Bottle");
+		POTION_NAME_INDEX.put("mundane_splash", "§rMundane Splash Potion");
+		POTION_NAME_INDEX.put("thick_splash", "§rThick Splash Potion");
+		POTION_NAME_INDEX.put("awkward_splash", "§rAwkward Splash Potion");
 	}
 
 	public static Item toClient(Item item) {
@@ -141,6 +145,7 @@ public class ItemRewriter {
 				if (POTION_NAME_TO_ID.containsKey(potionName)) {
 					data = POTION_NAME_TO_ID.get(potionName);
 				}
+				if (item.getId()==438) potionName += "_splash";
 				if (display==null && POTION_NAME_INDEX.containsKey(potionName)) {
 					tag.put(display = new CompoundTag("display"));
 					viaVersionTag.put(new ByteTag("noDisplay"));
