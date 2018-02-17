@@ -445,7 +445,7 @@ public class Protocol1_8TO1_9 extends Protocol {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						short windowsId = packetWrapper.get(Type.UNSIGNED_BYTE, 0);
-						packetWrapper.user().get(Windows.class).types.remove(windowsId);
+						packetWrapper.user().get(Windows.class).remove(windowsId);
 					}
 				});
 			}
@@ -471,7 +471,7 @@ public class Protocol1_8TO1_9 extends Protocol {
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						short windowId = packetWrapper.get(Type.UNSIGNED_BYTE, 0);
 						String windowType = packetWrapper.get(Type.STRING, 0);
-						packetWrapper.user().get(Windows.class).types.put(windowId, windowType);
+						packetWrapper.user().get(Windows.class).put(windowId, windowType);
 					}
 				});
 				handler(new PacketHandler() {
@@ -510,6 +510,8 @@ public class Protocol1_8TO1_9 extends Protocol {
 						} else {
 							String type = packetWrapper.user().get(Windows.class).get(windowId);
 							if (type!=null && type.equalsIgnoreCase("minecraft:brewing_stand")) {
+								System.arraycopy(items, 0, packetWrapper.user().get(Windows.class).getBrewingItems(windowId), 0, 4);
+								Windows.updateBrewingStand(packetWrapper.user(), items[4], windowId);
 								Item[] old = items;
 								items = new Item[old.length - 1];
 								System.arraycopy(old, 0, items, 0, 4);
@@ -549,7 +551,10 @@ public class Protocol1_8TO1_9 extends Protocol {
 								packetWrapper.set(Type.SHORT, 0, slot -= 1);
 							} else if (slot==4) {
 								packetWrapper.cancel();
+								Windows.updateBrewingStand(packetWrapper.user(), packetWrapper.get(Type.ITEM, 0), windowId);
 								return;
+							} else {
+								packetWrapper.user().get(Windows.class).getBrewingItems(windowId)[slot] = packetWrapper.get(Type.ITEM, 0);
 							}
 						}
 					}
@@ -1883,7 +1888,7 @@ public class Protocol1_8TO1_9 extends Protocol {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						short windowsId = packetWrapper.get(Type.UNSIGNED_BYTE, 0);
-						packetWrapper.user().get(Windows.class).types.remove(windowsId);
+						packetWrapper.user().get(Windows.class).remove(windowsId);
 					}
 				});
 			}
