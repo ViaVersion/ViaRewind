@@ -1,6 +1,6 @@
 package de.gerrygames.viarewind.replacement;
 
-import de.gerrygames.viarewind.storage.BlockStorage;
+import de.gerrygames.viarewind.storage.BlockState;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 
 import java.util.HashMap;
@@ -41,13 +41,13 @@ public class ReplacementRegistry {
 		return replacement==null ? item : replacement.replace(item);
 	}
 
-	public BlockStorage.BlockState replace(BlockStorage.BlockState block) {
+	public BlockState replace(BlockState block) {
 		Replacement replacement = blockReplacements.get(combine(block.getId(), block.getData()));
 		if (replacement==null) replacement = blockReplacements.get(combine(block.getId(), -1));
 		return replacement==null ? block : replacement.replace(block);
 	}
 
 	private static int combine(int id, int data) {
-		return (id << 4) | (data & 0xF);
+		return (id << 16) | (data & 0xFFFF);
 	}
 }

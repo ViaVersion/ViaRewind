@@ -1,6 +1,6 @@
 package de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.items;
 
-import de.gerrygames.viarewind.api.Enchantments;
+import de.gerrygames.viarewind.utils.Enchantments;
 import de.gerrygames.viarewind.utils.ChatUtil;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.viaversion.libs.opennbt.tag.builtin.ByteTag;

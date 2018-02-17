@@ -1,6 +1,6 @@
 package de.gerrygames.viarewind.protocol.protocol1_8to1_9.items;
 
-import de.gerrygames.viarewind.api.Enchantments;
+import de.gerrygames.viarewind.utils.Enchantments;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.viaversion.libs.opennbt.tag.builtin.ByteTag;
 import us.myles.viaversion.libs.opennbt.tag.builtin.CompoundTag;

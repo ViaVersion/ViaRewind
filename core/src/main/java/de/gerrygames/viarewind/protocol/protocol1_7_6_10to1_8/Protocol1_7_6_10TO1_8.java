@@ -24,7 +24,7 @@ import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.CustomIntTyp
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.Particle;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
 import de.gerrygames.viarewind.replacement.EntityReplacement;
-import de.gerrygames.viarewind.storage.BlockStorage;
+import de.gerrygames.viarewind.storage.BlockState;
 import de.gerrygames.viarewind.types.VarLongType;
 import de.gerrygames.viarewind.utils.ChatUtil;
 import de.gerrygames.viarewind.utils.PacketUtil;
@@ -997,7 +997,7 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 						int blockId = data >> 4;
 						int meta = data & 0xF;
 
-						BlockStorage.BlockState state = ReplacementRegistry1_7_6_10to1_8.replace(new BlockStorage.BlockState(blockId, meta));
+						BlockState state = ReplacementRegistry1_7_6_10to1_8.replace(new BlockState(blockId, meta));
 
 						blockId = state.getId();
 						meta = state.getData();

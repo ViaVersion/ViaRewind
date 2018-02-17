@@ -2,7 +2,7 @@ package de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.items;
 
 import de.gerrygames.viarewind.replacement.Replacement;
 import de.gerrygames.viarewind.replacement.ReplacementRegistry;
-import de.gerrygames.viarewind.storage.BlockStorage;
+import de.gerrygames.viarewind.storage.BlockState;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 
 public class ReplacementRegistry1_7_6_10to1_8 {
@@ -90,7 +90,7 @@ public class ReplacementRegistry1_7_6_10to1_8 {
 		return registry.replace(item);
 	}
 
-	public static BlockStorage.BlockState replace(BlockStorage.BlockState block) {
+	public static BlockState replace(BlockState block) {
 		return registry.replace(block);
 	}
 }

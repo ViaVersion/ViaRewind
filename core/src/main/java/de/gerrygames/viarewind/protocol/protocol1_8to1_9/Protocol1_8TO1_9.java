@@ -5,7 +5,7 @@ import de.gerrygames.viarewind.protocol.protocol1_8to1_9.entityreplacement.Shulk
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.entityreplacement.ShulkerReplacement;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.sound.Effect;
 import de.gerrygames.viarewind.replacement.EntityReplacement;
-import de.gerrygames.viarewind.storage.BlockStorage;
+import de.gerrygames.viarewind.storage.BlockState;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.chunks.ChunkPacketTransformer;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.items.ItemRewriter;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.items.ReplacementRegistry1_8to1_9;
@@ -383,9 +383,9 @@ public class Protocol1_8TO1_9 extends Protocol {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						int combined = packetWrapper.get(Type.VAR_INT, 0);
-						BlockStorage.BlockState state = BlockStorage.rawToState(combined);
+						BlockState state = BlockState.rawToState(combined);
 						state = ReplacementRegistry1_8to1_9.replace(state);
-						packetWrapper.set(Type.VAR_INT, 0, BlockStorage.stateToRaw(state));
+						packetWrapper.set(Type.VAR_INT, 0, BlockState.stateToRaw(state));
 					}
 				});
 			}
@@ -749,9 +749,9 @@ public class Protocol1_8TO1_9 extends Protocol {
 						}
 						packetWrapper.set(Type.INT, 0, id);
 						if (id==2001) {
-							BlockStorage.BlockState state = BlockStorage.rawToState(packetWrapper.get(Type.INT, 1));
+							BlockState state = BlockState.rawToState(packetWrapper.get(Type.INT, 1));
 							state = ReplacementRegistry1_8to1_9.replace(state);
-							packetWrapper.set(Type.INT, 1, BlockStorage.stateToRaw(state));
+							packetWrapper.set(Type.INT, 1, BlockState.stateToRaw(state));
 						}
 					}
 				});

@@ -1,4 +1,4 @@
-package de.gerrygames.viarewind.api;
+package de.gerrygames.viarewind.utils;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -1,6 +1,6 @@
 package de.gerrygames.viarewind.replacement;
 
-import de.gerrygames.viarewind.storage.BlockStorage;
+import de.gerrygames.viarewind.storage.BlockState;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.viaversion.libs.opennbt.tag.builtin.CompoundTag;
 import us.myles.viaversion.libs.opennbt.tag.builtin.StringTag;
@@ -62,7 +62,7 @@ public class Replacement {
 		return item;
 	}
 
-	public BlockStorage.BlockState replace(BlockStorage.BlockState block) {
-		return new BlockStorage.BlockState(id, data==-1 ? block.getData() : data);
+	public BlockState replace(BlockState block) {
+		return new BlockState(id, data==-1 ? block.getData() : data);
 	}
 }

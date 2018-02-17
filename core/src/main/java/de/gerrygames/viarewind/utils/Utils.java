@@ -10,13 +10,6 @@ import java.util.function.Consumer;
 
 public class Utils {
 
-	public static void iterateCompountTagRecursive(CompoundTag tag, final Consumer<Tag> action) {
-		tag.values().forEach(child -> {
-			if (child instanceof CompoundTag) iterateCompountTagRecursive((CompoundTag) child, action);
-			else action.accept(child);
-		});
-	}
-
 	public static UUID getUUID(UserConnection user) {
 		return user.get(ProtocolInfo.class).getUuid();
 	}
