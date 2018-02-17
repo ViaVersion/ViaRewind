@@ -783,7 +783,7 @@ public class Protocol1_8TO1_9 extends Protocol {
 						} else if (type == 44) { // Damage Indicator
 							packetWrapper.set(Type.INT, 0, 34); // Heart
 						} else if (type == 45) { // Sweep Attack
-							packetWrapper.set(Type.INT, 0, 0); // Large Explosion
+							packetWrapper.set(Type.INT, 0, 1); // Large Explosion
 						}
 					}
 				});
