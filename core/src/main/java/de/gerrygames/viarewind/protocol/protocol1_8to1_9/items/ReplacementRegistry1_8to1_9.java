@@ -18,7 +18,6 @@ public class ReplacementRegistry1_8to1_9 {
 		registry.registerItem(437, new Replacement(373, "Dragons Breath"));
 		registry.registerItem(443, new Replacement(299, "Elytra"));
 		registry.registerItem(426, new Replacement(410, "End Crystal"));
-		registry.registerItem(441, new Replacement(438, "Lingering Potion"));
 		registry.registerItem(442, new Replacement(425, "Shield"));
 		registry.registerItem(439, new Replacement(262, "Spectral Arrow"));
 		registry.registerItem(440, new Replacement(262, "Tipped Arrow"));
