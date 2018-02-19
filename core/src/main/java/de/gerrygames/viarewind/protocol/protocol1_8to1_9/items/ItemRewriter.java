@@ -15,10 +15,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static us.myles.ViaVersion.protocols.protocol1_9to1_8.ItemRewriter.potionNameFromDamage;
+
 @SuppressWarnings({"MismatchedQueryAndUpdateOfCollection", "unused"})
 public class ItemRewriter {
 	private static Map<String, Integer> ENTTIY_NAME_TO_ID;
+	private static Map<Integer, String> ENTTIY_ID_TO_NAME;
 	private static Map<String, Integer> POTION_NAME_TO_ID;
+	private static Map<Integer, String> POTION_ID_TO_NAME;
 	private static Map<String, String> POTION_NAME_INDEX = new HashMap<>();
 
 	static {
@@ -224,8 +228,31 @@ public class ItemRewriter {
 
 		CompoundTag tag = item.getTag();
 
-		 if (tag==null || !item.getTag().contains("ViaRewind1_8to1_9")) return item;
+		if (item.getId() == 383 && item.getData() != 0) {
+			if (tag == null) item.setTag(tag = new CompoundTag(""));
+			if (!tag.contains("EntityTag") && ENTTIY_ID_TO_NAME.containsKey((int) item.getData())) {
+				CompoundTag entityTag = new CompoundTag("EntityTag");
+				entityTag.put(new StringTag("id", ENTTIY_ID_TO_NAME.get((int) item.getData())));
+				tag.put(entityTag);
+			}
 
+			item.setData((short) 0);
+		}
+
+		if (item.getId() == 373 && (tag==null || !tag.contains("Potion"))) {
+			if (tag == null) item.setTag(tag = new CompoundTag(""));
+
+			if (item.getData() >= 16384) {
+				item.setId((short) 438);
+				item.setData((short) (item.getData() - 8192));
+			}
+
+			String name = item.getData() == 8192 ? "water" : potionNameFromDamage(item.getData());
+			tag.put(new StringTag("Potion", "minecraft:" + name));
+			item.setData((short) 0);
+		}
+		
+		 if (tag==null || !item.getTag().contains("ViaRewind1_8to1_9")) return item;
 
 		CompoundTag viaVersionTag = tag.remove("ViaRewind1_8to1_9");
 
