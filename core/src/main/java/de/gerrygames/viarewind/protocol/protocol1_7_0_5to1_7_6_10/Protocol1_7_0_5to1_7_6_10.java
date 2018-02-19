@@ -41,7 +41,8 @@ public class Protocol1_7_0_5to1_7_6_10 extends Protocol {
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
-						packetWrapper.read(Type.VAR_INT);
+						int size = packetWrapper.read(Type.VAR_INT);
+						for (int i = 0; i < size * 3; i++) packetWrapper.read(Type.STRING);
 					}
 				});
 				map(Type.INT);
