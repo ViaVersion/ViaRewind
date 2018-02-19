@@ -9,7 +9,7 @@ public class ChatUtil {
 	private static Pattern unusedColorPattern = Pattern.compile("(?>(?>§[0-fk-or])*(§r|\\Z))|(?>(?>§[0-f])*(§[0-f]))");
 
 	public static String jsonToLegacy(String json) {
-		if (json==null || json.equals("null")) return "";
+		if (json==null || json.equals("null") || json.equals("")) return "";
 		String legacy = TextComponent.toLegacyText(ComponentSerializer.parse(json));
 		while (legacy.startsWith("§f")) legacy = legacy.substring(2, legacy.length());
 		return legacy;

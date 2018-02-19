@@ -1612,7 +1612,6 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 								PacketUtil.sendPacket(packet, Protocol1_7_6_10TO1_8.class);
 							} else if (action==3) {
 								String displayName = packetWrapper.read(Type.BOOLEAN) ? packetWrapper.read(Type.STRING) : null;
-								if (displayName!=null) displayName = GameProfileStorage.GameProfile.fixDisplayName(displayName);
 
 								GameProfileStorage.GameProfile gameProfile = gameProfileStorage.get(uuid);
 								if (gameProfile==null || gameProfile.displayName==null && displayName==null) continue;

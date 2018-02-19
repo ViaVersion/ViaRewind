@@ -1,6 +1,5 @@
 package de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage;
 
-import de.gerrygames.viarewind.utils.ChatUtil;
 import us.myles.ViaVersion.api.data.StoredObject;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.item.Item;
@@ -118,13 +117,7 @@ public class GameProfileStorage extends StoredObject {
 		}
 
 		public void setDisplayName(String displayName) {
-			this.displayName = fixDisplayName(displayName);
-		}
-
-		public static String fixDisplayName(String displayName) {
-			displayName = ChatUtil.jsonToLegacy(displayName);
-			displayName = ChatUtil.removeUnusedColor(displayName, 'f');
-			return displayName;
+			this.displayName = displayName;
 		}
 	}
 
