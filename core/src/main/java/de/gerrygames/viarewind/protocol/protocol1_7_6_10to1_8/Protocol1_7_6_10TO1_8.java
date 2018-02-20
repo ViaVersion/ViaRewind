@@ -51,6 +51,7 @@ import us.myles.ViaVersion.exception.CancelException;
 import us.myles.ViaVersion.packets.Direction;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
+import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.ClientChunks;
 import us.myles.viaversion.libs.opennbt.tag.builtin.CompoundTag;
 import us.myles.viaversion.libs.opennbt.tag.builtin.ListTag;
@@ -101,6 +102,13 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 						tracker.setPlayerId(packetWrapper.get(Type.INT, 0));
 						tracker.getClientEntityTypes().put(tracker.getPlayerId(), Entity1_10Types.EntityType.ENTITY_HUMAN);
 						tracker.setDimension(packetWrapper.get(Type.BYTE, 0));
+					}
+				});
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						ClientWorld world = packetWrapper.user().get(ClientWorld.class);
+						world.setEnvironment(packetWrapper.get(Type.BYTE, 0));
 					}
 				});
 			}
@@ -212,6 +220,13 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 							tracker.setDimension(packetWrapper.get(Type.INT, 0));
 							tracker.clearEntities();
 						}
+					}
+				});
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						ClientWorld world = packetWrapper.user().get(ClientWorld.class);
+						world.setEnvironment(packetWrapper.get(Type.INT, 0));
 					}
 				});
 			}
@@ -2664,5 +2679,6 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 		userConnection.put(new CompressionSendStorage(userConnection));
 		userConnection.put(new WorldBorder(userConnection));
 		userConnection.put(new PlayerAbilities(userConnection));
+		userConnection.put(new ClientWorld(userConnection));
 	}
 }
