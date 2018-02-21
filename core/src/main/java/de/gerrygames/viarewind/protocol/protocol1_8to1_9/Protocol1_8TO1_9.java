@@ -431,7 +431,27 @@ public class Protocol1_8TO1_9 extends Protocol {
 		this.registerOutgoing(State.PLAY, 0x0F, 0x02);
 
 		//Multi Block Change
-		this.registerOutgoing(State.PLAY, 0x10, 0x22);
+		this.registerOutgoing(State.PLAY, 0x10, 0x22, new PacketRemapper() {
+			@Override
+			public void registerMap() {
+				map(Type.INT);
+				map(Type.INT);
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						int size = packetWrapper.passthrough(Type.VAR_INT);
+						for (int i = 0; i<size; i++) {
+							packetWrapper.passthrough(Type.UNSIGNED_BYTE);
+							packetWrapper.passthrough(Type.UNSIGNED_BYTE);
+							int combined = packetWrapper.read(Type.VAR_INT);
+							BlockState state = BlockState.rawToState(combined);
+							state = ReplacementRegistry1_8to1_9.replace(state);
+							packetWrapper.write(Type.VAR_INT, BlockState.stateToRaw(state));
+						}
+					}
+				});
+			}
+		});
 
 		//Confirm Transaction
 		this.registerOutgoing(State.PLAY, 0x11, 0x32);

@@ -48,7 +48,7 @@ public class ReplacementRegistry1_8to1_9 {
 		registry.registerItemBlock(209, new Replacement(90, "End Gateway"));
 		registry.registerItemBlock(210, new Replacement(137, "Repeating Command Block"));
 		registry.registerItemBlock(211, new Replacement(137, "Chain Command Block"));
-		registry.registerItemBlock(212, new Replacement(79, "Frosted Ice"));
+		registry.registerItemBlock(212, new Replacement(79, 0, "Frosted Ice"));
 		registry.registerItemBlock(214, new Replacement(87, "Nether Wart Block"));
 		registry.registerItemBlock(215, new Replacement(112, "Red Nether Brick"));
 		registry.registerItemBlock(217, new Replacement(166, "Structure Void"));
