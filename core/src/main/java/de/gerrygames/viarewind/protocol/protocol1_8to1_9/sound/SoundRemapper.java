@@ -613,8 +613,8 @@ public class SoundRemapper {
 		register1_9Sound("entity.endermite.hurt");
 		register1_9Sound("entity.endermite.step");
 		register1_9Sound("entity.enderpearl.throw");
-		register1_9Sound("entity.experience_orb.pickup");
 		register1_9Sound("entity.experience_bottle.throw");
+		register1_9Sound("entity.experience_orb.pickup");
 		register1_9Sound("entity.experience_orb.touch");
 		register1_9Sound("entity.firework.blast");
 		register1_9Sound("entity.firework.blast_far");
