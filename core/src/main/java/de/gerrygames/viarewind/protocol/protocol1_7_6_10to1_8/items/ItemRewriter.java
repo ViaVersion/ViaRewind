@@ -36,18 +36,20 @@ public class ItemRewriter {
 			viaVersionTag.put(new ListTag("lore", ((ListTag)display.get("Lore")).getValue()));
 		}
 
-		if (tag.contains("ench")) {
+		if (tag.contains("ench") || tag.contains("StoredEnchantments")) {
+			ListTag enchTag = tag.contains("ench") ? tag.get("ench") : tag.get("StoredEnchantments");
+			List<Tag> enchants = enchTag.getValue();
 			List<Tag> lore = new ArrayList<>();
-			List<CompoundTag> enchants = (List<CompoundTag>) tag.get("ench").getValue();
-			for (CompoundTag ench : enchants) {
-				short id = (short) ench.get("id").getValue();
-				short lvl = (short) ench.get("lvl").getValue();
+			for (Tag ench : enchants) {
+				short id = (short) ((CompoundTag)ench).get("id").getValue();
+				short lvl = (short) ((CompoundTag)ench).get("lvl").getValue();
 				String s;
 				if (id==8) {
 					s  = "§r§7Depth Strider ";
 				} else {
 					continue;
 				}
+				enchTag.remove(ench);
 				s += Enchantments.ENCHANTMENTS.getOrDefault(lvl, "enchantment.level." + lvl);
 				lore.add(new StringTag("", s));
 			}
