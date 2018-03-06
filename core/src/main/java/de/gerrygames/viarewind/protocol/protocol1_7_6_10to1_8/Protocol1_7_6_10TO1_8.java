@@ -552,7 +552,7 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 							endermite.setYawPitch(yaw * 360f / 256, pitch * 360f / 256);
 							endermite.setHeadYaw(headYaw * 360f / 256);
 							tracker.addEntityReplacement(endermite);
-						} else if (typeId==101 || typeId==30 || typeId==255) {
+						} else if (typeId==101 || typeId==30 || typeId==255 || typeId==-1) {
 							packetWrapper.cancel();
 						}
 					}

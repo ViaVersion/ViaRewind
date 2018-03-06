@@ -229,6 +229,8 @@ public class Protocol1_8TO1_9 extends Protocol {
 							shulkerReplacement.setYawPitch(yaw * 360f / 256, pitch * 360f / 256);
 							shulkerReplacement.setHeadYaw(headYaw * 360f / 256);
 							tracker.addEntityReplacement(shulkerReplacement);
+						} else if (typeId==-1 || typeId==255) {
+							packetWrapper.cancel();
 						}
 					}
 				});

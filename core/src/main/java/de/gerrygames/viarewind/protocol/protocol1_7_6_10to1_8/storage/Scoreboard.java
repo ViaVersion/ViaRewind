@@ -68,6 +68,7 @@ public class Scoreboard extends StoredObject {
 
 	public String sendTeamForScore(String score) {
 		if (score.length()<=16) return score;
+		if (scoreTeams.containsKey(score)) return scoreTeams.get(score).name;
 		int l = 16;
 		int i = Math.min(16, score.length()-16);
 		String name = score.substring(i, i+l);
