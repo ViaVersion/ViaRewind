@@ -1748,7 +1748,6 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 						Scoreboard scoreboard = packetWrapper.user().get(Scoreboard.class);
 						String name = packetWrapper.passthrough(Type.STRING);
 						byte mode = packetWrapper.passthrough(Type.BYTE);
-						System.out.println("score " + name + " " + mode);
 
 						if (mode==1) {
 							name = scoreboard.removeTeamForScore(name);
@@ -1756,14 +1755,11 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 							name = scoreboard.sendTeamForScore(name);
 						}
 
-						System.out.println("new name: " + name);
-
 						if (name.length()>16) {
 							name = ChatColor.stripColor(name);
 							if (name.length()>16) {
 								name = name.substring(0, 16);
 							}
-							System.out.println("new name 2 " + name);
 						}
 						packetWrapper.set(Type.STRING, 0, name);
 
