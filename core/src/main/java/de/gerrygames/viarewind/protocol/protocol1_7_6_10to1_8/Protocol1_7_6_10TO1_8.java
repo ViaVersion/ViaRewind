@@ -1745,15 +1745,28 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
+						Scoreboard scoreboard = packetWrapper.user().get(Scoreboard.class);
 						String name = packetWrapper.passthrough(Type.STRING);
+						byte mode = packetWrapper.passthrough(Type.BYTE);
+						System.out.println("score " + name + " " + mode);
+
+						if (mode==1) {
+							name = scoreboard.removeTeamForScore(name);
+						} else {
+							name = scoreboard.sendTeamForScore(name);
+						}
+
+						System.out.println("new name: " + name);
+
 						if (name.length()>16) {
 							name = ChatColor.stripColor(name);
 							if (name.length()>16) {
 								name = name.substring(0, 16);
 							}
-							packetWrapper.set(Type.STRING, 0, name);
+							System.out.println("new name 2 " + name);
 						}
-						byte mode = packetWrapper.passthrough(Type.BYTE);
+						packetWrapper.set(Type.STRING, 0, name);
+
 						String objective = packetWrapper.read(Type.STRING);
 						if (objective.length()>16) {
 							objective = objective.substring(0, 16);
