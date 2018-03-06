@@ -1101,7 +1101,7 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						int particleId = packetWrapper.read(Type.INT);
-						Particle particle = Particle.values()[particleId];
+						Particle particle = Particle.find(particleId);
 						if (particle == null) particle = Particle.CRIT;
 						packetWrapper.write(Type.STRING, particle.name);
 

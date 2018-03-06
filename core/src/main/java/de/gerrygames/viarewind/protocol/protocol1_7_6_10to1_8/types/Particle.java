@@ -63,6 +63,12 @@ public enum Particle {
 		return particleMap.get(part);
 	}
 
+	public static Particle find(int id) {
+		if (id<0) return null;
+		Particle[] values = Particle.values();
+		return id>=values.length ? null : values[id];
+	}
+
 	static {
 		Particle[] particles = values();
 

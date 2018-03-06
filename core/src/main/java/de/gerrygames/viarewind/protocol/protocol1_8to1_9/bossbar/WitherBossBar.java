@@ -12,7 +12,6 @@ import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
 import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_8;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.version.Types1_8;
-import us.myles.ViaVersion.exception.CancelException;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 
 import java.util.ArrayList;
@@ -61,6 +60,7 @@ public class WitherBossBar extends BossBar {
 	@Override
 	public BossBar setHealth(float health) {
 		this.health  = health;
+		if (this.health<=0) this.health = 0.0001f;
 		if (this.visible) updateMetadata();
 		return this;
 	}
