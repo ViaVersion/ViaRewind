@@ -13,12 +13,14 @@ import us.myles.ViaVersion.api.platform.TaskId;
 import us.myles.ViaVersion.api.type.Type;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 public class Cooldown extends StoredObject {
 	private double attackSpeed = 4.0;
 	private long lastHit = 0;
 	private TaskId taskId;
 	private final ViaRewindConfig.CooldownIndicator cooldownIndicator;
+	private UUID bossUUID = null;
 
 	public Cooldown(final UserConnection user) {
 		super(user);
@@ -47,28 +49,65 @@ public class Cooldown extends StoredObject {
 				BlockPlaceDestroyTracker tracker = getUser().get(BlockPlaceDestroyTracker.class);
 				if (tracker.isMining()) {
 					lastHit = 0;
-					hide();
-					lastSend = false;
+					if (lastSend) {
+						hide();
+						lastSend = false;
+					}
 					return;
 				}
 
-				String title = getTitle();
-				if (cooldownIndicator==ViaRewindConfig.CooldownIndicator.TITLE) {
-					sendTitle("", title, 0, 2, 5);
-				} else if (cooldownIndicator==ViaRewindConfig.CooldownIndicator.ACTION_BAR) {
-					sendActionBar(title);
-				}
+				showCooldown();
 				lastSend = true;
 			}
 		}, 1L);
 	}
 
+	private void showCooldown() {
+		if (cooldownIndicator==ViaRewindConfig.CooldownIndicator.TITLE) {
+			sendTitle("", getTitle(), 0, 2, 5);
+		} else if (cooldownIndicator==ViaRewindConfig.CooldownIndicator.ACTION_BAR) {
+			sendActionBar(getTitle());
+		} else if (cooldownIndicator==ViaRewindConfig.CooldownIndicator.BOSS_BAR) {
+			sendBossBar((float) getCooldown());
+		}
+	}
+
 	private void hide() {
 		if (cooldownIndicator==ViaRewindConfig.CooldownIndicator.ACTION_BAR) {
 			sendActionBar("§r");
-		} if (cooldownIndicator==ViaRewindConfig.CooldownIndicator.TITLE) {
+		} else if (cooldownIndicator==ViaRewindConfig.CooldownIndicator.TITLE) {
 			hideTitle();
+		} else if (cooldownIndicator==ViaRewindConfig.CooldownIndicator.BOSS_BAR) {
+			hideBossBar();
 		}
+	}
+
+	private void hideBossBar() {
+		if (bossUUID==null) return;
+		PacketWrapper wrapper = new PacketWrapper(0x0C, null, getUser());
+		wrapper.write(Type.UUID, bossUUID);
+		wrapper.write(Type.VAR_INT, 1);
+		PacketUtil.sendPacket(wrapper, Protocol1_8TO1_9.class, false, true);
+		bossUUID = null;
+	}
+
+	private void sendBossBar(float cooldown) {
+		PacketWrapper wrapper = new PacketWrapper(0x0C, null, getUser());
+		if (bossUUID==null) {
+			bossUUID = UUID.randomUUID();
+			wrapper.write(Type.UUID, bossUUID);
+			wrapper.write(Type.VAR_INT, 0);
+			wrapper.write(Type.STRING, "{\"text\":\"  \"}");
+			wrapper.write(Type.FLOAT, cooldown);
+			wrapper.write(Type.VAR_INT, 0);
+			wrapper.write(Type.VAR_INT, 0);
+			wrapper.write(Type.UNSIGNED_BYTE, (short) 0);
+		} else {
+			wrapper.write(Type.UUID, bossUUID);
+			wrapper.write(Type.VAR_INT, 2);
+			wrapper.write(Type.FLOAT, cooldown);
+		}
+		PacketUtil.sendPacket(wrapper, Protocol1_8TO1_9.class, false, true);
 	}
 
 	private void hideTitle() {
@@ -106,7 +145,7 @@ public class Cooldown extends StoredObject {
 	public boolean hasCooldown() {
 		long time = System.currentTimeMillis()-lastHit;
 		double cooldown = restrain(((double)time) * attackSpeed / 1000d, 0, 1.5);
-		return cooldown>0.1 && cooldown<1.2;
+		return cooldown>0.1 && cooldown<1.1;
 	}
 
 	public double getCooldown() {
