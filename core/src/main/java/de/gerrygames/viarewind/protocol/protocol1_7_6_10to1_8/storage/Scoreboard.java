@@ -16,6 +16,7 @@ public class Scoreboard extends StoredObject {
 	private HashMap<String, List<String>> teams = new HashMap<>();
 	private HashSet<String> objectives = new HashSet<>();
 	private HashMap<String, ScoreTeam> scoreTeams = new HashMap<>();
+	private HashSet<String> scoreTeamNames = new HashSet<>();
 
 	public Scoreboard(UserConnection user) {
 		super(user);
@@ -72,7 +73,7 @@ public class Scoreboard extends StoredObject {
 		int l = 16;
 		int i = Math.min(16, score.length()-16);
 		String name = score.substring(i, i+l);
-		while (scoreTeams.containsKey(name) || teams.containsKey(name)) {
+		while (scoreTeamNames.contains(name) || teams.containsKey(name)) {
 			i--;
 			while (score.length()-l-i>16) {
 				l--;
@@ -86,6 +87,7 @@ public class Scoreboard extends StoredObject {
 
 		ScoreTeam scoreTeam = new ScoreTeam(name, prefix, suffix);
 		scoreTeams.put(score, scoreTeam);
+		scoreTeamNames.add(name);
 
 		PacketWrapper teamPacket = new PacketWrapper(0x3E, null, getUser());
 		teamPacket.write(Type.STRING, name);
@@ -104,6 +106,7 @@ public class Scoreboard extends StoredObject {
 	public String removeTeamForScore(String score) {
 		ScoreTeam scoreTeam = scoreTeams.remove(score);
 		if (scoreTeam==null) return score;
+		scoreTeamNames.remove(scoreTeam.name);
 
 		PacketWrapper teamPacket = new PacketWrapper(0x3E, null, getUser());
 		teamPacket.write(Type.STRING, scoreTeam.name);
