@@ -1513,11 +1513,12 @@ public class Protocol1_8TO1_9 extends Protocol {
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
+						boolean player = packetWrapper.get(Type.VAR_INT, 0) == packetWrapper.user().get(EntityTracker.class).getPlayerId();
 						int size = packetWrapper.get(Type.INT, 0);
 						int removed = 0;
 						for (int i = 0; i<size; i++) {
 							String key = packetWrapper.read(Type.STRING);
-							boolean skip = key.equals("generic.armor") || key.equals("generic.attackSpeed") || key.equals("generic.luck") || key.equals("generic.armorToughness");
+							boolean skip = key.equals("generic.armor") || key.equals("generic.attackSpeed") || key.equals("generic.luck") || key.equals("generic.armorToughness") || key.equals("generic.flyingSpeed");
 							double value = packetWrapper.read(Type.DOUBLE);
 							int modifiersize = packetWrapper.read(Type.VAR_INT);
 							if (!skip) {
@@ -1536,7 +1537,7 @@ public class Protocol1_8TO1_9 extends Protocol {
 								packetWrapper.write(Type.DOUBLE, amount);
 								packetWrapper.write(Type.BYTE, operation);
 							}
-							if (key.equals("generic.attackSpeed")) {
+							if (player && key.equals("generic.attackSpeed")) {
 								packetWrapper.user().get(Cooldown.class).setAttackSpeed(value, modifiers);
 							}
 						}
