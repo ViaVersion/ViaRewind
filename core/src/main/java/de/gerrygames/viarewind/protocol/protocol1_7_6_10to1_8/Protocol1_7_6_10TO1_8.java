@@ -422,8 +422,6 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 						byte yaw = packetWrapper.get(Type.BYTE, 2);
 
 						if (typeId==71) {
-							int data = packetWrapper.get(Type.INT, 3);
-
 							switch (yaw) {
 								case -128:
 									z += 32;
@@ -443,7 +441,6 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 									break;
 							}
 
-							packetWrapper.set(Type.INT, 3, data);
 							packetWrapper.set(Type.INT, 0, x);
 							packetWrapper.set(Type.INT, 2, z);
 							packetWrapper.set(Type.BYTE, 2, yaw);
@@ -474,23 +471,10 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						if (packetWrapper.isCancelled()) return;
 						int data = packetWrapper.get(Type.INT, 3);
-						short vX = 0, vY = 0, vZ = 0;
-						try {
-							vX = packetWrapper.read(Type.SHORT);
-							vY = packetWrapper.read(Type.SHORT);
-							vZ = packetWrapper.read(Type.SHORT);
-						} catch (Exception ignored) {}
-						if (data!=0) {
-							packetWrapper.write(Type.SHORT, vX);
-							packetWrapper.write(Type.SHORT, vY);
-							packetWrapper.write(Type.SHORT, vZ);
-						} else if (vX!=0) {
-							PacketWrapper velocity = new PacketWrapper(0x12, null, packetWrapper.user());
-							velocity.write(Type.INT, packetWrapper.get(Type.VAR_INT, 0));
-							velocity.write(Type.SHORT, vX);
-							velocity.write(Type.SHORT, vY);
-							velocity.write(Type.SHORT, vZ);
-							PacketUtil.sendPacket(velocity, Protocol1_7_6_10TO1_8.class);
+						if (data>0) {
+							packetWrapper.passthrough(Type.SHORT);
+							packetWrapper.passthrough(Type.SHORT);
+							packetWrapper.passthrough(Type.SHORT);
 						}
 					}
 				});

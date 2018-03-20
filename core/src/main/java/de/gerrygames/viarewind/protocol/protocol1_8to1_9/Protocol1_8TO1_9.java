@@ -107,23 +107,11 @@ public class Protocol1_8TO1_9 extends Protocol {
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
-						int data = packetWrapper.read(Type.INT);
-						packetWrapper.write(Type.INT, data);
-						short vX = packetWrapper.read(Type.SHORT);
-						short vY = packetWrapper.read(Type.SHORT);
-						short vZ = packetWrapper.read(Type.SHORT);
-						if (data!=0) {
-							packetWrapper.write(Type.SHORT, vX);
-							packetWrapper.write(Type.SHORT, vY);
-							packetWrapper.write(Type.SHORT, vZ);
-						} else {
-							int entityId = packetWrapper.get(Type.VAR_INT, 0);
-							PacketWrapper velocity = new PacketWrapper(0x12, null, packetWrapper.user());
-							velocity.write(Type.VAR_INT, entityId);
-							velocity.write(Type.SHORT, vX);
-							velocity.write(Type.SHORT, vY);
-							velocity.write(Type.SHORT, vZ);
-							PacketUtil.sendPacket(velocity, Protocol1_8TO1_9.class);
+						int data = packetWrapper.passthrough(Type.INT);
+						if (data>0) {
+							packetWrapper.passthrough(Type.SHORT);
+							packetWrapper.passthrough(Type.SHORT);
+							packetWrapper.passthrough(Type.SHORT);
 						}
 					}
 				});
