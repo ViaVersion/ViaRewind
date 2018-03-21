@@ -112,6 +112,17 @@ public class Protocol1_8TO1_9 extends Protocol {
 							packetWrapper.passthrough(Type.SHORT);
 							packetWrapper.passthrough(Type.SHORT);
 							packetWrapper.passthrough(Type.SHORT);
+						} else {
+							int entityId = packetWrapper.get(Type.VAR_INT, 0);
+							short vX = packetWrapper.read(Type.SHORT);
+							short vY = packetWrapper.read(Type.SHORT);
+							short vZ = packetWrapper.read(Type.SHORT);
+							PacketWrapper velocityPacket = new PacketWrapper(0x12, null, packetWrapper.user());
+							velocityPacket.write(Type.VAR_INT, entityId);
+							velocityPacket.write(Type.SHORT, vX);
+							velocityPacket.write(Type.SHORT, vY);
+							velocityPacket.write(Type.SHORT, vZ);
+							PacketUtil.sendPacket(velocityPacket, Protocol1_8TO1_9.class);
 						}
 					}
 				});
