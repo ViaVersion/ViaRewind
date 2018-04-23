@@ -1,11 +1,14 @@
 package de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.chunks;
 
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.items.ReplacementRegistry1_7_6_10to1_8;
+import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.Chunk1_7_10WriteOnlyType;
+import de.gerrygames.viarewind.protocol.protocol1_8to1_9.types.Chunk1_8Type;
 import de.gerrygames.viarewind.storage.BlockState;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.minecraft.Environment;
+import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
+import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.CustomByteType;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
@@ -15,40 +18,21 @@ import java.util.zip.Deflater;
 public class ChunkPacketTransformer {
 	public static void transformChunk(PacketWrapper packetWrapper) throws Exception {
 		ClientWorld world = packetWrapper.user().get(ClientWorld.class);
-
-		int chunkX = packetWrapper.read(Type.INT);
-		int chunkZ = packetWrapper.read(Type.INT);
-		boolean groundUp = packetWrapper.read(Type.BOOLEAN);
-		int primaryBitMask = packetWrapper.read(Type.UNSIGNED_SHORT);
-		int size = packetWrapper.read(Type.VAR_INT);
-		CustomByteType customByteType = new CustomByteType(size);
-		byte[] data = packetWrapper.read(customByteType);
-
-		data = transformChunkData(data, primaryBitMask, world==null || world.getEnvironment()==Environment.NORMAL, groundUp);
-
-		packetWrapper.write(Type.INT, chunkX);
-		packetWrapper.write(Type.INT, chunkZ);
-		packetWrapper.write(Type.BOOLEAN, groundUp);
-		packetWrapper.write(Type.SHORT, (short) primaryBitMask);
-		packetWrapper.write(Type.SHORT, (short) 0);
-
-		packetWrapper.write(Type.INT, data.length);
-
-		Deflater deflater = new Deflater(4);
-
-		byte[] compressedData;
-		int compressedSize;
-		try {
-			deflater.setInput(data, 0, data.length);
-			deflater.finish();
-			compressedData = new byte[data.length];
-			compressedSize = deflater.deflate(compressedData);
-		} finally {
-			deflater.end();
+		Chunk chunk = packetWrapper.read(new Chunk1_8Type(world));
+		packetWrapper.write(new Chunk1_7_10WriteOnlyType(world), chunk);
+		for (ChunkSection section : chunk.getSections()){
+			if (section == null) return;
+			for (int x = 0; x < 16; x++){
+				for (int y = 0; y < 16; y++) {
+					for (int z = 0; z < 16; z++) {
+						int block = section.getBlock(x, y, z);
+						BlockState state = BlockState.rawToState(block);
+						state = ReplacementRegistry1_7_6_10to1_8.replace(state);
+						section.setBlock(x, y, z, state.getId(), state.getData());
+					}
+				}
+			}
 		}
-
-		customByteType = new CustomByteType(compressedSize);
-		packetWrapper.write(customByteType, compressedData);
 	}
 
 	private static byte[] transformChunkData(byte[] data, int primaryBitMask, boolean skyLight, boolean groundUp) {
