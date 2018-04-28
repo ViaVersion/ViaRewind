@@ -1701,7 +1701,6 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 								packetWrapper.cancel();
 								return;
 							}
-							scoreboard.removeObjective(name);
 							if (scoreboard.getColorIndependentSidebar() != null) {
 								String username = packetWrapper.user().get(ProtocolInfo.class).getUsername();
 								Optional<Byte> color = scoreboard.getPlayerTeamColor(username);
@@ -1715,6 +1714,7 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 									}
 								}
 							}
+							scoreboard.removeObjective(name);
 						} else if (mode==2) {
 							if (!scoreboard.objectiveExists(name)) {
 								packetWrapper.cancel();
@@ -1880,36 +1880,34 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 											} while (scoreboard.objectiveExists(fakeObjectiveName));
 											PacketWrapper fakeObjective = packetWrapper.create(0x3B);
 											fakeObjective.write(Type.STRING, fakeObjectiveName);
-											fakeObjective.write(Type.BYTE, (byte) 0); // add mode
 											fakeObjective.write(Type.STRING, fakeObjectiveName); // objective value
-											fakeObjective.write(Type.STRING, "integer");
-											fakeObjective.send(Protocol1_7_6_10TO1_8.class, false);
+											fakeObjective.write(Type.BYTE, (byte) 0); // add mode
+											PacketUtil.sendPacket(fakeObjective, Protocol1_7_6_10TO1_8.class);
 
 											PacketWrapper sidebarPacket = packetWrapper.create(0x3D);
-											sidebarPacket.write(Type.STRING, fakeObjectiveName);
 											sidebarPacket.write(Type.BYTE, (byte) 1);
-											sidebarPacket.send(Protocol1_7_6_10TO1_8.class, false);
+											sidebarPacket.write(Type.STRING, fakeObjectiveName);
+											PacketUtil.sendPacket(sidebarPacket, Protocol1_7_6_10TO1_8.class);
 
 											PacketWrapper removeFakeObjective = packetWrapper.create(0x3B);
 											removeFakeObjective.write(Type.STRING, fakeObjectiveName);
+											removeFakeObjective.write(Type.STRING, fakeObjectiveName);
 											removeFakeObjective.write(Type.BYTE, (byte) 1);
-											removeFakeObjective.send(Protocol1_7_6_10TO1_8.class, false);
+											PacketUtil.sendPacket(removeFakeObjective, Protocol1_7_6_10TO1_8.class);
 										} else {
 											PacketWrapper sidebarPacket = packetWrapper.create(0x3D);
 											sidebarPacket.write(Type.BYTE, (byte) 1);
 											sidebarPacket.write(Type.STRING, scoreboard.getColorIndependentSidebar());
-											sidebarPacket.send(Protocol1_7_6_10TO1_8.class, true);
+											PacketUtil.sendPacket(sidebarPacket, Protocol1_7_6_10TO1_8.class);
 										}
 									}
 								} else {
 									scoreboard.addPlayerToTeam(entry, team);
-									if (entry.equals(username)) {
-										if (scoreboard.getColorDependentSidebar().containsKey(color)) {
-											PacketWrapper displayObjective = packetWrapper.create(0x3D);
-											displayObjective.write(Type.BYTE, (byte) 1);
-											displayObjective.write(Type.STRING, scoreboard.getColorDependentSidebar().get(color));
-											displayObjective.send(Protocol1_7_6_10TO1_8.class, true);
-										}
+									if (entry.equals(username) && scoreboard.getColorDependentSidebar().containsKey(color)) {
+										PacketWrapper displayObjective = packetWrapper.create(0x3D);
+										displayObjective.write(Type.BYTE, (byte) 1);
+										displayObjective.write(Type.STRING, scoreboard.getColorDependentSidebar().get(color));
+										PacketUtil.sendPacket(displayObjective, Protocol1_7_6_10TO1_8.class);
 									}
 								}
 								entryList.add(entry);
