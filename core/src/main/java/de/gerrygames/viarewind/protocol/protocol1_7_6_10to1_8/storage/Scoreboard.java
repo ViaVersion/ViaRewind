@@ -70,6 +70,11 @@ public class Scoreboard extends StoredObject {
 		return false;
 	}
 
+	public Optional<Byte> getPlayerTeamColor(String player) {
+		Optional<String> team = getTeam(player);
+		return team.isPresent() ? getTeamColor(team.get()) : Optional.empty();
+	}
+
 	public Optional<String> getTeam(String player) {
 		for (Map.Entry<String, List<String>> entry : teams.entrySet())
 			if (entry.getValue().contains(player))
@@ -84,7 +89,7 @@ public class Scoreboard extends StoredObject {
 	public void removeObjective(String name) {
 		objectives.remove(name);
 		colorDependentSidebar.values().remove(name);
-		if (colorIndependentSidebar.equals(name)) {
+		if (name.equals(colorIndependentSidebar)) {
 			colorIndependentSidebar = null;
 		}
 	}

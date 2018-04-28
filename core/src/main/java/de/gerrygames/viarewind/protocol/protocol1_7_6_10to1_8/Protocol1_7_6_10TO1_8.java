@@ -34,7 +34,6 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import net.md_5.bungee.api.ChatColor;
 import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.entities.Entity1_10Types;
@@ -1703,6 +1702,19 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 								return;
 							}
 							scoreboard.removeObjective(name);
+							if (scoreboard.getColorIndependentSidebar() != null) {
+								String username = packetWrapper.user().get(ProtocolInfo.class).getUsername();
+								Optional<Byte> color = scoreboard.getPlayerTeamColor(username);
+								if (color.isPresent()) {
+									String sidebar = scoreboard.getColorDependentSidebar().get(color.get());
+									if (name.equals(sidebar)) {
+										PacketWrapper sidebarPacket = new PacketWrapper(0x3D, null, packetWrapper.user());
+										sidebarPacket.write(Type.BYTE, (byte) 1);
+										sidebarPacket.write(Type.STRING, scoreboard.getColorIndependentSidebar());
+										PacketUtil.sendPacket(sidebarPacket, Protocol1_7_6_10TO1_8.class);
+									}
+								}
+							}
 						} else if (mode==2) {
 							if (!scoreboard.objectiveExists(name)) {
 								packetWrapper.cancel();
@@ -1782,25 +1794,19 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
                             scoreboard.getColorDependentSidebar().put(receiverTeamColor, name);
 
                             String username = packetWrapper.user().get(ProtocolInfo.class).getUsername();
-                            Optional<String> team = scoreboard.getTeam(username);
-                            if (team.isPresent()) {
-                                Optional<Byte> color = scoreboard.getTeamColor(team.get());
-                                if (color.isPresent())
-                                    if (color.get() == receiverTeamColor)
-                                        position = 1;
-                                    else position = -1;
-                                else position = -1;
-                            } else position = -1;
-						} else if (position == 1) { // team independent sidebar
+	                        Optional<Byte> color = scoreboard.getPlayerTeamColor(username);
+	                        if (color.isPresent() && color.get() == receiverTeamColor) {
+		                        position = 1;
+	                        } else {
+		                        position = -1;
+	                        }
+                        } else if (position == 1) { // team independent sidebar
 						    scoreboard.setColorIndependentSidebar(name);
 						    String username = packetWrapper.user().get(ProtocolInfo.class).getUsername();
-						    Optional<String> team = scoreboard.getTeam(username);
-						    if (team.isPresent()) {
-						    	Optional<Byte> color = scoreboard.getTeamColor(team.get());
-						    	if (scoreboard.getColorDependentSidebar().containsKey(color.get())) {
-						    		position = -1;
-						    	}
-						    }
+	                        Optional<Byte> color = scoreboard.getPlayerTeamColor(username);
+	                        if (color.isPresent() && scoreboard.getColorDependentSidebar().containsKey(color.get())) {
+		                        position = -1;
+	                        }
                         }
 						if (position == -1) {
                             packetWrapper.cancel();
