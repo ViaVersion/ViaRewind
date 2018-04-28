@@ -6,6 +6,8 @@ import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.MetaType1_7_
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
 import de.gerrygames.viarewind.replacement.EntityReplacement;
 import de.gerrygames.viarewind.utils.PacketUtil;
+import de.gerrygames.viarewind.utils.math.AABB;
+import de.gerrygames.viarewind.utils.math.Vector3d;
 import lombok.Getter;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.data.UserConnection;
@@ -259,6 +261,14 @@ public class ArmorStandReplacement implements EntityReplacement {
 			updateMetadata();
 			updateLocation();
 		}
+	}
+
+	public AABB getBoundingBox() {
+		double w = this.small ? 0.25 : 0.5;
+		double h = this.small ? 0.9875 : 1.975;
+		Vector3d min = new Vector3d(this.locX - w / 2, this.locY, this.locZ - w / 2);
+		Vector3d max = new Vector3d(this.locX + w / 2, this.locY + h, this.locZ + w / 2);
+		return new AABB(min, max);
 	}
 
 	public void despawn() {

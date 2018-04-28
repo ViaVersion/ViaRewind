@@ -29,6 +29,10 @@ import de.gerrygames.viarewind.types.VarLongType;
 import de.gerrygames.viarewind.utils.ChatUtil;
 import de.gerrygames.viarewind.utils.PacketUtil;
 import de.gerrygames.viarewind.utils.Utils;
+import de.gerrygames.viarewind.utils.math.AABB;
+import de.gerrygames.viarewind.utils.math.Ray3d;
+import de.gerrygames.viarewind.utils.math.RayTracing;
+import de.gerrygames.viarewind.utils.math.Vector3d;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
@@ -2203,6 +2207,33 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 			public void registerMap() {
 				map(Type.INT, Type.VAR_INT);
 				map(Type.BYTE, Type.VAR_INT);
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						int mode = packetWrapper.get(Type.VAR_INT, 1);
+						if (mode!=0) return;
+						int entityId = packetWrapper.get(Type.VAR_INT, 0);
+						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
+						EntityReplacement replacement = tracker.getEntityReplacement(entityId);
+						if (!(replacement instanceof ArmorStandReplacement)) return;
+						ArmorStandReplacement armorStand = (ArmorStandReplacement) replacement;
+						AABB boundingBox = armorStand.getBoundingBox();
+						PlayerPosition playerPosition = packetWrapper.user().get(PlayerPosition.class);
+						Vector3d pos = new Vector3d(playerPosition.getPosX(), playerPosition.getPosY() + 1.8, playerPosition.getPosZ());
+						double yaw = Math.toRadians(playerPosition.getYaw());
+						double pitch = Math.toRadians(playerPosition.getPitch());
+						Vector3d dir = new Vector3d(-Math.cos(pitch) * Math.sin(yaw), -Math.sin(pitch), Math.cos(pitch) * Math.cos(yaw));
+						Ray3d ray = new Ray3d(pos, dir);
+						Vector3d intersection = RayTracing.trace(ray, boundingBox, 5.0);
+						if (intersection==null) return;
+						intersection.substract(boundingBox.getMin());
+						mode = 2;
+						packetWrapper.set(Type.VAR_INT, 1, mode);
+						packetWrapper.write(Type.FLOAT, (float) intersection.getX());
+						packetWrapper.write(Type.FLOAT, (float) intersection.getY());
+						packetWrapper.write(Type.FLOAT, (float) intersection.getZ());
+					}
+				});
 			}
 		});
 
@@ -2252,6 +2283,25 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 
 						playerPosition.setOnGround(packetWrapper.get(Type.BOOLEAN, 0));
 						playerPosition.setPos(x, feetY, z);
+					}
+				});
+			}
+		});
+
+		//Player Look
+		this.registerIncoming(State.PLAY, 0x05, 0x05, new PacketRemapper() {
+			@Override
+			public void registerMap() {
+				map(Type.FLOAT);
+				map(Type.FLOAT);
+				map(Type.BOOLEAN);
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						PlayerPosition playerPosition = packetWrapper.user().get(PlayerPosition.class);
+						playerPosition.setYaw(packetWrapper.get(Type.FLOAT, 0));
+						playerPosition.setPitch(packetWrapper.get(Type.FLOAT, 1));
+						playerPosition.setOnGround(packetWrapper.get(Type.BOOLEAN, 0));
 					}
 				});
 			}
