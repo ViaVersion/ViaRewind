@@ -7,15 +7,13 @@ import us.myles.ViaVersion.api.data.StoredObject;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.type.Type;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 public class Scoreboard extends StoredObject {
 	private HashMap<String, List<String>> teams = new HashMap<>();
 	private HashSet<String> objectives = new HashSet<>();
 	private HashMap<String, ScoreTeam> scoreTeams = new HashMap<>();
+	private HashMap<String, Byte> teamColors = new HashMap<>();
 	private HashSet<String> scoreTeamNames = new HashSet<>();
 
 	public Scoreboard(UserConnection user) {
@@ -26,12 +24,22 @@ public class Scoreboard extends StoredObject {
 		teams.computeIfAbsent(team, key -> new ArrayList<>()).add(player);
 	}
 
+	public void setTeamColor(String team, Byte color) {
+		teamColors.put(team, color);
+	}
+
+	public Optional<Byte> getTeamColor(String team) {
+		return Optional.ofNullable(teamColors.get(team));
+	}
+
 	public void addTeam(String team) {
 		teams.computeIfAbsent(team, key -> new ArrayList<>());
 	}
 
 	public void removeTeam(String team) {
 		teams.remove(team);
+		scoreTeams.remove(team);
+		teamColors.remove(team);
 	}
 
 	public boolean teamExists(String team) {
@@ -53,6 +61,13 @@ public class Scoreboard extends StoredObject {
 			if (teamPlayers.contains(player)) return true;
 		}
 		return false;
+	}
+
+	public Optional<String> getTeam(String player) {
+		for (Map.Entry<String, List<String>> entry : teams.entrySet())
+			if (entry.getValue().contains(player))
+				return Optional.of(entry.getKey());
+		return Optional.empty();
 	}
 
 	public void addObjective(String name) {

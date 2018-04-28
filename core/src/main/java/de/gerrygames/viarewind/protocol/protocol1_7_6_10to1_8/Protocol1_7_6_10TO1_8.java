@@ -59,6 +59,7 @@ import us.myles.viaversion.libs.opennbt.tag.builtin.StringTag;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class Protocol1_7_6_10TO1_8 extends Protocol {
@@ -1762,6 +1763,39 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 			}
 		});
 
+		// Display Scoreboard
+		registerOutgoing(State.PLAY, 0x3D, 0x3D, new PacketRemapper() {
+			@Override
+			public void registerMap() {
+				map(Type.BYTE); // Position
+				map(Type.STRING); // Score name
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						byte position = packetWrapper.get(Type.BYTE, 0);
+						if (position > 2) { // team specific sidebar
+							int receiverTeamColor = position - 3;
+							String username = packetWrapper.user().get(ProtocolInfo.class).getUsername();
+							Scoreboard scoreboard = packetWrapper.user().get(Scoreboard.class);
+							Optional<String> team = scoreboard.getTeam(username);
+							if (team.isPresent()) {
+								Optional<Byte> color = scoreboard.getTeamColor(team.get());
+								if (color.isPresent()) {
+									if (color.get() == receiverTeamColor) {
+										packetWrapper.set(Type.BYTE, 0, position = 1);
+									}
+								} else {
+									packetWrapper.cancel();
+								}
+							} else {
+								packetWrapper.cancel();
+							}
+						}
+					}
+				});
+			}
+		});
+
 		//Scoreboard Teams
 		this.registerOutgoing(State.PLAY, 0x3E, 0x3E, new PacketRemapper() {
 			@Override
@@ -1795,12 +1829,12 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 						else if (mode==1) scoreboard.removeTeam(team);
 
 						if (mode==0 || mode==2) {
-							packetWrapper.passthrough(Type.STRING);
-							packetWrapper.passthrough(Type.STRING);
-							packetWrapper.passthrough(Type.STRING);
-							packetWrapper.passthrough(Type.BYTE);
-							packetWrapper.read(Type.STRING);
-							packetWrapper.read(Type.BYTE);
+							packetWrapper.passthrough(Type.STRING); // Display name
+							packetWrapper.passthrough(Type.STRING); // prefix
+							packetWrapper.passthrough(Type.STRING); // suffix
+							packetWrapper.passthrough(Type.BYTE); // friendly fire
+							packetWrapper.read(Type.STRING); // name tag visibility
+							scoreboard.setTeamColor(team, packetWrapper.read(Type.BYTE)); // color
 						}
 						if (mode==0 || mode==3 || mode==4 || mode==5) {
 							int size = packetWrapper.read(Type.VAR_INT);
