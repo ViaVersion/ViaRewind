@@ -5,7 +5,6 @@ import de.gerrygames.viarewind.utils.PacketUtil;
 import lombok.Getter;
 import lombok.Setter;
 import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.data.StoredObject;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.type.Type;
@@ -22,15 +21,11 @@ public class Scoreboard extends StoredObject {
     @Setter
 	private String colorIndependentSidebar;
 	@Getter
-    @Setter
-	private Pair<String, Byte> colorDependentSidebar;
-
-
+	private HashMap<Byte, String> colorDependentSidebar = new HashMap<>();
 
     public Scoreboard(UserConnection user) {
 		super(user);
 	}
-
 
 	public void addPlayerToTeam(String player, String team) {
 		teams.computeIfAbsent(team, key -> new ArrayList<>()).add(player);
@@ -88,9 +83,7 @@ public class Scoreboard extends StoredObject {
 
 	public void removeObjective(String name) {
 		objectives.remove(name);
-		if (colorDependentSidebar.getKey().equals(name)) {
-			colorDependentSidebar = null;
-		}
+		colorDependentSidebar.values().remove(name);
 		if (colorIndependentSidebar.equals(name)) {
 			colorIndependentSidebar = null;
 		}
