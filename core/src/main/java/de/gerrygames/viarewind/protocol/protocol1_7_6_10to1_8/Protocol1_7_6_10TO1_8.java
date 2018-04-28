@@ -1793,8 +1793,16 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
                             } else position = -1;
 						} else if (position == 1) { // team independent sidebar
 						    scoreboard.setColorIndependentSidebar(name);
-						    if (scoreboard.getColorDependentSidebar() != null)
-						        position = -1;
+						    if (scoreboard.getColorDependentSidebar() != null) {
+                                String username = packetWrapper.user().get(ProtocolInfo.class).getUsername();
+                                Optional<String> team = scoreboard.getTeam(username);
+                                if (team.isPresent()) {
+                                    Optional<Byte> color = scoreboard.getTeamColor(team.get());
+                                    if (color.get() == scoreboard.getColorDependentSidebar().getValue()) {
+                                        position = -1;
+                                    }
+                                }
+                            }
                         }
 						if (position == -1) {
                             packetWrapper.cancel();
