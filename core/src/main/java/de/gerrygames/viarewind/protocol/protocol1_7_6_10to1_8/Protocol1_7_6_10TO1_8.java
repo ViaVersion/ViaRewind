@@ -65,7 +65,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class Protocol1_7_6_10TO1_8 extends Protocol {
 
@@ -1860,9 +1859,19 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 							packetWrapper.passthrough(Type.STRING); // suffix
 							packetWrapper.passthrough(Type.BYTE); // friendly fire
 							packetWrapper.read(Type.STRING); // name tag visibility
-							scoreboard.setTeamColor(team, packetWrapper.read(Type.BYTE)); // color
+							byte color = packetWrapper.read(Type.BYTE);
+							if (mode == 2 && scoreboard.getTeamColor(team).get() != color) {
+								String username = packetWrapper.user().get(ProtocolInfo.class).getUsername();
+								String sidebar = scoreboard.getColorDependentSidebar().get(color);
+								PacketWrapper sidebarPacket = packetWrapper.create(0x3D);
+								sidebarPacket.write(Type.BYTE, (byte) 1);
+								sidebarPacket.write(Type.STRING, sidebar == null ? "" : sidebar);
+								PacketUtil.sendPacket(sidebarPacket, Protocol1_7_6_10TO1_8.class);
+							}
+							scoreboard.setTeamColor(team, color);
 						}
-						if (mode==0 || mode==3 || mode==4 || mode==5) {
+						if (mode==0 || mode==3 || mode==4) {
+							byte color = scoreboard.getTeamColor(team).get();
 							int size = packetWrapper.read(Type.VAR_INT);
 							List<String> entryList = new ArrayList<>();
 
@@ -1871,39 +1880,14 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 								if (entry==null) continue;
 								String username = packetWrapper.user().get(ProtocolInfo.class).getUsername();
 
-                                byte color = scoreboard.getTeamColor(team).get();
 								if (mode == 4) {
 									if (!scoreboard.isPlayerInTeam(entry, team)) continue;
 									scoreboard.removePlayerFromTeam(entry, team);
-
 									if (entry.equals(username)) {
-										if (scoreboard.getColorIndependentSidebar() == null) {
-											String fakeObjectiveName;
-											do {
-												fakeObjectiveName = Long.toHexString(Math.abs(ThreadLocalRandom.current().nextLong()));
-											} while (scoreboard.objectiveExists(fakeObjectiveName));
-											PacketWrapper fakeObjective = packetWrapper.create(0x3B);
-											fakeObjective.write(Type.STRING, fakeObjectiveName);
-											fakeObjective.write(Type.STRING, fakeObjectiveName); // objective value
-											fakeObjective.write(Type.BYTE, (byte) 0); // add mode
-											PacketUtil.sendPacket(fakeObjective, Protocol1_7_6_10TO1_8.class);
-
-											PacketWrapper sidebarPacket = packetWrapper.create(0x3D);
-											sidebarPacket.write(Type.BYTE, (byte) 1);
-											sidebarPacket.write(Type.STRING, fakeObjectiveName);
-											PacketUtil.sendPacket(sidebarPacket, Protocol1_7_6_10TO1_8.class);
-
-											PacketWrapper removeFakeObjective = packetWrapper.create(0x3B);
-											removeFakeObjective.write(Type.STRING, fakeObjectiveName);
-											removeFakeObjective.write(Type.STRING, fakeObjectiveName);
-											removeFakeObjective.write(Type.BYTE, (byte) 1);
-											PacketUtil.sendPacket(removeFakeObjective, Protocol1_7_6_10TO1_8.class);
-										} else {
-											PacketWrapper sidebarPacket = packetWrapper.create(0x3D);
-											sidebarPacket.write(Type.BYTE, (byte) 1);
-											sidebarPacket.write(Type.STRING, scoreboard.getColorIndependentSidebar());
-											PacketUtil.sendPacket(sidebarPacket, Protocol1_7_6_10TO1_8.class);
-										}
+										PacketWrapper sidebarPacket = packetWrapper.create(0x3D);
+										sidebarPacket.write(Type.BYTE, (byte) 1);
+										sidebarPacket.write(Type.STRING, scoreboard.getColorIndependentSidebar() == null ? "" : scoreboard.getColorIndependentSidebar());
+										PacketUtil.sendPacket(sidebarPacket, Protocol1_7_6_10TO1_8.class);
 									}
 								} else {
 									scoreboard.addPlayerToTeam(entry, team);
