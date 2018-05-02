@@ -72,7 +72,7 @@ public class Chunk1_7_10WriteOnlyType extends PartialType<Chunk, ClientWorld> {
             }
         }
 
-        if (chunk.isGroundUp()) {
+        if (chunk.isGroundUp() && chunk.getBiomeData() != null) {
             dataToCompress.writeBytes(chunk.getBiomeData());
         }
 
