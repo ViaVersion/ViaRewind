@@ -50,6 +50,9 @@ public class Chunk1_8Type extends PartialType<Chunk, ClientWorld> {
 
         if (sectionCount == 0 && groundUp) {
             // This is a chunks unload packet
+            if (input.readableBytes() >= 256) {  //1.8 likes to send biome data in unload packets?!
+                input.readerIndex(input.readerIndex() + 256);
+            }
             return new Chunk1_9to1_8(chunkX, chunkZ);
         }
 

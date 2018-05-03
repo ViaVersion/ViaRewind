@@ -16,6 +16,7 @@ import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import java.util.zip.Deflater;
 
 public class ChunkPacketTransformer {
+
 	public static void transformChunk(PacketWrapper packetWrapper) throws Exception {
 		ClientWorld world = packetWrapper.user().get(ClientWorld.class);
 		Chunk chunk = packetWrapper.read(new Chunk1_8Type(world));
