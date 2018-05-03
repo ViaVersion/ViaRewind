@@ -21,7 +21,6 @@ import java.util.logging.Level;
 
 public class Chunk1_8Type extends PartialType<Chunk, ClientWorld> {
 
-
     public Chunk1_8Type(ClientWorld param) {
         super(param, Chunk.class);
     }
@@ -35,6 +34,14 @@ public class Chunk1_8Type extends PartialType<Chunk, ClientWorld> {
         int bitmask = input.readUnsignedShort();
         int dataLength = Type.VAR_INT.read(input);
 
+	    if (bitmask == 0 && groundUp) {
+		    // This is a chunks unload packet
+		    if (dataLength >= 256) {  //1.8 likes to send biome data in unload packets?!
+			    input.readerIndex(input.readerIndex() + 256);
+		    }
+		    return new Chunk1_9to1_8(chunkX, chunkZ);
+	    }
+
         // Data to be read
         BitSet usedSections = new BitSet(16);
         ChunkSection1_9to1_8[] sections = new ChunkSection1_9to1_8[16];
@@ -47,14 +54,6 @@ public class Chunk1_8Type extends PartialType<Chunk, ClientWorld> {
             }
         }
         int sectionCount = usedSections.cardinality(); // the amount of sections set
-
-        if (sectionCount == 0 && groundUp) {
-            // This is a chunks unload packet
-            if (input.readableBytes() >= 256) {  //1.8 likes to send biome data in unload packets?!
-                input.readerIndex(input.readerIndex() + 256);
-            }
-            return new Chunk1_9to1_8(chunkX, chunkZ);
-        }
 
         int startIndex = input.readerIndex();
 
@@ -146,25 +145,15 @@ public class Chunk1_8Type extends PartialType<Chunk, ClientWorld> {
             }
         }
 
-        int bitmask = chunk.getBitmask();
-        if (chunk.isGroundUp() && bitmask == 0) {
-            bitmask = 65535;
-            buf.writeBytes(new byte[2 * 16 * 4096 + 16 * 4096 / 2 + (skyLight ? 16 * 4096 / 2 : 0)]);
-        }
-
-        if (chunk.isGroundUp()) {
+        if (chunk.isGroundUp() && chunk.isBiomeData()) {
             buf.writeBytes(chunk.getBiomeData());
         }
-
-        byte[] finalData = new byte[buf.readableBytes()];
-        buf.readBytes(finalData);
-        buf.release();
 
         output.writeInt(chunk.getX());
         output.writeInt(chunk.getZ());
         output.writeBoolean(chunk.isGroundUp());
-        output.writeShort(bitmask);
-        Type.VAR_INT.write(output, finalData.length);
-        output.writeBytes(finalData);
+        output.writeShort(chunk.getBitmask());
+        Type.VAR_INT.write(output, buf.readableBytes());
+        output.writeBytes(buf, buf.readableBytes());
     }
 }

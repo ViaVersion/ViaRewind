@@ -4,6 +4,7 @@ import de.gerrygames.viarewind.ViaRewind;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.entityreplacement.ShulkerBulletReplacement;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.entityreplacement.ShulkerReplacement;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.sound.Effect;
+import de.gerrygames.viarewind.protocol.protocol1_8to1_9.types.Chunk1_8Type;
 import de.gerrygames.viarewind.replacement.EntityReplacement;
 import de.gerrygames.viarewind.storage.BlockState;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.chunks.ChunkPacketTransformer;
@@ -40,6 +41,7 @@ import us.myles.ViaVersion.api.type.types.version.Types1_9;
 import us.myles.ViaVersion.exception.CancelException;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.chunks.Chunk1_9to1_8;
 import us.myles.viaversion.libs.opennbt.tag.builtin.CompoundTag;
 import us.myles.viaversion.libs.opennbt.tag.builtin.ListTag;
 import us.myles.viaversion.libs.opennbt.tag.builtin.StringTag;
@@ -710,14 +712,13 @@ public class Protocol1_8TO1_9 extends Protocol {
 		this.registerOutgoing(State.PLAY, 0x1D, 0x21, new PacketRemapper() {
 			@Override
 			public void registerMap() {
-				map(Type.INT);
-				map(Type.INT);
-				create(new ValueCreator() {
+				handler(new PacketHandler() {
 					@Override
-					public void write(PacketWrapper packetWrapper) throws Exception {
-						packetWrapper.write(Type.BOOLEAN, true);
-						packetWrapper.write(Type.UNSIGNED_SHORT, 0);
-						packetWrapper.write(Type.VAR_INT, 0);
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						int chunkX = packetWrapper.read(Type.INT);
+						int chunkZ = packetWrapper.read(Type.INT);
+						ClientWorld world = packetWrapper.user().get(ClientWorld.class);
+						packetWrapper.write(new Chunk1_8Type(world), new Chunk1_9to1_8(chunkX, chunkZ));
 					}
 				});
 			}

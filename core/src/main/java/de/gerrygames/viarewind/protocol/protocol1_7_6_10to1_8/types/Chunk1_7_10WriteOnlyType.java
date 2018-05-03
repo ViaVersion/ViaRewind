@@ -7,6 +7,7 @@ import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
 import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
 import us.myles.ViaVersion.api.type.PartialType;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.chunks.Chunk1_9to1_8;
 
 import java.util.zip.Deflater;
 
@@ -72,7 +73,7 @@ public class Chunk1_7_10WriteOnlyType extends PartialType<Chunk, ClientWorld> {
             }
         }
 
-        if (chunk.isGroundUp() && chunk.getBiomeData() != null) {
+        if (chunk.isGroundUp() && chunk.isBiomeData()) {
             dataToCompress.writeBytes(chunk.getBiomeData());
         }
 

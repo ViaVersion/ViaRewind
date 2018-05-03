@@ -7,19 +7,21 @@ import de.gerrygames.viarewind.storage.BlockState;
 import de.gerrygames.viarewind.utils.PacketUtil;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.data.UserConnection;
+import us.myles.ViaVersion.api.minecraft.Environment;
 import us.myles.ViaVersion.api.minecraft.Position;
 import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
 import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.types.Chunk1_9_1_2Type;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.chunks.Chunk1_9to1_8;
+import us.myles.ViaVersion.protocols.protocol1_9to1_8.chunks.ChunkSection1_9to1_8;
 
 public class ChunkPacketTransformer {
 	public static void transformChunk(PacketWrapper packetWrapper) throws Exception {
 		ClientWorld world = packetWrapper.user().get(ClientWorld.class);
 
 		Chunk chunk = packetWrapper.read(new Chunk1_9_1_2Type(world));
-		packetWrapper.write(new Chunk1_8Type(world), chunk);
 
 		for (int i = 0; i < chunk.getSections().length; i++) {
 			if ((chunk.getBitmask() & 1 << i) == 0) continue;
@@ -35,6 +37,16 @@ public class ChunkPacketTransformer {
 				}
 			}
 		}
+
+		if (chunk.isGroundUp() && chunk.getBitmask() == 0) {  //This would be an unload packet for 1.8 clients. Just set one air section
+			boolean skylight = world.getEnvironment() == Environment.NORMAL;
+			ChunkSection1_9to1_8[] sections = new ChunkSection1_9to1_8[16];
+			sections[0] = new ChunkSection1_9to1_8();
+			if (skylight) sections[0].setSkyLight(new byte[2048]);
+			chunk = new Chunk1_9to1_8(chunk.getX(), chunk.getZ(), true, 1, sections, chunk.getBiomeData(), chunk.getBlockEntities());
+		}
+
+		packetWrapper.write(new Chunk1_8Type(world), chunk);
 
 		final UserConnection user = packetWrapper.user();
 		chunk.getBlockEntities().forEach(nbt -> {
