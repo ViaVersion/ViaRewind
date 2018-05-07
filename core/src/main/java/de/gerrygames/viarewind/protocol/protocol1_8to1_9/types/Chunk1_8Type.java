@@ -155,5 +155,6 @@ public class Chunk1_8Type extends PartialType<Chunk, ClientWorld> {
         output.writeShort(chunk.getBitmask());
         Type.VAR_INT.write(output, buf.readableBytes());
         output.writeBytes(buf, buf.readableBytes());
+        buf.release();
     }
 }
