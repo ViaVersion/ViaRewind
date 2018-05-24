@@ -2061,8 +2061,7 @@ public class Protocol1_8TO1_9 extends Protocol {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						String channel = packetWrapper.get(Type.STRING, 0);
-						if (channel.equalsIgnoreCase("MC|BSign")) {
-							packetWrapper.set(Type.STRING, 0, "MC|BSign");
+						if (channel.equalsIgnoreCase("MC|BEdit") || channel.equalsIgnoreCase("MC|BSign")) {
 							Item book = packetWrapper.passthrough(Type.ITEM);
 							book.setId((short) 386);
 							CompoundTag tag = book.getTag();
