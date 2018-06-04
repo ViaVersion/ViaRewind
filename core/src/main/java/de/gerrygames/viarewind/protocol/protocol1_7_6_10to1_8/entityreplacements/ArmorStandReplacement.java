@@ -33,7 +33,6 @@ public class ArmorStandReplacement implements EntityReplacement {
 	private float yaw, pitch;
 	private float headYaw;
 	private boolean small = false;
-	private static int ENTITY_ID = Integer.MAX_VALUE - 16000;
 
 	private enum State {
 		HOLOGRAM, ZOMBIE;
@@ -228,7 +227,7 @@ public class ArmorStandReplacement implements EntityReplacement {
 			updateMetadata();
 			updateLocation();
 		} else if (currentState==State.HOLOGRAM) {
-			int[] entityIds = new int[] {entityId, ENTITY_ID--};
+			int[] entityIds = new int[] {entityId, entityId*10000};
 
 			PacketWrapper spawnSkull = new PacketWrapper(0x0E, null, user);
 			spawnSkull.write(Type.VAR_INT, entityIds[0]);
