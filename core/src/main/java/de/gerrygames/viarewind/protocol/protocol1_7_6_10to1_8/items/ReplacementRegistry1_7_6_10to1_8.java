@@ -55,8 +55,8 @@ public class ReplacementRegistry1_7_6_10to1_8 {
 		registry.registerItemBlock(1, 2, new Replacement(1, 0, "Polished Granite"));
 		registry.registerItemBlock(1, 3, new Replacement(1, 0, "Diorite"));
 		registry.registerItemBlock(1, 4, new Replacement(1, 0, "Polished Diorite"));
-		registry.registerItemBlock(1, 5, new Replacement(1, 0, "Andsite"));
-		registry.registerItemBlock(1, 6, new Replacement(1, 0, "Polished Andsite"));
+		registry.registerItemBlock(1, 5, new Replacement(1, 0, "Andesite"));
+		registry.registerItemBlock(1, 6, new Replacement(1, 0, "Polished Andesite"));
 		registry.registerItemBlock(168, 0, new Replacement(1, 0, "Prismarine"));
 		registry.registerItemBlock(168, 1, new Replacement(98, 0, "Prismarine Bricks"));
 		registry.registerItemBlock(168, 2, new Replacement(98, 1, "Dark Prismarine"));
