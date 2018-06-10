@@ -426,8 +426,6 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 						byte pitch = packetWrapper.get(Type.BYTE, 1);
 						byte yaw = packetWrapper.get(Type.BYTE, 2);
 
-						System.out.println(typeId);
-
 						if (typeId == 71) {
 							switch (yaw) {
 								case -128:
@@ -805,7 +803,6 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 						int entityId = packetWrapper.get(Type.INT, 0);
 						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
 						Entity1_10Types.EntityType type = tracker.getClientEntityTypes().get(entityId);
-						System.out.println(type);
 						if (type == Entity1_10Types.EntityType.MINECART_ABSTRACT) {
 							int y = packetWrapper.get(Type.INT, 2);
 							y += 12;
