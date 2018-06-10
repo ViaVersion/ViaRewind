@@ -419,14 +419,16 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						int entityId = packetWrapper.get(Type.VAR_INT, 0);
-						int typeId = packetWrapper.get(Type.BYTE, 0);
+						byte typeId = packetWrapper.get(Type.BYTE, 0);
 						int x = packetWrapper.get(Type.INT, 0);
 						int y = packetWrapper.get(Type.INT, 1);
 						int z = packetWrapper.get(Type.INT, 2);
 						byte pitch = packetWrapper.get(Type.BYTE, 1);
 						byte yaw = packetWrapper.get(Type.BYTE, 2);
 
-						if (typeId==71) {
+						System.out.println(typeId);
+
+						if (typeId == 71) {
 							switch (yaw) {
 								case -128:
 									z += 32;
@@ -445,11 +447,7 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 									yaw = 64;
 									break;
 							}
-
-							packetWrapper.set(Type.INT, 0, x);
-							packetWrapper.set(Type.INT, 2, z);
-							packetWrapper.set(Type.BYTE, 2, yaw);
-						} else if (typeId==78) {
+						} else if (typeId == 78) {
 							packetWrapper.cancel();
 							EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
 							ArmorStandReplacement armorStand = new ArmorStandReplacement(entityId, packetWrapper.user());
@@ -457,7 +455,16 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 							armorStand.setYawPitch(yaw * 360f / 256, pitch * 360f / 256);
 							armorStand.setHeadYaw(yaw * 360f / 256);
 							tracker.addEntityReplacement(armorStand);
+						} else if (typeId == 10) {
+							y += 12;
 						}
+
+						packetWrapper.set(Type.BYTE, 0, typeId);
+						packetWrapper.set(Type.INT, 0, x);
+						packetWrapper.set(Type.INT, 1, y);
+						packetWrapper.set(Type.INT, 2, z);
+						packetWrapper.set(Type.BYTE, 1, pitch);
+						packetWrapper.set(Type.BYTE, 2, yaw);
 					}
 				});
 				handler(new PacketHandler() {
@@ -790,6 +797,20 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						packetWrapper.read(Type.BOOLEAN);
+					}
+				});
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						int entityId = packetWrapper.get(Type.INT, 0);
+						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
+						Entity1_10Types.EntityType type = tracker.getClientEntityTypes().get(entityId);
+						System.out.println(type);
+						if (type == Entity1_10Types.EntityType.MINECART_ABSTRACT) {
+							int y = packetWrapper.get(Type.INT, 2);
+							y += 12;
+							packetWrapper.set(Type.INT, 2, y);
+						}
 					}
 				});
 				handler(new PacketHandler() {
