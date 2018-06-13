@@ -22,8 +22,8 @@ public class ChunkPacketTransformer {
 		Chunk chunk = packetWrapper.read(new Chunk1_8Type(world));
 		packetWrapper.write(new Chunk1_7_10WriteOnlyType(world), chunk);
 		for (ChunkSection section : chunk.getSections()){
-			if (section == null) return;
-			for (int x = 0; x < 16; x++){
+			if (section == null) continue;
+			for (int x = 0; x < 16; x++) {
 				for (int y = 0; y < 16; y++) {
 					for (int z = 0; z < 16; z++) {
 						int block = section.getBlock(x, y, z);
