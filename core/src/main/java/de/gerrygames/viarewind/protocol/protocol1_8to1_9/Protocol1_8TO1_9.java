@@ -1,6 +1,8 @@
 package de.gerrygames.viarewind.protocol.protocol1_8to1_9;
 
+import com.google.common.collect.Sets;
 import de.gerrygames.viarewind.ViaRewind;
+import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage.WorldBorder;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.entityreplacement.ShulkerBulletReplacement;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.entityreplacement.ShulkerReplacement;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.sound.Effect;
@@ -47,10 +49,48 @@ import us.myles.viaversion.libs.opennbt.tag.builtin.ListTag;
 import us.myles.viaversion.libs.opennbt.tag.builtin.StringTag;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 public class Protocol1_8TO1_9 extends Protocol {
+
+	private final Set<UserConnection> users = Sets.newConcurrentHashSet();
+
+	private static final Consumer<Collection<UserConnection>> TICKER =
+            users -> {
+		Iterator<UserConnection> iter = users.iterator();
+		while (iter.hasNext()) {
+			UserConnection user = iter.next();
+			if (!user.getChannel().isOpen()) {
+				iter.remove();
+			}
+
+			Cooldown cd = user.get(Cooldown.class);
+			if (cd != null) {
+			    cd.tick();
+            }
+
+            Levitation ls = user.get(Levitation.class);
+            if (ls != null) {
+                ls.tick();
+            }
+
+            WorldBorder wb = user.get(WorldBorder.class);
+            if (wb != null) {
+                wb.tick();
+            }
+		}
+	};
+
+	public Protocol1_8TO1_9() {
+		Via.getPlatform().runRepeatingSync(() -> TICKER.accept(users), 1L);
+	}
+
 	public static final ValueTransformer<Double, Integer> toOldInt = new ValueTransformer<Double, Integer>(Type.INT) {
 		public Integer transform(PacketWrapper wrapper, Double inputValue) {
 			return (int)(inputValue * 32.0D);
@@ -2091,6 +2131,8 @@ public class Protocol1_8TO1_9 extends Protocol {
 
 	@Override
 	public void init(UserConnection userConnection) {
+		users.add(userConnection);
+
 		userConnection.put(new Windows(userConnection));
 		userConnection.put(new EntityTracker(userConnection));
 		userConnection.put(new Levitation(userConnection));

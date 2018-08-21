@@ -11,30 +11,24 @@ import us.myles.ViaVersion.api.type.Type;
 
 public class Levitation extends StoredObject {
 	private int amplifier;
-	private boolean active = false;
-	final TaskId taskId;
+	private volatile boolean active = false;
 
 	public Levitation(UserConnection user) {
 		super(user);
-		taskId = Via.getPlatform().runRepeatingSync(new Runnable() {
-			@Override
-			public void run() {
-				if (!user.getChannel().isOpen()) {
-					Via.getPlatform().cancelTask(taskId);
-					return;
-				}
-				if (!active) {
-					return;
-				}
-				int vY = (amplifier+1) * 360;
-				PacketWrapper packet = new PacketWrapper(0x12, null, Levitation.this.getUser());
-				packet.write(Type.VAR_INT, getUser().get(EntityTracker.class).getPlayerId());
-				packet.write(Type.SHORT, (short)0);
-				packet.write(Type.SHORT, (short)vY);
-				packet.write(Type.SHORT, (short)0);
-				PacketUtil.sendPacket(packet, Protocol1_8TO1_9.class);
-			}
-		}, 1L);
+	}
+
+	public void tick() {
+		if (!active) {
+			return;
+		}
+
+		int vY = (amplifier+1) * 360;
+		PacketWrapper packet = new PacketWrapper(0x12, null, Levitation.this.getUser());
+		packet.write(Type.VAR_INT, getUser().get(EntityTracker.class).getPlayerId());
+		packet.write(Type.SHORT, (short)0);
+		packet.write(Type.SHORT, (short)vY);
+		packet.write(Type.SHORT, (short)0);
+		PacketUtil.sendPacket(packet, Protocol1_8TO1_9.class);
 	}
 
 	public void setActive(boolean active) {

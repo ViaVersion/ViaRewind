@@ -16,11 +16,12 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 public class Cooldown extends StoredObject {
+
 	private double attackSpeed = 4.0;
 	private long lastHit = 0;
-	private TaskId taskId;
 	private final ViaRewindConfig.CooldownIndicator cooldownIndicator;
-	private UUID bossUUID = null;
+	private UUID bossUUID;
+	private boolean lastSend;
 
 	public Cooldown(final UserConnection user) {
 		super(user);
@@ -28,38 +29,29 @@ public class Cooldown extends StoredObject {
 		this.cooldownIndicator = ViaRewind.getConfig().getCooldownIndicator();
 
 		if (cooldownIndicator==ViaRewindConfig.CooldownIndicator.DISABLED) return;
+	}
 
-		taskId = Via.getPlatform().runRepeatingSync(new Runnable() {
-			private boolean lastSend = false;
-			@Override
-			public void run() {
-				if (!user.getChannel().isOpen()) {
-					Via.getPlatform().cancelTask(taskId);
-					return;
-				}
-
-				if (!hasCooldown()) {
-					if (lastSend) {
-						hide();
-						lastSend = false;
-					}
-					return;
-				}
-
-				BlockPlaceDestroyTracker tracker = getUser().get(BlockPlaceDestroyTracker.class);
-				if (tracker.isMining()) {
-					lastHit = 0;
-					if (lastSend) {
-						hide();
-						lastSend = false;
-					}
-					return;
-				}
-
-				showCooldown();
-				lastSend = true;
+	public void tick() {
+		if (!hasCooldown()) {
+			if (lastSend) {
+				hide();
+				lastSend = false;
 			}
-		}, 1L);
+			return;
+		}
+
+		BlockPlaceDestroyTracker tracker = getUser().get(BlockPlaceDestroyTracker.class);
+		if (tracker.isMining()) {
+			lastHit = 0;
+			if (lastSend) {
+				hide();
+				lastSend = false;
+			}
+			return;
+		}
+
+		showCooldown();
+		lastSend = true;
 	}
 
 	private void showCooldown() {

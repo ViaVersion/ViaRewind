@@ -17,24 +17,19 @@ public class WorldBorder extends StoredObject {
 	private int portalTeleportBoundary;
 	private int warningTime, warningBlocks;
 	private boolean init = false;
-	private final TaskId taskId;
 
 	private final int VIEW_DISTANCE = 16;
 
 	public WorldBorder(UserConnection user) {
 		super(user);
-		taskId = Via.getPlatform().runRepeatingSync(new Runnable() {
-			@Override
-			public void run() {
-				if (!getUser().getChannel().isOpen()) {
-					Via.getPlatform().cancelTask(taskId);
-					return;
-				}
-				if (!isInit()) return;
+	}
 
-				sendPackets();
-			}
-		}, 2L);
+	public void tick() {
+		if (!isInit()) {
+			return;
+		}
+
+		sendPackets();
 	}
 
 	private enum Side {
