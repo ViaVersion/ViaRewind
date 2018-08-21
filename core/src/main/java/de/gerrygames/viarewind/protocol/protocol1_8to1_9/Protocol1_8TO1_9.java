@@ -2,17 +2,13 @@ package de.gerrygames.viarewind.protocol.protocol1_8to1_9;
 
 import com.google.common.collect.Sets;
 import de.gerrygames.viarewind.ViaRewind;
-import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage.WorldBorder;
+import de.gerrygames.viarewind.protocol.protocol1_8to1_9.chunks.ChunkPacketTransformer;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.entityreplacement.ShulkerBulletReplacement;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.entityreplacement.ShulkerReplacement;
-import de.gerrygames.viarewind.protocol.protocol1_8to1_9.sound.Effect;
-import de.gerrygames.viarewind.protocol.protocol1_8to1_9.types.Chunk1_8Type;
-import de.gerrygames.viarewind.replacement.EntityReplacement;
-import de.gerrygames.viarewind.storage.BlockState;
-import de.gerrygames.viarewind.protocol.protocol1_8to1_9.chunks.ChunkPacketTransformer;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.items.ItemRewriter;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.items.ReplacementRegistry1_8to1_9;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.metadata.MetadataRewriter;
+import de.gerrygames.viarewind.protocol.protocol1_8to1_9.sound.Effect;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.sound.SoundRemapper;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage.BlockPlaceDestroyTracker;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage.BossBarStorage;
@@ -21,6 +17,9 @@ import de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage.EntityTracker;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage.Levitation;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage.PlayerPosition;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage.Windows;
+import de.gerrygames.viarewind.protocol.protocol1_8to1_9.types.Chunk1_8Type;
+import de.gerrygames.viarewind.replacement.EntityReplacement;
+import de.gerrygames.viarewind.storage.BlockState;
 import de.gerrygames.viarewind.utils.ChatUtil;
 import de.gerrygames.viarewind.utils.PacketUtil;
 import us.myles.ViaVersion.api.PacketWrapper;
@@ -50,9 +49,8 @@ import us.myles.viaversion.libs.opennbt.tag.builtin.StringTag;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -63,18 +61,15 @@ public class Protocol1_8TO1_9 extends Protocol {
 
 	private static final Consumer<Collection<UserConnection>> TICKER =
             users -> {
-		Iterator<UserConnection> iter = users.iterator();
-		while (iter.hasNext()) {
-			UserConnection user = iter.next();
-			if (!user.getChannel().isOpen()) {
-				iter.remove();
-			}
+		users.removeIf(u -> !u.getChannel().isOpen());
 
-            user.getStoredObjects().values().stream()
-                    .filter(Tickable.class::isInstance)
-                    .map(Tickable.class::cast)
-                    .forEach(Tickable::tick);
-		}
+		users.stream()
+                .map(UserConnection::getStoredObjects)
+                .map(Map::values)
+                .flatMap(Collection::stream)
+                .filter(Tickable.class::isInstance)
+                .map(Tickable.class::cast)
+                .forEach(Tickable::tick);
 	};
 
 	public Protocol1_8TO1_9() {
