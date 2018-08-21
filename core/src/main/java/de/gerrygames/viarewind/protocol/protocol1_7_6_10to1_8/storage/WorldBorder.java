@@ -1,6 +1,7 @@
 package de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage;
 
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10TO1_8;
+import de.gerrygames.viarewind.protocol.protocol1_8to1_9.Tickable;
 import de.gerrygames.viarewind.utils.PacketUtil;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
@@ -9,7 +10,7 @@ import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.platform.TaskId;
 import us.myles.ViaVersion.api.type.Type;
 
-public class WorldBorder extends StoredObject {
+public class WorldBorder extends StoredObject implements Tickable {
 	private double x, z;
 	private double oldDiameter, newDiameter;
 	private long lerpTime;
@@ -24,6 +25,7 @@ public class WorldBorder extends StoredObject {
 		super(user);
 	}
 
+	@Override
 	public void tick() {
 		if (!isInit()) {
 			return;

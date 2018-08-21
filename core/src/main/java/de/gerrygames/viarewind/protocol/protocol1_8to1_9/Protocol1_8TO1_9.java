@@ -70,20 +70,10 @@ public class Protocol1_8TO1_9 extends Protocol {
 				iter.remove();
 			}
 
-			Cooldown cd = user.get(Cooldown.class);
-			if (cd != null) {
-			    cd.tick();
-            }
-
-            Levitation ls = user.get(Levitation.class);
-            if (ls != null) {
-                ls.tick();
-            }
-
-            WorldBorder wb = user.get(WorldBorder.class);
-            if (wb != null) {
-                wb.tick();
-            }
+            user.getStoredObjects().values().stream()
+                    .filter(Tickable.class::isInstance)
+                    .map(Tickable.class::cast)
+                    .forEach(Tickable::tick);
 		}
 	};
 

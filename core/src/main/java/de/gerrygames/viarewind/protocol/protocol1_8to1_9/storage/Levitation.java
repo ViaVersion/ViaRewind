@@ -1,6 +1,8 @@
 package de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage;
 
+import com.google.common.base.Ticker;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.Protocol1_8TO1_9;
+import de.gerrygames.viarewind.protocol.protocol1_8to1_9.Tickable;
 import de.gerrygames.viarewind.utils.PacketUtil;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
@@ -9,7 +11,7 @@ import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.platform.TaskId;
 import us.myles.ViaVersion.api.type.Type;
 
-public class Levitation extends StoredObject {
+public class Levitation extends StoredObject implements Tickable {
 	private int amplifier;
 	private volatile boolean active = false;
 
@@ -17,6 +19,7 @@ public class Levitation extends StoredObject {
 		super(user);
 	}
 
+	@Override
 	public void tick() {
 		if (!active) {
 			return;
