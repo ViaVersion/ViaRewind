@@ -3,6 +3,7 @@ package de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage;
 import de.gerrygames.viarewind.ViaRewind;
 import de.gerrygames.viarewind.api.ViaRewindConfig;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.Protocol1_8TO1_9;
+import de.gerrygames.viarewind.protocol.protocol1_8to1_9.Tickable;
 import de.gerrygames.viarewind.utils.PacketUtil;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Pair;
@@ -15,12 +16,13 @@ import us.myles.ViaVersion.api.type.Type;
 import java.util.ArrayList;
 import java.util.UUID;
 
-public class Cooldown extends StoredObject {
+public class Cooldown extends StoredObject implements Tickable {
+
 	private double attackSpeed = 4.0;
 	private long lastHit = 0;
-	private TaskId taskId;
 	private final ViaRewindConfig.CooldownIndicator cooldownIndicator;
-	private UUID bossUUID = null;
+	private UUID bossUUID;
+	private boolean lastSend;
 
 	public Cooldown(final UserConnection user) {
 		super(user);
@@ -28,38 +30,30 @@ public class Cooldown extends StoredObject {
 		this.cooldownIndicator = ViaRewind.getConfig().getCooldownIndicator();
 
 		if (cooldownIndicator==ViaRewindConfig.CooldownIndicator.DISABLED) return;
+	}
 
-		taskId = Via.getPlatform().runRepeatingSync(new Runnable() {
-			private boolean lastSend = false;
-			@Override
-			public void run() {
-				if (!user.getChannel().isOpen()) {
-					Via.getPlatform().cancelTask(taskId);
-					return;
-				}
-
-				if (!hasCooldown()) {
-					if (lastSend) {
-						hide();
-						lastSend = false;
-					}
-					return;
-				}
-
-				BlockPlaceDestroyTracker tracker = getUser().get(BlockPlaceDestroyTracker.class);
-				if (tracker.isMining()) {
-					lastHit = 0;
-					if (lastSend) {
-						hide();
-						lastSend = false;
-					}
-					return;
-				}
-
-				showCooldown();
-				lastSend = true;
+	@Override
+	public void tick() {
+		if (!hasCooldown()) {
+			if (lastSend) {
+				hide();
+				lastSend = false;
 			}
-		}, 1L);
+			return;
+		}
+
+		BlockPlaceDestroyTracker tracker = getUser().get(BlockPlaceDestroyTracker.class);
+		if (tracker.isMining()) {
+			lastHit = 0;
+			if (lastSend) {
+				hide();
+				lastSend = false;
+			}
+			return;
+		}
+
+		showCooldown();
+		lastSend = true;
 	}
 
 	private void showCooldown() {

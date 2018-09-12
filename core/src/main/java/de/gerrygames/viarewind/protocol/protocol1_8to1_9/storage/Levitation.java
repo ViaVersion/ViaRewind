@@ -1,6 +1,8 @@
 package de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage;
 
+import com.google.common.base.Ticker;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.Protocol1_8TO1_9;
+import de.gerrygames.viarewind.protocol.protocol1_8to1_9.Tickable;
 import de.gerrygames.viarewind.utils.PacketUtil;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
@@ -9,32 +11,27 @@ import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.platform.TaskId;
 import us.myles.ViaVersion.api.type.Type;
 
-public class Levitation extends StoredObject {
+public class Levitation extends StoredObject implements Tickable {
 	private int amplifier;
-	private boolean active = false;
-	final TaskId taskId;
+	private volatile boolean active = false;
 
 	public Levitation(UserConnection user) {
 		super(user);
-		taskId = Via.getPlatform().runRepeatingSync(new Runnable() {
-			@Override
-			public void run() {
-				if (!user.getChannel().isOpen()) {
-					Via.getPlatform().cancelTask(taskId);
-					return;
-				}
-				if (!active) {
-					return;
-				}
-				int vY = (amplifier+1) * 360;
-				PacketWrapper packet = new PacketWrapper(0x12, null, Levitation.this.getUser());
-				packet.write(Type.VAR_INT, getUser().get(EntityTracker.class).getPlayerId());
-				packet.write(Type.SHORT, (short)0);
-				packet.write(Type.SHORT, (short)vY);
-				packet.write(Type.SHORT, (short)0);
-				PacketUtil.sendPacket(packet, Protocol1_8TO1_9.class);
-			}
-		}, 1L);
+	}
+
+	@Override
+	public void tick() {
+		if (!active) {
+			return;
+		}
+
+		int vY = (amplifier+1) * 360;
+		PacketWrapper packet = new PacketWrapper(0x12, null, Levitation.this.getUser());
+		packet.write(Type.VAR_INT, getUser().get(EntityTracker.class).getPlayerId());
+		packet.write(Type.SHORT, (short)0);
+		packet.write(Type.SHORT, (short)vY);
+		packet.write(Type.SHORT, (short)0);
+		PacketUtil.sendPacket(packet, Protocol1_8TO1_9.class);
 	}
 
 	public void setActive(boolean active) {
