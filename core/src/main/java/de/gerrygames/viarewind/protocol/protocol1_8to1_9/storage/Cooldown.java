@@ -1,16 +1,14 @@
 package de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage;
 
 import de.gerrygames.viarewind.ViaRewind;
+import de.gerrygames.viarewind.utils.Tickable;
 import de.gerrygames.viarewind.api.ViaRewindConfig;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.Protocol1_8TO1_9;
-import de.gerrygames.viarewind.protocol.protocol1_8to1_9.Tickable;
 import de.gerrygames.viarewind.utils.PacketUtil;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Pair;
-import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.data.StoredObject;
 import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.platform.TaskId;
 import us.myles.ViaVersion.api.type.Type;
 
 import java.util.ArrayList;

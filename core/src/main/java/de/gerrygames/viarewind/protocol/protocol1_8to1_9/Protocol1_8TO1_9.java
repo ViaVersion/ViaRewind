@@ -2,6 +2,7 @@ package de.gerrygames.viarewind.protocol.protocol1_8to1_9;
 
 import com.google.common.collect.Sets;
 import de.gerrygames.viarewind.ViaRewind;
+import de.gerrygames.viarewind.utils.Tickable;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.chunks.ChunkPacketTransformer;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.entityreplacement.ShulkerBulletReplacement;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.entityreplacement.ShulkerReplacement;
