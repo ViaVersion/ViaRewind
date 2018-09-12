@@ -28,6 +28,7 @@ import de.gerrygames.viarewind.storage.BlockState;
 import de.gerrygames.viarewind.types.VarLongType;
 import de.gerrygames.viarewind.utils.ChatUtil;
 import de.gerrygames.viarewind.utils.PacketUtil;
+import de.gerrygames.viarewind.utils.Ticker;
 import de.gerrygames.viarewind.utils.Utils;
 import de.gerrygames.viarewind.utils.math.AABB;
 import de.gerrygames.viarewind.utils.math.Ray3d;
@@ -2825,6 +2826,8 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 
 	@Override
 	public void init(UserConnection userConnection) {
+		Ticker.init();
+
 		userConnection.put(new Windows(userConnection));
 		userConnection.put(new EntityTracker(userConnection));
 		userConnection.put(new PlayerPosition(userConnection));

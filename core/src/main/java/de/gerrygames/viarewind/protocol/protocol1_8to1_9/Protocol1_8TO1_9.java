@@ -1,8 +1,6 @@
 package de.gerrygames.viarewind.protocol.protocol1_8to1_9;
 
-import com.google.common.collect.Sets;
 import de.gerrygames.viarewind.ViaRewind;
-import de.gerrygames.viarewind.utils.Tickable;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.chunks.ChunkPacketTransformer;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.entityreplacement.ShulkerBulletReplacement;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.entityreplacement.ShulkerReplacement;
@@ -23,6 +21,7 @@ import de.gerrygames.viarewind.replacement.EntityReplacement;
 import de.gerrygames.viarewind.storage.BlockState;
 import de.gerrygames.viarewind.utils.ChatUtil;
 import de.gerrygames.viarewind.utils.PacketUtil;
+import de.gerrygames.viarewind.utils.Ticker;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.Via;
@@ -49,33 +48,10 @@ import us.myles.viaversion.libs.opennbt.tag.builtin.ListTag;
 import us.myles.viaversion.libs.opennbt.tag.builtin.StringTag;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
-import java.util.function.Consumer;
 
 public class Protocol1_8TO1_9 extends Protocol {
-
-	private final Set<UserConnection> users = Sets.newConcurrentHashSet();
-
-	private static final Consumer<Collection<UserConnection>> TICKER =
-            users -> {
-		users.removeIf(u -> !u.getChannel().isOpen());
-
-		users.stream()
-                .map(UserConnection::getStoredObjects)
-                .map(Map::values)
-                .flatMap(Collection::stream)
-                .filter(Tickable.class::isInstance)
-                .map(Tickable.class::cast)
-                .forEach(Tickable::tick);
-	};
-
-	public Protocol1_8TO1_9() {
-		Via.getPlatform().runRepeatingSync(() -> TICKER.accept(users), 1L);
-	}
 
 	public static final ValueTransformer<Double, Integer> toOldInt = new ValueTransformer<Double, Integer>(Type.INT) {
 		public Integer transform(PacketWrapper wrapper, Double inputValue) {
@@ -2117,7 +2093,7 @@ public class Protocol1_8TO1_9 extends Protocol {
 
 	@Override
 	public void init(UserConnection userConnection) {
-		users.add(userConnection);
+		Ticker.init();
 
 		userConnection.put(new Windows(userConnection));
 		userConnection.put(new EntityTracker(userConnection));
