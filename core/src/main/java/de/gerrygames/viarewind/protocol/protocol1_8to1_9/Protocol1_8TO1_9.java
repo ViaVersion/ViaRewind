@@ -1089,13 +1089,7 @@ public class Protocol1_8TO1_9 extends Protocol {
 
 						confirm.write(Type.VAR_INT, id);
 
-						try {
-							PacketUtil.sendToServer(confirm, Protocol1_8TO1_9.class, true, false);
-						} catch (CancelException ignored) {
-							;
-						} catch (Exception ex) {
-							ex.printStackTrace();
-						}
+						PacketUtil.sendToServer(confirm, Protocol1_8TO1_9.class);
 					}
 				});
 				handler(new PacketHandler() {
@@ -1775,13 +1769,7 @@ public class Protocol1_8TO1_9 extends Protocol {
 							PacketWrapper useItem = new PacketWrapper(0x1D, null, packetWrapper.user());
 							useItem.write(Type.VAR_INT, 0);
 
-							try {
-								PacketUtil.sendToServer(useItem, Protocol1_8TO1_9.class, true, true);
-							} catch (CancelException ignored) {
-								;
-							} catch (Exception ex) {
-								ex.printStackTrace();
-							}
+							PacketUtil.sendToServer(useItem, Protocol1_8TO1_9.class, true, true);
 						}
 					}
 				});
@@ -1824,13 +1812,7 @@ public class Protocol1_8TO1_9 extends Protocol {
 						//1.8 sends it before the use entity packet
 						//1.9 afterwards
 						Via.getPlatform().runSync(() -> {
-							try {
-								PacketUtil.sendToServer(delayedPacket, Protocol1_8TO1_9.class, true, false);
-							} catch (CancelException ignored) {
-
-							} catch (Exception ex) {
-								ex.printStackTrace();
-							}
+							PacketUtil.sendToServer(delayedPacket, Protocol1_8TO1_9.class);
 						});
 					}
 				});
@@ -1891,13 +1873,7 @@ public class Protocol1_8TO1_9 extends Protocol {
 							float forward = packetWrapper.get(Type.FLOAT, 1);
 							steerBoat.write(Type.BOOLEAN, forward!=0.0f || left<0.0f);
 							steerBoat.write(Type.BOOLEAN, forward!=0.0f || left>0.0f);
-							try {
-								PacketUtil.sendToServer(steerBoat, Protocol1_8TO1_9.class, true, false);
-							} catch (CancelException ignored) {
-								;
-							} catch (Exception ex) {
-								ex.printStackTrace();
-							}
+							PacketUtil.sendToServer(steerBoat, Protocol1_8TO1_9.class);
 						}
 					}
 				});

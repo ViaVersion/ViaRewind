@@ -166,13 +166,7 @@ public class EntityTracker extends StoredObject {
 			unsneakPacket.write(Type.VAR_INT, 1);  //Stop sneaking
 			unsneakPacket.write(Type.VAR_INT, 0);  //Action Parameter
 
-			try {
-				PacketUtil.sendToServer(sneakPacket, Protocol1_7_6_10TO1_8.class, true, true);
-			} catch (CancelException ignored) {
-				;
-			} catch (Exception ex) {
-				ex.printStackTrace();
-			}
+			PacketUtil.sendToServer(sneakPacket, Protocol1_7_6_10TO1_8.class, true, true);
 
 			setSpectating(this.playerId);
 			return false;  //Entity has Passenger
