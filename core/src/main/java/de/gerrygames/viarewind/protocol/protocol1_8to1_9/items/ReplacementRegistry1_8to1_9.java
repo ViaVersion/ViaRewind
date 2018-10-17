@@ -26,6 +26,8 @@ public class ReplacementRegistry1_8to1_9 {
 		registry.registerItem(446, new Replacement(333, "Jungle Boat"));
 		registry.registerItem(447, new Replacement(333, "Acacia Boat"));
 		registry.registerItem(448, new Replacement(333, "Dark Oak Boat"));
+		registry.registerItem(204, new Replacement(43, 7, "Purpur Double Slab"));
+		registry.registerItem(205, new Replacement(44, 7, "Purpur Slab"));
 
 		registry.registerBlock(198, 0, new Replacement(50, 5));
 		registry.registerBlock(198, 1, new Replacement(50, 5));
@@ -33,6 +35,9 @@ public class ReplacementRegistry1_8to1_9 {
 		registry.registerBlock(198, 3, new Replacement(50, 3));
 		registry.registerBlock(198, 4, new Replacement(50, 2));
 		registry.registerBlock(198, 5, new Replacement(50, 1));
+		registry.registerBlock(204, new Replacement(43, 7));
+		registry.registerBlock(205, 0, new Replacement(44, 7));
+		registry.registerBlock(205, 8, new Replacement(44, 15));
 		registry.registerBlock(207, new Replacement(141));
 
 		registry.registerItemBlock(199, new Replacement(35, 10, "Chorus Plant"));
@@ -40,8 +45,6 @@ public class ReplacementRegistry1_8to1_9 {
 		registry.registerItemBlock(201, new Replacement(155, "Purpur Block"));
 		registry.registerItemBlock(202, new Replacement(155, 2, "Purpur Pillar"));
 		registry.registerItemBlock(203, new Replacement(156, "Purpur Stairs"));
-		registry.registerItemBlock(204, new Replacement(43, 7, "Purpur Double Slab"));
-		registry.registerItemBlock(205, new Replacement(44, 7, "Purpur Slab"));
 		registry.registerItemBlock(206, new Replacement(121, "Endstone Bricks"));
 		registry.registerItemBlock(207, new Replacement(141, "Beetroot Block"));
 		registry.registerItemBlock(208, new Replacement(2, "Grass Path"));
