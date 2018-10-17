@@ -55,7 +55,7 @@ public class ReplacementRegistry1_8to1_9 {
 		registry.registerItemBlock(214, new Replacement(87, "Nether Wart Block"));
 		registry.registerItemBlock(215, new Replacement(112, "Red Nether Brick"));
 		registry.registerItemBlock(217, new Replacement(166, "Structure Void"));
-		registry.registerItemBlock(255, new Replacement(137, "Structure Block"));
+		registry.registerItemBlock(255, new Replacement(137, 0, "Structure Block"));
 		registry.registerItemBlock(397, 5, new Replacement(397, 0, "Dragon Head"));
 	}
 
