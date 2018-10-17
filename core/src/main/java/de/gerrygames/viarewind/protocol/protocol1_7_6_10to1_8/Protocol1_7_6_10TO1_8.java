@@ -2194,13 +2194,7 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 								PacketWrapper teleportPacket = new PacketWrapper(0x18, null, packetWrapper.user());
 								teleportPacket.write(Type.UUID, profile.uuid);
 
-								try {
-									PacketUtil.sendToServer(teleportPacket, Protocol1_7_6_10TO1_8.class, true, true);
-								} catch (CancelException ignored) {
-									;
-								} catch (Exception ex) {
-									ex.printStackTrace();
-								}
+								PacketUtil.sendToServer(teleportPacket, Protocol1_7_6_10TO1_8.class, true, true);
 							}
 						}
 					}
@@ -2494,13 +2488,7 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 								unsneakPacket.write(Type.VAR_INT, 1);  //Stop sneaking
 								unsneakPacket.write(Type.VAR_INT, 0);  //Action Parameter
 
-								try {
-									PacketUtil.sendToServer(sneakPacket, Protocol1_7_6_10TO1_8.class, true, false);
-								} catch (CancelException ignored) {
-									;
-								} catch (Exception ex) {
-									ex.printStackTrace();
-								}
+								PacketUtil.sendToServer(sneakPacket, Protocol1_7_6_10TO1_8.class);
 							}
 						}
 					}
