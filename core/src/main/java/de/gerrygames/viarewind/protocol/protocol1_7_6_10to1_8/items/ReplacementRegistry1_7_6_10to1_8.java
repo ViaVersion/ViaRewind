@@ -25,6 +25,8 @@ public class ReplacementRegistry1_7_6_10to1_8 {
 		registry.registerBlock(143, 0, new Replacement(69, 0));
 		registry.registerBlock(143, 8, new Replacement(69, 8));
 		registry.registerBlock(178, new Replacement(151));
+		registry.registerBlock(182, 0, new Replacement(44, 1));
+		registry.registerBlock(182, 8, new Replacement(44, 9));
 
 		registry.registerItem(425, new Replacement(323, "Banner"));
 		registry.registerItem(409, new Replacement(406, "Prismarine Shard"));
@@ -48,6 +50,7 @@ public class ReplacementRegistry1_7_6_10to1_8 {
 		registry.registerItem(383, 68, new Replacement(383, "Spawn Guardian"));
 		registry.registerItem(383, 101, new Replacement(383, "Spawn Rabbit"));
 		registry.registerItem(19, 1, new Replacement(19, 0, "Wet Sponge"));
+		registry.registerItem(182, new Replacement(44, 1, "Red Sandstone Slab"));
 
 		registry.registerItemBlock(166, new Replacement(20, "Barrier"));
 		registry.registerItemBlock(167, new Replacement(96, "Iron Trapdoor"));
@@ -65,7 +68,6 @@ public class ReplacementRegistry1_7_6_10to1_8 {
 		registry.registerItemBlock(179, 0, new Replacement(24, "Red Sandstone"));
 		registry.registerItemBlock(179, 1, new Replacement(24, "Chiseled Red Sandstone"));
 		registry.registerItemBlock(179, 2, new Replacement(24, "Smooth Sandstone"));
-		registry.registerItemBlock(182, new Replacement(44, 1, "Red Sandstone Slab"));
 		registry.registerItemBlock(181, new Replacement(43, 1, "Double Red Sandstone Slab"));
 		registry.registerItemBlock(180, new Replacement(128, "Red Sandstone Stairs"));
 		registry.registerItemBlock(188, new Replacement(85, "Spruce Fence"));
