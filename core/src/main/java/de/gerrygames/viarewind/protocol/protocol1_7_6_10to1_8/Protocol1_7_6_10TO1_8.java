@@ -52,7 +52,6 @@ import us.myles.ViaVersion.api.remapper.ValueCreator;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.CustomByteType;
 import us.myles.ViaVersion.api.type.types.version.Types1_8;
-import us.myles.ViaVersion.exception.CancelException;
 import us.myles.ViaVersion.packets.Direction;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;

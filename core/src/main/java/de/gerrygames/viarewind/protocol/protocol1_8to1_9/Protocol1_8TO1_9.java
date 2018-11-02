@@ -1,5 +1,6 @@
 package de.gerrygames.viarewind.protocol.protocol1_8to1_9;
 
+import com.google.common.collect.ImmutableSet;
 import de.gerrygames.viarewind.ViaRewind;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.chunks.ChunkPacketTransformer;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.entityreplacement.ShulkerBulletReplacement;
@@ -39,7 +40,6 @@ import us.myles.ViaVersion.api.remapper.ValueTransformer;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.version.Types1_8;
 import us.myles.ViaVersion.api.type.types.version.Types1_9;
-import us.myles.ViaVersion.exception.CancelException;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import us.myles.ViaVersion.protocols.protocol1_9to1_8.chunks.Chunk1_9to1_8;
@@ -52,6 +52,18 @@ import java.util.List;
 import java.util.UUID;
 
 public class Protocol1_8TO1_9 extends Protocol {
+	public static final ImmutableSet<Object> VALID_ATTRIBUTES;
+	static {
+		ImmutableSet.Builder<Object> builder = ImmutableSet.builder();
+		builder.add("generic.maxHealth");
+		builder.add("generic.followRange");
+		builder.add("generic.knockbackResistance");
+		builder.add("generic.movementSpeed");
+		builder.add("generic.attackDamage");
+		builder.add("horse.jumpStrength");
+		builder.add("zombie.spawnReinforcements");
+		VALID_ATTRIBUTES = builder.build();
+	}
 
 	public static final ValueTransformer<Double, Integer> toOldInt = new ValueTransformer<Double, Integer>(Type.INT) {
 		public Integer transform(PacketWrapper wrapper, Double inputValue) {
@@ -1514,7 +1526,7 @@ public class Protocol1_8TO1_9 extends Protocol {
 						int removed = 0;
 						for (int i = 0; i<size; i++) {
 							String key = packetWrapper.read(Type.STRING);
-							boolean skip = key.equals("generic.armor") || key.equals("generic.attackSpeed") || key.equals("generic.luck") || key.equals("generic.armorToughness") || key.equals("generic.flyingSpeed");
+							boolean skip = !VALID_ATTRIBUTES.contains(key);
 							double value = packetWrapper.read(Type.DOUBLE);
 							int modifiersize = packetWrapper.read(Type.VAR_INT);
 							if (!skip) {
