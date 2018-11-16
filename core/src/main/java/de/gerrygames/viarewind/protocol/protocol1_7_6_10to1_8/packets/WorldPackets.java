@@ -4,8 +4,10 @@ import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10TO
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.chunks.ChunkPacketTransformer;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.items.ReplacementRegistry1_7_6_10to1_8;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage.WorldBorder;
+import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.Chunk1_7_10Type;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.Particle;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
+import de.gerrygames.viarewind.protocol.protocol1_8to1_9.types.Chunk1_8Type;
 import de.gerrygames.viarewind.storage.BlockState;
 import de.gerrygames.viarewind.types.VarLongType;
 import de.gerrygames.viarewind.utils.ChatUtil;
@@ -13,12 +15,15 @@ import de.gerrygames.viarewind.utils.PacketUtil;
 import net.md_5.bungee.api.ChatColor;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.minecraft.Position;
+import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
+import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.CustomByteType;
 import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
 public class WorldPackets {
 
@@ -33,7 +38,18 @@ public class WorldPackets {
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
-						ChunkPacketTransformer.transformChunk(packetWrapper);
+						ClientWorld world = packetWrapper.user().get(ClientWorld.class);
+						Chunk chunk = packetWrapper.read(new Chunk1_8Type(world));
+						packetWrapper.write(new Chunk1_7_10Type(world), chunk);
+						for (ChunkSection section : chunk.getSections()){
+							if (section == null) continue;
+							for (int i = 0; i < section.getPaletteSize(); i++) {
+								int block = section.getPaletteEntry(i);
+								BlockState state = BlockState.rawToState(block);
+								state = ReplacementRegistry1_7_6_10to1_8.replace(state);
+								section.setPaletteEntry(i, BlockState.stateToRaw(state));
+							}
+						}
 					}
 				});
 			}
@@ -46,7 +62,22 @@ public class WorldPackets {
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
-						ChunkPacketTransformer.transformMultiBlockChange(packetWrapper);
+						packetWrapper.passthrough(Type.INT);
+						packetWrapper.passthrough(Type.INT);
+						int count = packetWrapper.read(Type.VAR_INT);
+						packetWrapper.write(Type.SHORT, (short) count);
+						packetWrapper.write(Type.INT, count * 4);
+						for (int i = 0; i < count; i++) {
+							packetWrapper.passthrough(Type.UNSIGNED_BYTE);
+							packetWrapper.passthrough(Type.UNSIGNED_BYTE);
+							int blockData = packetWrapper.read(Type.VAR_INT);
+
+							BlockState state = ReplacementRegistry1_7_6_10to1_8.replace(BlockState.rawToState(blockData));
+
+							blockData = BlockState.stateToRaw(state);
+
+							packetWrapper.write(Type.SHORT, (short) blockData);
+						}
 					}
 				});
 			}

@@ -1,20 +1,27 @@
 package de.gerrygames.viarewind.protocol.protocol1_8to1_9.packets;
 
 import de.gerrygames.viarewind.ViaRewind;
-import de.gerrygames.viarewind.protocol.protocol1_8to1_9.chunks.ChunkPacketTransformer;
+import de.gerrygames.viarewind.protocol.protocol1_8to1_9.Protocol1_8TO1_9;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.items.ReplacementRegistry1_8to1_9;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.sound.Effect;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.sound.SoundRemapper;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.types.Chunk1_8Type;
 import de.gerrygames.viarewind.storage.BlockState;
+import de.gerrygames.viarewind.utils.PacketUtil;
 import us.myles.ViaVersion.api.PacketWrapper;
+import us.myles.ViaVersion.api.data.UserConnection;
+import us.myles.ViaVersion.api.minecraft.Environment;
+import us.myles.ViaVersion.api.minecraft.Position;
+import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
+import us.myles.ViaVersion.api.minecraft.chunks.Chunk1_8;
+import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.chunks.Chunk1_9to1_8;
+import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.types.Chunk1_9_1_2Type;
 import us.myles.viaversion.libs.opennbt.tag.builtin.CompoundTag;
 import us.myles.viaversion.libs.opennbt.tag.builtin.StringTag;
 
@@ -178,7 +185,7 @@ public class WorldPackets {
 						int chunkX = packetWrapper.read(Type.INT);
 						int chunkZ = packetWrapper.read(Type.INT);
 						ClientWorld world = packetWrapper.user().get(ClientWorld.class);
-						packetWrapper.write(new Chunk1_8Type(world), new Chunk1_9to1_8(chunkX, chunkZ));
+						packetWrapper.write(new Chunk1_8Type(world), new Chunk1_8(chunkX, chunkZ));
 					}
 				});
 			}
@@ -191,7 +198,67 @@ public class WorldPackets {
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
-						ChunkPacketTransformer.transformChunk(packetWrapper);
+						ClientWorld world = packetWrapper.user().get(ClientWorld.class);
+
+						Chunk chunk = packetWrapper.read(new Chunk1_9_1_2Type(world));
+
+						for (ChunkSection section : chunk.getSections()){
+							if (section == null) continue;
+							for (int i = 0; i < section.getPaletteSize(); i++) {
+								int block = section.getPaletteEntry(i);
+								BlockState state = BlockState.rawToState(block);
+								state = ReplacementRegistry1_8to1_9.replace(state);
+								section.setPaletteEntry(i, BlockState.stateToRaw(state));
+							}
+						}
+
+						if (chunk.isGroundUp() && chunk.getBitmask() == 0) {  //This would be an unload packet for 1.8 clients. Just set one air section
+							boolean skylight = world.getEnvironment() == Environment.NORMAL;
+							ChunkSection[] sections = new ChunkSection[16];
+							sections[0] = new ChunkSection();
+							if (skylight) sections[0].setSkyLight(new byte[2048]);
+							chunk = new Chunk1_8(chunk.getX(), chunk.getZ(), true, 1, sections, chunk.getBiomeData(), chunk.getBlockEntities());
+						}
+
+						packetWrapper.write(new Chunk1_8Type(world), chunk);
+
+						final UserConnection user = packetWrapper.user();
+						chunk.getBlockEntities().forEach(nbt -> {
+							if (!nbt.contains("x") || !nbt.contains("y") || !nbt.contains("z") || !nbt.contains("id")) return;
+							Position position = new Position((long) (int) nbt.get("x").getValue(), (long) (int) nbt.get("y").getValue(), (long) (int) nbt.get("z").getValue());
+							String id = (String) nbt.get("id").getValue();
+
+							short action;
+							switch (id) {
+								case "minecraft:mob_spawner":
+									action = 1;
+									break;
+								case "minecraft:command_block":
+									action = 2;
+									break;
+								case "minecraft:beacon":
+									action = 3;
+									break;
+								case "minecraft:skull":
+									action = 4;
+									break;
+								case "minecraft:flower_pot":
+									action = 5;
+									break;
+								case "minecraft:banner":
+									action = 6;
+									break;
+								default:
+									return;
+							}
+
+							PacketWrapper updateTileEntity = new PacketWrapper(0x09, null, user);
+							updateTileEntity.write(Type.POSITION, position);
+							updateTileEntity.write(Type.UNSIGNED_BYTE, action);
+							updateTileEntity.write(Type.NBT, nbt);
+
+							PacketUtil.sendPacket(updateTileEntity, Protocol1_8TO1_9.class, false, false);
+						});
 					}
 				});
 			}

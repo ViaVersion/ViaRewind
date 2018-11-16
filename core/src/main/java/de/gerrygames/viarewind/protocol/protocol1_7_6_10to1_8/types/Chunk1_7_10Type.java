@@ -7,13 +7,12 @@ import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
 import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
 import us.myles.ViaVersion.api.type.PartialType;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.chunks.Chunk1_9to1_8;
 
 import java.util.zip.Deflater;
 
-public class Chunk1_7_10WriteOnlyType extends PartialType<Chunk, ClientWorld> {
+public class Chunk1_7_10Type extends PartialType<Chunk, ClientWorld> {
 
-    public Chunk1_7_10WriteOnlyType(ClientWorld param) {
+    public Chunk1_7_10Type(ClientWorld param) {
         super(param, Chunk.class);
     }
 
@@ -42,7 +41,7 @@ public class Chunk1_7_10WriteOnlyType extends PartialType<Chunk, ClientWorld> {
                 for (int z = 0; z < 16; z++) {
                     int previousData = 0;
                     for (int x = 0; x < 16; x++) {
-                        int block = section.getBlock(x, y, z);
+                        int block = section.getFlatBlock(x, y, z);
                         dataToCompress.writeByte(block >> 4);
 
                         int data = block & 0xF;
@@ -60,16 +59,14 @@ public class Chunk1_7_10WriteOnlyType extends PartialType<Chunk, ClientWorld> {
 
         for (int i = 0; i < chunk.getSections().length; i++) {
             if ((chunk.getBitmask() & 1 << i) == 0) continue;
-            ChunkSection section = chunk.getSections()[i];
-            section.writeBlockLight(dataToCompress);
+            chunk.getSections()[i].writeBlockLight(dataToCompress);
         }
 
         boolean skyLight = clientWorld != null && clientWorld.getEnvironment() == Environment.NORMAL;
         if (skyLight) {
             for (int i = 0; i < chunk.getSections().length; i++) {
                 if ((chunk.getBitmask() & 1 << i) == 0) continue;
-                ChunkSection section = chunk.getSections()[i];
-                section.writeSkyLight(dataToCompress);
+                chunk.getSections()[i].writeSkyLight(dataToCompress);
             }
         }
 

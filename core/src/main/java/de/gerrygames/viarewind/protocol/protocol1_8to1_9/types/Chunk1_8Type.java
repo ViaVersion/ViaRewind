@@ -5,21 +5,17 @@ import io.netty.buffer.Unpooled;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.minecraft.Environment;
 import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
+import us.myles.ViaVersion.api.minecraft.chunks.Chunk1_8;
 import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
 import us.myles.ViaVersion.api.type.PartialType;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.chunks.Chunk1_9to1_8;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.chunks.ChunkSection1_9to1_8;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.ShortBuffer;
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.logging.Level;
 
 public class Chunk1_8Type extends PartialType<Chunk, ClientWorld> {
+    private static final Type<ChunkSection> CHUNK_SECTION_TYPE = new ChunkSectionType1_8();
 
     public Chunk1_8Type(ClientWorld param) {
         super(param, Chunk.class);
@@ -39,60 +35,34 @@ public class Chunk1_8Type extends PartialType<Chunk, ClientWorld> {
 		    if (dataLength >= 256) {  //1.8 likes to send biome data in unload packets?!
 			    input.readerIndex(input.readerIndex() + 256);
 		    }
-		    return new Chunk1_9to1_8(chunkX, chunkZ);
+		    return new Chunk1_8(chunkX, chunkZ);
 	    }
 
         // Data to be read
-        BitSet usedSections = new BitSet(16);
-        ChunkSection1_9to1_8[] sections = new ChunkSection1_9to1_8[16];
+        ChunkSection[] sections = new ChunkSection[16];
         byte[] biomeData = null;
-
-        // Calculate section count from bitmask
-        for (int i = 0; i < 16; i++) {
-            if ((bitmask & (1 << i)) != 0) {
-                usedSections.set(i);
-            }
-        }
-        int sectionCount = usedSections.cardinality(); // the amount of sections set
 
         int startIndex = input.readerIndex();
 
         // Read blocks
         for (int i = 0; i < 16; i++) {
-            if (!usedSections.get(i)) continue; // Section not set
-            ChunkSection1_9to1_8 section = new ChunkSection1_9to1_8();
-            sections[i] = section;
-
-            // Read block data and convert to short buffer
-            byte[] blockData = new byte[ChunkSection1_9to1_8.SIZE * 2];
-            input.readBytes(blockData);
-            ShortBuffer blockBuf = ByteBuffer.wrap(blockData).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer();
-
-            for (int j = 0; j < ChunkSection1_9to1_8.SIZE; j++) {
-                int mask = blockBuf.get();
-                int type = mask >> 4;
-                int data = mask & 0xF;
-                section.setBlock(j, type, data);
-            }
+            if ((bitmask & 1 << i) == 0) continue;
+            sections[i] = CHUNK_SECTION_TYPE.read(input);
         }
 
         // Read block light
         for (int i = 0; i < 16; i++) {
-            if (!usedSections.get(i)) continue; // Section not set, has no light
-            byte[] blockLightArray = new byte[ChunkSection1_9to1_8.LIGHT_LENGTH];
-            input.readBytes(blockLightArray);
-            sections[i].setBlockLight(blockLightArray);
+            if ((bitmask & 1 << i) == 0) continue;
+            sections[i].readBlockLight(input);
         }
 
         // Read sky light
         int bytesLeft = dataLength - (input.readerIndex() - startIndex);
-        if (bytesLeft >= ChunkSection1_9to1_8.LIGHT_LENGTH) {
+        if (bytesLeft >= ChunkSection.LIGHT_LENGTH) {
             for (int i = 0; i < 16; i++) {
-                if (!usedSections.get(i)) continue; // Section not set, has no light
-                byte[] skyLightArray = new byte[ChunkSection1_9to1_8.LIGHT_LENGTH];
-                input.readBytes(skyLightArray);
-                sections[i].setSkyLight(skyLightArray);
-                bytesLeft -= ChunkSection1_9to1_8.LIGHT_LENGTH;
+                if ((bitmask & 1 << i) == 0) continue;
+                sections[i].readSkyLight(input);
+                bytesLeft -= ChunkSection.LIGHT_LENGTH;
             }
         }
 
@@ -109,7 +79,7 @@ public class Chunk1_8Type extends PartialType<Chunk, ClientWorld> {
         }
 
         // Return chunks
-        return new Chunk1_9to1_8(chunkX, chunkZ, groundUp, bitmask, sections, biomeData, new ArrayList<>());
+        return new Chunk1_8(chunkX, chunkZ, groundUp, bitmask, sections, biomeData, new ArrayList<>());
     }
 
     @Override
@@ -118,30 +88,19 @@ public class Chunk1_8Type extends PartialType<Chunk, ClientWorld> {
 
         for (int i = 0; i < chunk.getSections().length; i++) {
             if ((chunk.getBitmask() & 1 << i) == 0) continue;
-            ChunkSection section = chunk.getSections()[i];
-            for (int y = 0; y < 16; y++) {
-                for (int z = 0; z < 16; z++) {
-                    for (int x = 0; x < 16; x++) {
-                        int block = section.getBlock(x, y, z);
-                        buf.writeByte(block/* & 0xFF*/);
-                        buf.writeByte(block >> 8);
-                    }
-                }
-            }
+            CHUNK_SECTION_TYPE.write(buf, chunk.getSections()[i]);
         }
 
         for (int i = 0; i < chunk.getSections().length; i++) {
             if ((chunk.getBitmask() & 1 << i) == 0) continue;
-            ChunkSection section = chunk.getSections()[i];
-            section.writeBlockLight(buf);
+            chunk.getSections()[i].writeBlockLight(buf);
         }
 
         boolean skyLight = world.getEnvironment() == Environment.NORMAL;
         if (skyLight) {
             for (int i = 0; i < chunk.getSections().length; i++) {
                 if ((chunk.getBitmask() & 1 << i) == 0) continue;
-                ChunkSection section = chunk.getSections()[i];
-                section.writeSkyLight(buf);
+                chunk.getSections()[i].writeSkyLight(buf);
             }
         }
 

@@ -1,40 +1,16 @@
 package de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.chunks;
 
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.items.ReplacementRegistry1_7_6_10to1_8;
-import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.Chunk1_7_10WriteOnlyType;
-import de.gerrygames.viarewind.protocol.protocol1_8to1_9.types.Chunk1_8Type;
 import de.gerrygames.viarewind.storage.BlockState;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
-import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.CustomByteType;
-import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
 import java.util.zip.Deflater;
 
 public class ChunkPacketTransformer {
-
-	public static void transformChunk(PacketWrapper packetWrapper) throws Exception {
-		ClientWorld world = packetWrapper.user().get(ClientWorld.class);
-		Chunk chunk = packetWrapper.read(new Chunk1_8Type(world));
-		packetWrapper.write(new Chunk1_7_10WriteOnlyType(world), chunk);
-		for (ChunkSection section : chunk.getSections()){
-			if (section == null) continue;
-			for (int x = 0; x < 16; x++) {
-				for (int y = 0; y < 16; y++) {
-					for (int z = 0; z < 16; z++) {
-						int block = section.getBlock(x, y, z);
-						BlockState state = BlockState.rawToState(block);
-						state = ReplacementRegistry1_7_6_10to1_8.replace(state);
-						section.setBlock(x, y, z, state.getId(), state.getData());
-					}
-				}
-			}
-		}
-	}
 
 	private static byte[] transformChunkData(byte[] data, int primaryBitMask, boolean skyLight, boolean groundUp) {
 		int dataSize = 0;
@@ -54,7 +30,7 @@ public class ChunkPacketTransformer {
 
 				buf.writeByte(state.getId());
 
-				if (j % 2 ==0) {
+				if (j % 2 == 0) {
 					tmp = (byte) (state.getData() & 0xF);
 				} else {
 					blockDataBuf.writeByte(tmp | (state.getData() & 15) << 4);
@@ -77,7 +53,7 @@ public class ChunkPacketTransformer {
 			dataSize += 2048 * columnCount;
 		}
 
-		if (groundUp && dataSize+256<=data.length) {
+		if (groundUp && dataSize + 256 <= data.length) {
 			buf.writeBytes(data, dataSize, 256);
 			dataSize += 256;
 		}
@@ -151,25 +127,6 @@ public class ChunkPacketTransformer {
 			packetWrapper.write(Type.INT, chunkZ[i]);
 			packetWrapper.write(Type.SHORT, (short) primaryBitMask[i]);
 			packetWrapper.write(Type.SHORT, (short) 0);
-		}
-	}
-
-	public static void transformMultiBlockChange(PacketWrapper packetWrapper) throws Exception {
-		packetWrapper.passthrough(Type.INT);
-		packetWrapper.passthrough(Type.INT);
-		int count = packetWrapper.read(Type.VAR_INT);
-		packetWrapper.write(Type.SHORT, (short) count);
-		packetWrapper.write(Type.INT, count * 4);
-		for (int i = 0; i < count; i++) {
-			packetWrapper.passthrough(Type.UNSIGNED_BYTE);
-			packetWrapper.passthrough(Type.UNSIGNED_BYTE);
-			int blockData = packetWrapper.read(Type.VAR_INT);
-
-			BlockState state = ReplacementRegistry1_7_6_10to1_8.replace(BlockState.rawToState(blockData));
-
-			blockData = BlockState.stateToRaw(state);
-
-			packetWrapper.write(Type.SHORT, (short) blockData);
 		}
 	}
 }
