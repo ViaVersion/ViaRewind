@@ -488,6 +488,8 @@ public class PlayerPackets {
 
 							packetWrapper.set(Type.SHORT, 0, (short) buf.readableBytes());
 							buf.release();
+						} else if (channel.equalsIgnoreCase("MC|Brand")) {
+							packetWrapper.write(Type.SHORT, packetWrapper.read(Type.VAR_INT).shortValue());
 						} else {
 							byte[] data = packetWrapper.read(Type.REMAINING_BYTES);
 							packetWrapper.write(Type.SHORT, (short) data.length);
@@ -1011,7 +1013,7 @@ public class PlayerPackets {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						String channel = packetWrapper.get(Type.STRING, 0);
-                        int length = packetWrapper.read(Type.SHORT);
+						int length = packetWrapper.read(Type.SHORT);
 						if (channel.equalsIgnoreCase("MC|ItemName")) {
 							CustomByteType customByteType = new CustomByteType(length);
 							byte[] data = packetWrapper.read(customByteType);
@@ -1044,8 +1046,8 @@ public class PlayerPackets {
 							}
 							packetWrapper.write(Type.ITEM, book);
 						} else if (channel.equalsIgnoreCase("MC|Brand")) {
-                            packetWrapper.write(Type.STRING, new String(packetWrapper.read(Type.REMAINING_BYTES), StandardCharsets.UTF_8));
-                        }
+							packetWrapper.write(Type.VAR_INT, length);
+						}
 					}
 				});
 			}
