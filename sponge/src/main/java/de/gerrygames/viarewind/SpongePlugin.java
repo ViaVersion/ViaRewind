@@ -5,16 +5,15 @@ import de.gerrygames.viarewind.api.ViaRewindConfigImpl;
 import de.gerrygames.viarewind.api.ViaRewindPlatform;
 import de.gerrygames.viarewind.sponge.VersionInfo;
 import lombok.Getter;
-import org.spongepowered.api.config.DefaultConfig;
+import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
-import org.spongepowered.api.event.game.state.GameAboutToStartServerEvent;
+import org.spongepowered.api.event.game.state.GameInitializationEvent;
 import org.spongepowered.api.plugin.Dependency;
 import org.spongepowered.api.plugin.Plugin;
-import org.spongepowered.api.plugin.PluginContainer;
 import us.myles.ViaVersion.sponge.util.LoggerWrapper;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.logging.Logger;
 
 @Plugin(id = "viarewind",
@@ -30,30 +29,19 @@ public class SpongePlugin implements ViaRewindPlatform {
 	@Getter
 	private Logger logger;
 	@Inject
-	private PluginContainer container;
+	private org.slf4j.Logger loggerSlf4j;
 
 	@Inject
-	@DefaultConfig(sharedRoot = false)
-	private File defaultConfig;
+	@ConfigDir(sharedRoot = false)
+	private Path configDir;
 
 	@Listener(order = Order.LATE)
-	public void onServerStart(GameAboutToStartServerEvent e) {
+	public void onGameStart(GameInitializationEvent e) {
 		// Setup Logger
-		this.logger = new LoggerWrapper(container.getLogger());
+		this.logger = new LoggerWrapper(loggerSlf4j);
 		// Init!
-
-		File configFile = new File(defaultConfig.getParentFile(), "config.yml");
-
-		ViaRewindConfigImpl conf = new ViaRewindConfigImpl(configFile,
-				getClass().getClassLoader().getResource("assets/viarewind/config.yml"));
+		ViaRewindConfigImpl conf = new ViaRewindConfigImpl(configDir.resolve("config.yml").toFile());
 		conf.reloadConfig();
-
 		this.init(conf);
 	}
-
-	@Override
-	public void disable() {
-
-	}
-
 }
