@@ -10,9 +10,9 @@ import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import de.gerrygames.viarewind.api.ViaRewindConfigImpl;
 import de.gerrygames.viarewind.api.ViaRewindPlatform;
 import de.gerrygames.viarewind.velocity.VersionInfo;
+import lombok.Getter;
 import us.myles.ViaVersion.sponge.util.LoggerWrapper;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.util.logging.Logger;
 
@@ -26,7 +26,7 @@ import java.util.logging.Logger;
 		}
 )
 public class VelocityPlugin implements ViaRewindPlatform {
-
+    @Getter
 	private Logger logger;
 	@Inject
 	private org.slf4j.Logger loggerSlf4j;
@@ -40,24 +40,8 @@ public class VelocityPlugin implements ViaRewindPlatform {
 		// Setup Logger
 		this.logger = new LoggerWrapper(loggerSlf4j);
 		// Init!
-		File configFile = configDir.resolve("config.yml").toFile();
-
-		ViaRewindConfigImpl conf = new ViaRewindConfigImpl(
-				configFile,
-				getClass().getClassLoader().getResource("assets/viarewind/config.yml")
-		);
+		ViaRewindConfigImpl conf = new ViaRewindConfigImpl(configDir.resolve("config.yml").toFile());
 		conf.reloadConfig();
 		this.init(conf);
 	}
-
-	@Override
-	public Logger getLogger() {
-		return logger;
-	}
-
-	@Override
-	public void disable() {
-
-	}
-
 }

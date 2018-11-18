@@ -9,11 +9,8 @@ import java.util.List;
 import java.util.Map;
 
 public class ViaRewindConfigImpl extends Config implements ViaRewindConfig {
-    private URL defaultConfig;
-
-    public ViaRewindConfigImpl(File configFile, URL defaultConfig) {
+    public ViaRewindConfigImpl(File configFile) {
         super(configFile);
-        this.defaultConfig = defaultConfig;
     }
 
     @Override
@@ -33,7 +30,7 @@ public class ViaRewindConfigImpl extends Config implements ViaRewindConfig {
 
     @Override
     public URL getDefaultConfigURL() {
-        return defaultConfig;
+        return getClass().getClassLoader().getResource("assets/viarewind/config.yml");
     }
 
     @Override
