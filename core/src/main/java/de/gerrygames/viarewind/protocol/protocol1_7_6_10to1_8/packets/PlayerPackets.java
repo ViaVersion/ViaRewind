@@ -40,6 +40,7 @@ import us.myles.viaversion.libs.opennbt.tag.builtin.CompoundTag;
 import us.myles.viaversion.libs.opennbt.tag.builtin.ListTag;
 import us.myles.viaversion.libs.opennbt.tag.builtin.StringTag;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.UUID;
 
@@ -1010,8 +1011,8 @@ public class PlayerPackets {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						String channel = packetWrapper.get(Type.STRING, 0);
+                        int length = packetWrapper.read(Type.SHORT);
 						if (channel.equalsIgnoreCase("MC|ItemName")) {
-							int length = packetWrapper.read(Type.SHORT);
 							CustomByteType customByteType = new CustomByteType(length);
 							byte[] data = packetWrapper.read(customByteType);
 							String name = new String(data, Charsets.UTF_8);
@@ -1030,7 +1031,6 @@ public class PlayerPackets {
 
 							PacketUtil.sendPacket(updateCost, Protocol1_7_6_10TO1_8.class, true, true);
 						} else if (channel.equalsIgnoreCase("MC|BEdit") || channel.equalsIgnoreCase("MC|BSign")) {
-							packetWrapper.read(Type.SHORT); //length
 							Item book = packetWrapper.read(Types1_7_6_10.COMPRESSED_NBT_ITEM);
 							CompoundTag tag = book.getTag();
 							if (tag != null && tag.contains("pages")) {
@@ -1043,12 +1043,9 @@ public class PlayerPackets {
 								}
 							}
 							packetWrapper.write(Type.ITEM, book);
-						} else {
-							int length = packetWrapper.read(Type.SHORT);
-							CustomByteType customByteType = new CustomByteType(length);
-							byte[] data = packetWrapper.read(customByteType);
-							packetWrapper.write(Type.REMAINING_BYTES, data);
-						}
+						} else if (channel.equalsIgnoreCase("MC|Brand")) {
+                            packetWrapper.write(Type.STRING, new String(packetWrapper.read(Type.REMAINING_BYTES), StandardCharsets.UTF_8));
+                        }
 					}
 				});
 			}
