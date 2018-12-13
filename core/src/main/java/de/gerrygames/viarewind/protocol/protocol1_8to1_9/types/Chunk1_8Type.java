@@ -40,7 +40,7 @@ public class Chunk1_8Type extends PartialType<Chunk, ClientWorld> {
 
         // Data to be read
         ChunkSection[] sections = new ChunkSection[16];
-        byte[] biomeData = null;
+        int[] biomeData = null;
 
         int startIndex = input.readerIndex();
 
@@ -68,8 +68,10 @@ public class Chunk1_8Type extends PartialType<Chunk, ClientWorld> {
 
         // Read biome data
         if (bytesLeft >= 256) {
-            biomeData = new byte[256];
-            input.readBytes(biomeData);
+            biomeData = new int[256];
+            for (int i = 0; i < 256; i++) {
+                biomeData[i] = input.readByte() & 0xFF;
+            }
             bytesLeft -= 256;
         }
 
@@ -105,7 +107,9 @@ public class Chunk1_8Type extends PartialType<Chunk, ClientWorld> {
         }
 
         if (chunk.isGroundUp() && chunk.isBiomeData()) {
-            buf.writeBytes(chunk.getBiomeData());
+            for (int biome : chunk.getBiomeData()) {
+                buf.writeByte((byte) biome);
+            }
         }
 
         output.writeInt(chunk.getX());
