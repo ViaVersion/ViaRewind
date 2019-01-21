@@ -71,7 +71,9 @@ public class Chunk1_7_10Type extends PartialType<Chunk, ClientWorld> {
         }
 
         if (chunk.isGroundUp() && chunk.isBiomeData()) {
-            dataToCompress.writeBytes(chunk.getBiomeData());
+            for (int biome : chunk.getBiomeData()) {
+                dataToCompress.writeByte((byte) biome);
+            }
         }
 
         dataToCompress.readerIndex(0);

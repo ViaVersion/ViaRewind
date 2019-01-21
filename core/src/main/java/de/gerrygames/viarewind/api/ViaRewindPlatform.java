@@ -11,7 +11,6 @@ import java.util.Collections;
 import java.util.logging.Logger;
 
 public interface ViaRewindPlatform {
-
 	default void init(ViaRewindConfig config) {
 		ViaRewind.init(this, config);
 
@@ -21,6 +20,4 @@ public interface ViaRewindPlatform {
 	}
 
 	Logger getLogger();
-
-	void disable();
 }

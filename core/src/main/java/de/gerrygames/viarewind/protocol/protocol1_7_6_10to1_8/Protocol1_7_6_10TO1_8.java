@@ -24,6 +24,7 @@ import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
+import us.myles.ViaVersion.api.type.types.CustomByteType;
 import us.myles.ViaVersion.packets.Direction;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
@@ -79,14 +80,11 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						int publicKeyLength = packetWrapper.read(Type.VAR_INT);
 						packetWrapper.write(Type.SHORT, (short) publicKeyLength);
-						for (int i = 0; i < publicKeyLength; i++) {
-							packetWrapper.passthrough(Type.BYTE);
-						}
+						packetWrapper.passthrough(new CustomByteType(publicKeyLength));
+
 						int verifyTokenLength = packetWrapper.read(Type.VAR_INT);
 						packetWrapper.write(Type.SHORT, (short) verifyTokenLength);
-						for (int i = 0; i < verifyTokenLength; i++) {
-							packetWrapper.passthrough(Type.BYTE);
-						}
+						packetWrapper.passthrough(new CustomByteType(verifyTokenLength));
 					}
 				});
 			}
@@ -115,14 +113,11 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						int sharedSecretLength = packetWrapper.read(Type.SHORT);
 						packetWrapper.write(Type.VAR_INT, sharedSecretLength);
-						for (int i = 0; i < sharedSecretLength; i++) {
-							packetWrapper.passthrough(Type.BYTE);
-						}
+						packetWrapper.passthrough(new CustomByteType(sharedSecretLength));
+
 						int verifyTokenLength = packetWrapper.read(Type.SHORT);
 						packetWrapper.write(Type.VAR_INT, verifyTokenLength);
-						for (int i = 0; i < verifyTokenLength; i++) {
-							packetWrapper.passthrough(Type.BYTE);
-						}
+						packetWrapper.passthrough(new CustomByteType(verifyTokenLength));
 					}
 				});
 			}
@@ -134,8 +129,13 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 		CompressionSendStorage compressionSendStorage = packetWrapper.user().get(CompressionSendStorage.class);
 		if (compressionSendStorage.isCompressionSend()) {
 			Channel channel = packetWrapper.user().getChannel();
-			channel.pipeline().replace("decompress", "decompress", new EmptyChannelHandler());
-			channel.pipeline().replace("compress", "compress", new ForwardMessageToByteEncoder());
+			if (channel.pipeline().get("compress") != null) {
+				channel.pipeline().replace("decompress", "decompress", new EmptyChannelHandler());
+				channel.pipeline().replace("compress", "compress", new ForwardMessageToByteEncoder());
+			} else if (channel.pipeline().get("compression-encoder") != null) { // Velocity
+				channel.pipeline().replace("compression-decoder", "compression-decoder", new EmptyChannelHandler());
+				channel.pipeline().replace("compression-encoder", "compression-encoder", new ForwardMessageToByteEncoder());
+			}
 
 			compressionSendStorage.setCompressionSend(false);
 		}
