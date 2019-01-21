@@ -39,11 +39,7 @@ public class ScoreboardPackets {
 						}
 
 						if (mode == 0 || mode == 3 || mode == 4) {
-							int size = packetWrapper.read(Type.VAR_INT);
-							packetWrapper.write(Type.VAR_INT, size);
-							for (int i = 0; i < size; i++) {
-								packetWrapper.passthrough(Type.STRING);
-							}
+							packetWrapper.passthrough(Type.STRING_ARRAY);
 						}
 					}
 				});
