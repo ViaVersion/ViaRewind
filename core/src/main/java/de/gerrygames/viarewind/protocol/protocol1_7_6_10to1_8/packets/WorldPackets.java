@@ -14,6 +14,7 @@ import de.gerrygames.viarewind.utils.ChatUtil;
 import de.gerrygames.viarewind.utils.PacketUtil;
 import net.md_5.bungee.api.ChatColor;
 import us.myles.ViaVersion.api.PacketWrapper;
+import us.myles.ViaVersion.api.minecraft.BlockChangeRecord;
 import us.myles.ViaVersion.api.minecraft.Position;
 import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
 import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
@@ -59,24 +60,20 @@ public class WorldPackets {
 		protocol.registerOutgoing(State.PLAY, 0x22, 0x22, new PacketRemapper() {
 			@Override
 			public void registerMap() {
+				map(Type.INT);
+				map(Type.INT);
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
-						packetWrapper.passthrough(Type.INT);
-						packetWrapper.passthrough(Type.INT);
-						int count = packetWrapper.read(Type.VAR_INT);
-						packetWrapper.write(Type.SHORT, (short) count);
-						packetWrapper.write(Type.INT, count * 4);
-						for (int i = 0; i < count; i++) {
-							packetWrapper.passthrough(Type.UNSIGNED_BYTE);
-							packetWrapper.passthrough(Type.UNSIGNED_BYTE);
-							int blockData = packetWrapper.read(Type.VAR_INT);
-
-							BlockState state = ReplacementRegistry1_7_6_10to1_8.replace(BlockState.rawToState(blockData));
-
-							blockData = BlockState.stateToRaw(state);
-
-							packetWrapper.write(Type.SHORT, (short) blockData);
+						final BlockChangeRecord[] records = packetWrapper.read(Type.BLOCK_CHANGE_RECORD_ARRAY);
+						packetWrapper.write(Type.SHORT, (short) records.length);
+						packetWrapper.write(Type.INT, records.length * 4);
+						for (BlockChangeRecord record : records) {
+							packetWrapper.write(Type.UNSIGNED_BYTE, record.getHorizontal());
+							packetWrapper.write(Type.UNSIGNED_BYTE, record.getY());
+							BlockState state = BlockState.rawToState(record.getBlockId());
+							state = ReplacementRegistry1_7_6_10to1_8.replace(state);
+							packetWrapper.write(Type.SHORT, (short) BlockState.stateToRaw(state));
 						}
 					}
 				});

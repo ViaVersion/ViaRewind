@@ -10,6 +10,7 @@ import de.gerrygames.viarewind.storage.BlockState;
 import de.gerrygames.viarewind.utils.PacketUtil;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.data.UserConnection;
+import us.myles.ViaVersion.api.minecraft.BlockChangeRecord;
 import us.myles.ViaVersion.api.minecraft.Environment;
 import us.myles.ViaVersion.api.minecraft.Position;
 import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
@@ -101,17 +102,14 @@ public class WorldPackets {
 			public void registerMap() {
 				map(Type.INT);
 				map(Type.INT);
+				map(Type.BLOCK_CHANGE_RECORD_ARRAY);
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
-						int size = packetWrapper.passthrough(Type.VAR_INT);
-						for (int i = 0; i < size; i++) {
-							packetWrapper.passthrough(Type.UNSIGNED_BYTE);
-							packetWrapper.passthrough(Type.UNSIGNED_BYTE);
-							int combined = packetWrapper.read(Type.VAR_INT);
-							BlockState state = BlockState.rawToState(combined);
+						for (BlockChangeRecord record : packetWrapper.get(Type.BLOCK_CHANGE_RECORD_ARRAY, 0)) {
+							BlockState state = BlockState.rawToState(record.getBlockId());
 							state = ReplacementRegistry1_8to1_9.replace(state);
-							packetWrapper.write(Type.VAR_INT, BlockState.stateToRaw(state));
+							record.setBlockId(BlockState.stateToRaw(state));
 						}
 					}
 				});
