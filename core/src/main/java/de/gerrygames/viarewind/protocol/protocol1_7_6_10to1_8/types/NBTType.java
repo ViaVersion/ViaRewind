@@ -48,6 +48,7 @@ public class NBTType extends Type<CompoundTag> {
 			dataOutputStream.close();
 			buffer.writeShort(buf.readableBytes());
 			buffer.writeBytes(buf);
+			buf.release();
 		}
 	}
 }
