@@ -21,7 +21,6 @@ import de.gerrygames.viarewind.utils.math.Ray3d;
 import de.gerrygames.viarewind.utils.math.RayTracing;
 import de.gerrygames.viarewind.utils.math.Vector3d;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.entities.Entity1_10Types;
@@ -40,7 +39,6 @@ import us.myles.viaversion.libs.opennbt.tag.builtin.CompoundTag;
 import us.myles.viaversion.libs.opennbt.tag.builtin.ListTag;
 import us.myles.viaversion.libs.opennbt.tag.builtin.StringTag;
 
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.UUID;
 
@@ -457,7 +455,7 @@ public class PlayerPackets {
 						if (channel.equalsIgnoreCase("MC|TrList")) {
 							packetWrapper.write(Type.SHORT, (short) 0);  //Size Placeholder
 
-							ByteBuf buf = Unpooled.buffer();
+							ByteBuf buf = packetWrapper.user().getChannel().alloc().buffer();
 
 							Type.INT.write(buf, packetWrapper.passthrough(Type.INT));  //Window Id
 
@@ -1018,7 +1016,7 @@ public class PlayerPackets {
 							CustomByteType customByteType = new CustomByteType(length);
 							byte[] data = packetWrapper.read(customByteType);
 							String name = new String(data, Charsets.UTF_8);
-							ByteBuf buf = Unpooled.buffer();
+							ByteBuf buf = packetWrapper.user().getChannel().alloc().buffer();
 							Type.STRING.write(buf, name);
 							data = new byte[buf.readableBytes()];
 							buf.readBytes(data);

@@ -1,7 +1,6 @@
 package de.gerrygames.viarewind.protocol.protocol1_8to1_9.types;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.minecraft.Environment;
 import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
@@ -86,7 +85,7 @@ public class Chunk1_8Type extends PartialType<Chunk, ClientWorld> {
 
     @Override
     public void write(ByteBuf output, ClientWorld world, Chunk chunk) throws Exception {
-        ByteBuf buf = Unpooled.buffer();
+        ByteBuf buf = output.alloc().buffer();
 
         for (int i = 0; i < chunk.getSections().length; i++) {
             if ((chunk.getBitmask() & 1 << i) == 0) continue;

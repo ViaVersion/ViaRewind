@@ -3,7 +3,6 @@ package de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.ByteBufOutputStream;
-import io.netty.buffer.Unpooled;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.viaversion.libs.opennbt.NBTIO;
 import us.myles.viaversion.libs.opennbt.tag.builtin.CompoundTag;
@@ -41,7 +40,7 @@ public class NBTType extends Type<CompoundTag> {
 		if (nbt == null) {
 			buffer.writeShort(-1);
 		} else {
-			ByteBuf buf = Unpooled.buffer();
+			ByteBuf buf = buffer.alloc().buffer();
 			ByteBufOutputStream bytebufStream = new ByteBufOutputStream(buf);
 			DataOutputStream dataOutputStream = new DataOutputStream(bytebufStream);
 			NBTIO.writeTag((DataOutput) dataOutputStream, nbt);

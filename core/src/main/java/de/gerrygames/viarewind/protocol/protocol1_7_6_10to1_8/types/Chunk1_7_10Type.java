@@ -1,7 +1,6 @@
 package de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import us.myles.ViaVersion.api.minecraft.Environment;
 import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
 import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
@@ -29,10 +28,10 @@ public class Chunk1_7_10Type extends PartialType<Chunk, ClientWorld> {
         output.writeShort(chunk.getBitmask());
         output.writeShort(0);
 
-        ByteBuf dataToCompress = Unpooled.buffer();
+        ByteBuf dataToCompress = output.alloc().buffer();
 
         // Half byte per block data
-        ByteBuf blockData = Unpooled.buffer();
+        ByteBuf blockData = output.alloc().buffer();
 
         for (int i = 0; i < chunk.getSections().length; i++) {
             if ((chunk.getBitmask() & 1 << i) == 0) continue;
