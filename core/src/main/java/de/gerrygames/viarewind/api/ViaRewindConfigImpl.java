@@ -11,6 +11,7 @@ import java.util.Map;
 public class ViaRewindConfigImpl extends Config implements ViaRewindConfig {
     public ViaRewindConfigImpl(File configFile) {
         super(configFile);
+        reloadConfig();
     }
 
     @Override
