@@ -615,14 +615,7 @@ public class PlayerPackets {
 						packetWrapper.write(Type.BOOLEAN, false);
 					}
 				});
-				map(Type.BOOLEAN);
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						boolean hasPosition = packetWrapper.get(Type.BOOLEAN, 1);
-						if (hasPosition) packetWrapper.passthrough(Type.POSITION);
-					}
-				});
+				map(Type.OPTIONAL_POSITION);
 			}
 		});
 

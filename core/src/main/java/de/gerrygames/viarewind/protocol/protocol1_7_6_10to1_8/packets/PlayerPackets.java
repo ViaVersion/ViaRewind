@@ -953,7 +953,7 @@ public class PlayerPackets {
 				create(new ValueCreator() {
 					@Override
 					public void write(PacketWrapper packetWrapper) throws Exception {
-						packetWrapper.write(Type.BOOLEAN, false);
+						packetWrapper.write(Type.OPTIONAL_POSITION, null);
 					}
 				});
 				handler(new PacketHandler() {
