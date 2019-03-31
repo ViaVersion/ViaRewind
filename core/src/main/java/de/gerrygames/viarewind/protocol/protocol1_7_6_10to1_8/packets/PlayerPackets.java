@@ -21,6 +21,7 @@ import de.gerrygames.viarewind.utils.math.Ray3d;
 import de.gerrygames.viarewind.utils.math.RayTracing;
 import de.gerrygames.viarewind.utils.math.Vector3d;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.entities.Entity1_10Types;
@@ -453,45 +454,40 @@ public class PlayerPackets {
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						String channel = packetWrapper.get(Type.STRING, 0);
 						if (channel.equalsIgnoreCase("MC|TrList")) {
-							packetWrapper.write(Type.SHORT, (short) 0);  //Size Placeholder
-
-							ByteBuf buf = packetWrapper.user().getChannel().alloc().buffer();
-
-							Type.INT.write(buf, packetWrapper.passthrough(Type.INT));  //Window Id
+							packetWrapper.passthrough(Type.INT);  //Window Id
 
 							int size = packetWrapper.passthrough(Type.BYTE);  //Size
-							Type.BYTE.write(buf, (byte) size);
 
 							for (int i = 0; i < size; i++) {
 								Item item = ItemRewriter.toClient(packetWrapper.read(Type.ITEM));
 								packetWrapper.write(Types1_7_6_10.COMPRESSED_NBT_ITEM, item); //Buy Item 1
-								Types1_7_6_10.COMPRESSED_NBT_ITEM.write(buf, item);
 
 								item = ItemRewriter.toClient(packetWrapper.read(Type.ITEM));
 								packetWrapper.write(Types1_7_6_10.COMPRESSED_NBT_ITEM, item); //Buy Item 3
-								Types1_7_6_10.COMPRESSED_NBT_ITEM.write(buf, item);
 
 								boolean has3Items = packetWrapper.passthrough(Type.BOOLEAN);
-								Type.BOOLEAN.write(buf, has3Items);
 								if (has3Items) {
 									item = ItemRewriter.toClient(packetWrapper.read(Type.ITEM));
 									packetWrapper.write(Types1_7_6_10.COMPRESSED_NBT_ITEM, item); //Buy Item 2
-									Types1_7_6_10.COMPRESSED_NBT_ITEM.write(buf, item);
 								}
 
-								Type.BOOLEAN.write(buf, packetWrapper.passthrough(Type.BOOLEAN)); //Unavailable
+								packetWrapper.passthrough(Type.BOOLEAN); //Unavailable
 								packetWrapper.read(Type.INT); //Uses
 								packetWrapper.read(Type.INT); //Max Uses
 							}
-
-							packetWrapper.set(Type.SHORT, 0, (short) buf.readableBytes());
-							buf.release();
 						} else if (channel.equalsIgnoreCase("MC|Brand")) {
-							packetWrapper.write(Type.SHORT, packetWrapper.read(Type.VAR_INT).shortValue());
-						} else {
-							byte[] data = packetWrapper.read(Type.REMAINING_BYTES);
-							packetWrapper.write(Type.SHORT, (short) data.length);
-							packetWrapper.write(Type.REMAINING_BYTES, data);
+							packetWrapper.write(Type.REMAINING_BYTES, packetWrapper.read(Type.STRING).getBytes(Charsets.UTF_8));
+						}
+
+						packetWrapper.cancel();
+						packetWrapper.setId(-1);
+						ByteBuf newPacketBuf = Unpooled.buffer();
+						packetWrapper.writeToBuffer(newPacketBuf);
+						PacketWrapper newWrapper = new PacketWrapper(0x3F, newPacketBuf, packetWrapper.user());
+						newWrapper.passthrough(Type.STRING);
+						if (newPacketBuf.readableBytes() <= Short.MAX_VALUE) {
+							newWrapper.write(Type.SHORT, (short) newPacketBuf.readableBytes());
+							newWrapper.send(Protocol1_7_6_10TO1_8.class, true, true);
 						}
 					}
 				});
