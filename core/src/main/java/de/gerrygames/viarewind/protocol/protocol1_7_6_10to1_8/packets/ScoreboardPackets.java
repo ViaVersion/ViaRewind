@@ -216,12 +216,11 @@ public class ScoreboardPackets {
 						}
 						if (mode == 0 || mode == 3 || mode == 4) {
 							byte color = scoreboard.getTeamColor(team).get();
-							int size = packetWrapper.read(Type.VAR_INT);
+							String[] entries = packetWrapper.read(Type.STRING_ARRAY);
 							List<String> entryList = new ArrayList<>();
 
-							for (int i = 0; i < size; i++) {
-								String entry = packetWrapper.read(Type.STRING);
-								if (entry == null) continue;
+							for (int i = 0; i < entries.length; i++) {
+								String entry = entries[i];
 								String username = packetWrapper.user().get(ProtocolInfo.class).getUsername();
 
 								if (mode == 4) {
