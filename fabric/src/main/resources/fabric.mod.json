@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "viarewind",
+  "name": "ViaRewind",
+  "version": "${project.version}",
+  "license": "MIT",
+  "contact": {
+    "homepage": "https://github.com/ViaVersion/ViaRewind",
+    "issues": "https://github.com/ViaVersion/ViaRewind/issues",
+    "sources": "https://github.com/ViaVersion/ViaRewind"
+  },
+  "environment": "*",
+  "authors": [
+    "Gerrygames"
+  ],
+  "entrypoints": {
+    "viafabric:via_api_initialized": [
+      "de.gerrygames.viarewind.ViaFabricAddon"
+    ]
+  },
+  "requires": {
+    "fabricloader": ">=0.4.0",
+    "viafabric": "*"
+  },
+  "recommended": {
+    "viabackwards": "*"
+  }
+}
