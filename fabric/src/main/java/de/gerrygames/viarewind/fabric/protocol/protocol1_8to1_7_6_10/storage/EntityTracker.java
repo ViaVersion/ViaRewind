@@ -1,7 +1,7 @@
-package de.gerrygames.viarewind.protocol.protocol1_8to1_7_6_10.storage;
+package de.gerrygames.viarewind.fabric.protocol.protocol1_8to1_7_6_10.storage;
 
-import com.github.creeper123123321.viafabric.protocol.protocol1_8to1_7_6_10.Protocol1_8To1_7_6_10;
-import com.github.creeper123123321.viafabric.protocol.protocol1_8to1_7_6_10.metadata.MetadataRewriter;
+import de.gerrygames.viarewind.fabric.protocol.protocol1_8to1_7_6_10.Protocol1_8To1_7_6_10;
+import de.gerrygames.viarewind.fabric.protocol.protocol1_8to1_7_6_10.metadata.MetadataRewriter;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.data.StoredObject;
 import us.myles.ViaVersion.api.data.UserConnection;

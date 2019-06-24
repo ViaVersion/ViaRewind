@@ -1,4 +1,4 @@
-package de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_7_1_5;
+package de.gerrygames.viarewind.fabric.protocol.protocol1_7_6_10to1_7_1_5;
 
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.data.UserConnection;

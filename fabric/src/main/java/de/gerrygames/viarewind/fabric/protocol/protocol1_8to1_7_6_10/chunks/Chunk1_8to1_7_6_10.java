@@ -1,4 +1,4 @@
-package de.gerrygames.viarewind.protocol.protocol1_8to1_7_6_10.chunks;
+package de.gerrygames.viarewind.fabric.protocol.protocol1_8to1_7_6_10.chunks;
 
 import us.myles.ViaVersion.api.minecraft.chunks.NibbleArray;
 

@@ -1,4 +1,4 @@
-package de.gerrygames.viarewind.protocol.protocol1_8to1_7_6_10.storage;
+package de.gerrygames.viarewind.fabric.protocol.protocol1_8to1_7_6_10.storage;
 
 import us.myles.ViaVersion.api.data.StoredObject;
 import us.myles.ViaVersion.api.data.UserConnection;

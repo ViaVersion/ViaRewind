@@ -1,6 +1,6 @@
-package de.gerrygames.viarewind.protocol.protocol1_8to1_7_6_10.metadata;
+package de.gerrygames.viarewind.fabric.protocol.protocol1_8to1_7_6_10.metadata;
 
-import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.MetaType1_7_6_10;
+import de.gerrygames.viarewind.protocol.protocol1_8to1_7_6_10.metadata.MetaIndex1_8to1_7_6_10;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.entities.Entity1_10Types;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MetadataRewriter {
-
     public static void transform(Entity1_10Types.EntityType type, List<Metadata> list) {
         for (Metadata entry : new ArrayList<>(list)) {
             MetaIndex1_8to1_7_6_10 metaIndex = MetaIndex1_8to1_7_6_10.searchIndex(type, entry.getId());
@@ -29,45 +28,28 @@ public class MetadataRewriter {
                 entry.setId(metaIndex.getNewIndex());
                 switch (metaIndex.getNewType()) {
                     case Int:
-                        if (metaIndex.getOldType() == MetaType1_7_6_10.Byte) {
-                            entry.setValue(((Byte) value).intValue());
-                        }
-                        if (metaIndex.getOldType() == MetaType1_7_6_10.Short) {
-                            entry.setValue(((Short) value).intValue());
-                        }
-                        if (metaIndex.getOldType() == MetaType1_7_6_10.Int) {
-                            entry.setValue(value);
-                        }
+                        entry.setValue(((Number) value).intValue());
                         break;
                     case Byte:
-                        if (metaIndex.getOldType() == MetaType1_7_6_10.Int) {
-                            entry.setValue(((Integer) value).byteValue());
-                        }
-                        if (metaIndex.getOldType() == MetaType1_7_6_10.Byte) {
-                            entry.setValue(value);
-                        }
+                        byte byteValue = ((Number) value).byteValue();
+                        entry.setValue(byteValue);
                         if (metaIndex == MetaIndex1_8to1_7_6_10.HUMAN_SKIN_FLAGS) {
-                            byte flags = (byte) value;
-                            boolean cape = flags == 2;
-                            flags = (byte) (cape ? 127 : 125);
-                            entry.setValue(flags);
+                            boolean cape = byteValue == 2;
+                            byteValue = (byte) (cape ? 127 : 125);
+                            entry.setValue(byteValue);
                         }
-                        break;
-                    case Slot:
-                        entry.setValue(value);
-                        break;
-                    case Float:
-                        entry.setValue(value);
                         break;
                     case Short:
-                        entry.setValue(value);
+                        entry.setValue(((Number) value).shortValue());
                         break;
                     case String:
-                        entry.setValue(value);
+                        entry.setValue(value.toString());
                         break;
+                    case Float:
+                        entry.setValue(((Number) value).floatValue());
+                        break;
+                    case Slot:
                     case Position:
-                        entry.setValue(value);
-                        break;
                     case Rotation:
                         entry.setValue(value);
                         break;
