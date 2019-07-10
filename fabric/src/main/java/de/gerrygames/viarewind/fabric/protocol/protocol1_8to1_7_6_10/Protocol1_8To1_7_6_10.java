@@ -1310,16 +1310,41 @@ public class Protocol1_8To1_7_6_10 extends Protocol {
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper packetWrapper) throws Exception {
-                        Position pos = packetWrapper.read(Type.POSITION);  //Position
-                        xyzUBytePosWriter.write(packetWrapper, pos);
+                        int x;
+                        short y;
+                        int z;
+                        if (packetWrapper.isReadable(Type.POSITION, 0)) { // TODO remove this hack (https://github.com/ViaVersion/ViaVersion/pull/1379)
+                            Position pos = packetWrapper.read(Type.POSITION);  //Position
+                            x = pos.getX().intValue();
+                            y = pos.getY().shortValue();
+                            z = pos.getZ().intValue();
+                        } else {
+                            Long pos = packetWrapper.read(Type.LONG);  //Position
+                            x = (int) (pos >> 38);
+                            y = (short) (pos >> 26 & 4095L);
+                            z = (int) (pos << 38 >> 38);
+
+                        }
+                        packetWrapper.write(Type.INT, x);
+                        packetWrapper.write(Type.UNSIGNED_BYTE, y);
+                        packetWrapper.write(Type.INT, z);
                         byte direction = packetWrapper.passthrough(Type.BYTE);  //Direction
                         VoidType voidType = new VoidType();
                         if (packetWrapper.isReadable(voidType, 0)) packetWrapper.read(voidType);
                         Item item = packetWrapper.read(Type.ITEM);
                         packetWrapper.write(Types1_7_6_10.COMPRESSED_NBT_ITEM, item);
 
-                        if (isPlayerInsideBlock(pos.getX(), pos.getY(), pos.getZ(), direction) && !isPlaceable(item.getId()))
+                        if (isPlayerInsideBlock(x, y, z, direction) && !isPlaceable(item.getId()))
                             packetWrapper.cancel();
+
+                        for (int i = 0; i < 3; i++) {
+                            if (packetWrapper.isReadable(Type.BYTE, 0)) {
+                                packetWrapper.passthrough(Type.BYTE);
+                            } else {
+                                short cursor = packetWrapper.read(Type.UNSIGNED_BYTE);
+                                packetWrapper.write(Type.BYTE, (byte) cursor);
+                            }
+                        }
                     }
                 });
             }
