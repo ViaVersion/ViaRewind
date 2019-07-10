@@ -97,6 +97,12 @@
 
         <dependency>
             <groupId>de.gerrygames</groupId>
+            <artifactId>viarewind-fabric</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>de.gerrygames</groupId>
             <artifactId>viarewind-sponge</artifactId>
             <version>${project.parent.version}</version>
         </dependency>

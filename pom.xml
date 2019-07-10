@@ -13,6 +13,7 @@
         <module>core</module>
         <module>bukkit</module>
         <module>bungee</module>
+        <module>fabric</module>
         <module>sponge</module>
         <module>velocity</module>
         <module>all</module>
@@ -39,7 +40,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.16.18</version>
+            <version>1.18.8</version>
             <scope>provided</scope>
         </dependency>
 
