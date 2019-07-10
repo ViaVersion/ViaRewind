@@ -58,6 +58,18 @@ public class Protocol1_8To1_7_6_10 extends Protocol {
         packetWrapper.write(Type.UNSIGNED_BYTE, pos.getY().shortValue());
         packetWrapper.write(Type.INT, pos.getZ().intValue());
     };
+    private static ValueWriter<Position> xyzShortPosWriter = (packetWrapper, pos) -> {
+        packetWrapper.write(Type.INT, pos.getX().intValue());
+        packetWrapper.write(Type.SHORT, pos.getY().shortValue());
+        packetWrapper.write(Type.INT, pos.getZ().intValue());
+    };
+    private static ValueReader<Position> xyzShortPos = packetWrapper -> {
+        long x = packetWrapper.read(Type.INT);
+        long y = packetWrapper.read(Type.SHORT);
+        long z = packetWrapper.read(Type.INT);
+        return new Position(x, y, z);
+    };
+
     private static ArrayList<Integer> placeable = new ArrayList<>();
 
     static {
@@ -752,7 +764,7 @@ public class Protocol1_8To1_7_6_10 extends Protocol {
         this.registerOutgoing(State.PLAY, 0x24, 0x24, new PacketRemapper() {
             @Override
             public void registerMap() {
-                map(xyzUBytePos, new TypeRemapper<>(Type.POSITION));  //Position
+                map(xyzShortPos, new TypeRemapper<>(Type.POSITION));  //Position
                 map(Type.UNSIGNED_BYTE);
                 map(Type.UNSIGNED_BYTE);
                 map(Type.VAR_INT);
@@ -944,7 +956,7 @@ public class Protocol1_8To1_7_6_10 extends Protocol {
         this.registerOutgoing(State.PLAY, 0x33, 0x33, new PacketRemapper() {
             @Override
             public void registerMap() {
-                map(xyzUBytePos, new TypeRemapper<>(Type.POSITION));  //Position
+                map(xyzShortPos, new TypeRemapper<>(Type.POSITION));  //Position
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper packetWrapper) throws Exception {
@@ -1019,7 +1031,7 @@ public class Protocol1_8To1_7_6_10 extends Protocol {
         this.registerOutgoing(State.PLAY, 0x35, 0x35, new PacketRemapper() {
             @Override
             public void registerMap() {
-                map(xyzUBytePos, new TypeRemapper<>(Type.POSITION));  //Position
+                map(xyzShortPos, new TypeRemapper<>(Type.POSITION));  //Position
                 map(Type.UNSIGNED_BYTE);  //Action
                 map(Types1_7_6_10.COMPRESSED_NBT, Type.NBT);
             }
@@ -1437,7 +1449,7 @@ public class Protocol1_8To1_7_6_10 extends Protocol {
         this.registerIncoming(State.PLAY, 0x12, 0x12, new PacketRemapper() {
             @Override
             public void registerMap() {
-                map(new TypeRemapper<>(Type.POSITION), xyzUBytePosWriter);
+                map(new TypeRemapper<>(Type.POSITION), xyzShortPosWriter);
                 handler(new PacketHandler() {
                     @Override
                     public void handle(PacketWrapper packetWrapper) throws Exception {
