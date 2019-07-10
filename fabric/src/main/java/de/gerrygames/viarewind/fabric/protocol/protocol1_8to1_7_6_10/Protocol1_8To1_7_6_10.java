@@ -1276,10 +1276,11 @@ public class Protocol1_8To1_7_6_10 extends Protocol {
             @Override
             public void registerMap() {
                 map(Type.DOUBLE);  //X
-                map(Type.DOUBLE, new ValueTransformer<Double, Double>(Type.DOUBLE) {
+                handler(new PacketHandler() {
                     @Override
-                    public Double transform(PacketWrapper packetWrapper, Double feetY) throws Exception {
-                        return feetY + 1.62; //HeadY
+                    public void handle(PacketWrapper packetWrapper) throws Exception {
+                        double feetY = packetWrapper.passthrough(Type.DOUBLE);
+                        packetWrapper.write(Type.DOUBLE, feetY + 1.62);  //HeadY
                     }
                 });
                 map(Type.DOUBLE);  //Z
@@ -1292,10 +1293,11 @@ public class Protocol1_8To1_7_6_10 extends Protocol {
             @Override
             public void registerMap() {
                 map(Type.DOUBLE);  //X
-                map(Type.DOUBLE, new ValueTransformer<Double, Double>(Type.DOUBLE) {
+                handler(new PacketHandler() {
                     @Override
-                    public Double transform(PacketWrapper packetWrapper, Double feetY) throws Exception {
-                        return feetY + 1.62; //HeadY
+                    public void handle(PacketWrapper packetWrapper) throws Exception {
+                        double feetY = packetWrapper.passthrough(Type.DOUBLE);
+                        packetWrapper.write(Type.DOUBLE, feetY + 1.62);  //HeadY
                     }
                 });
                 map(Type.DOUBLE);  //Z
