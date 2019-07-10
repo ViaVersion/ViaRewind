@@ -4,6 +4,7 @@ import de.gerrygames.viarewind.protocol.protocol1_8to1_9.Protocol1_8TO1_9;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.metadata.MetadataRewriter;
 import de.gerrygames.viarewind.replacement.EntityReplacement;
 import us.myles.ViaVersion.api.PacketWrapper;
+import us.myles.ViaVersion.api.data.ExternalJoinGameListener;
 import us.myles.ViaVersion.api.data.StoredObject;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.entities.Entity1_10Types;
@@ -16,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class EntityTracker extends StoredObject {
+public class EntityTracker extends StoredObject implements ExternalJoinGameListener {
 	private final Map<Integer, ArrayList<Integer>> vehicleMap = new ConcurrentHashMap();
 	private final Map<Integer, Entity1_10Types.EntityType> clientEntityTypes = new ConcurrentHashMap();
 	private final Map<Integer, List<Metadata>> metadataBuffer = new ConcurrentHashMap();
@@ -123,5 +124,12 @@ public class EntityTracker extends StoredObject {
 
 			this.metadataBuffer.remove(entityId);
 		}
+	}
+
+	@Override
+	public void onExternalJoinGame(int playerEntityId) {
+		clientEntityTypes.remove(this.playerId);
+		this.playerId = playerEntityId;
+		clientEntityTypes.put(this.playerId, Entity1_10Types.EntityType.ENTITY_HUMAN);
 	}
 }

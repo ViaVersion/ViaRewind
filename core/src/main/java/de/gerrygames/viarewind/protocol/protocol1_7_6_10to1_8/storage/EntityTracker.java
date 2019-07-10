@@ -5,6 +5,7 @@ import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.metadata.MetadataR
 import de.gerrygames.viarewind.replacement.EntityReplacement;
 import de.gerrygames.viarewind.utils.PacketUtil;
 import us.myles.ViaVersion.api.PacketWrapper;
+import us.myles.ViaVersion.api.data.ExternalJoinGameListener;
 import us.myles.ViaVersion.api.data.StoredObject;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.entities.Entity1_10Types;
@@ -12,7 +13,6 @@ import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.version.Types1_8;
-import us.myles.ViaVersion.exception.CancelException;
 
 import java.util.HashMap;
 import java.util.List;
@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class EntityTracker extends StoredObject {
+public class EntityTracker extends StoredObject implements ExternalJoinGameListener {
 	private final Map<Integer, Entity1_10Types.EntityType> clientEntityTypes = new ConcurrentHashMap();
 	private final Map<Integer, List<Metadata>> metadataBuffer = new ConcurrentHashMap();
 	private final Map<Integer, Integer> vehicles = new ConcurrentHashMap<>();
@@ -220,5 +220,15 @@ public class EntityTracker extends StoredObject {
 
 	public void setDimension(int dimension) {
 		this.dimension = dimension;
+	}
+
+	@Override
+	public void onExternalJoinGame(int playerEntityId) {
+		if (this.spectating == this.playerId) {
+			this.spectating = playerEntityId;
+		}
+		clientEntityTypes.remove(this.playerId);
+		this.playerId = playerEntityId;
+		clientEntityTypes.put(this.playerId, Entity1_10Types.EntityType.ENTITY_HUMAN);
 	}
 }

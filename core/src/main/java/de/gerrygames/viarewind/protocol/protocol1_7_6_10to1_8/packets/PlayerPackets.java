@@ -156,6 +156,7 @@ public class PlayerPackets {
 						if (tracker.getDimension() != packetWrapper.get(Type.INT, 0)) {
 							tracker.setDimension(packetWrapper.get(Type.INT, 0));
 							tracker.clearEntities();
+							tracker.getClientEntityTypes().put(tracker.getPlayerId(), Entity1_10Types.EntityType.ENTITY_HUMAN);
 						}
 					}
 				});

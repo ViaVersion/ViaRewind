@@ -36,8 +36,8 @@ public class BossBarStorage extends StoredObject {
 
 	public void changeWorld() {
 		bossBars.values().forEach(bossBar -> {
-			bossBar.show();
 			bossBar.hide();
+			bossBar.show();
 		});
 	}
 

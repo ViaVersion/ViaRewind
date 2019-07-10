@@ -123,7 +123,7 @@ public class ScoreboardPackets {
 			}
 		});
 
-		// Display Scoreboard
+		//Display Scoreboard
 		protocol.registerOutgoing(State.PLAY, 0x3D, 0x3D, new PacketRemapper() {
 			@Override
 			public void registerMap() {
@@ -195,7 +195,9 @@ public class ScoreboardPackets {
 
 						if (mode == 0) {
 							scoreboard.addTeam(team);
-						} else if (mode == 1) scoreboard.removeTeam(team);
+						} else if (mode == 1) {
+							scoreboard.removeTeam(team);
+						}
 
 						if (mode == 0 || mode == 2) {
 							packetWrapper.passthrough(Type.STRING); // Display name
