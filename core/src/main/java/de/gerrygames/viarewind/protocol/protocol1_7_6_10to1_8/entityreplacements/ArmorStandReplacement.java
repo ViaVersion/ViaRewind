@@ -33,6 +33,7 @@ public class ArmorStandReplacement implements EntityReplacement {
 	private float yaw, pitch;
 	private float headYaw;
 	private boolean small = false;
+	private boolean marker = false;
 	private static int ENTITY_ID = Integer.MAX_VALUE - 16000;
 
 	private enum State {
@@ -100,8 +101,9 @@ public class ArmorStandReplacement implements EntityReplacement {
 				nameTagVisible = (byte) metadata.getId()!=0;
 			}
 		}
-		invisible = (flags & 0x20) == 0x20;
-		small = (armorStandFlags & 0x01) == 0x01;
+		invisible = (flags & 0x20) != 0;
+		small = (armorStandFlags & 0x01) != 0;
+		marker = (armorStandFlags & 0x10) != 0;
 
 		State prevState = currentState;
 		if (invisible && name!=null) {
@@ -146,7 +148,7 @@ public class ArmorStandReplacement implements EntityReplacement {
 			PacketWrapper teleportSkull = new PacketWrapper(0x18, null, user);
 			teleportSkull.write(Type.INT, entityIds[0]);
 			teleportSkull.write(Type.INT, (int) (locX * 32.0));
-			teleportSkull.write(Type.INT, (int) ((locY + (small ? 56 : 57)) * 32.0));  //Don't ask me where this offset is coming from
+			teleportSkull.write(Type.INT, (int) ((locY + (marker ? 54.85 : small ? 56 : 57)) * 32.0));  //Don't ask me where this offset is coming from
 			teleportSkull.write(Type.INT, (int) (locZ * 32.0));
 			teleportSkull.write(Type.BYTE, (byte) 0);
 			teleportSkull.write(Type.BYTE, (byte) 0);
