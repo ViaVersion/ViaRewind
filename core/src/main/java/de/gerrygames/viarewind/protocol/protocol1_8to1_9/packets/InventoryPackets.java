@@ -195,9 +195,6 @@ public class InventoryPackets {
 			}
 		});
 
-		//Confirm Transaction
-		protocol.registerIncoming(State.PLAY, 0x05, 0x0F);
-
 		//Creative Inventory Action
 		protocol.registerIncoming(State.PLAY, 0x18, 0x10, new PacketRemapper() {
 			@Override
