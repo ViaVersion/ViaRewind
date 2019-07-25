@@ -205,7 +205,7 @@ public class PlayerPackets {
 						//The client will send a confirm transaction response just before it will send a position packet with its new position
 						//Then we will send the confirm packet
 						PacketWrapper confirmHack = packetWrapper.create(0x32);
-						confirmHack.write(Type.BYTE, (byte) 0);
+						confirmHack.write(Type.UNSIGNED_BYTE, (short) 0);
 						confirmHack.write(Type.SHORT, (short) -1337);
 						confirmHack.write(Type.BOOLEAN, false);
 						PacketUtil.sendPacket(confirmHack, Protocol1_8TO1_9.class, true, true);
@@ -252,7 +252,7 @@ public class PlayerPackets {
 						//The client sometimes sends an old position packet, because the teleport packet is posted to the main thread after position updating
 						//After we received the response for this packet we know that the last position must be the valid new position
 						PacketWrapper confirmHack2 = packetWrapper.create(0x32);
-						confirmHack2.write(Type.BYTE, (byte) 0);
+						confirmHack2.write(Type.UNSIGNED_BYTE, (short) 0);
 						confirmHack2.write(Type.SHORT, (short) -1338);
 						confirmHack2.write(Type.BOOLEAN, false);
 						PacketUtil.sendPacket(confirmHack2, Protocol1_8TO1_9.class, true, true);
@@ -345,13 +345,13 @@ public class PlayerPackets {
 		protocol.registerIncoming(State.PLAY, 0x05, 0x0F, new PacketRemapper() {
 			@Override
 			public void registerMap() {
-				map(Type.UNSIGNED_BYTE);
+				map(Type.BYTE);
 				map(Type.SHORT);
 				map(Type.BOOLEAN);
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
-						short windowId = packetWrapper.get(Type.UNSIGNED_BYTE, 0);
+						short windowId = packetWrapper.get(Type.BYTE, 0);
 						short actionNumber = packetWrapper.get(Type.SHORT, 0);
 
 						if (windowId == 0 && (actionNumber == -1337 || actionNumber == -1338)) {
