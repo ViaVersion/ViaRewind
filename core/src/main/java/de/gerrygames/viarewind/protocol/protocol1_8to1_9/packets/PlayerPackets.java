@@ -103,7 +103,13 @@ public class PlayerPackets {
 						if (channel.equalsIgnoreCase("MC|TrList")) {
 							packetWrapper.passthrough(Type.INT);  //Window Id
 
-							int size = packetWrapper.passthrough(Type.BYTE);  //Size
+							int size;
+							if (packetWrapper.isReadable(Type.BYTE, 0)) {
+								size = packetWrapper.passthrough(Type.BYTE);
+							} else {
+								size = packetWrapper.passthrough(Type.UNSIGNED_BYTE);
+							}
+
 							for (int i = 0; i < size; i++) {
 								packetWrapper.write(Type.ITEM, ItemRewriter.toClient(packetWrapper.read(Type.ITEM))); //Buy Item 1
 								packetWrapper.write(Type.ITEM, ItemRewriter.toClient(packetWrapper.read(Type.ITEM))); //Buy Item 3
