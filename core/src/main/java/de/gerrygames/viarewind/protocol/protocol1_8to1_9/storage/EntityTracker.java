@@ -8,6 +8,7 @@ import us.myles.ViaVersion.api.data.ExternalJoinGameListener;
 import us.myles.ViaVersion.api.data.StoredObject;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.entities.Entity1_10Types;
+import us.myles.ViaVersion.api.minecraft.Vector;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.version.Types1_8;
@@ -18,10 +19,11 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class EntityTracker extends StoredObject implements ExternalJoinGameListener {
-	private final Map<Integer, ArrayList<Integer>> vehicleMap = new ConcurrentHashMap();
+	private final Map<Integer, List<Integer>> vehicleMap = new ConcurrentHashMap();
 	private final Map<Integer, Entity1_10Types.EntityType> clientEntityTypes = new ConcurrentHashMap();
 	private final Map<Integer, List<Metadata>> metadataBuffer = new ConcurrentHashMap();
 	private final Map<Integer, EntityReplacement> entityReplacements = new ConcurrentHashMap<>();
+	private final Map<Integer, Vector> entityOffsets = new ConcurrentHashMap<>();
 	private int playerId;
 	private int playerGamemode = 0;
 
@@ -50,16 +52,55 @@ public class EntityTracker extends StoredObject implements ExternalJoinGameListe
 		vehicleMap.forEach((vehicle, passengers) -> passengers.remove((Integer)entityId));
 		vehicleMap.entrySet().removeIf(entry -> entry.getValue().isEmpty());
 		clientEntityTypes.remove(entityId);
+		entityOffsets.remove(entityId);
 		if (entityReplacements.containsKey(entityId)) {
 			entityReplacements.remove(entityId).despawn();
 		}
 	}
 
-	public ArrayList<Integer> getPassengers(int entityId) {
+	public void resetEntityOffset(int entityId) {
+		entityOffsets.remove(entityId);
+	}
+
+	public Vector getEntityOffset(int entityId) {
+		return entityOffsets.computeIfAbsent(entityId, key -> new Vector(0, 0, 0));
+	}
+
+	public void addToEntityOffset(int entityId, short relX, short relY, short relZ) {
+		entityOffsets.compute(entityId, (key, offset) -> {
+			if (offset == null) {
+				return new Vector(relX, relY, relZ);
+			} else {
+				offset.setBlockX(offset.getBlockX() + relX);
+				offset.setBlockY(offset.getBlockY() + relY);
+				offset.setBlockZ(offset.getBlockZ() + relZ);
+				return offset;
+			}
+		});
+	}
+
+	public void setEntityOffset(int entityId, short relX, short relY, short relZ) {
+		entityOffsets.compute(entityId, (key, offset) -> {
+			if (offset == null) {
+				return new Vector(relX, relY, relZ);
+			} else {
+				offset.setBlockX(relX);
+				offset.setBlockY(relY);
+				offset.setBlockZ(relZ);
+				return offset;
+			}
+		});
+	}
+
+	public void setEntityOffset(int entityId, Vector offset) {
+		entityOffsets.put(entityId, offset);
+	}
+
+	public List<Integer> getPassengers(int entityId) {
 		return vehicleMap.getOrDefault(entityId, new ArrayList<>());
 	}
 
-	public void setPassengers(int entityId, ArrayList<Integer> passengers) {
+	public void setPassengers(int entityId, List<Integer> passengers) {
 		vehicleMap.put(entityId, passengers);
 	}
 
@@ -88,14 +129,14 @@ public class EntityTracker extends StoredObject implements ExternalJoinGameListe
 	}
 
 	public boolean isInsideVehicle(int entityId) {
-		for (ArrayList<Integer> vehicle : vehicleMap.values()) {
+		for (List<Integer> vehicle : vehicleMap.values()) {
 			if (vehicle.contains(entityId)) return true;
 		}
 		return false;
 	}
 
 	public int getVehicle(int passenger) {
-		for (Map.Entry<Integer, ArrayList<Integer>> vehicle : vehicleMap.entrySet()) {
+		for (Map.Entry<Integer, List<Integer>> vehicle : vehicleMap.entrySet()) {
 			if (vehicle.getValue().contains(passenger)) return vehicle.getKey();
 		}
 		return -1;

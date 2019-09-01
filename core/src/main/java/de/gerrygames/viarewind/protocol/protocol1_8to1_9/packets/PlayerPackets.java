@@ -10,7 +10,6 @@ import de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage.PlayerPosition;
 import de.gerrygames.viarewind.utils.ChatUtil;
 import de.gerrygames.viarewind.utils.PacketUtil;
 import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.api.entities.Entity1_10Types;
 import us.myles.ViaVersion.api.minecraft.Position;
 import us.myles.ViaVersion.api.minecraft.item.Item;
@@ -29,6 +28,7 @@ import us.myles.viaversion.libs.opennbt.tag.builtin.ListTag;
 import us.myles.viaversion.libs.opennbt.tag.builtin.StringTag;
 
 import java.util.ArrayList;
+import java.util.TimerTask;
 import java.util.UUID;
 
 public class PlayerPackets {
@@ -615,19 +615,22 @@ public class PlayerPackets {
 						packetWrapper.cancel();
 						final PacketWrapper delayedPacket = new PacketWrapper(0x1A, null, packetWrapper.user());
 						delayedPacket.write(Type.VAR_INT, 0);  //Main Hand
-						//delay packet in order to deal damage to entites
+						//delay packet in order to deal damage to entities
 						//the cooldown value gets reset by this packet
 						//1.8 sends it before the use entity packet
 						//1.9 afterwards
-						Via.getPlatform().runSync(() -> {
-							PacketUtil.sendToServer(delayedPacket, Protocol1_8TO1_9.class);
-						});
+						Protocol1_8TO1_9.TIMER.schedule(new TimerTask() {
+							@Override
+							public void run() {
+								PacketUtil.sendToServer(delayedPacket, Protocol1_8TO1_9.class);
+							}
+						}, 5);
 					}
 				});
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
-						packetWrapper.user().get(BlockPlaceDestroyTracker.class).updateMinig();
+						packetWrapper.user().get(BlockPlaceDestroyTracker.class).updateMining();
 						packetWrapper.user().get(Cooldown.class).hit();
 					}
 				});
