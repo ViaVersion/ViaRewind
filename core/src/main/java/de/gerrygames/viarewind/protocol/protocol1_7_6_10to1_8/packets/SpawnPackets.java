@@ -4,10 +4,13 @@ import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10TO
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.entityreplacements.ArmorStandReplacement;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.entityreplacements.EndermiteReplacement;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.entityreplacements.GuardianReplacement;
+import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.items.ReplacementRegistry1_7_6_10to1_8;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.metadata.MetadataRewriter;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage.EntityTracker;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage.GameProfileStorage;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
+import de.gerrygames.viarewind.protocol.protocol1_8to1_9.items.ReplacementRegistry1_8to1_9;
+import de.gerrygames.viarewind.storage.BlockState;
 import de.gerrygames.viarewind.utils.PacketUtil;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.entities.Entity1_10Types;
@@ -182,7 +185,19 @@ public class SpawnPackets {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						if (packetWrapper.isCancelled()) return;
+						final int typeId = packetWrapper.get(Type.BYTE, 0);
 						int data = packetWrapper.get(Type.INT, 3);
+
+						final Entity1_10Types.EntityType type = Entity1_10Types.getTypeFromId(typeId, true);
+
+						if(type != null && type.isOrHasParent(Entity1_10Types.EntityType.FALLING_BLOCK)){
+							int objType = data & 4095;
+							int objData = data >> 12 & 15;
+							BlockState state = new BlockState(objType, objData);
+							state = ReplacementRegistry1_7_6_10to1_8.replace(state);
+							packetWrapper.set(Type.INT, 3, state.getId() | state.getData() << 12);
+						}
+
 						if (data > 0) {
 							packetWrapper.passthrough(Type.SHORT);
 							packetWrapper.passthrough(Type.SHORT);
