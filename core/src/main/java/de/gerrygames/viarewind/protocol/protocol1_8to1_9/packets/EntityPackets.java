@@ -7,11 +7,13 @@ import de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage.Cooldown;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage.EntityTracker;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage.Levitation;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage.PlayerPosition;
+import de.gerrygames.viarewind.protocol.protocol1_8to1_9.util.RelativeMoveUtil;
 import de.gerrygames.viarewind.replacement.EntityReplacement;
 import de.gerrygames.viarewind.utils.PacketUtil;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.entities.Entity1_10Types;
+import us.myles.ViaVersion.api.minecraft.Vector;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
 import us.myles.ViaVersion.api.protocol.Protocol;
 import us.myles.ViaVersion.api.remapper.PacketHandler;
@@ -61,10 +63,9 @@ public class EntityPackets {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						int entityId = packetWrapper.get(Type.VAR_INT, 0);
-						//devide into two packets because Short.MAX_VALUE / 128 = 2 * Byte.MAX_VALUE
-						short relX = packetWrapper.read(Type.SHORT);
-						short relY = packetWrapper.read(Type.SHORT);
-						short relZ = packetWrapper.read(Type.SHORT);
+						int relX = packetWrapper.read(Type.SHORT);
+						int relY = packetWrapper.read(Type.SHORT);
+						int relZ = packetWrapper.read(Type.SHORT);
 
 						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
 						EntityReplacement replacement = tracker.getEntityReplacement(entityId);
@@ -74,27 +75,24 @@ public class EntityPackets {
 							return;
 						}
 
-						byte relX1 = (byte) (relX / 256);
-						byte relX2 = (byte) ((relX - relX1 * 128) / 128);
-						byte relY1 = (byte) (relY / 256);
-						byte relY2 = (byte) ((relY - relY1 * 128) / 128);
-						byte relZ1 = (byte) (relZ / 256);
-						byte relZ2 = (byte) ((relZ - relZ1 * 128) / 128);
+						Vector[] moves = RelativeMoveUtil.calculateRelativeMoves(packetWrapper.user(), entityId, relX, relY, relZ);
 
-						packetWrapper.write(Type.BYTE, relX1);
-						packetWrapper.write(Type.BYTE, relY1);
-						packetWrapper.write(Type.BYTE, relZ1);
+						packetWrapper.write(Type.BYTE, (byte) moves[0].getBlockX());
+						packetWrapper.write(Type.BYTE, (byte) moves[0].getBlockY());
+						packetWrapper.write(Type.BYTE, (byte) moves[0].getBlockZ());
 
 						boolean onGround = packetWrapper.passthrough(Type.BOOLEAN);
 
-						PacketWrapper secondPacket = new PacketWrapper(0x15, null, packetWrapper.user());
-						secondPacket.write(Type.VAR_INT, packetWrapper.get(Type.VAR_INT, 0));
-						secondPacket.write(Type.BYTE, relX2);
-						secondPacket.write(Type.BYTE, relY2);
-						secondPacket.write(Type.BYTE, relZ2);
-						secondPacket.write(Type.BOOLEAN, onGround);
+						if (moves.length > 1) {
+							PacketWrapper secondPacket = new PacketWrapper(0x15, null, packetWrapper.user());
+							secondPacket.write(Type.VAR_INT, packetWrapper.get(Type.VAR_INT, 0));
+							secondPacket.write(Type.BYTE, (byte) moves[1].getBlockX());
+							secondPacket.write(Type.BYTE, (byte) moves[1].getBlockY());
+							secondPacket.write(Type.BYTE, (byte) moves[1].getBlockZ());
+							secondPacket.write(Type.BOOLEAN, onGround);
 
-						PacketUtil.sendPacket(secondPacket, Protocol1_8TO1_9.class);
+							PacketUtil.sendPacket(secondPacket, Protocol1_8TO1_9.class);
+						}
 					}
 				});
 			}
@@ -109,10 +107,9 @@ public class EntityPackets {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						int entityId = packetWrapper.get(Type.VAR_INT, 0);
-						//devide into two packets because Short.MAX_VALUE / 128 = 2 * Byte.MAX_VALUE
-						short relX = packetWrapper.read(Type.SHORT);
-						short relY = packetWrapper.read(Type.SHORT);
-						short relZ = packetWrapper.read(Type.SHORT);
+						int relX = packetWrapper.read(Type.SHORT);
+						int relY = packetWrapper.read(Type.SHORT);
+						int relZ = packetWrapper.read(Type.SHORT);
 
 						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
 						EntityReplacement replacement = tracker.getEntityReplacement(entityId);
@@ -123,16 +120,11 @@ public class EntityPackets {
 							return;
 						}
 
-						byte relX1 = (byte) (relX / 256);
-						byte relX2 = (byte) ((relX - relX1 * 128) / 128);
-						byte relY1 = (byte) (relY / 256);
-						byte relY2 = (byte) ((relY - relY1 * 128) / 128);
-						byte relZ1 = (byte) (relZ / 256);
-						byte relZ2 = (byte) ((relZ - relZ1 * 128) / 128);
+						Vector[] moves = RelativeMoveUtil.calculateRelativeMoves(packetWrapper.user(), entityId, relX, relY, relZ);
 
-						packetWrapper.write(Type.BYTE, relX1);
-						packetWrapper.write(Type.BYTE, relY1);
-						packetWrapper.write(Type.BYTE, relZ1);
+						packetWrapper.write(Type.BYTE, (byte) moves[0].getBlockX());
+						packetWrapper.write(Type.BYTE, (byte) moves[0].getBlockY());
+						packetWrapper.write(Type.BYTE, (byte) moves[0].getBlockZ());
 
 						byte yaw = packetWrapper.passthrough(Type.BYTE);
 						byte pitch = packetWrapper.passthrough(Type.BYTE);
@@ -144,16 +136,18 @@ public class EntityPackets {
 							packetWrapper.set(Type.BYTE, 3, yaw);
 						}
 
-						PacketWrapper secondPacket = new PacketWrapper(0x17, null, packetWrapper.user());
-						secondPacket.write(Type.VAR_INT, packetWrapper.get(Type.VAR_INT, 0));
-						secondPacket.write(Type.BYTE, relX2);
-						secondPacket.write(Type.BYTE, relY2);
-						secondPacket.write(Type.BYTE, relZ2);
-						secondPacket.write(Type.BYTE, yaw);
-						secondPacket.write(Type.BYTE, pitch);
-						secondPacket.write(Type.BOOLEAN, onGround);
+						if (moves.length > 1) {
+							PacketWrapper secondPacket = new PacketWrapper(0x17, null, packetWrapper.user());
+							secondPacket.write(Type.VAR_INT, packetWrapper.get(Type.VAR_INT, 0));
+							secondPacket.write(Type.BYTE, (byte) moves[1].getBlockX());
+							secondPacket.write(Type.BYTE, (byte) moves[1].getBlockY());
+							secondPacket.write(Type.BYTE, (byte) moves[1].getBlockZ());
+							secondPacket.write(Type.BYTE, yaw);
+							secondPacket.write(Type.BYTE, pitch);
+							secondPacket.write(Type.BOOLEAN, onGround);
 
-						PacketUtil.sendPacket(secondPacket, Protocol1_8TO1_9.class);
+							PacketUtil.sendPacket(secondPacket, Protocol1_8TO1_9.class);
+						}
 					}
 				});
 			}
@@ -393,7 +387,7 @@ public class EntityPackets {
 						int count = packetWrapper.read(Type.VAR_INT);
 						ArrayList<Integer> passengers = new ArrayList<>();
 						for (int i = 0; i < count; i++) passengers.add(packetWrapper.read(Type.VAR_INT));
-						ArrayList<Integer> oldPassengers = entityTracker.getPassengers(vehicle);
+						List<Integer> oldPassengers = entityTracker.getPassengers(vehicle);
 						entityTracker.setPassengers(vehicle, passengers);
 						if (!oldPassengers.isEmpty()) {
 							for (Integer passenger : oldPassengers) {
@@ -445,6 +439,13 @@ public class EntityPackets {
 							y += 10;
 							packetWrapper.set(Type.INT, 1, y);
 						}
+					}
+				});
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						int entityId = packetWrapper.get(Type.VAR_INT, 0);
+						packetWrapper.user().get(EntityTracker.class).resetEntityOffset(entityId);
 					}
 				});
 				handler(new PacketHandler() {

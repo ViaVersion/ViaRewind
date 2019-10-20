@@ -5,7 +5,7 @@ import us.myles.ViaVersion.api.data.UserConnection;
 
 public class BlockPlaceDestroyTracker extends StoredObject {
 	private long blockPlaced, lastMining;
-	boolean mining;
+	private boolean mining;
 
 	public BlockPlaceDestroyTracker(UserConnection user) {
 		super(user);
@@ -33,7 +33,7 @@ public class BlockPlaceDestroyTracker extends StoredObject {
 		return lastMining;
 	}
 
-	public void updateMinig() {
+	public void updateMining() {
 		if (this.isMining()) {
 			lastMining = System.currentTimeMillis();
 		}

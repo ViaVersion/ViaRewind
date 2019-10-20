@@ -156,6 +156,7 @@ public class PlayerPackets {
 						if (tracker.getDimension() != packetWrapper.get(Type.INT, 0)) {
 							tracker.setDimension(packetWrapper.get(Type.INT, 0));
 							tracker.clearEntities();
+							tracker.getClientEntityTypes().put(tracker.getPlayerId(), Entity1_10Types.EntityType.ENTITY_HUMAN);
 						}
 					}
 				});
@@ -456,7 +457,12 @@ public class PlayerPackets {
 						if (channel.equalsIgnoreCase("MC|TrList")) {
 							packetWrapper.passthrough(Type.INT);  //Window Id
 
-							int size = packetWrapper.passthrough(Type.BYTE);  //Size
+							int size;
+							if (packetWrapper.isReadable(Type.BYTE, 0)) {
+								size = packetWrapper.passthrough(Type.BYTE);
+							} else {
+								size = packetWrapper.passthrough(Type.UNSIGNED_BYTE);
+							}
 
 							for (int i = 0; i < size; i++) {
 								Item item = ItemRewriter.toClient(packetWrapper.read(Type.ITEM));

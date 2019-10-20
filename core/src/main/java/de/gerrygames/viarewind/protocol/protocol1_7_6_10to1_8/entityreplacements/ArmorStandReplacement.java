@@ -33,6 +33,7 @@ public class ArmorStandReplacement implements EntityReplacement {
 	private float yaw, pitch;
 	private float headYaw;
 	private boolean small = false;
+	private boolean marker = false;
 	private static int ENTITY_ID = Integer.MAX_VALUE - 16000;
 
 	private enum State {
@@ -45,7 +46,7 @@ public class ArmorStandReplacement implements EntityReplacement {
 	}
 
 	public void setLocation(double x, double y, double z) {
-		if (x!=this.locX || y!=this.locY || z!=this.locZ) {
+		if (x != this.locX || y != this.locY || z != this.locZ) {
 			this.locX = x;
 			this.locY = y;
 			this.locZ = z;
@@ -54,7 +55,7 @@ public class ArmorStandReplacement implements EntityReplacement {
 	}
 
 	public void relMove(double x, double y, double z) {
-		if (x==0.0 && y==0.0 && z==0.0) return;
+		if (x == 0.0 && y == 0.0 && z == 0.0) return;
 		this.locX += x;
 		this.locY += y;
 		this.locZ += z;
@@ -62,7 +63,7 @@ public class ArmorStandReplacement implements EntityReplacement {
 	}
 
 	public void setYawPitch(float yaw, float pitch) {
-		if (this.yaw!=yaw && this.pitch!=pitch || this.headYaw!=yaw) {
+		if (this.yaw != yaw && this.pitch != pitch || this.headYaw != yaw) {
 			this.yaw = yaw;
 			this.headYaw = yaw;
 			this.pitch = pitch;
@@ -71,7 +72,7 @@ public class ArmorStandReplacement implements EntityReplacement {
 	}
 
 	public void setHeadYaw(float yaw) {
-		if (this.headYaw!=yaw) {
+		if (this.headYaw != yaw) {
 			this.headYaw = yaw;
 			updateLocation();
 		}
@@ -79,7 +80,7 @@ public class ArmorStandReplacement implements EntityReplacement {
 
 	public void updateMetadata(List<Metadata> metadataList) {
 		for (Metadata metadata : metadataList) {
-			datawatcher.removeIf(m -> m.getId()==metadata.getId());
+			datawatcher.removeIf(m -> m.getId() == metadata.getId());
 			datawatcher.add(metadata);
 		}
 		updateState();
@@ -89,28 +90,29 @@ public class ArmorStandReplacement implements EntityReplacement {
 		byte flags = 0;
 		byte armorStandFlags = 0;
 		for (Metadata metadata : datawatcher) {
-			if (metadata.getId()==0 && metadata.getMetaType()==MetaType1_8.Byte) {
+			if (metadata.getId() == 0 && metadata.getMetaType() == MetaType1_8.Byte) {
 				flags = (byte) metadata.getValue();
-			} else if (metadata.getId()==2 && metadata.getMetaType()==MetaType1_8.String) {
+			} else if (metadata.getId() == 2 && metadata.getMetaType() == MetaType1_8.String) {
 				name = (String) metadata.getValue();
-				if (name!=null && name.equals("")) name = null;
-			} else if (metadata.getId()==10 && metadata.getMetaType()==MetaType1_8.Byte) {
+				if (name != null && name.equals("")) name = null;
+			} else if (metadata.getId() == 10 && metadata.getMetaType() == MetaType1_8.Byte) {
 				armorStandFlags = (byte) metadata.getValue();
-			} else if (metadata.getId()==3 && metadata.getMetaType()==MetaType1_8.Byte) {
-				nameTagVisible = (byte) metadata.getId()!=0;
+			} else if (metadata.getId() == 3 && metadata.getMetaType() == MetaType1_8.Byte) {
+				nameTagVisible = (byte) metadata.getId() != 0;
 			}
 		}
-		invisible = (flags & 0x20) == 0x20;
-		small = (armorStandFlags & 0x01) == 0x01;
+		invisible = (flags & 0x20) != 0;
+		small = (armorStandFlags & 0x01) != 0;
+		marker = (armorStandFlags & 0x10) != 0;
 
 		State prevState = currentState;
-		if (invisible && name!=null) {
+		if (invisible && name != null) {
 			currentState = State.HOLOGRAM;
 		} else {
 			currentState = State.ZOMBIE;
 		}
 
-		if (currentState!=prevState) {
+		if (currentState != prevState) {
 			despawn();
 			spawn();
 		} else {
@@ -120,24 +122,24 @@ public class ArmorStandReplacement implements EntityReplacement {
 	}
 
 	public void updateLocation() {
-		if (entityIds==null) return;
+		if (entityIds == null) return;
 
-		if (currentState==State.ZOMBIE) {
+		if (currentState == State.ZOMBIE) {
 			PacketWrapper teleport = new PacketWrapper(0x18, null, user);
 			teleport.write(Type.INT, entityId);
 			teleport.write(Type.INT, (int) (locX * 32.0));
 			teleport.write(Type.INT, (int) (locY * 32.0));
 			teleport.write(Type.INT, (int) (locZ * 32.0));
-			teleport.write(Type.BYTE, (byte)((yaw / 360f) * 256));
-			teleport.write(Type.BYTE, (byte)((pitch / 360f) * 256));
+			teleport.write(Type.BYTE, (byte) ((yaw / 360f) * 256));
+			teleport.write(Type.BYTE, (byte) ((pitch / 360f) * 256));
 
 			PacketWrapper head = new PacketWrapper(0x19, null, user);
 			head.write(Type.INT, entityId);
-			head.write(Type.BYTE, (byte)((headYaw / 360f) * 256));
+			head.write(Type.BYTE, (byte) ((headYaw / 360f) * 256));
 
 			PacketUtil.sendPacket(teleport, Protocol1_7_6_10TO1_8.class, true, true);
 			PacketUtil.sendPacket(head, Protocol1_7_6_10TO1_8.class, true, true);
-		} else if (currentState==State.HOLOGRAM) {
+		} else if (currentState == State.HOLOGRAM) {
 			PacketWrapper detach = new PacketWrapper(0x1B, null, user);
 			detach.write(Type.INT, entityIds[1]);
 			detach.write(Type.INT, -1);
@@ -146,7 +148,7 @@ public class ArmorStandReplacement implements EntityReplacement {
 			PacketWrapper teleportSkull = new PacketWrapper(0x18, null, user);
 			teleportSkull.write(Type.INT, entityIds[0]);
 			teleportSkull.write(Type.INT, (int) (locX * 32.0));
-			teleportSkull.write(Type.INT, (int) ((locY + (small ? 56 : 57)) * 32.0));  //Don't ask me where this offset is coming from
+			teleportSkull.write(Type.INT, (int) ((locY + (marker ? 54.85 : small ? 56 : 57)) * 32.0));  //Don't ask me where this offset is coming from
 			teleportSkull.write(Type.INT, (int) (locZ * 32.0));
 			teleportSkull.write(Type.BYTE, (byte) 0);
 			teleportSkull.write(Type.BYTE, (byte) 0);
@@ -172,23 +174,23 @@ public class ArmorStandReplacement implements EntityReplacement {
 	}
 
 	public void updateMetadata() {
-		if (entityIds==null) return;
+		if (entityIds == null) return;
 
 		PacketWrapper metadataPacket = new PacketWrapper(0x1C, null, user);
 
-		if (currentState==State.ZOMBIE) {
+		if (currentState == State.ZOMBIE) {
 			metadataPacket.write(Type.INT, entityIds[0]);
 
 			List<Metadata> metadataList = new ArrayList<>();
 			for (Metadata metadata : datawatcher) {
-				if (metadata.getId()<0 || metadata.getId()>9) continue;
+				if (metadata.getId() < 0 || metadata.getId() > 9) continue;
 				metadataList.add(new Metadata(metadata.getId(), metadata.getMetaType(), metadata.getValue()));
 			}
-			if (small) metadataList.add(new Metadata(12, MetaType1_8.Byte, (byte)1));
+			if (small) metadataList.add(new Metadata(12, MetaType1_8.Byte, (byte) 1));
 			MetadataRewriter.transform(Entity1_10Types.EntityType.ZOMBIE, metadataList);
 
 			metadataPacket.write(Types1_7_6_10.METADATA_LIST, metadataList);
-		} else if (currentState==State.HOLOGRAM) {
+		} else if (currentState == State.HOLOGRAM) {
 			metadataPacket.write(Type.INT, entityIds[1]);
 
 			List<Metadata> metadataList = new ArrayList<>();
@@ -205,9 +207,9 @@ public class ArmorStandReplacement implements EntityReplacement {
 	}
 
 	public void spawn() {
-		if (entityIds!=null) despawn();
+		if (entityIds != null) despawn();
 
-		if (currentState==State.ZOMBIE) {
+		if (currentState == State.ZOMBIE) {
 			PacketWrapper spawn = new PacketWrapper(0x0F, null, user);
 			spawn.write(Type.VAR_INT, entityId);
 			spawn.write(Type.UNSIGNED_BYTE, (short) 54);
@@ -227,7 +229,7 @@ public class ArmorStandReplacement implements EntityReplacement {
 			entityIds = new int[] {entityId};
 			updateMetadata();
 			updateLocation();
-		} else if (currentState==State.HOLOGRAM) {
+		} else if (currentState == State.HOLOGRAM) {
 			int[] entityIds = new int[] {entityId, ENTITY_ID--};
 
 			PacketWrapper spawnSkull = new PacketWrapper(0x0E, null, user);
@@ -272,9 +274,9 @@ public class ArmorStandReplacement implements EntityReplacement {
 	}
 
 	public void despawn() {
-		if (entityIds==null) return;
+		if (entityIds == null) return;
 		PacketWrapper despawn = new PacketWrapper(0x13, null, user);
-		despawn.write(Type.BYTE, (byte)entityIds.length);
+		despawn.write(Type.BYTE, (byte) entityIds.length);
 		for (int id : entityIds) {
 			despawn.write(Type.INT, id);
 		}

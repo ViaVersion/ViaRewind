@@ -7,7 +7,7 @@
     <parent>
         <groupId>de.gerrygames</groupId>
         <artifactId>viarewind-parent</artifactId>
-        <version>1.4.0</version>
+        <version>1.4.6-SNAPSHOT</version>
     </parent>
 
     <artifactId>viarewind-all</artifactId>
@@ -92,6 +92,12 @@
         <dependency>
             <groupId>de.gerrygames</groupId>
             <artifactId>viarewind-bungee</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>de.gerrygames</groupId>
+            <artifactId>viarewind-fabric</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
 
