@@ -87,6 +87,18 @@ public class SpawnPackets {
 
 						int data = packetWrapper.get(Type.INT, 3);
 
+						//Rewrite Object Data
+						if(type.isOrHasParent(Entity1_10Types.EntityType.ARROW) && data != 0){
+							packetWrapper.set(Type.INT, 3, --data);
+						}
+						if(type.is(Entity1_10Types.EntityType.FALLING_BLOCK)){
+							int objType = data & 4095;
+							int objData = data >> 12 & 15;
+							BlockState state = new BlockState(objType, objData);
+							state = ReplacementRegistry1_8to1_9.replace(state);
+							packetWrapper.set(Type.INT, 3, state.getId() | state.getData() << 12);
+						}
+
 						if (data > 0) {
 							packetWrapper.passthrough(Type.SHORT);
 							packetWrapper.passthrough(Type.SHORT);
