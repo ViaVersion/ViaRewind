@@ -9,7 +9,6 @@ import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.metadata.MetadataR
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage.EntityTracker;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage.GameProfileStorage;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
-import de.gerrygames.viarewind.protocol.protocol1_8to1_9.items.ReplacementRegistry1_8to1_9;
 import de.gerrygames.viarewind.storage.BlockState;
 import de.gerrygames.viarewind.utils.PacketUtil;
 import us.myles.ViaVersion.api.PacketWrapper;
@@ -120,6 +119,7 @@ public class SpawnPackets {
 				map(Type.BYTE);
 				map(Type.BYTE);
 				map(Type.INT);
+
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
@@ -158,6 +158,7 @@ public class SpawnPackets {
 							armorStand.setYawPitch(yaw * 360f / 256, pitch * 360f / 256);
 							armorStand.setHeadYaw(yaw * 360f / 256);
 							tracker.addEntityReplacement(armorStand);
+							return;
 						} else if (typeId == 10) {
 							y += 12;
 						}
@@ -168,34 +169,18 @@ public class SpawnPackets {
 						packetWrapper.set(Type.INT, 2, z);
 						packetWrapper.set(Type.BYTE, 1, pitch);
 						packetWrapper.set(Type.BYTE, 2, yaw);
-					}
-				});
-				handler(new PacketHandler() {
-					@Override
-					public void handle(final PacketWrapper packetWrapper) throws Exception {
-						final int entityId = packetWrapper.get(Type.VAR_INT, 0);
-						final int typeId = packetWrapper.get(Type.BYTE, 0);
-						final EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-						final Entity1_10Types.EntityType type = Entity1_10Types.getTypeFromId(typeId, true);
+
+						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
+						Entity1_10Types.EntityType type = Entity1_10Types.getTypeFromId(typeId, true);
 						tracker.getClientEntityTypes().put(entityId, type);
 						tracker.sendMetadataBuffer(entityId);
-					}
-				});
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						if (packetWrapper.isCancelled()) return;
-						final int typeId = packetWrapper.get(Type.BYTE, 0);
+
 						int data = packetWrapper.get(Type.INT, 3);
 
-						final Entity1_10Types.EntityType type = Entity1_10Types.getTypeFromId(typeId, true);
-
-						if(type != null && type.isOrHasParent(Entity1_10Types.EntityType.FALLING_BLOCK)){
-							int objType = data & 4095;
-							int objData = data >> 12 & 15;
-							BlockState state = new BlockState(objType, objData);
+						if (type != null && type.isOrHasParent(Entity1_10Types.EntityType.FALLING_BLOCK)) {
+							BlockState state = new BlockState(data & 0xFFF, data >> 12 & 0xF);
 							state = ReplacementRegistry1_7_6_10to1_8.replace(state);
-							packetWrapper.set(Type.INT, 3, state.getId() | state.getData() << 12);
+							packetWrapper.set(Type.INT, 3, data = (state.getId() | state.getData() << 16));
 						}
 
 						if (data > 0) {

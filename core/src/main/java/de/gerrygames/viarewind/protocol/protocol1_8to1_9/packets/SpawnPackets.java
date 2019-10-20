@@ -71,13 +71,13 @@ public class SpawnPackets {
 						int y = packetWrapper.get(Type.INT, 1);
 						int z = packetWrapper.get(Type.INT, 2);
 
-						if(type.is(Entity1_10Types.EntityType.BOAT)){
+						if (type.is(Entity1_10Types.EntityType.BOAT)) {
 							byte yaw = packetWrapper.get(Type.BYTE, 1);
 							yaw -= 64;
 							packetWrapper.set(Type.BYTE, 1, yaw);
 							y += 10;
 							packetWrapper.set(Type.INT, 1, y);
-						}else if(type.is(Entity1_10Types.EntityType.SHULKER_BULLET)){
+						} else if (type.is(Entity1_10Types.EntityType.SHULKER_BULLET)) {
 							packetWrapper.cancel();
 							ShulkerBulletReplacement shulkerBulletReplacement = new ShulkerBulletReplacement(entityId, packetWrapper.user());
 							shulkerBulletReplacement.setLocation(x / 32.0, y / 32.0, z / 32.0);
@@ -88,13 +88,11 @@ public class SpawnPackets {
 						int data = packetWrapper.get(Type.INT, 3);
 
 						//Rewrite Object Data
-						if(type.isOrHasParent(Entity1_10Types.EntityType.ARROW) && data != 0){
+						if (type.isOrHasParent(Entity1_10Types.EntityType.ARROW) && data != 0) {
 							packetWrapper.set(Type.INT, 3, --data);
 						}
-						if(type.is(Entity1_10Types.EntityType.FALLING_BLOCK)){
-							int objType = data & 4095;
-							int objData = data >> 12 & 15;
-							BlockState state = new BlockState(objType, objData);
+						if (type.is(Entity1_10Types.EntityType.FALLING_BLOCK)) {
+							BlockState state = new BlockState(data & 0xFFF, data >> 12 & 0xF);
 							state = ReplacementRegistry1_8to1_9.replace(state);
 							packetWrapper.set(Type.INT, 3, state.getId() | state.getData() << 12);
 						}
