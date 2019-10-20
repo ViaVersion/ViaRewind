@@ -1,10 +1,13 @@
 package de.gerrygames.viarewind.protocol.protocol1_8to1_9.packets;
 
+import de.gerrygames.viarewind.ViaRewind;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.Protocol1_8TO1_9;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.entityreplacement.ShulkerBulletReplacement;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.entityreplacement.ShulkerReplacement;
+import de.gerrygames.viarewind.protocol.protocol1_8to1_9.items.ReplacementRegistry1_8to1_9;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.metadata.MetadataRewriter;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage.EntityTracker;
+import de.gerrygames.viarewind.storage.BlockState;
 import de.gerrygames.viarewind.utils.PacketUtil;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.entities.Entity1_10Types;
@@ -42,39 +45,53 @@ public class SpawnPackets {
 				map(Type.DOUBLE, Protocol1_8TO1_9.TO_OLD_INT);
 				map(Type.BYTE);
 				map(Type.BYTE);
+				map(Type.INT);
+
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
-						int entityId = packetWrapper.get(Type.VAR_INT, 0);
-						int typeId = packetWrapper.get(Type.BYTE, 0);
+						final int entityId = packetWrapper.get(Type.VAR_INT, 0);
+						final int typeId = packetWrapper.get(Type.BYTE, 0);
+						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
+						final Entity1_10Types.EntityType type = Entity1_10Types.getTypeFromId(typeId, true);
+
+						//cancel AREA_EFFECT_CLOUD = 3, SPECTRAL_ARROW = 91, DRAGON_FIREBALL = 93
+						if (typeId == 3 || typeId == 91 || typeId == 92 || typeId == 93) {
+							packetWrapper.cancel();
+							return;
+						}
+
+						if (type == null) {
+							ViaRewind.getPlatform().getLogger().warning("[ViaRewind] Unhandled Spawn Object Type: " + typeId);
+							packetWrapper.cancel();
+							return;
+						}
+
 						int x = packetWrapper.get(Type.INT, 0);
 						int y = packetWrapper.get(Type.INT, 1);
 						int z = packetWrapper.get(Type.INT, 2);
-						if (typeId == 1) {
+
+						if(type.is(Entity1_10Types.EntityType.BOAT)){
 							byte yaw = packetWrapper.get(Type.BYTE, 1);
 							yaw -= 64;
 							packetWrapper.set(Type.BYTE, 1, yaw);
 							y += 10;
 							packetWrapper.set(Type.INT, 1, y);
-						} else if (typeId == 67) {
+						}else if(type.is(Entity1_10Types.EntityType.SHULKER_BULLET)){
 							packetWrapper.cancel();
-							EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
 							ShulkerBulletReplacement shulkerBulletReplacement = new ShulkerBulletReplacement(entityId, packetWrapper.user());
 							shulkerBulletReplacement.setLocation(x / 32.0, y / 32.0, z / 32.0);
 							tracker.addEntityReplacement(shulkerBulletReplacement);
+							return;
 						}
-					}
-				});
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						int data = packetWrapper.passthrough(Type.INT);
+
+						int data = packetWrapper.get(Type.INT, 3);
+
 						if (data > 0) {
 							packetWrapper.passthrough(Type.SHORT);
 							packetWrapper.passthrough(Type.SHORT);
 							packetWrapper.passthrough(Type.SHORT);
 						} else {
-							int entityId = packetWrapper.get(Type.VAR_INT, 0);
 							short vX = packetWrapper.read(Type.SHORT);
 							short vY = packetWrapper.read(Type.SHORT);
 							short vZ = packetWrapper.read(Type.SHORT);
@@ -85,19 +102,7 @@ public class SpawnPackets {
 							velocityPacket.write(Type.SHORT, vZ);
 							PacketUtil.sendPacket(velocityPacket, Protocol1_8TO1_9.class);
 						}
-					}
-				});
-				handler(new PacketHandler() {
-					@Override
-					public void handle(final PacketWrapper packetWrapper) throws Exception {
-						final int entityId = packetWrapper.get(Type.VAR_INT, 0);
-						final int typeId = packetWrapper.get(Type.BYTE, 0);
-						if (typeId == 3 || typeId == 67 || typeId == 91 || typeId == 92 || typeId == 93) {
-							packetWrapper.cancel();
-							return;
-						}
-						final EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-						final Entity1_10Types.EntityType type = Entity1_10Types.getTypeFromId(typeId, true);
+
 						tracker.getClientEntityTypes().put(entityId, type);
 						tracker.sendMetadataBuffer(entityId);
 					}
