@@ -29,6 +29,7 @@ public class ReplacementRegistry1_8to1_9 {
 		registry.registerItem(204, new Replacement(43, 7, "Purpur Double Slab"));
 		registry.registerItem(205, new Replacement(44, 7, "Purpur Slab"));
 
+		registry.registerBlock(209, 0, new Replacement(119, 0));
 		registry.registerBlock(198, 0, new Replacement(50, 5));
 		registry.registerBlock(198, 1, new Replacement(50, 5));
 		registry.registerBlock(198, 2, new Replacement(50, 4));
