@@ -26,8 +26,8 @@ import java.util.List;
 public class SpawnPackets {
 
 	// TODO - remove this temporary duck tape when abstraction is merged
-	private static boolean isOrHasParent(EntityType ref, Entity1_10Types.EntityType type) {
-		EntityType parent = ref;
+	private static boolean isOrHasParent(Entity1_10Types.EntityType ref, Entity1_10Types.EntityType type) {
+		Entity1_10Types.EntityType parent = ref;
 		do {
 			if (parent.equals(type)) return true;
 			parent = parent.getParent();
@@ -101,7 +101,7 @@ public class SpawnPackets {
 						if (isOrHasParent(type, Entity1_10Types.EntityType.ARROW) && data != 0) {
 							packetWrapper.set(Type.INT, 3, --data);
 						}
-						if (type == Entity1_10Types.EntityType.FALLING_BLOCK)) {
+						if (type == Entity1_10Types.EntityType.FALLING_BLOCK) {
 							BlockState state = new BlockState(data & 0xFFF, data >> 12 & 0xF);
 							state = ReplacementRegistry1_8to1_9.replace(state);
 							packetWrapper.set(Type.INT, 3, state.getId() | state.getData() << 12);

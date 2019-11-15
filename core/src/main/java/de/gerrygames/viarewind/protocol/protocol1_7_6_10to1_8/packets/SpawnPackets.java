@@ -28,8 +28,8 @@ import java.util.UUID;
 public class SpawnPackets {
 
         // TODO - remove this temporary duck tape when abstraction is merged
-        private static boolean isOrHasParent(EntityType ref, Entity1_10Types.EntityType type) {
-                EntityType parent = ref;
+        private static boolean isOrHasParent(Entity1_10Types.EntityType ref, Entity1_10Types.EntityType type) {
+                Entity1_10Types.EntityType parent = ref;
                 do {
                     if (parent.equals(type))
                         return true;
