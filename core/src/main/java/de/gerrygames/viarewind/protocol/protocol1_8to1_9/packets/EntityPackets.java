@@ -253,12 +253,12 @@ public class EntityPackets {
 		protocol.registerOutgoing(State.PLAY, 0x30, 0x13, new PacketRemapper() {
 			@Override
 			public void registerMap() {
-				map(Type.VAR_INT_ARRAY);
+				map(Type.VAR_INT_ARRAY_PRIMITIVE);
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-						for (int entityId : packetWrapper.get(Type.VAR_INT_ARRAY, 0)) tracker.removeEntity(entityId);
+						for (int entityId : packetWrapper.get(Type.VAR_INT_ARRAY_PRIMITIVE, 0)) tracker.removeEntity(entityId);
 					}
 				});
 			}

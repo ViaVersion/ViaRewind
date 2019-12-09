@@ -203,7 +203,7 @@ public class WitherBossBar extends BossBar {
 
 	private void despawnWither() {
 		PacketWrapper packetWrapper = new PacketWrapper(0x13, null, this.connection);
-		packetWrapper.write(Type.VAR_INT_ARRAY, new Integer[] {entityId});
+		packetWrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[] {entityId});
 
 		PacketUtil.sendPacket(packetWrapper, Protocol1_8TO1_9.class, true, true);
 	}

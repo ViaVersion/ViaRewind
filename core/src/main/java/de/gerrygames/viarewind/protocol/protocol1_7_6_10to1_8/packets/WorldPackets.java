@@ -287,7 +287,7 @@ public class WorldPackets {
 							short rows = packetWrapper.read(Type.UNSIGNED_BYTE);
 							byte x = packetWrapper.read(Type.BYTE);
 							byte z = packetWrapper.read(Type.BYTE);
-							Byte[] data = packetWrapper.read(Type.BYTE_ARRAY);
+							byte[] data = packetWrapper.read(Type.BYTE_ARRAY_PRIMITIVE);
 
 							for (int column = 0; column < columns; column++) {
 								byte[] columnData = new byte[rows + 3];

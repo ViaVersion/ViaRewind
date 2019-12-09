@@ -2,7 +2,6 @@ package de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.entityreplacement
 
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10TO1_8;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.metadata.MetadataRewriter;
-import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.CustomIntType;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
 import de.gerrygames.viarewind.replacement.EntityReplacement;
 import de.gerrygames.viarewind.utils.PacketUtil;
@@ -123,8 +122,7 @@ public class EndermiteReplacement implements EntityReplacement {
 	@Override
 	public void despawn() {
 		PacketWrapper despawn = new PacketWrapper(0x13, null, user);
-		despawn.write(Type.BYTE, (byte) 1);
-		despawn.write(new CustomIntType(1), new Integer[] {entityId});
+		despawn.write(Types1_7_6_10.INT_ARRAY, new int[] {entityId});
 
 		PacketUtil.sendPacket(despawn, Protocol1_7_6_10TO1_8.class, true, true);
 	}

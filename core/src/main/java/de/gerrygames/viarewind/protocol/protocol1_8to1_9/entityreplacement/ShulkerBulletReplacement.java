@@ -95,7 +95,7 @@ public class ShulkerBulletReplacement implements EntityReplacement {
 	@Override
 	public void despawn() {
 		PacketWrapper despawn = new PacketWrapper(0x13, null, user);
-		despawn.write(Type.VAR_INT_ARRAY, new Integer[] {entityId});
+		despawn.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[] {entityId});
 
 		PacketUtil.sendPacket(despawn, Protocol1_8TO1_9.class, true, true);
 	}
