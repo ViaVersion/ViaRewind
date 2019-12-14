@@ -113,9 +113,9 @@ public class PlayerPackets {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						Position position = packetWrapper.read(Type.POSITION);
-						packetWrapper.write(Type.INT, position.getX().intValue());
-						packetWrapper.write(Type.INT, position.getY().intValue());
-						packetWrapper.write(Type.INT, position.getZ().intValue());
+						packetWrapper.write(Type.INT, position.getX());
+						packetWrapper.write(Type.INT, (int) position.getY());
+						packetWrapper.write(Type.INT, position.getZ());
 					}
 				});
 			}
@@ -304,9 +304,9 @@ public class PlayerPackets {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						Position position = packetWrapper.read(Type.POSITION);
-						packetWrapper.write(Type.INT, position.getX().intValue());
-						packetWrapper.write(Type.INT, position.getY().intValue());
-						packetWrapper.write(Type.INT, position.getZ().intValue());
+						packetWrapper.write(Type.INT, position.getX());
+						packetWrapper.write(Type.INT, (int) position.getY());
+						packetWrapper.write(Type.INT, position.getZ());
 					}
 				});
 			}
@@ -769,9 +769,9 @@ public class PlayerPackets {
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
-						long x = packetWrapper.read(Type.INT);
-						long y = packetWrapper.read(Type.UNSIGNED_BYTE);
-						long z = packetWrapper.read(Type.INT);
+						int x = packetWrapper.read(Type.INT);
+						short y = packetWrapper.read(Type.UNSIGNED_BYTE);
+						int z = packetWrapper.read(Type.INT);
 						packetWrapper.write(Type.POSITION, new Position(x, y, z));
 					}
 				});
@@ -786,9 +786,9 @@ public class PlayerPackets {
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
-						long x = packetWrapper.read(Type.INT);
-						long y = packetWrapper.read(Type.UNSIGNED_BYTE);
-						long z = packetWrapper.read(Type.INT);
+						int x = packetWrapper.read(Type.INT);
+						short y = packetWrapper.read(Type.UNSIGNED_BYTE);
+						int z = packetWrapper.read(Type.INT);
 						packetWrapper.write(Type.POSITION, new Position(x, y, z));
 
 						packetWrapper.passthrough(Type.BYTE);  //Direction
@@ -913,9 +913,9 @@ public class PlayerPackets {
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
-						long x = packetWrapper.read(Type.INT);
-						long y = packetWrapper.read(Type.SHORT);
-						long z = packetWrapper.read(Type.INT);
+						int x = packetWrapper.read(Type.INT);
+						short y = packetWrapper.read(Type.SHORT);
+						int z = packetWrapper.read(Type.INT);
 						packetWrapper.write(Type.POSITION, new Position(x, y, z));
 						for (int i = 0; i < 4; i++) {
 							String line = packetWrapper.read(Type.STRING);

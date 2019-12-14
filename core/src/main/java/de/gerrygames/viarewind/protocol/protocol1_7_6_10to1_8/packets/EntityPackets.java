@@ -78,9 +78,9 @@ public class EntityPackets {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						Position position = packetWrapper.read(Type.POSITION);
-						packetWrapper.write(Type.INT, position.getX().intValue());
-						packetWrapper.write(Type.UNSIGNED_BYTE, position.getY().shortValue());
-						packetWrapper.write(Type.INT, position.getZ().intValue());
+						packetWrapper.write(Type.INT, position.getX());
+						packetWrapper.write(Type.UNSIGNED_BYTE, position.getY());
+						packetWrapper.write(Type.INT, position.getZ());
 					}
 				});
 			}
