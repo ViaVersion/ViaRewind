@@ -24,7 +24,7 @@ public class ItemRewriter {
 		CompoundTag viaVersionTag = new CompoundTag("ViaRewind1_7_6_10to1_8");
 		tag.put(viaVersionTag);
 
-		viaVersionTag.put(new ShortTag("id", item.getId()));
+		viaVersionTag.put(new ShortTag("id", (short) item.getIdentifier()));
 		viaVersionTag.put(new ShortTag("data", item.getData()));
 
 		CompoundTag display = tag.get("display");
@@ -65,7 +65,7 @@ public class ItemRewriter {
 			}
 		}
 
-		if (item.getId()==387 && tag.contains("pages")) {
+		if (item.getIdentifier()==387 && tag.contains("pages")) {
 			ListTag pages = tag.get("pages");
 			ListTag oldPages = new ListTag("pages", StringTag.class);
 			viaVersionTag.put(oldPages);
@@ -81,7 +81,7 @@ public class ItemRewriter {
 
 		ReplacementRegistry1_7_6_10to1_8.replace(item);
 
-		if (viaVersionTag.size()==2 && (short)viaVersionTag.get("id").getValue()==item.getId() && (short)viaVersionTag.get("data").getValue()==item.getData()) {
+		if (viaVersionTag.size()==2 && (short)viaVersionTag.get("id").getValue()==item.getIdentifier() && (short)viaVersionTag.get("data").getValue()==item.getData()) {
 			item.getTag().remove("ViaRewind1_7_6_10to1_8");
 			if (item.getTag().isEmpty()) item.setTag(null);
 		}
@@ -98,7 +98,7 @@ public class ItemRewriter {
 
 		CompoundTag viaVersionTag = tag.remove("ViaRewind1_7_6_10to1_8");
 
-		item.setId((Short) viaVersionTag.get("id").getValue());
+		item.setIdentifier((short) viaVersionTag.get("id").getValue());
 		item.setData((Short) viaVersionTag.get("data").getValue());
 
 		if (viaVersionTag.contains("noDisplay")) tag.remove("display");
@@ -113,7 +113,7 @@ public class ItemRewriter {
 			((CompoundTag)tag.get("display")).remove("Name");
 		}
 
-		if (item.getId()==387) {
+		if (item.getIdentifier()==387) {
 			ListTag oldPages = viaVersionTag.get("pages");
 			tag.remove("pages");
 			tag.put(oldPages);

@@ -88,9 +88,9 @@ public class WorldPackets {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						Position position = packetWrapper.read(Type.POSITION);
-						packetWrapper.write(Type.INT, position.getX().intValue());
-						packetWrapper.write(Type.UNSIGNED_BYTE, position.getY().shortValue());
-						packetWrapper.write(Type.INT, position.getZ().intValue());
+						packetWrapper.write(Type.INT, position.getX());
+						packetWrapper.write(Type.UNSIGNED_BYTE, position.getY());
+						packetWrapper.write(Type.INT, position.getZ());
 					}
 				});
 				handler(new PacketHandler() {
@@ -121,9 +121,9 @@ public class WorldPackets {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						Position position = packetWrapper.read(Type.POSITION);
-						packetWrapper.write(Type.INT, position.getX().intValue());
-						packetWrapper.write(Type.SHORT, position.getY().shortValue());
-						packetWrapper.write(Type.INT, position.getZ().intValue());
+						packetWrapper.write(Type.INT, position.getX());
+						packetWrapper.write(Type.SHORT, position.getY());
+						packetWrapper.write(Type.INT, position.getZ());
 					}
 				});
 				map(Type.UNSIGNED_BYTE);
@@ -141,9 +141,9 @@ public class WorldPackets {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						Position position = packetWrapper.read(Type.POSITION);
-						packetWrapper.write(Type.INT, position.getX().intValue());
-						packetWrapper.write(Type.INT, position.getY().intValue());
-						packetWrapper.write(Type.INT, position.getZ().intValue());
+						packetWrapper.write(Type.INT, position.getX());
+						packetWrapper.write(Type.INT, (int) position.getY());
+						packetWrapper.write(Type.INT, position.getZ());
 					}
 				});
 				map(Type.BYTE);  //Progress
@@ -172,9 +172,9 @@ public class WorldPackets {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						Position position = packetWrapper.read(Type.POSITION);
-						packetWrapper.write(Type.INT, position.getX().intValue());
-						packetWrapper.write(Type.BYTE, position.getY().byteValue());
-						packetWrapper.write(Type.INT, position.getZ().intValue());
+						packetWrapper.write(Type.INT, position.getX());
+						packetWrapper.write(Type.BYTE, (byte) position.getY());
+						packetWrapper.write(Type.INT, position.getZ());
 					}
 				});
 				map(Type.INT);
@@ -239,9 +239,9 @@ public class WorldPackets {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						Position position = packetWrapper.read(Type.POSITION);
-						packetWrapper.write(Type.INT, position.getX().intValue());
-						packetWrapper.write(Type.SHORT, position.getY().shortValue());
-						packetWrapper.write(Type.INT, position.getZ().intValue());
+						packetWrapper.write(Type.INT, position.getX());
+						packetWrapper.write(Type.SHORT, position.getY());
+						packetWrapper.write(Type.INT, position.getZ());
 					}
 				});
 				handler(new PacketHandler() {
@@ -342,9 +342,9 @@ public class WorldPackets {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						Position position = packetWrapper.read(Type.POSITION);
-						packetWrapper.write(Type.INT, position.getX().intValue());
-						packetWrapper.write(Type.SHORT, position.getY().shortValue());
-						packetWrapper.write(Type.INT, position.getZ().intValue());
+						packetWrapper.write(Type.INT, position.getX());
+						packetWrapper.write(Type.SHORT, position.getY());
+						packetWrapper.write(Type.INT, position.getZ());
 					}
 				});
 				map(Type.UNSIGNED_BYTE);  //Action

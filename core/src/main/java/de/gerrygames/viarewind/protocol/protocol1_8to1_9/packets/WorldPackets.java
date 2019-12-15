@@ -223,7 +223,7 @@ public class WorldPackets {
 						final UserConnection user = packetWrapper.user();
 						chunk.getBlockEntities().forEach(nbt -> {
 							if (!nbt.contains("x") || !nbt.contains("y") || !nbt.contains("z") || !nbt.contains("id")) return;
-							Position position = new Position((long) (int) nbt.get("x").getValue(), (long) (int) nbt.get("y").getValue(), (long) (int) nbt.get("z").getValue());
+							Position position = new Position((int) nbt.get("x").getValue(), (short) (int) nbt.get("y").getValue(), (int) nbt.get("z").getValue());
 							String id = (String) nbt.get("id").getValue();
 
 							short action;

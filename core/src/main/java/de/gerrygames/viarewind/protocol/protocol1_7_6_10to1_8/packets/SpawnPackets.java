@@ -291,9 +291,9 @@ public class SpawnPackets {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						Position position = packetWrapper.read(Type.POSITION);
-						packetWrapper.write(Type.INT, position.getX().intValue());
-						packetWrapper.write(Type.INT, position.getY().intValue());
-						packetWrapper.write(Type.INT, position.getZ().intValue());
+						packetWrapper.write(Type.INT, position.getX());
+						packetWrapper.write(Type.INT, (int) position.getY());
+						packetWrapper.write(Type.INT, position.getZ());
 					}
 				});
 				map(Type.UNSIGNED_BYTE, Type.INT);  //Rotation
