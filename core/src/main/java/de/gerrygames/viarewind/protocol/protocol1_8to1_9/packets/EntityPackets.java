@@ -276,6 +276,7 @@ public class EntityPackets {
 						int id = packetWrapper.get(Type.BYTE, 0);
 						if (id > 23) packetWrapper.cancel();
 						if (id == 25) {
+							if(packetWrapper.get(Type.VAR_INT, 0) != packetWrapper.user().get(EntityTracker.class).getPlayerId()) return;
 							Levitation levitation = packetWrapper.user().get(Levitation.class);
 							levitation.setActive(false);
 						}
@@ -529,6 +530,7 @@ public class EntityPackets {
 						int id = packetWrapper.get(Type.BYTE, 0);
 						if (id > 23) packetWrapper.cancel();
 						if (id == 25) {
+							if(packetWrapper.get(Type.VAR_INT, 0) != packetWrapper.user().get(EntityTracker.class).getPlayerId()) return;
 							Levitation levitation = packetWrapper.user().get(Levitation.class);
 							levitation.setActive(true);
 							levitation.setAmplifier(packetWrapper.get(Type.BYTE, 1));
