@@ -1,6 +1,7 @@
 name: ViaRewind
 version: ${project.version}
 main: de.gerrygames.viarewind.BukkitPlugin
+api-version: 1.13
 
 authors: [Gerrygames]
 website: https://github.com/Gerrygames
