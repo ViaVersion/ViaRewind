@@ -25,9 +25,15 @@ public class Cooldown extends StoredObject implements Tickable {
 	public Cooldown(final UserConnection user) {
 		super(user);
 
-		this.cooldownIndicator = ViaRewind.getConfig().getCooldownIndicator();
+        ViaRewindConfig.CooldownIndicator indicator;
+        try {
+            indicator = ViaRewind.getConfig().getCooldownIndicator();
+        } catch (IllegalArgumentException e) {
+            ViaRewind.getPlatform().getLogger().warning("Invalid cooldown-indicator setting");
+            indicator = ViaRewindConfig.CooldownIndicator.DISABLED;
+        }
 
-		if (cooldownIndicator==ViaRewindConfig.CooldownIndicator.DISABLED) return;
+        this.cooldownIndicator = indicator;
 	}
 
 	@Override
