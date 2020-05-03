@@ -11,6 +11,7 @@
     </parent>
 
     <artifactId>viarewind-all</artifactId>
+    <name>ViaRewind</name>
 
     <build>
         <finalName>${project.name}-${project.version}</finalName>
