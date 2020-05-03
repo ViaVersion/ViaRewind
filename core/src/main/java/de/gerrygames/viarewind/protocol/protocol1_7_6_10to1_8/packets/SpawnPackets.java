@@ -158,7 +158,6 @@ public class SpawnPackets {
 							armorStand.setYawPitch(yaw * 360f / 256, pitch * 360f / 256);
 							armorStand.setHeadYaw(yaw * 360f / 256);
 							tracker.addEntityReplacement(armorStand);
-							return;
 						} else if (typeId == 10) {
 							y += 12;
 						}
@@ -257,7 +256,7 @@ public class SpawnPackets {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						int entityId = packetWrapper.get(Type.VAR_INT, 0);
-						int typeId = packetWrapper.get(Type.UNSIGNED_BYTE, 0) & 0xff;
+						int typeId = packetWrapper.get(Type.UNSIGNED_BYTE, 0);
 						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
 						tracker.getClientEntityTypes().put(entityId, Entity1_10Types.getTypeFromId(typeId, false));
 						tracker.sendMetadataBuffer(entityId);
