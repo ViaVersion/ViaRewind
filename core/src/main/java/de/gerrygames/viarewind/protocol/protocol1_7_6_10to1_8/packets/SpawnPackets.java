@@ -221,7 +221,7 @@ public class SpawnPackets {
 						byte yaw = packetWrapper.get(Type.BYTE, 0);
 						byte headYaw = packetWrapper.get(Type.BYTE, 2);
 
-						if (typeId == 78) {
+						if (typeId == 30) {
 							packetWrapper.cancel();
 
 							EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
@@ -248,7 +248,7 @@ public class SpawnPackets {
 							endermite.setYawPitch(yaw * 360f / 256, pitch * 360f / 256);
 							endermite.setHeadYaw(headYaw * 360f / 256);
 							tracker.addEntityReplacement(endermite);
-						} else if (typeId == 101 || typeId == 30 || typeId == 255 || typeId == -1) {
+						} else if (typeId == 101 || typeId == 255 || typeId == -1) {
 							packetWrapper.cancel();
 						}
 					}
@@ -277,7 +277,6 @@ public class SpawnPackets {
 						}
 					}
 				});
-
 			}
 		});
 
