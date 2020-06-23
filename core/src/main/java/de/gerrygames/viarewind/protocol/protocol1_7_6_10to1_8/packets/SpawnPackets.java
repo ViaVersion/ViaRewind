@@ -27,18 +27,6 @@ import java.util.UUID;
 
 public class SpawnPackets {
 
-        // TODO - remove this temporary duck tape when abstraction is merged
-        private static boolean isOrHasParent(Entity1_10Types.EntityType ref, Entity1_10Types.EntityType type) {
-                Entity1_10Types.EntityType parent = ref;
-                do {
-                    if (parent.equals(type))
-                        return true;
-
-                    parent = parent.getParent();
-                } while (parent != null);
-                return false;
-        }
-
 	public static void register(Protocol protocol) {
 
 		/*  OUTGOING  */
@@ -170,7 +158,6 @@ public class SpawnPackets {
 							armorStand.setYawPitch(yaw * 360f / 256, pitch * 360f / 256);
 							armorStand.setHeadYaw(yaw * 360f / 256);
 							tracker.addEntityReplacement(armorStand);
-							return;
 						} else if (typeId == 10) {
 							y += 12;
 						}
@@ -189,7 +176,7 @@ public class SpawnPackets {
 
 						int data = packetWrapper.get(Type.INT, 3);
 
-						if (type != null && isOrHasParent(type, Entity1_10Types.EntityType.FALLING_BLOCK)) {
+						if (type != null && type.isOrHasParent(Entity1_10Types.EntityType.FALLING_BLOCK)) {
 							BlockState state = new BlockState(data & 0xFFF, data >> 12 & 0xF);
 							state = ReplacementRegistry1_7_6_10to1_8.replace(state);
 							packetWrapper.set(Type.INT, 3, data = (state.getId() | state.getData() << 16));
@@ -233,7 +220,7 @@ public class SpawnPackets {
 						byte yaw = packetWrapper.get(Type.BYTE, 0);
 						byte headYaw = packetWrapper.get(Type.BYTE, 2);
 
-						if (typeId == 78) {
+						if (typeId == 30) {
 							packetWrapper.cancel();
 
 							EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
@@ -260,7 +247,7 @@ public class SpawnPackets {
 							endermite.setYawPitch(yaw * 360f / 256, pitch * 360f / 256);
 							endermite.setHeadYaw(headYaw * 360f / 256);
 							tracker.addEntityReplacement(endermite);
-						} else if (typeId == 101 || typeId == 30 || typeId == 255 || typeId == -1) {
+						} else if (typeId == 101 || typeId == 255 || typeId == -1) {
 							packetWrapper.cancel();
 						}
 					}
@@ -269,7 +256,7 @@ public class SpawnPackets {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						int entityId = packetWrapper.get(Type.VAR_INT, 0);
-						int typeId = packetWrapper.get(Type.UNSIGNED_BYTE, 0) & 0xff;
+						int typeId = packetWrapper.get(Type.UNSIGNED_BYTE, 0);
 						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
 						tracker.getClientEntityTypes().put(entityId, Entity1_10Types.getTypeFromId(typeId, false));
 						tracker.sendMetadataBuffer(entityId);
@@ -289,7 +276,6 @@ public class SpawnPackets {
 						}
 					}
 				});
-
 			}
 		});
 
@@ -303,9 +289,9 @@ public class SpawnPackets {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						Position position = packetWrapper.read(Type.POSITION);
-						packetWrapper.write(Type.INT, position.getX().intValue());
-						packetWrapper.write(Type.INT, position.getY().intValue());
-						packetWrapper.write(Type.INT, position.getZ().intValue());
+						packetWrapper.write(Type.INT, position.getX());
+						packetWrapper.write(Type.INT, (int) position.getY());
+						packetWrapper.write(Type.INT, position.getZ());
 					}
 				});
 				map(Type.UNSIGNED_BYTE, Type.INT);  //Rotation

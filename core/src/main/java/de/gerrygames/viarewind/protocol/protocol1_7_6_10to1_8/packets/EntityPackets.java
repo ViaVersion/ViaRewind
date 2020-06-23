@@ -5,7 +5,7 @@ import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.items.ItemRewriter
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.metadata.MetadataRewriter;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage.EntityTracker;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage.GameProfileStorage;
-import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.CustomIntType;
+import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.IntArrayType;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
 import de.gerrygames.viarewind.replacement.EntityReplacement;
 import de.gerrygames.viarewind.utils.PacketUtil;
@@ -78,9 +78,9 @@ public class EntityPackets {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						Position position = packetWrapper.read(Type.POSITION);
-						packetWrapper.write(Type.INT, position.getX().intValue());
-						packetWrapper.write(Type.UNSIGNED_BYTE, position.getY().shortValue());
-						packetWrapper.write(Type.INT, position.getZ().intValue());
+						packetWrapper.write(Type.INT, position.getX());
+						packetWrapper.write(Type.UNSIGNED_BYTE, position.getY());
+						packetWrapper.write(Type.INT, position.getZ());
 					}
 				});
 			}
@@ -113,29 +113,24 @@ public class EntityPackets {
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
-						Integer[] entityIds = packetWrapper.read(Type.VAR_INT_ARRAY);
+						int[] entityIds = packetWrapper.read(Type.VAR_INT_ARRAY_PRIMITIVE);
 
 						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
 						for (int entityId : entityIds) tracker.removeEntity(entityId);
 
 						while (entityIds.length > 127) {
-							Integer[] entityIds2 = new Integer[127];
+							int[] entityIds2 = new int[127];
 							System.arraycopy(entityIds, 0, entityIds2, 0, 127);
-							Integer[] temp = new Integer[entityIds.length - 127];
+							int[] temp = new int[entityIds.length - 127];
 							System.arraycopy(entityIds, 127, temp, 0, temp.length);
 							entityIds = temp;
 
 							PacketWrapper destroy = new PacketWrapper(0x13, null, packetWrapper.user());
-							destroy.write(Type.BYTE, (byte) 127);
-							CustomIntType customIntType = new CustomIntType(127);
-							destroy.write(customIntType, entityIds2);
+							destroy.write(Types1_7_6_10.INT_ARRAY, entityIds2);
 							PacketUtil.sendPacket(destroy, Protocol1_7_6_10TO1_8.class);
 						}
 
-						packetWrapper.write(Type.BYTE, ((Integer) entityIds.length).byteValue());
-
-						CustomIntType customIntType = new CustomIntType(entityIds.length);
-						packetWrapper.write(customIntType, entityIds);
+						packetWrapper.write(Types1_7_6_10.INT_ARRAY, entityIds);
 					}
 				});  //Entity Id Array
 			}

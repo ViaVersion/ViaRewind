@@ -213,9 +213,9 @@ public class ArmorStandReplacement implements EntityReplacement {
 			PacketWrapper spawn = new PacketWrapper(0x0F, null, user);
 			spawn.write(Type.VAR_INT, entityId);
 			spawn.write(Type.UNSIGNED_BYTE, (short) 54);
-			spawn.write(Type.INT, 0);
-			spawn.write(Type.INT, 0);
-			spawn.write(Type.INT, 0);
+			spawn.write(Type.INT, (int) (locX * 32.0));
+			spawn.write(Type.INT, (int) (locY * 32.0));
+			spawn.write(Type.INT, (int) (locZ * 32.0));
 			spawn.write(Type.BYTE, (byte) 0);
 			spawn.write(Type.BYTE, (byte) 0);
 			spawn.write(Type.BYTE, (byte) 0);
@@ -227,17 +227,15 @@ public class ArmorStandReplacement implements EntityReplacement {
 			PacketUtil.sendPacket(spawn, Protocol1_7_6_10TO1_8.class, true, true);
 
 			entityIds = new int[] {entityId};
-			updateMetadata();
-			updateLocation();
 		} else if (currentState == State.HOLOGRAM) {
 			int[] entityIds = new int[] {entityId, ENTITY_ID--};
 
 			PacketWrapper spawnSkull = new PacketWrapper(0x0E, null, user);
 			spawnSkull.write(Type.VAR_INT, entityIds[0]);
 			spawnSkull.write(Type.BYTE, (byte) 66);
-			spawnSkull.write(Type.INT, 0);
-			spawnSkull.write(Type.INT, 0);
-			spawnSkull.write(Type.INT, 0);
+			spawnSkull.write(Type.INT, (int) (locX * 32.0));
+			spawnSkull.write(Type.INT, (int) (locY * 32.0));
+			spawnSkull.write(Type.INT, (int) (locZ * 32.0));
 			spawnSkull.write(Type.BYTE, (byte) 0);
 			spawnSkull.write(Type.BYTE, (byte) 0);
 			spawnSkull.write(Type.INT, 0);
@@ -245,9 +243,9 @@ public class ArmorStandReplacement implements EntityReplacement {
 			PacketWrapper spawnHorse = new PacketWrapper(0x0F, null, user);
 			spawnHorse.write(Type.VAR_INT, entityIds[1]);
 			spawnHorse.write(Type.UNSIGNED_BYTE, (short) 100);
-			spawnHorse.write(Type.INT, 0);
-			spawnHorse.write(Type.INT, 0);
-			spawnHorse.write(Type.INT, 0);
+			spawnHorse.write(Type.INT, (int) (locX * 32.0));
+			spawnHorse.write(Type.INT, (int) (locY * 32.0));
+			spawnHorse.write(Type.INT, (int) (locZ * 32.0));
 			spawnHorse.write(Type.BYTE, (byte) 0);
 			spawnHorse.write(Type.BYTE, (byte) 0);
 			spawnHorse.write(Type.BYTE, (byte) 0);
@@ -260,9 +258,10 @@ public class ArmorStandReplacement implements EntityReplacement {
 			PacketUtil.sendPacket(spawnHorse, Protocol1_7_6_10TO1_8.class, true, true);
 
 			this.entityIds = entityIds;
-			updateMetadata();
-			updateLocation();
 		}
+
+		updateMetadata();
+		updateLocation();
 	}
 
 	public AABB getBoundingBox() {

@@ -337,7 +337,7 @@ public class PlayerPackets {
 							packetWrapper.cancel();
 							PacketWrapper swapItems = new PacketWrapper(0x13, null, packetWrapper.user());
 							swapItems.write(Type.VAR_INT, 6);
-							swapItems.write(Type.POSITION, new Position(0L, 0L, 0L));
+							swapItems.write(Type.POSITION, new Position(0, (short) 0, 0));
 							swapItems.write(Type.BYTE, (byte) 255);
 
 							PacketUtil.sendToServer(swapItems, Protocol1_8TO1_9.class, true, true);
@@ -775,7 +775,7 @@ public class PlayerPackets {
 						String channel = packetWrapper.get(Type.STRING, 0);
 						if (channel.equalsIgnoreCase("MC|BEdit") || channel.equalsIgnoreCase("MC|BSign")) {
 							Item book = packetWrapper.passthrough(Type.ITEM);
-							book.setId((short) 386);
+							book.setIdentifier(386);
 							CompoundTag tag = book.getTag();
 							if (tag.contains("pages")) {
 								ListTag pages = tag.get("pages");

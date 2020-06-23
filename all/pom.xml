@@ -7,16 +7,48 @@
     <parent>
         <groupId>de.gerrygames</groupId>
         <artifactId>viarewind-parent</artifactId>
-        <version>1.4.7-SNAPSHOT</version>
+        <version>1.5.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>viarewind-all</artifactId>
+    <name>ViaRewind</name>
 
     <build>
         <finalName>${project.name}-${project.version}</finalName>
         <defaultGoal>clean install</defaultGoal>
 
         <plugins>
+            <!-- Write git commit hash into build properties -->
+            <plugin>
+                <groupId>net.md-5</groupId>
+                <artifactId>scriptus</artifactId>
+                <version>0.3.2</version>
+                <configuration>
+                    <format>git-ViaRewind-${project.parent.version}:%s</format>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>describe</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.2.0</version>
+                <configuration>
+                    <archive>
+                        <manifestEntries>
+                            <!--suppress MavenModelInspection -->
+                            <Implementation-Version>${describe}</Implementation-Version>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>

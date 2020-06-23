@@ -41,7 +41,7 @@ public class Windows extends StoredObject {
 	}
 
 	public static void updateBrewingStand(UserConnection user, Item blazePowder, short windowId) {
-		if (blazePowder != null && blazePowder.getId() != 377) return;
+		if (blazePowder != null && blazePowder.getIdentifier() != 377) return;
 		int amount = blazePowder == null ? 0 : blazePowder.getAmount();
 		PacketWrapper openWindow = new PacketWrapper(0x2D, null, user);
 		openWindow.write(Type.UNSIGNED_BYTE, windowId);

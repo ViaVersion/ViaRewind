@@ -16,4 +16,5 @@ public class Types1_7_6_10 {
 	public static final Type<List<Metadata>> METADATA_LIST = new MetadataListType();
 	public static final Type<Metadata> METADATA = new MetadataType();
 	public static final Type<CompoundTag> NBT = new NBTType();
+	public static final Type<int[]> INT_ARRAY = new IntArrayType();
 }

@@ -44,7 +44,7 @@ public class Replacement {
 	}
 
 	public Item replace(Item item) {
-		item.setId((short)id);
+		item.setIdentifier(id);
 		if (data!=-1) item.setData((short)data);
 		if (name!=null) {
 			CompoundTag compoundTag = item.getTag()==null ? new CompoundTag("") : item.getTag();

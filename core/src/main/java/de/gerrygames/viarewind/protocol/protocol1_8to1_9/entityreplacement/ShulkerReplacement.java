@@ -77,7 +77,7 @@ public class ShulkerReplacement implements EntityReplacement {
 			if (metadata.getId()==11 || metadata.getId()==12 || metadata.getId()==13) continue;
 			metadataList.add(new Metadata(metadata.getId(), metadata.getMetaType(), metadata.getValue()));
 		}
-		metadataList.add(new Metadata(11, MetaType1_9.VarInt, (int) 2));
+		metadataList.add(new Metadata(11, MetaType1_9.VarInt, 2));
 
 		MetadataRewriter.transform(Entity1_10Types.EntityType.MAGMA_CUBE, metadataList);
 
@@ -108,7 +108,7 @@ public class ShulkerReplacement implements EntityReplacement {
 	@Override
 	public void despawn() {
 		PacketWrapper despawn = new PacketWrapper(0x13, null, user);
-		despawn.write(Type.VAR_INT_ARRAY, new Integer[] {entityId});
+		despawn.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[] {entityId});
 
 		PacketUtil.sendPacket(despawn, Protocol1_8TO1_9.class, true, true);
 	}
