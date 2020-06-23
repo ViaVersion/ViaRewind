@@ -4,7 +4,7 @@ main: de.gerrygames.viarewind.BukkitPlugin
 api-version: 1.13
 
 authors: [Gerrygames]
-website: https://github.com/Gerrygames
+website: https://viaversion.com/rewind
 
 load: STARTUP
 depend: [ViaVersion]

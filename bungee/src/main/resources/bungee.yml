@@ -4,3 +4,4 @@ author: Gerrygames
 version: ${project.version}
 depends: [ViaVersion]
 softdepends: [ViaBackwards]
+website: https://viaversion.com/rewind
