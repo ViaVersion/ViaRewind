@@ -35,7 +35,7 @@ public class InventoryPackets {
 						short windowtypeId = (short) Windows.getInventoryType(windowType);
 						packetWrapper.write(Type.UNSIGNED_BYTE, windowtypeId);
 						packetWrapper.user().get(Windows.class).types.put(windowId, windowtypeId);
-						String title = packetWrapper.read(Type.STRING);  //Title
+						String title = packetWrapper.read(Type.COMPONENT).toString();  //Title
 						try {
 							title = ChatUtil.jsonToLegacy(title);
 						} catch (IllegalArgumentException ignored) {  //Bungeecord Chat API included in 1.8 is missing HoverAction SHOW_ENTITY enum .-.
