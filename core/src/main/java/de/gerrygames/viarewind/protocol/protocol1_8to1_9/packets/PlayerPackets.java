@@ -566,9 +566,23 @@ public class PlayerPackets {
 						packetWrapper.write(Type.VAR_INT, 0);  //Main Hand
 					}
 				});
-				map(Type.BYTE, Type.UNSIGNED_BYTE);
-				map(Type.BYTE, Type.UNSIGNED_BYTE);
-				map(Type.BYTE, Type.UNSIGNED_BYTE);
+				handler(new PacketHandler() {
+					@Override
+					public void handle(PacketWrapper packetWrapper) throws Exception {
+						byte x = packetWrapper.read(Type.BYTE);
+						byte y = packetWrapper.read(Type.BYTE);
+						byte z = packetWrapper.read(Type.BYTE);
+
+						// Check to see if this is a "special case packet" which is no longer sent since 1.9
+						if(x == -1f && y == -1f && z == -1f) {
+							packetWrapper.cancel();
+						} else {
+							packetWrapper.write(Type.UNSIGNED_BYTE, (short) Byte.toUnsignedInt(x));
+							packetWrapper.write(Type.UNSIGNED_BYTE, (short) Byte.toUnsignedInt(y));
+							packetWrapper.write(Type.UNSIGNED_BYTE, (short) Byte.toUnsignedInt(z));
+						}
+					}
+				});
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
