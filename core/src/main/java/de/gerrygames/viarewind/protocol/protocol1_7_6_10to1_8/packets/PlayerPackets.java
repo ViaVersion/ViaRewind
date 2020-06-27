@@ -36,6 +36,7 @@ import us.myles.ViaVersion.api.type.types.CustomByteType;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
+import us.myles.ViaVersion.util.GsonUtil;
 import us.myles.viaversion.libs.opennbt.tag.builtin.CompoundTag;
 import us.myles.viaversion.libs.opennbt.tag.builtin.ListTag;
 import us.myles.viaversion.libs.opennbt.tag.builtin.StringTag;
@@ -94,7 +95,7 @@ public class PlayerPackets {
 		protocol.registerOutgoing(State.PLAY, 0x02, 0x02, new PacketRemapper() {
 			@Override
 			public void registerMap() {
-				map(Type.STRING);  //Chat Message
+				map(Type.COMPONENT);  //Chat Message
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
@@ -920,7 +921,7 @@ public class PlayerPackets {
 						for (int i = 0; i < 4; i++) {
 							String line = packetWrapper.read(Type.STRING);
 							line = ChatUtil.legacyToJson(line);
-							packetWrapper.write(Type.STRING, line);
+							packetWrapper.write(Type.COMPONENT, GsonUtil.getJsonParser().parse(line));
 						}
 					}
 				});
