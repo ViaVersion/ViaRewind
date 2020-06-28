@@ -9,6 +9,7 @@ import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
+import us.myles.ViaVersion.util.GsonUtil;
 
 public class InventoryPackets {
 
@@ -39,7 +40,7 @@ public class InventoryPackets {
 			public void registerMap() {
 				map(Type.UNSIGNED_BYTE);
 				map(Type.STRING);
-				map(Type.STRING);
+				map(Type.COMPONENT);
 				map(Type.UNSIGNED_BYTE);
 				handler(new PacketHandler() {
 					@Override
@@ -63,9 +64,9 @@ public class InventoryPackets {
 						if (type.equalsIgnoreCase("minecraft:shulker_box")) {
 							packetWrapper.set(Type.STRING, 0, type = "minecraft:container");
 						}
-						String name = packetWrapper.get(Type.STRING, 1);
+						String name = packetWrapper.get(Type.COMPONENT, 0).toString();
 						if (name.equalsIgnoreCase("{\"translate\":\"container.shulkerBox\"}")) {
-							packetWrapper.set(Type.STRING, 1, name = "{\"text\":\"Shulker Box\"}");
+							packetWrapper.set(Type.COMPONENT, 0, GsonUtil.getJsonParser().parse("{\"text\":\"Shulker Box\"}"));
 						}
 					}
 				});
