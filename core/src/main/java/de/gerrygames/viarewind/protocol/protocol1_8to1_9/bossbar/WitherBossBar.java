@@ -90,12 +90,22 @@ public class WitherBossBar extends BossBar {
 		throw new UnsupportedOperationException(this.getClass().getName() + " is only for one UserConnection!");
 	}
 
-	@Override
+    @Override
+    public BossBar addConnection(UserConnection userConnection) {
+        throw new UnsupportedOperationException(this.getClass().getName() + " is only for one UserConnection!");
+    }
+
+    @Override
 	public BossBar removePlayer(UUID uuid) {
 		throw new UnsupportedOperationException(this.getClass().getName() + " is only for one UserConnection!");
 	}
 
-	@Override
+    @Override
+    public BossBar removeConnection(UserConnection userConnection) {
+        throw new UnsupportedOperationException(this.getClass().getName() + " is only for one UserConnection!");
+    }
+
+    @Override
 	public BossBar addFlag(BossFlag bossFlag) {
 		throw new UnsupportedOperationException(this.getClass().getName() + " does not support flags");
 	}
@@ -115,7 +125,12 @@ public class WitherBossBar extends BossBar {
 		return Collections.singleton(connection.get(ProtocolInfo.class).getUuid());
 	}
 
-	@Override
+    @Override
+    public Set<UserConnection> getConnections() {
+        throw new UnsupportedOperationException(this.getClass().getName() + " is only for one UserConnection!");
+    }
+
+    @Override
 	public BossBar show() {
 		if (!this.visible) {
 			this.visible = true;
