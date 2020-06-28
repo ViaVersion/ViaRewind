@@ -5,7 +5,7 @@
   "version": "${project.version}",
   "license": "MIT",
   "contact": {
-    "homepage": "https://github.com/ViaVersion/ViaRewind",
+    "homepage": "https://viaversion.com/rewind",
     "issues": "https://github.com/ViaVersion/ViaRewind/issues",
     "sources": "https://github.com/ViaVersion/ViaRewind"
   },

@@ -23,7 +23,8 @@ import java.util.logging.Logger;
 		dependencies = {
 			@Dependency(id = "viaversion"),
 			@Dependency(id = "viabackwards", optional = true)
-		}
+		},
+		url = "https://viaversion.com/rewind"
 )
 public class VelocityPlugin implements ViaRewindPlatform {
     @Getter
