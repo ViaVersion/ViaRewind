@@ -342,25 +342,7 @@ public class WorldPackets {
 		protocol.registerOutgoing(State.PLAY, 0x44, 0x03);
 
 		//Update Sign
-		protocol.registerOutgoing(State.PLAY, 0x46, 0x33, new PacketRemapper() {
-			@Override
-			public void registerMap() {
-				map(Type.POSITION);
-				map(Type.STRING);
-				map(Type.STRING);
-				map(Type.STRING);
-				map(Type.STRING);
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						for (int i = 0; i < 4; i++) {
-							String text = packetWrapper.get(Type.STRING, i);
-							packetWrapper.set(Type.STRING, i, text);
-						}
-					}
-				});
-			}
-		});
+		protocol.registerOutgoing(State.PLAY, 0x46, 0x33);
 
 		//Sound Effects
 		protocol.registerOutgoing(State.PLAY, 0x47, 0x29, new PacketRemapper() {
