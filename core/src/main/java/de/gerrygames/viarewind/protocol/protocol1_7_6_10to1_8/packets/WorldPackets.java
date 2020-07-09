@@ -69,8 +69,8 @@ public class WorldPackets {
 						packetWrapper.write(Type.SHORT, (short) records.length);
 						packetWrapper.write(Type.INT, records.length * 4);
 						for (BlockChangeRecord record : records) {
-							packetWrapper.write(Type.UNSIGNED_BYTE, record.getHorizontal());
-							packetWrapper.write(Type.UNSIGNED_BYTE, record.getY());
+							short data = (short) (record.getSectionX() << 12 | record.getSectionZ() << 8 | record.getY());
+							packetWrapper.write(Type.SHORT, data);
 							BlockState state = BlockState.rawToState(record.getBlockId());
 							state = ReplacementRegistry1_7_6_10to1_8.replace(state);
 							packetWrapper.write(Type.SHORT, (short) BlockState.stateToRaw(state));
