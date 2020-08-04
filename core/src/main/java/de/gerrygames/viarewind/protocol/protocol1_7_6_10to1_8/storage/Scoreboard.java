@@ -2,8 +2,6 @@ package de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage;
 
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10TO1_8;
 import de.gerrygames.viarewind.utils.PacketUtil;
-import lombok.Getter;
-import lombok.Setter;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.data.StoredObject;
 import us.myles.ViaVersion.api.data.UserConnection;
@@ -12,16 +10,13 @@ import us.myles.ViaVersion.api.type.Type;
 import java.util.*;
 
 public class Scoreboard extends StoredObject {
-	private HashMap<String, List<String>> teams = new HashMap<>();
-	private HashSet<String> objectives = new HashSet<>();
-	private HashMap<String, ScoreTeam> scoreTeams = new HashMap<>();
-	private HashMap<String, Byte> teamColors = new HashMap<>();
-	private HashSet<String> scoreTeamNames = new HashSet<>();
-	@Getter
-    @Setter
+	private final HashMap<String, List<String>> teams = new HashMap<>();
+	private final HashSet<String> objectives = new HashSet<>();
+	private final HashMap<String, ScoreTeam> scoreTeams = new HashMap<>();
+	private final HashMap<String, Byte> teamColors = new HashMap<>();
+	private final HashSet<String> scoreTeamNames = new HashSet<>();
 	private String colorIndependentSidebar;
-	@Getter
-	private HashMap<Byte, String> colorDependentSidebar = new HashMap<>();
+	private final HashMap<Byte, String> colorDependentSidebar = new HashMap<>();
 
     public Scoreboard(UserConnection user) {
 		super(user);
@@ -114,7 +109,7 @@ public class Scoreboard extends StoredObject {
 			name = score.substring(i, i+l);
 		}
 		String prefix = score.substring(0, i);
-		String suffix = i+l>=score.length() ? "" : score.substring(i+l, score.length());
+		String suffix = i+l>=score.length() ? "" : score.substring(i+l);
 
 		ScoreTeam scoreTeam = new ScoreTeam(name, prefix, suffix);
 		scoreTeams.put(score, scoreTeam);
@@ -148,14 +143,26 @@ public class Scoreboard extends StoredObject {
 	}
 
 	private class ScoreTeam {
-		private String prefix;
-		private String suffix;
-		private String name;
+		private final String prefix;
+		private final String suffix;
+		private final String name;
 
 		public ScoreTeam(String name, String prefix, String suffix) {
 			this.prefix = prefix;
 			this.suffix = suffix;
 			this.name = name;
 		}
+	}
+
+	public String getColorIndependentSidebar() {
+		return colorIndependentSidebar;
+	}
+
+	public HashMap<Byte, String> getColorDependentSidebar() {
+		return colorDependentSidebar;
+	}
+
+	public void setColorIndependentSidebar(String colorIndependentSidebar) {
+		this.colorIndependentSidebar = colorIndependentSidebar;
 	}
 }

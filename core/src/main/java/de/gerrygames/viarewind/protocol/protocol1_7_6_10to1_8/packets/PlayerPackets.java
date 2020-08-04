@@ -6,11 +6,7 @@ import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10TO
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.entityreplacements.ArmorStandReplacement;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.items.ItemRewriter;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.provider.TitleRenderProvider;
-import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage.EntityTracker;
-import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage.GameProfileStorage;
-import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage.PlayerAbilities;
-import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage.PlayerPosition;
-import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage.Windows;
+import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage.*;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
 import de.gerrygames.viarewind.replacement.EntityReplacement;
 import de.gerrygames.viarewind.utils.ChatUtil;

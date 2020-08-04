@@ -6,8 +6,8 @@ import us.myles.ViaVersion.api.minecraft.item.Item;
 import java.util.HashMap;
 
 public class ReplacementRegistry {
-	private HashMap<Integer, Replacement> itemReplacements = new HashMap<>();
-	private HashMap<Integer, Replacement> blockReplacements = new HashMap<>();
+	private final HashMap<Integer, Replacement> itemReplacements = new HashMap<>();
+	private final HashMap<Integer, Replacement> blockReplacements = new HashMap<>();
 
 
 	public void registerItem(int id, Replacement replacement) {

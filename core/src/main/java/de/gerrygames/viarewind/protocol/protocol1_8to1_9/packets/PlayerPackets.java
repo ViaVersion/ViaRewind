@@ -2,11 +2,7 @@ package de.gerrygames.viarewind.protocol.protocol1_8to1_9.packets;
 
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.Protocol1_8TO1_9;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.items.ItemRewriter;
-import de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage.BlockPlaceDestroyTracker;
-import de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage.BossBarStorage;
-import de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage.Cooldown;
-import de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage.EntityTracker;
-import de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage.PlayerPosition;
+import de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage.*;
 import de.gerrygames.viarewind.utils.ChatUtil;
 import de.gerrygames.viarewind.utils.PacketUtil;
 import us.myles.ViaVersion.api.PacketWrapper;

@@ -1,8 +1,8 @@
 package de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage;
 
-import de.gerrygames.viarewind.utils.Tickable;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10TO1_8;
 import de.gerrygames.viarewind.utils.PacketUtil;
+import de.gerrygames.viarewind.utils.Tickable;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.data.StoredObject;
 import us.myles.ViaVersion.api.data.UserConnection;
@@ -39,8 +39,8 @@ public class WorldBorder extends StoredObject implements Tickable {
 		WEST(-1, 0),
 		;
 
-		private int modX;
-		private int modZ;
+		private final int modX;
+		private final int modZ;
 
 		Side(int modX, int modZ) {
 			this.modX = modX;

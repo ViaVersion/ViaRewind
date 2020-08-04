@@ -5,17 +5,17 @@ import io.netty.channel.ChannelHandlerContext;
 
 public class EmptyChannelHandler implements ChannelHandler {
 	@Override
-	public void handlerAdded(ChannelHandlerContext channelHandlerContext) throws Exception {
-
+	public void handlerAdded(ChannelHandlerContext channelHandlerContext) {
+		// Do nothing
 	}
 
 	@Override
-	public void handlerRemoved(ChannelHandlerContext channelHandlerContext) throws Exception {
-
+	public void handlerRemoved(ChannelHandlerContext channelHandlerContext) {
+		// Do nothing
 	}
 
 	@Override
-	public void exceptionCaught(ChannelHandlerContext channelHandlerContext, Throwable throwable) throws Exception {
-
+	public void exceptionCaught(ChannelHandlerContext channelHandlerContext, Throwable throwable) {
+		channelHandlerContext.fireExceptionCaught(throwable);
 	}
 }

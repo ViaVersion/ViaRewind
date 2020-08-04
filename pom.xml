@@ -36,26 +36,10 @@
     </repositories>
 
     <dependencies>
-        <!-- Lombok -->
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.18.12</version>
-            <scope>provided</scope>
-        </dependency>
-
         <!-- ViaVersion -->
         <dependency>
             <groupId>us.myles</groupId>
             <artifactId>viaversion</artifactId>
-            <version>3.2.0-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <!-- ViaBackwards -->
-        <dependency>
-            <groupId>nl.matsv</groupId>
-            <artifactId>viabackwards-all</artifactId>
             <version>3.2.0-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>

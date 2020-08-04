@@ -6,7 +6,7 @@ import io.netty.handler.codec.MessageToByteEncoder;
 
 public class ForwardMessageToByteEncoder extends MessageToByteEncoder<ByteBuf> {
 	@Override
-	protected void encode(ChannelHandlerContext ctx, ByteBuf msg, ByteBuf out) throws Exception {
+	protected void encode(ChannelHandlerContext ctx, ByteBuf msg, ByteBuf out) {
 		out.writeBytes(msg);
 	}
 }

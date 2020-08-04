@@ -7,14 +7,10 @@ import us.myles.viaversion.libs.opennbt.tag.builtin.CompoundTag;
 import us.myles.viaversion.libs.opennbt.tag.builtin.ListTag;
 import us.myles.viaversion.libs.opennbt.tag.builtin.StringTag;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class GameProfileStorage extends StoredObject {
-	private Map<UUID, GameProfile> properties = new HashMap<>();
+	private final Map<UUID, GameProfile> properties = new HashMap<>();
 
 	public GameProfileStorage(UserConnection user) {
 		super(user);

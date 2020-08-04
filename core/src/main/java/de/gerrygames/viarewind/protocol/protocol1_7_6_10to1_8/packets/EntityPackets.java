@@ -5,7 +5,6 @@ import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.items.ItemRewriter
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.metadata.MetadataRewriter;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage.EntityTracker;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage.GameProfileStorage;
-import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.IntArrayType;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
 import de.gerrygames.viarewind.replacement.EntityReplacement;
 import de.gerrygames.viarewind.utils.PacketUtil;

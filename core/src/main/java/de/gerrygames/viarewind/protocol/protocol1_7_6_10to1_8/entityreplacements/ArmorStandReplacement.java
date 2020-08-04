@@ -8,7 +8,6 @@ import de.gerrygames.viarewind.replacement.EntityReplacement;
 import de.gerrygames.viarewind.utils.PacketUtil;
 import de.gerrygames.viarewind.utils.math.AABB;
 import de.gerrygames.viarewind.utils.math.Vector3d;
-import lombok.Getter;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.entities.Entity1_10Types;
@@ -20,16 +19,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ArmorStandReplacement implements EntityReplacement {
-	@Getter
-	private int entityId;
-	private List<Metadata> datawatcher = new ArrayList<>();
+	private final int entityId;
+	private final List<Metadata> datawatcher = new ArrayList<>();
 	private int[] entityIds = null;
 	private double locX, locY, locZ;
 	private State currentState = null;
 	private boolean invisible = false;
 	private boolean nameTagVisible = false;
 	private String name = null;
-	private UserConnection user;
+	private final UserConnection user;
 	private float yaw, pitch;
 	private float headYaw;
 	private boolean small = false;
@@ -37,7 +35,7 @@ public class ArmorStandReplacement implements EntityReplacement {
 	private static int ENTITY_ID = Integer.MAX_VALUE - 16000;
 
 	private enum State {
-		HOLOGRAM, ZOMBIE;
+		HOLOGRAM, ZOMBIE
 	}
 
 	public ArmorStandReplacement(int entityId, UserConnection user) {
@@ -281,5 +279,9 @@ public class ArmorStandReplacement implements EntityReplacement {
 		}
 		entityIds = null;
 		PacketUtil.sendPacket(despawn, Protocol1_7_6_10TO1_8.class, true, true);
+	}
+
+	public int getEntityId() {
+		return entityId;
 	}
 }

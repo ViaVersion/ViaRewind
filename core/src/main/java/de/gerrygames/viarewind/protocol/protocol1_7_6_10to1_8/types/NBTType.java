@@ -7,11 +7,7 @@ import us.myles.ViaVersion.api.type.Type;
 import us.myles.viaversion.libs.opennbt.NBTIO;
 import us.myles.viaversion.libs.opennbt.tag.builtin.CompoundTag;
 
-import java.io.DataInput;
-import java.io.DataInputStream;
-import java.io.DataOutput;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 
 public class NBTType extends Type<CompoundTag> {
 	public NBTType() {

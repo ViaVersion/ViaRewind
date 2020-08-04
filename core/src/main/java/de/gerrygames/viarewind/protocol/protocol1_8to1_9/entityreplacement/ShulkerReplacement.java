@@ -4,7 +4,6 @@ import de.gerrygames.viarewind.protocol.protocol1_8to1_9.Protocol1_8TO1_9;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.metadata.MetadataRewriter;
 import de.gerrygames.viarewind.replacement.EntityReplacement;
 import de.gerrygames.viarewind.utils.PacketUtil;
-import lombok.Getter;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.entities.Entity1_10Types;
@@ -17,11 +16,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ShulkerReplacement implements EntityReplacement {
-	@Getter
-	private int entityId;
-	private List<Metadata> datawatcher = new ArrayList<>();
+	private final int entityId;
+	private final List<Metadata> datawatcher = new ArrayList<>();
 	private double locX, locY, locZ;
-	private UserConnection user;
+	private final UserConnection user;
 
 	public ShulkerReplacement(int entityId, UserConnection user) {
 		this.entityId = entityId;
@@ -111,5 +109,9 @@ public class ShulkerReplacement implements EntityReplacement {
 		despawn.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[] {entityId});
 
 		PacketUtil.sendPacket(despawn, Protocol1_8TO1_9.class, true, true);
+	}
+
+	public int getEntityId() {
+		return this.entityId;
 	}
 }

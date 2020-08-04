@@ -1,8 +1,8 @@
 package de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage;
 
-import de.gerrygames.viarewind.utils.Tickable;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.Protocol1_8TO1_9;
 import de.gerrygames.viarewind.utils.PacketUtil;
+import de.gerrygames.viarewind.utils.Tickable;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.data.StoredObject;
 import us.myles.ViaVersion.api.data.UserConnection;

@@ -1,8 +1,8 @@
 package de.gerrygames.viarewind.storage;
 
 public class BlockState {
-	private int id;
-	private int data;
+	private final int id;
+	private final int data;
 
 	public BlockState(int id, int data) {
 		this.id = id;

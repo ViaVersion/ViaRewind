@@ -4,7 +4,6 @@ import com.google.inject.Inject;
 import de.gerrygames.viarewind.api.ViaRewindConfigImpl;
 import de.gerrygames.viarewind.api.ViaRewindPlatform;
 import de.gerrygames.viarewind.sponge.VersionInfo;
-import lombok.Getter;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
@@ -27,7 +26,6 @@ import java.util.logging.Logger;
 		url = "https://viaversion.com/rewind"
 )
 public class SpongePlugin implements ViaRewindPlatform {
-	@Getter
 	private Logger logger;
 	@Inject
 	private org.slf4j.Logger loggerSlf4j;
@@ -44,5 +42,9 @@ public class SpongePlugin implements ViaRewindPlatform {
 		ViaRewindConfigImpl conf = new ViaRewindConfigImpl(configDir.resolve("config.yml").toFile());
 		conf.reloadConfig();
 		this.init(conf);
+	}
+
+	public Logger getLogger() {
+		return this.logger;
 	}
 }

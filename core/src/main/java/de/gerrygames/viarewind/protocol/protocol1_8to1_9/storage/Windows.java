@@ -11,8 +11,8 @@ import us.myles.ViaVersion.api.type.Type;
 import java.util.HashMap;
 
 public class Windows extends StoredObject {
-	private HashMap<Short, String> types = new HashMap<>();
-	private HashMap<Short, Item[]> brewingItems = new HashMap<>();
+	private final HashMap<Short, String> types = new HashMap<>();
+	private final HashMap<Short, Item[]> brewingItems = new HashMap<>();
 
 	public Windows(UserConnection user) {
 		super(user);

@@ -1,6 +1,5 @@
 package de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage;
 
-import lombok.Data;
 import us.myles.ViaVersion.api.data.StoredObject;
 import us.myles.ViaVersion.api.data.UserConnection;
 
@@ -58,11 +57,42 @@ public class Windows extends StoredObject {
 		}
 	}
 
-	@Data
 	public static class Furnace {
 		private short fuelLeft = 0;
 		private short maxFuel = 0;
 		private short progress = 0;
 		private short maxProgress = 200;
+
+		public short getFuelLeft() {
+			return fuelLeft;
+		}
+
+		public void setFuelLeft(short fuelLeft) {
+			this.fuelLeft = fuelLeft;
+		}
+
+		public short getMaxFuel() {
+			return maxFuel;
+		}
+
+		public void setMaxFuel(short maxFuel) {
+			this.maxFuel = maxFuel;
+		}
+
+		public short getProgress() {
+			return progress;
+		}
+
+		public void setProgress(short progress) {
+			this.progress = progress;
+		}
+
+		public short getMaxProgress() {
+			return maxProgress;
+		}
+
+		public void setMaxProgress(short maxProgress) {
+			this.maxProgress = maxProgress;
+		}
 	}
 }

@@ -14,11 +14,7 @@ import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.version.Types1_8;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public class WitherBossBar extends BossBar {
 	private static int highestId = Integer.MAX_VALUE-10000;
@@ -28,7 +24,7 @@ public class WitherBossBar extends BossBar {
 	private float health;
 	private boolean visible = false;
 
-	private UserConnection connection;
+	private final UserConnection connection;
 
 	private final int entityId = highestId++;
 	private double locX, locY, locZ;

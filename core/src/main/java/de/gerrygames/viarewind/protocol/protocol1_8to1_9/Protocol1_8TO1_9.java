@@ -1,19 +1,8 @@
 package de.gerrygames.viarewind.protocol.protocol1_8to1_9;
 
 import com.google.common.collect.ImmutableSet;
-import de.gerrygames.viarewind.protocol.protocol1_8to1_9.packets.EntityPackets;
-import de.gerrygames.viarewind.protocol.protocol1_8to1_9.packets.InventoryPackets;
-import de.gerrygames.viarewind.protocol.protocol1_8to1_9.packets.PlayerPackets;
-import de.gerrygames.viarewind.protocol.protocol1_8to1_9.packets.ScoreboardPackets;
-import de.gerrygames.viarewind.protocol.protocol1_8to1_9.packets.SpawnPackets;
-import de.gerrygames.viarewind.protocol.protocol1_8to1_9.packets.WorldPackets;
-import de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage.BlockPlaceDestroyTracker;
-import de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage.BossBarStorage;
-import de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage.Cooldown;
-import de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage.EntityTracker;
-import de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage.Levitation;
-import de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage.PlayerPosition;
-import de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage.Windows;
+import de.gerrygames.viarewind.protocol.protocol1_8to1_9.packets.*;
+import de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage.*;
 import de.gerrygames.viarewind.utils.Ticker;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.data.UserConnection;

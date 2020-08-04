@@ -5,7 +5,6 @@ import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.metadata.MetadataR
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
 import de.gerrygames.viarewind.replacement.EntityReplacement;
 import de.gerrygames.viarewind.utils.PacketUtil;
-import lombok.Getter;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.entities.Entity1_10Types;
@@ -16,13 +15,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GuardianReplacement implements EntityReplacement {
-	@Getter
-	private int entityId;
-	private List<Metadata> datawatcher = new ArrayList<>();
+	private final int entityId;
+	private final List<Metadata> datawatcher = new ArrayList<>();
 	private double locX, locY, locZ;
 	private float yaw, pitch;
 	private float headYaw;
-	private UserConnection user;
+	private final UserConnection user;
 
 	public GuardianReplacement(int entityId, UserConnection user) {
 		this.entityId = entityId;
@@ -126,5 +124,10 @@ public class GuardianReplacement implements EntityReplacement {
 		despawn.write(Types1_7_6_10.INT_ARRAY, new int[] {entityId});
 
 		PacketUtil.sendPacket(despawn, Protocol1_7_6_10TO1_8.class, true, true);
+	}
+
+	@Override
+	public int getEntityId() {
+		return entityId;
 	}
 }

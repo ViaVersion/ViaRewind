@@ -6,8 +6,11 @@ import us.myles.viaversion.libs.opennbt.tag.builtin.CompoundTag;
 import us.myles.viaversion.libs.opennbt.tag.builtin.StringTag;
 
 public class Replacement {
-	private int id, data;
-	private String name, resetName, bracketName;
+	private final int id;
+	private final int data;
+	private final String name;
+	private String resetName;
+	private String bracketName;
 
 	public Replacement(int id) {
 		this(id, -1);

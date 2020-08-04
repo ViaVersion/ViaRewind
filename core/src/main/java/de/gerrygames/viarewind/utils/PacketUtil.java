@@ -18,7 +18,6 @@ public class PacketUtil {
 		try {
 			packet.sendToServer(packetProtocol, skipCurrentPipeline, currentThread);
 		} catch (CancelException ignored) {
-			;
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -37,7 +36,6 @@ public class PacketUtil {
 			packet.send(packetProtocol, skipCurrentPipeline, currentThread);
 			return true;
 		} catch (CancelException ignored) {
-			;
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}

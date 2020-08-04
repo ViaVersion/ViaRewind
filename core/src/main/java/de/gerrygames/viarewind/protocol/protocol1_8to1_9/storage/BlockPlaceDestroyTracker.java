@@ -21,7 +21,7 @@ public class BlockPlaceDestroyTracker extends StoredObject {
 
 	public boolean isMining() {
 		long time = System.currentTimeMillis()-lastMining;
-		return mining && time<75 || time<75;
+		return time < 75;
 	}
 
 	public void setMining(boolean mining) {
