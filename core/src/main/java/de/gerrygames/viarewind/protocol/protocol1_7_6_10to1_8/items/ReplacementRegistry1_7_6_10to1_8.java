@@ -37,7 +37,7 @@ public class ReplacementRegistry1_7_6_10to1_8 {
 		registry.registerItem(411, new Replacement(365, "Raw Rabbit"));
 		registry.registerItem(412, new Replacement(366, "Cooked Rabbit"));
 		registry.registerItem(413, new Replacement(282, "Rabbit Stew"));
-		registry.registerItem(414, new Replacement(375, "Rabbit's Foor"));
+		registry.registerItem(414, new Replacement(375, "Rabbit's Foot"));
 		registry.registerItem(415, new Replacement(334, "Rabbit Hide"));
 		registry.registerItem(373, 8203, new Replacement(373, 0, "Potion of Leaping"));
 		registry.registerItem(373, 8235, new Replacement(373, 0, "Potion of Leaping"));
