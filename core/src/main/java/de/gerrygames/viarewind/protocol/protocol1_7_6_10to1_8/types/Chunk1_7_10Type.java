@@ -24,7 +24,7 @@ public class Chunk1_7_10Type extends PartialType<Chunk, ClientWorld> {
     public void write(ByteBuf output, ClientWorld clientWorld, Chunk chunk) throws Exception {
         output.writeInt(chunk.getX());
         output.writeInt(chunk.getZ());
-        output.writeBoolean(chunk.isGroundUp());
+        output.writeBoolean(chunk.isFullChunk());
         output.writeShort(chunk.getBitmask());
         output.writeShort(0);
 
@@ -69,7 +69,7 @@ public class Chunk1_7_10Type extends PartialType<Chunk, ClientWorld> {
             }
         }
 
-        if (chunk.isGroundUp() && chunk.isBiomeData()) {
+        if (chunk.isFullChunk() && chunk.isBiomeData()) {
             for (int biome : chunk.getBiomeData()) {
                 dataToCompress.writeByte((byte) biome);
             }

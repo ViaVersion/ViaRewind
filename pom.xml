@@ -6,7 +6,7 @@
 
     <groupId>de.gerrygames</groupId>
     <artifactId>viarewind-parent</artifactId>
-    <version>1.5.1</version>
+    <version>1.5.2-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>
@@ -48,7 +48,7 @@
         <dependency>
             <groupId>us.myles</groupId>
             <artifactId>viaversion</artifactId>
-            <version>3.1.0</version>
+            <version>3.2.0-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
 
@@ -56,7 +56,7 @@
         <dependency>
             <groupId>nl.matsv</groupId>
             <artifactId>viabackwards-all</artifactId>
-            <version>3.1.0</version>
+            <version>3.2.0-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

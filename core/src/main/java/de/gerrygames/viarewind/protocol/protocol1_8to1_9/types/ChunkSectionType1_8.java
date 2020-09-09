@@ -16,7 +16,6 @@ public class ChunkSectionType1_8 extends Type<ChunkSection> {
 
 	public ChunkSection read(ByteBuf buffer) throws Exception {
 		ChunkSection chunkSection = new ChunkSection();
-		chunkSection.clearPalette();
 		byte[] blockData = new byte[8192];
 		buffer.readBytes(blockData);
 		ShortBuffer blockBuf = ByteBuffer.wrap(blockData).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer();

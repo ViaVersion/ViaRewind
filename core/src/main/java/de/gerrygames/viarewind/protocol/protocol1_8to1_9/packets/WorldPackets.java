@@ -210,11 +210,13 @@ public class WorldPackets {
 							}
 						}
 
-						if (chunk.isGroundUp() && chunk.getBitmask() == 0) {  //This would be an unload packet for 1.8 clients. Just set one air section
+						if (chunk.isFullChunk() && chunk.getBitmask() == 0) {  //This would be an unload packet for 1.8 clients. Just set one air section
 							boolean skylight = world.getEnvironment() == Environment.NORMAL;
 							ChunkSection[] sections = new ChunkSection[16];
-							sections[0] = new ChunkSection();
-							if (skylight) sections[0].setSkyLight(new byte[2048]);
+							ChunkSection section = new ChunkSection();
+							sections[0] = section;
+							section.addPaletteEntry(0);
+							if (skylight) section.setSkyLight(new byte[2048]);
 							chunk = new Chunk1_8(chunk.getX(), chunk.getZ(), true, 1, sections, chunk.getBiomeData(), chunk.getBlockEntities());
 						}
 

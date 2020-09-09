@@ -27,7 +27,7 @@ public class Chunk1_8Type extends PartialType<Chunk, ClientWorld> {
         int chunkZ = input.readInt();
         boolean groundUp = input.readByte() != 0;
         int bitmask = input.readUnsignedShort();
-        int dataLength = Type.VAR_INT.read(input);
+        int dataLength = Type.VAR_INT.readPrimitive(input);
 
 	    if (bitmask == 0 && groundUp) {
 		    // This is a chunks unload packet
@@ -105,7 +105,7 @@ public class Chunk1_8Type extends PartialType<Chunk, ClientWorld> {
             }
         }
 
-        if (chunk.isGroundUp() && chunk.isBiomeData()) {
+        if (chunk.isFullChunk() && chunk.isBiomeData()) {
             for (int biome : chunk.getBiomeData()) {
                 buf.writeByte((byte) biome);
             }
@@ -113,9 +113,9 @@ public class Chunk1_8Type extends PartialType<Chunk, ClientWorld> {
 
         output.writeInt(chunk.getX());
         output.writeInt(chunk.getZ());
-        output.writeBoolean(chunk.isGroundUp());
+        output.writeBoolean(chunk.isFullChunk());
         output.writeShort(chunk.getBitmask());
-        Type.VAR_INT.write(output, buf.readableBytes());
+        Type.VAR_INT.writePrimitive(output, buf.readableBytes());
         output.writeBytes(buf, buf.readableBytes());
         buf.release();
     }
