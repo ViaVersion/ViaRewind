@@ -47,12 +47,8 @@ public class MetadataRewriter {
 							else entry.setValue(owner.toString());
 							break;
 						case BlockID:
-							int combined = (Integer) value;
-							int id = combined >> 4;
-							int data = combined & 0xF;
 							list.remove(entry);
-							list.add(new Metadata(metaIndex.getIndex(), MetaType1_8.Short, (short)id));
-							list.add(new Metadata(metaIndex.getIndex(), MetaType1_8.Byte, (byte)data));
+							list.add(new Metadata(metaIndex.getIndex(), MetaType1_8.Short, ((Integer) value).shortValue()));
 							break;
 						case VarInt:
 							if (metaIndex.getOldType() == MetaType1_8.Byte) {
