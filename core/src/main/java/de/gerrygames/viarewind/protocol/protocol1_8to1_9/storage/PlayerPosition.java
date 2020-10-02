@@ -10,7 +10,6 @@ public class PlayerPosition extends StoredObject {
 	private float yaw, pitch;
 	private boolean onGround;
 	private int confirmId = -1;
-	private boolean cancel = false;
 
 	public PlayerPosition(UserConnection user) {
 		super(user);

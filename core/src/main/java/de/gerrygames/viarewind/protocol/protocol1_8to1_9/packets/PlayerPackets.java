@@ -204,17 +204,8 @@ public class PlayerPackets {
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						PlayerPosition pos = packetWrapper.user().get(PlayerPosition.class);
 
-						int confirmId = packetWrapper.read(Type.VAR_INT);
-						pos.setConfirmId(confirmId);
-
-						//Send a confirm transaction packet in order to know when the client received the position packet
-						//The client will send a confirm transaction response just before it will send a position packet with its new position
-						//Then we will send the confirm packet
-						PacketWrapper confirmHack = packetWrapper.create(0x32);
-						confirmHack.write(Type.UNSIGNED_BYTE, (short) 0);
-						confirmHack.write(Type.SHORT, (short) -1337);
-						confirmHack.write(Type.BOOLEAN, false);
-						PacketUtil.sendPacket(confirmHack, Protocol1_8TO1_9.class, true, true);
+						int teleportId = packetWrapper.read(Type.VAR_INT);
+						pos.setConfirmId(teleportId);
 
 						byte flags = packetWrapper.get(Type.BYTE, 0);
 						double x = packetWrapper.get(Type.DOUBLE, 0);
@@ -223,45 +214,34 @@ public class PlayerPackets {
 						float yaw = packetWrapper.get(Type.FLOAT, 0);
 						float pitch = packetWrapper.get(Type.FLOAT, 1);
 
-						if ((flags & 0x01) != 0) {
-							x += pos.getPosX();
-						}
-						if ((flags & 0x02) != 0) {
-							y += pos.getPosY();
-						}
-						if ((flags & 0x04) != 0) {
-							z += pos.getPosZ();
-						}
-						if ((flags & 0x08) != 0) {
-							yaw += pos.getYaw();
-						}
-						if ((flags & 0x10) != 0) {
-							pitch += pos.getPitch();
+						packetWrapper.set(Type.BYTE, 0, (byte) 0);
+
+						if (flags != 0) {
+							if ((flags & 0x01) != 0) {
+								x += pos.getPosX();
+								packetWrapper.set(Type.DOUBLE, 0, x);
+							}
+							if ((flags & 0x02) != 0) {
+								y += pos.getPosY();
+								packetWrapper.set(Type.DOUBLE, 1, y);
+							}
+							if ((flags & 0x04) != 0) {
+								z += pos.getPosZ();
+								packetWrapper.set(Type.DOUBLE, 2, z);
+							}
+							if ((flags & 0x08) != 0) {
+								yaw += pos.getYaw();
+								packetWrapper.set(Type.FLOAT, 0, yaw);
+							}
+							if ((flags & 0x10) != 0) {
+								pitch += pos.getPitch();
+								packetWrapper.set(Type.FLOAT, 1, pitch);
+							}
 						}
 
 						pos.setPos(x, y, z);
 						pos.setYaw(yaw);
 						pos.setPitch(pitch);
-
-						packetWrapper.cancel();
-
-						//Make sure our packets are in the right order. Let's hope this doesn't break anything.
-						PacketWrapper teleportPacket = packetWrapper.create(0x08);
-						teleportPacket.write(Type.DOUBLE, packetWrapper.get(Type.DOUBLE, 0));
-						teleportPacket.write(Type.DOUBLE, packetWrapper.get(Type.DOUBLE, 1));
-						teleportPacket.write(Type.DOUBLE, packetWrapper.get(Type.DOUBLE, 2));
-						teleportPacket.write(Type.FLOAT, packetWrapper.get(Type.FLOAT, 0));
-						teleportPacket.write(Type.FLOAT, packetWrapper.get(Type.FLOAT, 1));
-						teleportPacket.write(Type.BYTE, packetWrapper.get(Type.BYTE, 0));
-						PacketUtil.sendPacket(teleportPacket, Protocol1_8TO1_9.class, true, true);
-
-						//The client sometimes sends an old position packet, because the teleport packet is posted to the main thread after position updating
-						//After we received the response for this packet we know that the last position must be the valid new position
-						PacketWrapper confirmHack2 = packetWrapper.create(0x32);
-						confirmHack2.write(Type.UNSIGNED_BYTE, (short) 0);
-						confirmHack2.write(Type.SHORT, (short) -1338);
-						confirmHack2.write(Type.BOOLEAN, false);
-						PacketUtil.sendPacket(confirmHack2, Protocol1_8TO1_9.class, true, true);
 					}
 				});
 			}
@@ -354,44 +334,6 @@ public class PlayerPackets {
 				map(Type.BYTE);
 				map(Type.SHORT);
 				map(Type.BOOLEAN);
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						short windowId = packetWrapper.get(Type.BYTE, 0);
-						short actionNumber = packetWrapper.get(Type.SHORT, 0);
-
-						if (windowId == 0 && (actionNumber == -1337 || actionNumber == -1338)) {
-							//This is a response to our teleport confirm hack
-							packetWrapper.cancel();
-
-							PlayerPosition pos = packetWrapper.user().get(PlayerPosition.class);
-
-							if (pos.getConfirmId() == -1) return;
-
-							if (actionNumber == -1337) {
-								//This is the first packet, cancel all positions until the second one.
-								pos.setCancel(true);
-							} else {
-								//This is the second packet, confirm the teleport and send our position
-								PacketWrapper confirm = packetWrapper.create(0x00);
-								confirm.write(Type.VAR_INT, pos.getConfirmId());
-								PacketUtil.sendToServer(confirm, Protocol1_8TO1_9.class, true, true);
-
-								PacketWrapper position = packetWrapper.create(0x0D);
-								position.write(Type.DOUBLE, pos.getPosX());
-								position.write(Type.DOUBLE, pos.getPosY());
-								position.write(Type.DOUBLE, pos.getPosZ());
-								position.write(Type.FLOAT, pos.getYaw());
-								position.write(Type.FLOAT, pos.getPitch());
-								position.write(Type.BOOLEAN, pos.isOnGround());
-								PacketUtil.sendToServer(position, Protocol1_8TO1_9.class, true, true);
-
-								pos.setCancel(false);
-								pos.setConfirmId(-1);
-							}
-						}
-					}
-				});
 			}
 		});
 
@@ -446,10 +388,9 @@ public class PlayerPackets {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						PlayerPosition pos = packetWrapper.user().get(PlayerPosition.class);
+						if (pos.getConfirmId() != -1) return;
 						pos.setPos(packetWrapper.get(Type.DOUBLE, 0), packetWrapper.get(Type.DOUBLE, 1), packetWrapper.get(Type.DOUBLE, 2));
 						pos.setOnGround(packetWrapper.get(Type.BOOLEAN, 0));
-
-						if (pos.isCancel()) packetWrapper.cancel();
 					}
 				});
 				handler(new PacketHandler() {
@@ -472,11 +413,10 @@ public class PlayerPackets {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						PlayerPosition pos = packetWrapper.user().get(PlayerPosition.class);
+						if (pos.getConfirmId() != -1) return;
 						pos.setYaw(packetWrapper.get(Type.FLOAT, 0));
 						pos.setPitch(packetWrapper.get(Type.FLOAT, 1));
 						pos.setOnGround(packetWrapper.get(Type.BOOLEAN, 0));
-
-						if (pos.isCancel()) packetWrapper.cancel();
 					}
 				});
 				handler(new PacketHandler() {
@@ -501,13 +441,28 @@ public class PlayerPackets {
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
-						PlayerPosition pos = packetWrapper.user().get(PlayerPosition.class);
-						pos.setPos(packetWrapper.get(Type.DOUBLE, 0), packetWrapper.get(Type.DOUBLE, 1), packetWrapper.get(Type.DOUBLE, 2));
-						pos.setYaw(packetWrapper.get(Type.FLOAT, 0));
-						pos.setPitch(packetWrapper.get(Type.FLOAT, 1));
-						pos.setOnGround(packetWrapper.get(Type.BOOLEAN, 0));
+						double x = packetWrapper.get(Type.DOUBLE, 0);
+						double y = packetWrapper.get(Type.DOUBLE, 1);
+						double z = packetWrapper.get(Type.DOUBLE, 2);
+						float yaw = packetWrapper.get(Type.FLOAT, 0);
+						float pitch = packetWrapper.get(Type.FLOAT, 1);
+						boolean onGround = packetWrapper.get(Type.BOOLEAN, 0);
 
-						if (pos.isCancel()) packetWrapper.cancel();
+						PlayerPosition pos = packetWrapper.user().get(PlayerPosition.class);
+						if (pos.getConfirmId() != -1) {
+							if (pos.getPosX() == x && pos.getPosY() == y && pos.getPosZ() == z && pos.getYaw() == yaw && pos.getPitch() == pitch) {
+								PacketWrapper confirmTeleport = packetWrapper.create(0x00);
+								confirmTeleport.write(Type.VAR_INT, pos.getConfirmId());
+								PacketUtil.sendToServer(confirmTeleport, Protocol1_8TO1_9.class, true, true);
+
+								pos.setConfirmId(-1);
+							}
+						} else {
+							pos.setPos(x, y, z);
+							pos.setYaw(yaw);
+							pos.setPitch(pitch);
+							pos.setOnGround(onGround);
+						}
 					}
 				});
 				handler(new PacketHandler() {
