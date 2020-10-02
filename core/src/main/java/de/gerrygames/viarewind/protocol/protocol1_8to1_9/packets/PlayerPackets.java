@@ -328,14 +328,7 @@ public class PlayerPackets {
 		});
 
 		//Confirm Transaction
-		protocol.registerIncoming(State.PLAY, 0x05, 0x0F, new PacketRemapper() {
-			@Override
-			public void registerMap() {
-				map(Type.BYTE);
-				map(Type.SHORT);
-				map(Type.BOOLEAN);
-			}
-		});
+		protocol.registerIncoming(State.PLAY, 0x05, 0x0F);
 
 		//Use Entity
 		protocol.registerIncoming(State.PLAY, 0x0A, 0x02, new PacketRemapper() {
