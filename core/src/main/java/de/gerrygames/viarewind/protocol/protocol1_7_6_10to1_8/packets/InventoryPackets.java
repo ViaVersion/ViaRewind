@@ -14,6 +14,7 @@ import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.base.ProtocolInfo;
+import us.myles.viaversion.libs.gson.JsonElement;
 
 import java.util.UUID;
 
@@ -33,19 +34,17 @@ public class InventoryPackets {
 						short windowId = packetWrapper.passthrough(Type.UNSIGNED_BYTE);
 						String windowType = packetWrapper.read(Type.STRING);
 						short windowtypeId = (short) Windows.getInventoryType(windowType);
-						packetWrapper.write(Type.UNSIGNED_BYTE, windowtypeId);
 						packetWrapper.user().get(Windows.class).types.put(windowId, windowtypeId);
-						String title = packetWrapper.read(Type.COMPONENT).toString();  //Title
-						try {
-							title = ChatUtil.jsonToLegacy(title);
-						} catch (IllegalArgumentException ignored) {  //Bungeecord Chat API included in 1.8 is missing HoverAction SHOW_ENTITY enum .-.
-							title = "";
-						}
+						packetWrapper.write(Type.UNSIGNED_BYTE, windowtypeId);
+
+						JsonElement titleComponent = packetWrapper.read(Type.COMPONENT);  //Title
+						String title = ChatUtil.jsonToLegacy(titleComponent);
 						title = ChatUtil.removeUnusedColor(title, '8');
 						if (title.length() > 32) {
 							title = title.substring(0, 32);
 						}
 						packetWrapper.write(Type.STRING, title);  //Window title
+
 						packetWrapper.passthrough(Type.UNSIGNED_BYTE);
 						packetWrapper.write(Type.BOOLEAN, true);
 						if (windowtypeId == 11) packetWrapper.passthrough(Type.INT);  //Entity Id
