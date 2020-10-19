@@ -248,7 +248,8 @@ public class WorldPackets {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						for (int i = 0; i < 4; i++) {
-							String line = ChatUtil.jsonToLegacy(packetWrapper.read(Type.COMPONENT));
+							String line = packetWrapper.read(Type.STRING);
+							line = ChatUtil.jsonToLegacy(line);
 							line = ChatUtil.removeUnusedColor(line, '0');
 							if (line.length() > 15) {
 								line = ChatColor.stripColor(line);
