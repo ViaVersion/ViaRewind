@@ -50,11 +50,12 @@ public class PlayerPackets {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						packetWrapper.cancel();
+
 						UUID uuid = packetWrapper.read(Type.UUID);
 						int action = packetWrapper.read(Type.VAR_INT);
 						BossBarStorage bossBarStorage = packetWrapper.user().get(BossBarStorage.class);
 						if (action == 0) {
-							bossBarStorage.add(uuid, ChatUtil.jsonToLegacy(packetWrapper.read(Type.COMPONENT).toString()), packetWrapper.read(Type.FLOAT));
+							bossBarStorage.add(uuid, ChatUtil.jsonToLegacy(packetWrapper.read(Type.COMPONENT)), packetWrapper.read(Type.FLOAT));
 							packetWrapper.read(Type.VAR_INT);
 							packetWrapper.read(Type.VAR_INT);
 							packetWrapper.read(Type.UNSIGNED_BYTE);
@@ -63,8 +64,7 @@ public class PlayerPackets {
 						} else if (action == 2) {
 							bossBarStorage.updateHealth(uuid, packetWrapper.read(Type.FLOAT));
 						} else if (action == 3) {
-							String title = packetWrapper.read(Type.COMPONENT).toString();
-							title = ChatUtil.jsonToLegacy(title);
+							String title = ChatUtil.jsonToLegacy(packetWrapper.read(Type.COMPONENT));
 							bossBarStorage.updateTitle(uuid, title);
 						}
 					}
@@ -648,9 +648,7 @@ public class PlayerPackets {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						for (int i = 0; i < 4; i++) {
-							String line = packetWrapper.read(Type.COMPONENT).toString();
-							line = ChatUtil.jsonToLegacy(line);
-							packetWrapper.write(Type.STRING, line);
+							packetWrapper.write(Type.STRING, ChatUtil.jsonToLegacy(packetWrapper.read(Type.COMPONENT)));
 						}
 					}
 				});
