@@ -5,6 +5,7 @@ import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
 import us.myles.ViaVersion.api.type.types.minecraft.MetaTypeTemplate;
 
 public class MetadataType extends MetaTypeTemplate {
+
 	@Override
 	public Metadata read(ByteBuf buffer) throws Exception {
 		byte item = buffer.readByte();

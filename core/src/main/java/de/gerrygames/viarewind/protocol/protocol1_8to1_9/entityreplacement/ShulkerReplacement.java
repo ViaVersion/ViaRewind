@@ -43,13 +43,13 @@ public class ShulkerReplacement implements EntityReplacement {
 		updateLocation();
 	}
 
-	public void setYawPitch(float yaw, float pitch) { }
+	public void setYawPitch(float yaw, float pitch) {}
 
-	public void setHeadYaw(float yaw) { }
+	public void setHeadYaw(float yaw) {}
 
 	public void updateMetadata(List<Metadata> metadataList) {
 		for (Metadata metadata : metadataList) {
-			datawatcher.removeIf(m -> m.getId()==metadata.getId());
+			datawatcher.removeIf(m -> m.getId() == metadata.getId());
 			datawatcher.add(metadata);
 		}
 		updateMetadata();
@@ -74,7 +74,7 @@ public class ShulkerReplacement implements EntityReplacement {
 
 		List<Metadata> metadataList = new ArrayList<>();
 		for (Metadata metadata : datawatcher) {
-			if (metadata.getId()==11 || metadata.getId()==12 || metadata.getId()==13) continue;
+			if (metadata.getId() == 11 || metadata.getId() == 12 || metadata.getId() == 13) continue;
 			metadataList.add(new Metadata(metadata.getId(), metadata.getMetaType(), metadata.getValue()));
 		}
 		metadataList.add(new Metadata(11, MetaType1_9.VarInt, 2));
@@ -108,7 +108,7 @@ public class ShulkerReplacement implements EntityReplacement {
 	@Override
 	public void despawn() {
 		PacketWrapper despawn = new PacketWrapper(0x13, null, user);
-		despawn.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[] {entityId});
+		despawn.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[]{entityId});
 
 		PacketUtil.sendPacket(despawn, Protocol1_8TO1_9.class, true, true);
 	}

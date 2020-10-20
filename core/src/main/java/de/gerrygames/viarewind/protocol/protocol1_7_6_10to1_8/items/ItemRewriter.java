@@ -15,11 +15,11 @@ import java.util.List;
 
 public class ItemRewriter {
 
-	public static Item toClient(Item item) {
-		if (item==null) return null;
+	public static void toClient(Item item) {
+		if (item == null) return;
 
 		CompoundTag tag = item.getTag();
-		if (tag==null) item.setTag(tag = new CompoundTag(""));
+		if (tag == null) item.setTag(tag = new CompoundTag(""));
 
 		CompoundTag viaVersionTag = new CompoundTag("ViaRewind1_7_6_10to1_8");
 		tag.put(viaVersionTag);
@@ -28,12 +28,12 @@ public class ItemRewriter {
 		viaVersionTag.put(new ShortTag("data", item.getData()));
 
 		CompoundTag display = tag.get("display");
-		if (display!=null && display.contains("Name")) {
+		if (display != null && display.contains("Name")) {
 			viaVersionTag.put(new StringTag("displayName", (String) display.get("Name").getValue()));
 		}
 
-		if (display!=null && display.contains("Lore")) {
-			viaVersionTag.put(new ListTag("lore", ((ListTag)display.get("Lore")).getValue()));
+		if (display != null && display.contains("Lore")) {
+			viaVersionTag.put(new ListTag("lore", ((ListTag) display.get("Lore")).getValue()));
 		}
 
 		if (tag.contains("ench") || tag.contains("StoredEnchantments")) {
@@ -41,11 +41,11 @@ public class ItemRewriter {
 			List<Tag> enchants = enchTag.getValue();
 			List<Tag> lore = new ArrayList<>();
 			for (Tag ench : enchants) {
-				short id = (short) ((CompoundTag)ench).get("id").getValue();
-				short lvl = (short) ((CompoundTag)ench).get("lvl").getValue();
+				short id = (short) ((CompoundTag) ench).get("id").getValue();
+				short lvl = (short) ((CompoundTag) ench).get("lvl").getValue();
 				String s;
-				if (id==8) {
-					s  = "§r§7Depth Strider ";
+				if (id == 8) {
+					s = "§r§7Depth Strider ";
 				} else {
 					continue;
 				}
@@ -54,23 +54,23 @@ public class ItemRewriter {
 				lore.add(new StringTag("", s));
 			}
 			if (!lore.isEmpty()) {
-				if (display==null) {
+				if (display == null) {
 					tag.put(display = new CompoundTag("display"));
 					viaVersionTag.put(new ByteTag("noDisplay"));
 				}
 				ListTag loreTag = display.get("Lore");
-				if (loreTag==null) display.put(loreTag = new ListTag("Lore", StringTag.class));
+				if (loreTag == null) display.put(loreTag = new ListTag("Lore", StringTag.class));
 				lore.addAll(loreTag.getValue());
 				loreTag.setValue(lore);
 			}
 		}
 
-		if (item.getIdentifier()==387 && tag.contains("pages")) {
+		if (item.getIdentifier() == 387 && tag.contains("pages")) {
 			ListTag pages = tag.get("pages");
 			ListTag oldPages = new ListTag("pages", StringTag.class);
 			viaVersionTag.put(oldPages);
 
-			for (int i = 0; i<pages.size(); i++) {
+			for (int i = 0; i < pages.size(); i++) {
 				StringTag page = pages.get(i);
 				String value = page.getValue();
 				oldPages.add(new StringTag(page.getName(), value));
@@ -81,20 +81,18 @@ public class ItemRewriter {
 
 		ReplacementRegistry1_7_6_10to1_8.replace(item);
 
-		if (viaVersionTag.size()==2 && (short)viaVersionTag.get("id").getValue()==item.getIdentifier() && (short)viaVersionTag.get("data").getValue()==item.getData()) {
+		if (viaVersionTag.size() == 2 && (short) viaVersionTag.get("id").getValue() == item.getIdentifier() && (short) viaVersionTag.get("data").getValue() == item.getData()) {
 			item.getTag().remove("ViaRewind1_7_6_10to1_8");
 			if (item.getTag().isEmpty()) item.setTag(null);
 		}
-
-		return item;
 	}
 
-	public static Item toServer(Item item) {
-		if (item==null) return null;
+	public static void toServer(Item item) {
+		if (item == null) return;
 
 		CompoundTag tag = item.getTag();
 
-		if (tag==null || !item.getTag().contains("ViaRewind1_7_6_10to1_8")) return item;
+		if (tag == null || !item.getTag().contains("ViaRewind1_7_6_10to1_8")) return;
 
 		CompoundTag viaVersionTag = tag.remove("ViaRewind1_7_6_10to1_8");
 
@@ -105,20 +103,18 @@ public class ItemRewriter {
 
 		if (viaVersionTag.contains("displayName")) {
 			CompoundTag display = tag.get("display");
-			if (display==null) tag.put(display = new CompoundTag("display"));
+			if (display == null) tag.put(display = new CompoundTag("display"));
 			StringTag name = display.get("Name");
-			if (name==null) display.put(new StringTag("Name", (String) viaVersionTag.get("displayName").getValue()));
+			if (name == null) display.put(new StringTag("Name", (String) viaVersionTag.get("displayName").getValue()));
 			else name.setValue((String) viaVersionTag.get("displayName").getValue());
 		} else if (tag.contains("display")) {
-			((CompoundTag)tag.get("display")).remove("Name");
+			((CompoundTag) tag.get("display")).remove("Name");
 		}
 
-		if (item.getIdentifier()==387) {
+		if (item.getIdentifier() == 387) {
 			ListTag oldPages = viaVersionTag.get("pages");
 			tag.remove("pages");
 			tag.put(oldPages);
 		}
-
-		return item;
 	}
 }

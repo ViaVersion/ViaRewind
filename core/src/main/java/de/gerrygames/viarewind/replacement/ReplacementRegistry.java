@@ -37,14 +37,14 @@ public class ReplacementRegistry {
 
 	public Item replace(Item item) {
 		Replacement replacement = itemReplacements.get(combine(item.getIdentifier(), item.getData()));
-		if (replacement==null) replacement = itemReplacements.get(combine(item.getIdentifier(), -1));
-		return replacement==null ? item : replacement.replace(item);
+		if (replacement == null) replacement = itemReplacements.get(combine(item.getIdentifier(), -1));
+		return replacement == null ? item : replacement.replace(item);
 	}
 
 	public BlockState replace(BlockState block) {
 		Replacement replacement = blockReplacements.get(combine(block.getId(), block.getData()));
-		if (replacement==null) replacement = blockReplacements.get(combine(block.getId(), -1));
-		return replacement==null ? block : replacement.replace(block);
+		if (replacement == null) replacement = blockReplacements.get(combine(block.getId(), -1));
+		return replacement == null ? block : replacement.replace(block);
 	}
 
 	private static int combine(int id, int data) {

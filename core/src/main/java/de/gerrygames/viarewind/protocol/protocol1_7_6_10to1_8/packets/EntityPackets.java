@@ -5,7 +5,6 @@ import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.items.ItemRewriter
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.metadata.MetadataRewriter;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage.EntityTracker;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage.GameProfileStorage;
-import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.IntArrayType;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
 import de.gerrygames.viarewind.replacement.EntityReplacement;
 import de.gerrygames.viarewind.utils.PacketUtil;
@@ -15,7 +14,6 @@ import us.myles.ViaVersion.api.minecraft.Position;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
 import us.myles.ViaVersion.api.protocol.Protocol;
-import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.version.Types1_8;
@@ -37,34 +35,27 @@ public class EntityPackets {
 				map(Type.VAR_INT, Type.INT);  //Entity Id
 				map(Type.SHORT);  //Slot
 				map(Type.ITEM, Types1_7_6_10.COMPRESSED_NBT_ITEM);  //Item
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						Item item = packetWrapper.get(Types1_7_6_10.COMPRESSED_NBT_ITEM, 0);
-						ItemRewriter.toClient(item);
-						packetWrapper.set(Types1_7_6_10.COMPRESSED_NBT_ITEM, 0, item);
-					}
+
+				handler(wrapper -> {
+					if (wrapper.get(Type.SHORT, 0) > 4) wrapper.cancel();
 				});
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						if (packetWrapper.get(Type.SHORT, 0) > 4) packetWrapper.cancel();
-					}
+				handler(wrapper -> {
+					ItemRewriter.toClient(wrapper.get(Types1_7_6_10.COMPRESSED_NBT_ITEM, 0));
 				});
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						if (packetWrapper.isCancelled()) return;
-						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-						UUID uuid = tracker.getPlayerUUID(packetWrapper.get(Type.INT, 0));
-						if (uuid == null) return;
-						Item[] equipment = tracker.getPlayerEquipment(uuid);
-						if (equipment == null) tracker.setPlayerEquipment(uuid, equipment = new Item[5]);
-						equipment[packetWrapper.get(Type.SHORT, 0)] = packetWrapper.get(Types1_7_6_10.COMPRESSED_NBT_ITEM, 0);
-						GameProfileStorage storage = packetWrapper.user().get(GameProfileStorage.class);
-						GameProfileStorage.GameProfile profile = storage.get(uuid);
-						if (profile != null && profile.gamemode == 3) packetWrapper.cancel();
-					}
+				handler(wrapper -> {
+					if (wrapper.isCancelled()) return;
+
+					EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+					UUID uuid = tracker.getPlayerUUID(wrapper.get(Type.INT, 0));
+					if (uuid == null) return;
+
+					Item[] equipment = tracker.getPlayerEquipment(uuid);
+					if (equipment == null) tracker.setPlayerEquipment(uuid, equipment = new Item[5]);
+					equipment[wrapper.get(Type.SHORT, 0)] = wrapper.get(Types1_7_6_10.COMPRESSED_NBT_ITEM, 0);
+
+					GameProfileStorage storage = wrapper.user().get(GameProfileStorage.class);
+					GameProfileStorage.GameProfile profile = storage.get(uuid);
+					if (profile != null && profile.gamemode == 3) wrapper.cancel();
 				});
 			}
 		});
@@ -74,14 +65,11 @@ public class EntityPackets {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT, Type.INT);  //Entity Id
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						Position position = packetWrapper.read(Type.POSITION);
-						packetWrapper.write(Type.INT, position.getX());
-						packetWrapper.write(Type.UNSIGNED_BYTE, position.getY());
-						packetWrapper.write(Type.INT, position.getZ());
-					}
+				handler(wrapper -> {
+					Position position = wrapper.read(Type.POSITION);
+					wrapper.write(Type.INT, position.getX());
+					wrapper.write(Type.UNSIGNED_BYTE, position.getY());
+					wrapper.write(Type.INT, position.getZ());
 				});
 			}
 		});
@@ -100,9 +88,6 @@ public class EntityPackets {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT, Type.INT);  //Entity Id
-				map(Type.SHORT);  //velX
-				map(Type.SHORT);  //velY
-				map(Type.SHORT);  //velZ
 			}
 		});
 
@@ -110,29 +95,26 @@ public class EntityPackets {
 		protocol.registerOutgoing(State.PLAY, 0x13, 0x13, new PacketRemapper() {
 			@Override
 			public void registerMap() {
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						int[] entityIds = packetWrapper.read(Type.VAR_INT_ARRAY_PRIMITIVE);
+				handler(wrapper -> {
+					int[] entityIds = wrapper.read(Type.VAR_INT_ARRAY_PRIMITIVE);
 
-						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-						for (int entityId : entityIds) tracker.removeEntity(entityId);
+					EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+					for (int entityId : entityIds) tracker.removeEntity(entityId);
 
-						while (entityIds.length > 127) {
-							int[] entityIds2 = new int[127];
-							System.arraycopy(entityIds, 0, entityIds2, 0, 127);
-							int[] temp = new int[entityIds.length - 127];
-							System.arraycopy(entityIds, 127, temp, 0, temp.length);
-							entityIds = temp;
+					while (entityIds.length > 127) {
+						int[] entityIds2 = new int[127];
+						System.arraycopy(entityIds, 0, entityIds2, 0, 127);
+						int[] temp = new int[entityIds.length - 127];
+						System.arraycopy(entityIds, 127, temp, 0, temp.length);
+						entityIds = temp;
 
-							PacketWrapper destroy = new PacketWrapper(0x13, null, packetWrapper.user());
-							destroy.write(Types1_7_6_10.INT_ARRAY, entityIds2);
-							PacketUtil.sendPacket(destroy, Protocol1_7_6_10TO1_8.class);
-						}
-
-						packetWrapper.write(Types1_7_6_10.INT_ARRAY, entityIds);
+						PacketWrapper destroy = new PacketWrapper(0x13, null, wrapper.user());
+						destroy.write(Types1_7_6_10.INT_ARRAY, entityIds2);
+						PacketUtil.sendPacket(destroy, Protocol1_7_6_10TO1_8.class);
 					}
-				});  //Entity Id Array
+
+					wrapper.write(Types1_7_6_10.INT_ARRAY, entityIds);
+				});
 			}
 		});
 
@@ -152,25 +134,18 @@ public class EntityPackets {
 				map(Type.BYTE);  //x
 				map(Type.BYTE);  //y
 				map(Type.BYTE);  //z
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						packetWrapper.read(Type.BOOLEAN);
-					}
-				});
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						int entityId = packetWrapper.get(Type.INT, 0);
-						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-						EntityReplacement replacement = tracker.getEntityReplacement(entityId);
-						if (replacement != null) {
-							packetWrapper.cancel();
-							int x = packetWrapper.get(Type.BYTE, 0);
-							int y = packetWrapper.get(Type.BYTE, 1);
-							int z = packetWrapper.get(Type.BYTE, 2);
-							replacement.relMove(x / 32.0, y / 32.0, z / 32.0);
-						}
+				handler(wrapper -> wrapper.read(Type.BOOLEAN));
+
+				handler(wrapper -> {
+					int entityId = wrapper.get(Type.INT, 0);
+					EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+					EntityReplacement replacement = tracker.getEntityReplacement(entityId);
+					if (replacement != null) {
+						wrapper.cancel();
+						int x = wrapper.get(Type.BYTE, 0);
+						int y = wrapper.get(Type.BYTE, 1);
+						int z = wrapper.get(Type.BYTE, 2);
+						replacement.relMove(x / 32.0, y / 32.0, z / 32.0);
 					}
 				});
 			}
@@ -183,24 +158,17 @@ public class EntityPackets {
 				map(Type.VAR_INT, Type.INT);  //Entity Id
 				map(Type.BYTE);  //yaw
 				map(Type.BYTE);  //pitch
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						packetWrapper.read(Type.BOOLEAN);
-					}
-				});
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						int entityId = packetWrapper.get(Type.INT, 0);
-						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-						EntityReplacement replacement = tracker.getEntityReplacement(entityId);
-						if (replacement != null) {
-							packetWrapper.cancel();
-							int yaw = packetWrapper.get(Type.BYTE, 0);
-							int pitch = packetWrapper.get(Type.BYTE, 1);
-							replacement.setYawPitch(yaw * 360f / 256, pitch * 360f / 256);
-						}
+				handler(wrapper -> wrapper.read(Type.BOOLEAN));
+
+				handler(wrapper -> {
+					int entityId = wrapper.get(Type.INT, 0);
+					EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+					EntityReplacement replacement = tracker.getEntityReplacement(entityId);
+					if (replacement != null) {
+						wrapper.cancel();
+						int yaw = wrapper.get(Type.BYTE, 0);
+						int pitch = wrapper.get(Type.BYTE, 1);
+						replacement.setYawPitch(yaw * 360f / 256, pitch * 360f / 256);
 					}
 				});
 			}
@@ -216,28 +184,21 @@ public class EntityPackets {
 				map(Type.BYTE);  //z
 				map(Type.BYTE);  //yaw
 				map(Type.BYTE);  //pitch
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						packetWrapper.read(Type.BOOLEAN);
-					}
-				});
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						int entityId = packetWrapper.get(Type.INT, 0);
-						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-						EntityReplacement replacement = tracker.getEntityReplacement(entityId);
-						if (replacement != null) {
-							packetWrapper.cancel();
-							int x = packetWrapper.get(Type.BYTE, 0);
-							int y = packetWrapper.get(Type.BYTE, 1);
-							int z = packetWrapper.get(Type.BYTE, 2);
-							int yaw = packetWrapper.get(Type.BYTE, 3);
-							int pitch = packetWrapper.get(Type.BYTE, 4);
-							replacement.relMove(x / 32.0, y / 32.0, z / 32.0);
-							replacement.setYawPitch(yaw * 360f / 256, pitch * 360f / 256);
-						}
+				handler(wrapper -> wrapper.read(Type.BOOLEAN));
+
+				handler(wrapper -> {
+					int entityId = wrapper.get(Type.INT, 0);
+					EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+					EntityReplacement replacement = tracker.getEntityReplacement(entityId);
+					if (replacement != null) {
+						wrapper.cancel();
+						int x = wrapper.get(Type.BYTE, 0);
+						int y = wrapper.get(Type.BYTE, 1);
+						int z = wrapper.get(Type.BYTE, 2);
+						int yaw = wrapper.get(Type.BYTE, 3);
+						int pitch = wrapper.get(Type.BYTE, 4);
+						replacement.relMove(x / 32.0, y / 32.0, z / 32.0);
+						replacement.setYawPitch(yaw * 360f / 256, pitch * 360f / 256);
 					}
 				});
 			}
@@ -253,41 +214,31 @@ public class EntityPackets {
 				map(Type.INT);  //z
 				map(Type.BYTE);  //yaw
 				map(Type.BYTE);  //pitch
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						packetWrapper.read(Type.BOOLEAN);
+				handler(wrapper -> wrapper.read(Type.BOOLEAN));
+
+				handler(wrapper -> {
+					int entityId = wrapper.get(Type.INT, 0);
+					EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+					Entity1_10Types.EntityType type = tracker.getClientEntityTypes().get(entityId);
+					if (type == Entity1_10Types.EntityType.MINECART_ABSTRACT) {
+						int y = wrapper.get(Type.INT, 2);
+						y += 12;
+						wrapper.set(Type.INT, 2, y);
 					}
 				});
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						int entityId = packetWrapper.get(Type.INT, 0);
-						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-						Entity1_10Types.EntityType type = tracker.getClientEntityTypes().get(entityId);
-						if (type == Entity1_10Types.EntityType.MINECART_ABSTRACT) {
-							int y = packetWrapper.get(Type.INT, 2);
-							y += 12;
-							packetWrapper.set(Type.INT, 2, y);
-						}
-					}
-				});
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						int entityId = packetWrapper.get(Type.INT, 0);
-						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-						EntityReplacement replacement = tracker.getEntityReplacement(entityId);
-						if (replacement != null) {
-							packetWrapper.cancel();
-							int x = packetWrapper.get(Type.INT, 1);
-							int y = packetWrapper.get(Type.INT, 2);
-							int z = packetWrapper.get(Type.INT, 3);
-							int yaw = packetWrapper.get(Type.BYTE, 0);
-							int pitch = packetWrapper.get(Type.BYTE, 1);
-							replacement.setLocation(x / 32.0, y / 32.0, z / 32.0);
-							replacement.setYawPitch(yaw * 360f / 256, pitch * 360f / 256);
-						}
+				handler(wrapper -> {
+					int entityId = wrapper.get(Type.INT, 0);
+					EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+					EntityReplacement replacement = tracker.getEntityReplacement(entityId);
+					if (replacement != null) {
+						wrapper.cancel();
+						int x = wrapper.get(Type.INT, 1);
+						int y = wrapper.get(Type.INT, 2);
+						int z = wrapper.get(Type.INT, 3);
+						int yaw = wrapper.get(Type.BYTE, 0);
+						int pitch = wrapper.get(Type.BYTE, 1);
+						replacement.setLocation(x / 32.0, y / 32.0, z / 32.0);
+						replacement.setYawPitch(yaw * 360f / 256, pitch * 360f / 256);
 					}
 				});
 			}
@@ -299,17 +250,15 @@ public class EntityPackets {
 			public void registerMap() {
 				map(Type.VAR_INT, Type.INT);  //Entity Id
 				map(Type.BYTE);  //Head yaw
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						int entityId = packetWrapper.get(Type.INT, 0);
-						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-						EntityReplacement replacement = tracker.getEntityReplacement(entityId);
-						if (replacement != null) {
-							packetWrapper.cancel();
-							int yaw = packetWrapper.get(Type.BYTE, 0);
-							replacement.setHeadYaw(yaw * 360f / 256);
-						}
+
+				handler(wrapper -> {
+					int entityId = wrapper.get(Type.INT, 0);
+					EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+					EntityReplacement replacement = tracker.getEntityReplacement(entityId);
+					if (replacement != null) {
+						wrapper.cancel();
+						int yaw = wrapper.get(Type.BYTE, 0);
+						replacement.setHeadYaw(yaw * 360f / 256);
 					}
 				});
 			}
@@ -322,16 +271,14 @@ public class EntityPackets {
 				map(Type.INT);
 				map(Type.INT);
 				map(Type.BOOLEAN);
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						boolean leash = packetWrapper.get(Type.BOOLEAN, 0);
-						if (leash) return;
-						int passenger = packetWrapper.get(Type.INT, 0);
-						int vehicle = packetWrapper.get(Type.INT, 1);
-						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-						tracker.setPassenger(vehicle, passenger);
-					}
+
+				handler(wrapper -> {
+					boolean leash = wrapper.get(Type.BOOLEAN, 0);
+					if (leash) return;
+					int passenger = wrapper.get(Type.INT, 0);
+					int vehicle = wrapper.get(Type.INT, 1);
+					EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+					tracker.setPassenger(vehicle, passenger);
 				});
 			}
 		});
@@ -342,24 +289,23 @@ public class EntityPackets {
 			public void registerMap() {
 				map(Type.VAR_INT, Type.INT);  //Entity Id
 				map(Types1_8.METADATA_LIST, Types1_7_6_10.METADATA_LIST);  //Metadata
-				handler(new PacketHandler() {
-					public void handle(PacketWrapper wrapper) throws Exception {
-						List<Metadata> metadataList = wrapper.get(Types1_7_6_10.METADATA_LIST, 0);
-						int entityId = wrapper.get(Type.INT, 0);
-						EntityTracker tracker = wrapper.user().get(EntityTracker.class);
-						if (tracker.getClientEntityTypes().containsKey(entityId)) {
-							EntityReplacement replacement = tracker.getEntityReplacement(entityId);
-							if (replacement != null) {
-								wrapper.cancel();
-								replacement.updateMetadata(metadataList);
-							} else {
-								MetadataRewriter.transform(tracker.getClientEntityTypes().get(entityId), metadataList);
-								if (metadataList.isEmpty()) wrapper.cancel();
-							}
-						} else {
-							tracker.addMetadataToBuffer(entityId, metadataList);
+
+				handler(wrapper -> {
+					List<Metadata> metadataList = wrapper.get(Types1_7_6_10.METADATA_LIST, 0);
+					int entityId = wrapper.get(Type.INT, 0);
+					EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+					if (tracker.getClientEntityTypes().containsKey(entityId)) {
+						EntityReplacement replacement = tracker.getEntityReplacement(entityId);
+						if (replacement != null) {
 							wrapper.cancel();
+							replacement.updateMetadata(metadataList);
+						} else {
+							MetadataRewriter.transform(tracker.getClientEntityTypes().get(entityId), metadataList);
+							if (metadataList.isEmpty()) wrapper.cancel();
 						}
+					} else {
+						tracker.addMetadataToBuffer(entityId, metadataList);
+						wrapper.cancel();
 					}
 				});
 			}
@@ -373,12 +319,7 @@ public class EntityPackets {
 				map(Type.BYTE);  //Effect Id
 				map(Type.BYTE);  //Amplifier
 				map(Type.VAR_INT, Type.SHORT);  //Duration
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						packetWrapper.read(Type.BYTE);  //Hide Particles
-					}
-				});
+				handler(wrapper -> wrapper.read(Type.BYTE)); //Hide Particles
 			}
 		});
 
@@ -396,26 +337,24 @@ public class EntityPackets {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT, Type.INT);  //Entity Id
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						int entityId = packetWrapper.get(Type.INT, 0);
-						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-						if (tracker.getEntityReplacement(entityId) != null) {
-							packetWrapper.cancel();
-							return;
-						}
-						int amount = packetWrapper.passthrough(Type.INT);
-						for (int i = 0; i < amount; i++) {
-							packetWrapper.passthrough(Type.STRING);
-							packetWrapper.passthrough(Type.DOUBLE);
-							int modifierlength = packetWrapper.read(Type.VAR_INT);
-							packetWrapper.write(Type.SHORT, (short) modifierlength);
-							for (int j = 0; j < modifierlength; j++) {
-								packetWrapper.passthrough(Type.UUID);
-								packetWrapper.passthrough(Type.DOUBLE);
-								packetWrapper.passthrough(Type.BYTE);
-							}
+
+				handler(wrapper -> {
+					int entityId = wrapper.get(Type.INT, 0);
+					EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+					if (tracker.getEntityReplacement(entityId) != null) {
+						wrapper.cancel();
+						return;
+					}
+					int amount = wrapper.passthrough(Type.INT);
+					for (int i = 0; i < amount; i++) {
+						wrapper.passthrough(Type.STRING);
+						wrapper.passthrough(Type.DOUBLE);
+						int modifierlength = wrapper.read(Type.VAR_INT);
+						wrapper.write(Type.SHORT, (short) modifierlength);
+						for (int j = 0; j < modifierlength; j++) {
+							wrapper.passthrough(Type.UUID);
+							wrapper.passthrough(Type.DOUBLE);
+							wrapper.passthrough(Type.BYTE);
 						}
 					}
 				});
@@ -424,18 +363,6 @@ public class EntityPackets {
 		});
 
 		//Update Entity NBT
-		protocol.registerOutgoing(State.PLAY, 0x49, -1, new PacketRemapper() {
-			@Override
-			public void registerMap() {
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						packetWrapper.cancel();
-					}
-				});
-			}
-		});
-
-
+		protocol.cancelOutgoing(State.PLAY, 0x49);
 	}
 }

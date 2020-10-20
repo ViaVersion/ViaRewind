@@ -42,7 +42,7 @@ public class GameProfileStorage extends StoredObject {
 		if (ignoreCase) name = name.toLowerCase();
 
 		for (GameProfile profile : properties.values()) {
-			if (profile.name==null) continue;
+			if (profile.name == null) continue;
 
 			String n = ignoreCase ? profile.name.toLowerCase() : profile.name;
 
@@ -59,7 +59,7 @@ public class GameProfileStorage extends StoredObject {
 		ArrayList<GameProfile> profiles = new ArrayList<>();
 
 		for (GameProfile profile : properties.values()) {
-			if (profile.name==null) continue;
+			if (profile.name == null) continue;
 
 			String n = ignoreCase ? profile.name.toLowerCase() : profile.name;
 
@@ -100,7 +100,7 @@ public class GameProfileStorage extends StoredObject {
 				if (property.name.equals("textures")) {
 					CompoundTag textureTag = new CompoundTag("");
 					textureTag.put(new StringTag("Value", property.value));
-					if (property.signature!=null) {
+					if (property.signature != null) {
 						textureTag.put(new StringTag("Signature", property.signature));
 					}
 					textures.add(textureTag);
@@ -111,8 +111,8 @@ public class GameProfileStorage extends StoredObject {
 		}
 
 		public String getDisplayName() {
-			String displayName = this.displayName==null ? name : this.displayName;
-			if (displayName.length()>16) displayName = displayName.substring(0, 16);
+			String displayName = this.displayName == null ? name : this.displayName;
+			if (displayName.length() > 16) displayName = displayName.substring(0, 16);
 			return displayName;
 		}
 

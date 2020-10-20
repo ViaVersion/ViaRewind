@@ -34,7 +34,7 @@ public class MetadataRewriter {
 					case Int:
 						if (metaIndex.getNewType() == MetaType1_8.Byte) {
 							entry.setValue(((Byte) value).intValue());
-							if (metaIndex==MetaIndex1_8to1_7_6_10.ENTITY_AGEABLE_AGE) {
+							if (metaIndex == MetaIndex1_8to1_7_6_10.ENTITY_AGEABLE_AGE) {
 								if ((Integer) entry.getValue() < 0) {
 									entry.setValue(-25000);
 								}
@@ -52,12 +52,12 @@ public class MetadataRewriter {
 							entry.setValue(((Integer) value).byteValue());
 						}
 						if (metaIndex.getNewType() == MetaType1_8.Byte) {
-							if (metaIndex==MetaIndex1_8to1_7_6_10.ITEM_FRAME_ROTATION) {
-								value = (Byte)((Integer)((Byte)value / 2)).byteValue();
+							if (metaIndex == MetaIndex1_8to1_7_6_10.ITEM_FRAME_ROTATION) {
+								value = (Byte) ((Integer) ((Byte) value / 2)).byteValue();
 							}
 							entry.setValue(value);
 						}
-						if (metaIndex==MetaIndex1_8to1_7_6_10.HUMAN_SKIN_FLAGS) {
+						if (metaIndex == MetaIndex1_8to1_7_6_10.HUMAN_SKIN_FLAGS) {
 							byte flags = (byte) value;
 							boolean cape = (flags & 0x01) != 0;
 							flags = (byte) (cape ? 0x00 : 0x02);
@@ -65,17 +65,11 @@ public class MetadataRewriter {
 						}
 						break;
 					case Slot:
-						entry.setValue(ItemRewriter.toClient((Item) value));
+						ItemRewriter.toClient((Item) value);
 						break;
 					case Float:
-						entry.setValue(value);
-						break;
 					case Short:
-						entry.setValue(value);
-						break;
 					case String:
-						entry.setValue(value);
-						break;
 					case Position:
 						entry.setValue(value);
 						break;

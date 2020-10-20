@@ -20,12 +20,12 @@ public class BlockPlaceDestroyTracker extends StoredObject {
 	}
 
 	public boolean isMining() {
-		long time = System.currentTimeMillis()-lastMining;
-		return mining && time<75 || time<75;
+		long time = System.currentTimeMillis() - lastMining;
+		return mining && time < 75 || time < 75;
 	}
 
 	public void setMining(boolean mining) {
-		this.mining = mining && getUser().get(EntityTracker.class).getPlayerGamemode()!=1;
+		this.mining = mining && getUser().get(EntityTracker.class).getPlayerGamemode() != 1;
 		lastMining = System.currentTimeMillis();
 	}
 

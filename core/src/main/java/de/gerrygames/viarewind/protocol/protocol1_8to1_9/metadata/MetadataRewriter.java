@@ -62,9 +62,8 @@ public class MetadataRewriter {
 							}
 							break;
 						case Float:
-							entry.setValue(value);
-							break;
 						case String:
+						case Chat:
 							entry.setValue(value);
 							break;
 						case Boolean:
@@ -72,7 +71,7 @@ public class MetadataRewriter {
 							else entry.setValue((byte)((Boolean) value ? 1 : 0));
 							break;
 						case Slot:
-							entry.setValue(ItemRewriter.toClient((Item) value));
+							ItemRewriter.toClient((Item) value);
 							break;
 						case Position:
 							Vector vector = (Vector) value;
@@ -81,9 +80,6 @@ public class MetadataRewriter {
 						case Vector3F:
 							EulerAngle angle = (EulerAngle) value;
 							entry.setValue(angle);
-							break;
-						case Chat:
-							entry.setValue(value);
 							break;
 						default:
 							ViaRewind.getPlatform().getLogger().warning("[Out] Unhandled MetaDataType: " + metaIndex.getNewType());

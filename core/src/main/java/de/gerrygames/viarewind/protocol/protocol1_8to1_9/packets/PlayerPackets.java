@@ -16,9 +16,7 @@ import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
 import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_8;
 import us.myles.ViaVersion.api.protocol.Protocol;
-import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
-import us.myles.ViaVersion.api.remapper.ValueCreator;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.version.Types1_8;
 import us.myles.ViaVersion.packets.State;
@@ -28,6 +26,7 @@ import us.myles.viaversion.libs.opennbt.tag.builtin.ListTag;
 import us.myles.viaversion.libs.opennbt.tag.builtin.StringTag;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.TimerTask;
 import java.util.UUID;
 
@@ -46,27 +45,24 @@ public class PlayerPackets {
 		protocol.registerOutgoing(State.PLAY, 0x0C, -1, new PacketRemapper() {
 			@Override
 			public void registerMap() {
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						packetWrapper.cancel();
+				handler(wrapper -> {
+					wrapper.cancel();
 
-						UUID uuid = packetWrapper.read(Type.UUID);
-						int action = packetWrapper.read(Type.VAR_INT);
-						BossBarStorage bossBarStorage = packetWrapper.user().get(BossBarStorage.class);
-						if (action == 0) {
-							bossBarStorage.add(uuid, ChatUtil.jsonToLegacy(packetWrapper.read(Type.COMPONENT)), packetWrapper.read(Type.FLOAT));
-							packetWrapper.read(Type.VAR_INT);
-							packetWrapper.read(Type.VAR_INT);
-							packetWrapper.read(Type.UNSIGNED_BYTE);
-						} else if (action == 1) {
-							bossBarStorage.remove(uuid);
-						} else if (action == 2) {
-							bossBarStorage.updateHealth(uuid, packetWrapper.read(Type.FLOAT));
-						} else if (action == 3) {
-							String title = ChatUtil.jsonToLegacy(packetWrapper.read(Type.COMPONENT));
-							bossBarStorage.updateTitle(uuid, title);
-						}
+					UUID uuid = wrapper.read(Type.UUID);
+					int action = wrapper.read(Type.VAR_INT);
+					BossBarStorage bossBarStorage = wrapper.user().get(BossBarStorage.class);
+					if (action == 0) {
+						bossBarStorage.add(uuid, ChatUtil.jsonToLegacy(wrapper.read(Type.COMPONENT)), wrapper.read(Type.FLOAT));
+						wrapper.read(Type.VAR_INT);
+						wrapper.read(Type.VAR_INT);
+						wrapper.read(Type.UNSIGNED_BYTE);
+					} else if (action == 1) {
+						bossBarStorage.remove(uuid);
+					} else if (action == 2) {
+						bossBarStorage.updateHealth(uuid, wrapper.read(Type.FLOAT));
+					} else if (action == 3) {
+						String title = ChatUtil.jsonToLegacy(wrapper.read(Type.COMPONENT));
+						bossBarStorage.updateTitle(uuid, title);
 					}
 				});
 			}
@@ -79,53 +75,41 @@ public class PlayerPackets {
 		protocol.registerOutgoing(State.PLAY, 0x0F, 0x02);
 
 		//Set Cooldown
-		protocol.registerOutgoing(State.PLAY, 0x17, -1, new PacketRemapper() {
-			@Override
-			public void registerMap() {
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						packetWrapper.cancel();
-					}
-				});
-			}
-		});
+		protocol.cancelOutgoing(State.PLAY, 0x17);
 
 		//Custom Payload
 		protocol.registerOutgoing(State.PLAY, 0x18, 0x3F, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.STRING);
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						String channel = packetWrapper.get(Type.STRING, 0);
-						if (channel.equalsIgnoreCase("MC|TrList")) {
-							packetWrapper.passthrough(Type.INT);  //Window Id
 
-							int size;
-							if (packetWrapper.isReadable(Type.BYTE, 0)) {
-								size = packetWrapper.passthrough(Type.BYTE);
-							} else {
-								size = packetWrapper.passthrough(Type.UNSIGNED_BYTE);
-							}
+				handler(wrapper -> {
+					String channel = wrapper.get(Type.STRING, 0);
+					if (channel.equalsIgnoreCase("MC|TrList")) {
+						wrapper.passthrough(Type.INT);  //Window Id
 
-							for (int i = 0; i < size; i++) {
-								packetWrapper.write(Type.ITEM, ItemRewriter.toClient(packetWrapper.read(Type.ITEM))); //Buy Item 1
-								packetWrapper.write(Type.ITEM, ItemRewriter.toClient(packetWrapper.read(Type.ITEM))); //Buy Item 3
-
-								boolean has3Items = packetWrapper.passthrough(Type.BOOLEAN);
-								if (has3Items) {
-									packetWrapper.write(Type.ITEM, ItemRewriter.toClient(packetWrapper.read(Type.ITEM))); //Buy Item 2
-								}
-
-								packetWrapper.passthrough(Type.BOOLEAN); //Unavailable
-								packetWrapper.passthrough(Type.INT); //Uses
-								packetWrapper.passthrough(Type.INT); //Max Uses
-							}
-						} else if (channel.equalsIgnoreCase("MC|BOpen")) {
-							packetWrapper.read(Type.VAR_INT);
+						int size;
+						if (wrapper.isReadable(Type.BYTE, 0)) {
+							size = wrapper.passthrough(Type.BYTE);
+						} else {
+							size = wrapper.passthrough(Type.UNSIGNED_BYTE);
 						}
+
+						for (int i = 0; i < size; i++) {
+							ItemRewriter.toClient(wrapper.passthrough(Type.ITEM)); //Buy Item 1
+							ItemRewriter.toClient(wrapper.passthrough(Type.ITEM)); //Buy Item 3
+
+							boolean has3Items = wrapper.passthrough(Type.BOOLEAN);
+							if (has3Items) {
+								ItemRewriter.toClient(wrapper.passthrough(Type.ITEM)); //Buy Item 2
+							}
+
+							wrapper.passthrough(Type.BOOLEAN); //Unavailable
+							wrapper.passthrough(Type.INT); //Uses
+							wrapper.passthrough(Type.INT); //Max Uses
+						}
+					} else if (channel.equalsIgnoreCase("MC|BOpen")) {
+						wrapper.read(Type.VAR_INT);
 					}
 				});
 			}
@@ -140,12 +124,10 @@ public class PlayerPackets {
 			public void registerMap() {
 				map(Type.UNSIGNED_BYTE);
 				map(Type.FLOAT);
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						int reason = packetWrapper.get(Type.UNSIGNED_BYTE, 0);
-						if (reason == 3) packetWrapper.user().get(EntityTracker.class).setPlayerGamemode(packetWrapper.get(Type.FLOAT, 0).intValue());
-					}
+
+				handler(wrapper -> {
+					int reason = wrapper.get(Type.UNSIGNED_BYTE, 0);
+					if (reason == 3) wrapper.user().get(EntityTracker.class).setPlayerGamemode(wrapper.get(Type.FLOAT, 0).intValue());
 				});
 			}
 		});
@@ -161,21 +143,16 @@ public class PlayerPackets {
 				map(Type.UNSIGNED_BYTE);
 				map(Type.STRING);
 				map(Type.BOOLEAN);
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-						tracker.setPlayerId(packetWrapper.get(Type.INT, 0));
-						tracker.setPlayerGamemode(packetWrapper.get(Type.UNSIGNED_BYTE, 0));
-						tracker.getClientEntityTypes().put(tracker.getPlayerId(), Entity1_10Types.EntityType.ENTITY_HUMAN);
-					}
+
+				handler(wrapper -> {
+					EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+					tracker.setPlayerId(wrapper.get(Type.INT, 0));
+					tracker.setPlayerGamemode(wrapper.get(Type.UNSIGNED_BYTE, 0));
+					tracker.getClientEntityTypes().put(tracker.getPlayerId(), Entity1_10Types.EntityType.ENTITY_HUMAN);
 				});
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						ClientWorld world = packetWrapper.user().get(ClientWorld.class);
-						world.setEnvironment(packetWrapper.get(Type.BYTE, 0));
-					}
+				handler(wrapper -> {
+					ClientWorld world = wrapper.user().get(ClientWorld.class);
+					world.setEnvironment(wrapper.get(Type.BYTE, 0));
 				});
 			}
 		});
@@ -199,50 +176,48 @@ public class PlayerPackets {
 				map(Type.FLOAT);
 				map(Type.FLOAT);
 				map(Type.BYTE);
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						PlayerPosition pos = packetWrapper.user().get(PlayerPosition.class);
 
-						int teleportId = packetWrapper.read(Type.VAR_INT);
-						pos.setConfirmId(teleportId);
+				handler(wrapper -> {
+					PlayerPosition pos = wrapper.user().get(PlayerPosition.class);
 
-						byte flags = packetWrapper.get(Type.BYTE, 0);
-						double x = packetWrapper.get(Type.DOUBLE, 0);
-						double y = packetWrapper.get(Type.DOUBLE, 1);
-						double z = packetWrapper.get(Type.DOUBLE, 2);
-						float yaw = packetWrapper.get(Type.FLOAT, 0);
-						float pitch = packetWrapper.get(Type.FLOAT, 1);
+					int teleportId = wrapper.read(Type.VAR_INT);
+					pos.setConfirmId(teleportId);
 
-						packetWrapper.set(Type.BYTE, 0, (byte) 0);
+					byte flags = wrapper.get(Type.BYTE, 0);
+					double x = wrapper.get(Type.DOUBLE, 0);
+					double y = wrapper.get(Type.DOUBLE, 1);
+					double z = wrapper.get(Type.DOUBLE, 2);
+					float yaw = wrapper.get(Type.FLOAT, 0);
+					float pitch = wrapper.get(Type.FLOAT, 1);
 
-						if (flags != 0) {
-							if ((flags & 0x01) != 0) {
-								x += pos.getPosX();
-								packetWrapper.set(Type.DOUBLE, 0, x);
-							}
-							if ((flags & 0x02) != 0) {
-								y += pos.getPosY();
-								packetWrapper.set(Type.DOUBLE, 1, y);
-							}
-							if ((flags & 0x04) != 0) {
-								z += pos.getPosZ();
-								packetWrapper.set(Type.DOUBLE, 2, z);
-							}
-							if ((flags & 0x08) != 0) {
-								yaw += pos.getYaw();
-								packetWrapper.set(Type.FLOAT, 0, yaw);
-							}
-							if ((flags & 0x10) != 0) {
-								pitch += pos.getPitch();
-								packetWrapper.set(Type.FLOAT, 1, pitch);
-							}
+					wrapper.set(Type.BYTE, 0, (byte) 0);
+
+					if (flags != 0) {
+						if ((flags & 0x01) != 0) {
+							x += pos.getPosX();
+							wrapper.set(Type.DOUBLE, 0, x);
 						}
-
-						pos.setPos(x, y, z);
-						pos.setYaw(yaw);
-						pos.setPitch(pitch);
+						if ((flags & 0x02) != 0) {
+							y += pos.getPosY();
+							wrapper.set(Type.DOUBLE, 1, y);
+						}
+						if ((flags & 0x04) != 0) {
+							z += pos.getPosZ();
+							wrapper.set(Type.DOUBLE, 2, z);
+						}
+						if ((flags & 0x08) != 0) {
+							yaw += pos.getYaw();
+							wrapper.set(Type.FLOAT, 0, yaw);
+						}
+						if ((flags & 0x10) != 0) {
+							pitch += pos.getPitch();
+							wrapper.set(Type.FLOAT, 1, pitch);
+						}
 					}
+
+					pos.setPos(x, y, z);
+					pos.setYaw(yaw);
+					pos.setPitch(pitch);
 				});
 			}
 		});
@@ -258,25 +233,15 @@ public class PlayerPackets {
 				map(Type.UNSIGNED_BYTE);
 				map(Type.UNSIGNED_BYTE);
 				map(Type.STRING);
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						packetWrapper.user().get(EntityTracker.class).setPlayerGamemode(packetWrapper.get(Type.UNSIGNED_BYTE, 1));
-					}
+
+				handler(wrapper -> wrapper.user().get(EntityTracker.class).setPlayerGamemode(wrapper.get(Type.UNSIGNED_BYTE, 1)));
+				handler(wrapper -> {
+					wrapper.user().get(BossBarStorage.class).updateLocation();
+					wrapper.user().get(BossBarStorage.class).changeWorld();
 				});
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						packetWrapper.user().get(BossBarStorage.class).updateLocation();
-						packetWrapper.user().get(BossBarStorage.class).changeWorld();
-					}
-				});
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						ClientWorld world = packetWrapper.user().get(ClientWorld.class);
-						world.setEnvironment(packetWrapper.get(Type.INT, 0));
-					}
+				handler(wrapper -> {
+					ClientWorld world = wrapper.user().get(ClientWorld.class);
+					world.setEnvironment(wrapper.get(Type.INT, 0));
 				});
 			}
 		});
@@ -309,19 +274,17 @@ public class PlayerPackets {
 			@Override
 			public void registerMap() {
 				map(Type.STRING);
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						String msg = packetWrapper.get(Type.STRING, 0);
-						if (msg.toLowerCase().startsWith("/offhand")) {
-							packetWrapper.cancel();
-							PacketWrapper swapItems = new PacketWrapper(0x13, null, packetWrapper.user());
-							swapItems.write(Type.VAR_INT, 6);
-							swapItems.write(Type.POSITION, new Position(0, (short) 0, 0));
-							swapItems.write(Type.BYTE, (byte) 255);
 
-							PacketUtil.sendToServer(swapItems, Protocol1_8TO1_9.class, true, true);
-						}
+				handler(wrapper -> {
+					String msg = wrapper.get(Type.STRING, 0);
+					if (msg.toLowerCase().startsWith("/offhand")) {
+						wrapper.cancel();
+						PacketWrapper swapItems = new PacketWrapper(0x13, null, wrapper.user());
+						swapItems.write(Type.VAR_INT, 6);
+						swapItems.write(Type.POSITION, new Position(0, (short) 0, 0));
+						swapItems.write(Type.BYTE, (byte) 255);
+
+						PacketUtil.sendToServer(swapItems, Protocol1_8TO1_9.class, true, true);
 					}
 				});
 			}
@@ -336,18 +299,16 @@ public class PlayerPackets {
 			public void registerMap() {
 				map(Type.VAR_INT);
 				map(Type.VAR_INT);
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						int type = packetWrapper.get(Type.VAR_INT, 1);
-						if (type == 2) {
-							packetWrapper.passthrough(Type.FLOAT);
-							packetWrapper.passthrough(Type.FLOAT);
-							packetWrapper.passthrough(Type.FLOAT);
-						}
-						if (type == 2 || type == 0) {
-							packetWrapper.write(Type.VAR_INT, 0);
-						}
+
+				handler(wrapper -> {
+					int type = wrapper.get(Type.VAR_INT, 1);
+					if (type == 2) {
+						wrapper.passthrough(Type.FLOAT);
+						wrapper.passthrough(Type.FLOAT);
+						wrapper.passthrough(Type.FLOAT);
+					}
+					if (type == 2 || type == 0) {
+						wrapper.write(Type.VAR_INT, 0);
 					}
 				});
 			}
@@ -358,13 +319,11 @@ public class PlayerPackets {
 			@Override
 			public void registerMap() {
 				map(Type.BOOLEAN);
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-						int playerId = tracker.getPlayerId();
-						if (tracker.isInsideVehicle(playerId)) packetWrapper.cancel();
-					}
+
+				handler(wrapper -> {
+					EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+					int playerId = tracker.getPlayerId();
+					if (tracker.isInsideVehicle(playerId)) wrapper.cancel();
 				});
 			}
 		});
@@ -377,21 +336,14 @@ public class PlayerPackets {
 				map(Type.DOUBLE);
 				map(Type.DOUBLE);
 				map(Type.BOOLEAN);
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						PlayerPosition pos = packetWrapper.user().get(PlayerPosition.class);
-						if (pos.getConfirmId() != -1) return;
-						pos.setPos(packetWrapper.get(Type.DOUBLE, 0), packetWrapper.get(Type.DOUBLE, 1), packetWrapper.get(Type.DOUBLE, 2));
-						pos.setOnGround(packetWrapper.get(Type.BOOLEAN, 0));
-					}
+
+				handler(wrapper -> {
+					PlayerPosition pos = wrapper.user().get(PlayerPosition.class);
+					if (pos.getConfirmId() != -1) return;
+					pos.setPos(wrapper.get(Type.DOUBLE, 0), wrapper.get(Type.DOUBLE, 1), wrapper.get(Type.DOUBLE, 2));
+					pos.setOnGround(wrapper.get(Type.BOOLEAN, 0));
 				});
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						packetWrapper.user().get(BossBarStorage.class).updateLocation();
-					}
-				});
+				handler(wrapper -> wrapper.user().get(BossBarStorage.class).updateLocation());
 			}
 		});
 
@@ -402,22 +354,15 @@ public class PlayerPackets {
 				map(Type.FLOAT);
 				map(Type.FLOAT);
 				map(Type.BOOLEAN);
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						PlayerPosition pos = packetWrapper.user().get(PlayerPosition.class);
-						if (pos.getConfirmId() != -1) return;
-						pos.setYaw(packetWrapper.get(Type.FLOAT, 0));
-						pos.setPitch(packetWrapper.get(Type.FLOAT, 1));
-						pos.setOnGround(packetWrapper.get(Type.BOOLEAN, 0));
-					}
+
+				handler(wrapper -> {
+					PlayerPosition pos = wrapper.user().get(PlayerPosition.class);
+					if (pos.getConfirmId() != -1) return;
+					pos.setYaw(wrapper.get(Type.FLOAT, 0));
+					pos.setPitch(wrapper.get(Type.FLOAT, 1));
+					pos.setOnGround(wrapper.get(Type.BOOLEAN, 0));
 				});
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						packetWrapper.user().get(BossBarStorage.class).updateLocation();
-					}
-				});
+				handler(wrapper -> wrapper.user().get(BossBarStorage.class).updateLocation());
 			}
 		});
 
@@ -431,39 +376,32 @@ public class PlayerPackets {
 				map(Type.FLOAT);
 				map(Type.FLOAT);
 				map(Type.BOOLEAN);
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						double x = packetWrapper.get(Type.DOUBLE, 0);
-						double y = packetWrapper.get(Type.DOUBLE, 1);
-						double z = packetWrapper.get(Type.DOUBLE, 2);
-						float yaw = packetWrapper.get(Type.FLOAT, 0);
-						float pitch = packetWrapper.get(Type.FLOAT, 1);
-						boolean onGround = packetWrapper.get(Type.BOOLEAN, 0);
 
-						PlayerPosition pos = packetWrapper.user().get(PlayerPosition.class);
-						if (pos.getConfirmId() != -1) {
-							if (pos.getPosX() == x && pos.getPosY() == y && pos.getPosZ() == z && pos.getYaw() == yaw && pos.getPitch() == pitch) {
-								PacketWrapper confirmTeleport = packetWrapper.create(0x00);
-								confirmTeleport.write(Type.VAR_INT, pos.getConfirmId());
-								PacketUtil.sendToServer(confirmTeleport, Protocol1_8TO1_9.class, true, true);
+				handler(wrapper -> {
+					double x = wrapper.get(Type.DOUBLE, 0);
+					double y = wrapper.get(Type.DOUBLE, 1);
+					double z = wrapper.get(Type.DOUBLE, 2);
+					float yaw = wrapper.get(Type.FLOAT, 0);
+					float pitch = wrapper.get(Type.FLOAT, 1);
+					boolean onGround = wrapper.get(Type.BOOLEAN, 0);
 
-								pos.setConfirmId(-1);
-							}
-						} else {
-							pos.setPos(x, y, z);
-							pos.setYaw(yaw);
-							pos.setPitch(pitch);
-							pos.setOnGround(onGround);
+					PlayerPosition pos = wrapper.user().get(PlayerPosition.class);
+					if (pos.getConfirmId() != -1) {
+						if (pos.getPosX() == x && pos.getPosY() == y && pos.getPosZ() == z && pos.getYaw() == yaw && pos.getPitch() == pitch) {
+							PacketWrapper confirmTeleport = wrapper.create(0x00);
+							confirmTeleport.write(Type.VAR_INT, pos.getConfirmId());
+							PacketUtil.sendToServer(confirmTeleport, Protocol1_8TO1_9.class, true, true);
+
+							pos.setConfirmId(-1);
 						}
+					} else {
+						pos.setPos(x, y, z);
+						pos.setYaw(yaw);
+						pos.setPitch(pitch);
+						pos.setOnGround(onGround);
 					}
 				});
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						packetWrapper.user().get(BossBarStorage.class).updateLocation();
-					}
-				});
+				handler(wrapper -> wrapper.user().get(BossBarStorage.class).updateLocation());
 			}
 		});
 
@@ -474,23 +412,21 @@ public class PlayerPackets {
 				map(Type.BYTE, Type.VAR_INT);
 				map(Type.POSITION);
 				map(Type.BYTE);
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						int state = packetWrapper.get(Type.VAR_INT, 0);
-						if (state == 0) {
-							packetWrapper.user().get(BlockPlaceDestroyTracker.class).setMining(true);
-						} else if (state == 2) {
-							BlockPlaceDestroyTracker tracker = packetWrapper.user().get(BlockPlaceDestroyTracker.class);
-							tracker.setMining(false);
-							tracker.setLastMining(System.currentTimeMillis() + 100);
-							packetWrapper.user().get(Cooldown.class).setLastHit(0);
-						} else if (state == 1) {
-							BlockPlaceDestroyTracker tracker = packetWrapper.user().get(BlockPlaceDestroyTracker.class);
-							tracker.setMining(false);
-							tracker.setLastMining(0);
-							packetWrapper.user().get(Cooldown.class).hit();
-						}
+
+				handler(wrapper -> {
+					int state = wrapper.get(Type.VAR_INT, 0);
+					if (state == 0) {
+						wrapper.user().get(BlockPlaceDestroyTracker.class).setMining(true);
+					} else if (state == 2) {
+						BlockPlaceDestroyTracker tracker = wrapper.user().get(BlockPlaceDestroyTracker.class);
+						tracker.setMining(false);
+						tracker.setLastMining(System.currentTimeMillis() + 100);
+						wrapper.user().get(Cooldown.class).setLastHit(0);
+					} else if (state == 1) {
+						BlockPlaceDestroyTracker tracker = wrapper.user().get(BlockPlaceDestroyTracker.class);
+						tracker.setMining(false);
+						tracker.setLastMining(0);
+						wrapper.user().get(Cooldown.class).hit();
 					}
 				});
 			}
@@ -502,39 +438,22 @@ public class PlayerPackets {
 			public void registerMap() {
 				map(Type.POSITION);
 				map(Type.BYTE, Type.VAR_INT);
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						packetWrapper.read(Type.ITEM);
-					}
-				});
-				create(new ValueCreator() {
-					@Override
-					public void write(PacketWrapper packetWrapper) throws Exception {
-						packetWrapper.write(Type.VAR_INT, 0);  //Main Hand
-					}
-				});
+				handler(wrapper -> wrapper.read(Type.ITEM));
+				create(wrapper -> wrapper.write(Type.VAR_INT, 0)); //Main Hand
 				map(Type.BYTE, Type.UNSIGNED_BYTE);
 				map(Type.BYTE, Type.UNSIGNED_BYTE);
 				map(Type.BYTE, Type.UNSIGNED_BYTE);
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						if (packetWrapper.get(Type.VAR_INT, 0) == -1) {
-							packetWrapper.cancel();
-							PacketWrapper useItem = new PacketWrapper(0x1D, null, packetWrapper.user());
-							useItem.write(Type.VAR_INT, 0);
 
-							PacketUtil.sendToServer(useItem, Protocol1_8TO1_9.class, true, true);
-						}
+				handler(wrapper -> {
+					if (wrapper.get(Type.VAR_INT, 0) == -1) {
+						wrapper.clearPacket();
+						wrapper.setId(0x1D);
+						wrapper.write(Type.VAR_INT, 0);
 					}
 				});
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						if (packetWrapper.get(Type.VAR_INT, 0) != -1) {
-							packetWrapper.user().get(BlockPlaceDestroyTracker.class).place();
-						}
+				handler(wrapper -> {
+					if (wrapper.get(Type.VAR_INT, 0) != -1) {
+						wrapper.user().get(BlockPlaceDestroyTracker.class).place();
 					}
 				});
 			}
@@ -544,12 +463,7 @@ public class PlayerPackets {
 		protocol.registerIncoming(State.PLAY, 0x17, 0x09, new PacketRemapper() {
 			@Override
 			public void registerMap() {
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						packetWrapper.user().get(Cooldown.class).hit();
-					}
-				});
+				handler(wrapper -> wrapper.user().get(Cooldown.class).hit());
 			}
 		});
 
@@ -557,30 +471,24 @@ public class PlayerPackets {
 		protocol.registerIncoming(State.PLAY, 0x1A, 0x0A, new PacketRemapper() {
 			@Override
 			public void registerMap() {
-				create(new ValueCreator() {
-					@Override
-					public void write(PacketWrapper packetWrapper) throws Exception {
-						packetWrapper.cancel();
-						final PacketWrapper delayedPacket = new PacketWrapper(0x1A, null, packetWrapper.user());
-						delayedPacket.write(Type.VAR_INT, 0);  //Main Hand
-						//delay packet in order to deal damage to entities
-						//the cooldown value gets reset by this packet
-						//1.8 sends it before the use entity packet
-						//1.9 afterwards
-						Protocol1_8TO1_9.TIMER.schedule(new TimerTask() {
-							@Override
-							public void run() {
-								PacketUtil.sendToServer(delayedPacket, Protocol1_8TO1_9.class);
-							}
-						}, 5);
-					}
+				create(wrapper -> {
+					wrapper.cancel();
+					final PacketWrapper delayedPacket = new PacketWrapper(0x1A, null, wrapper.user());
+					delayedPacket.write(Type.VAR_INT, 0);  //Main Hand
+					//delay packet in order to deal damage to entities
+					//the cooldown value gets reset by this packet
+					//1.8 sends it before the use entity packet
+					//1.9 afterwards
+					Protocol1_8TO1_9.TIMER.schedule(new TimerTask() {
+						@Override
+						public void run() {
+							PacketUtil.sendToServer(delayedPacket, Protocol1_8TO1_9.class);
+						}
+					}, 5);
 				});
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						packetWrapper.user().get(BlockPlaceDestroyTracker.class).updateMining();
-						packetWrapper.user().get(Cooldown.class).hit();
-					}
+				handler(wrapper -> {
+					wrapper.user().get(BlockPlaceDestroyTracker.class).updateMining();
+					wrapper.user().get(Cooldown.class).hit();
 				});
 			}
 		});
@@ -592,21 +500,19 @@ public class PlayerPackets {
 				map(Type.VAR_INT);
 				map(Type.VAR_INT);
 				map(Type.VAR_INT);
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						int action = packetWrapper.get(Type.VAR_INT, 1);
-						if (action == 6) {
-							packetWrapper.set(Type.VAR_INT, 1, 7);
-						} else if (action == 0) {
-							PlayerPosition pos = packetWrapper.user().get(PlayerPosition.class);
-							if (!pos.isOnGround()) {
-								PacketWrapper elytra = new PacketWrapper(0x14, null, packetWrapper.user());
-								elytra.write(Type.VAR_INT, packetWrapper.get(Type.VAR_INT, 0));
-								elytra.write(Type.VAR_INT, 8);
-								elytra.write(Type.VAR_INT, 0);
-								PacketUtil.sendToServer(elytra, Protocol1_8TO1_9.class, true, false);
-							}
+
+				handler(wrapper -> {
+					int action = wrapper.get(Type.VAR_INT, 1);
+					if (action == 6) {
+						wrapper.set(Type.VAR_INT, 1, 7);
+					} else if (action == 0) {
+						PlayerPosition pos = wrapper.user().get(PlayerPosition.class);
+						if (!pos.isOnGround()) {
+							PacketWrapper elytra = new PacketWrapper(0x14, null, wrapper.user());
+							elytra.write(Type.VAR_INT, wrapper.get(Type.VAR_INT, 0));
+							elytra.write(Type.VAR_INT, 8);
+							elytra.write(Type.VAR_INT, 0);
+							PacketUtil.sendToServer(elytra, Protocol1_8TO1_9.class, true, false);
 						}
 					}
 				});
@@ -620,20 +526,18 @@ public class PlayerPackets {
 				map(Type.FLOAT);
 				map(Type.FLOAT);
 				map(Type.UNSIGNED_BYTE);
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-						int playerId = tracker.getPlayerId();
-						int vehicle = tracker.getVehicle(playerId);
-						if (vehicle != -1 && tracker.getClientEntityTypes().get(vehicle) == Entity1_10Types.EntityType.BOAT) {
-							PacketWrapper steerBoat = new PacketWrapper(0x11, null, packetWrapper.user());
-							float left = packetWrapper.get(Type.FLOAT, 0);
-							float forward = packetWrapper.get(Type.FLOAT, 1);
-							steerBoat.write(Type.BOOLEAN, forward != 0.0f || left < 0.0f);
-							steerBoat.write(Type.BOOLEAN, forward != 0.0f || left > 0.0f);
-							PacketUtil.sendToServer(steerBoat, Protocol1_8TO1_9.class);
-						}
+
+				handler(wrapper -> {
+					EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+					int playerId = tracker.getPlayerId();
+					int vehicle = tracker.getVehicle(playerId);
+					if (vehicle != -1 && tracker.getClientEntityTypes().get(vehicle) == Entity1_10Types.EntityType.BOAT) {
+						PacketWrapper steerBoat = new PacketWrapper(0x11, null, wrapper.user());
+						float left = wrapper.get(Type.FLOAT, 0);
+						float forward = wrapper.get(Type.FLOAT, 1);
+						steerBoat.write(Type.BOOLEAN, forward != 0.0f || left < 0.0f);
+						steerBoat.write(Type.BOOLEAN, forward != 0.0f || left > 0.0f);
+						PacketUtil.sendToServer(steerBoat, Protocol1_8TO1_9.class, true, true);
 					}
 				});
 			}
@@ -644,12 +548,9 @@ public class PlayerPackets {
 			@Override
 			public void registerMap() {
 				map(Type.POSITION);
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						for (int i = 0; i < 4; i++) {
-							packetWrapper.write(Type.STRING, ChatUtil.jsonToLegacy(packetWrapper.read(Type.COMPONENT)));
-						}
+				handler(wrapper -> {
+					for (int i = 0; i < 4; i++) {
+						wrapper.write(Type.STRING, ChatUtil.jsonToLegacy(wrapper.read(Type.COMPONENT)));
 					}
 				});
 			}
@@ -663,12 +564,7 @@ public class PlayerPackets {
 			@Override
 			public void registerMap() {
 				map(Type.STRING);
-				create(new ValueCreator() {
-					@Override
-					public void write(PacketWrapper packetWrapper) throws Exception {
-						packetWrapper.write(Type.BOOLEAN, false);
-					}
-				});
+				create(wrapper -> wrapper.write(Type.BOOLEAN, false));
 				map(Type.OPTIONAL_POSITION);
 			}
 		});
@@ -682,27 +578,20 @@ public class PlayerPackets {
 				map(Type.BYTE, Type.VAR_INT);
 				map(Type.BOOLEAN);
 				map(Type.UNSIGNED_BYTE);
-				create(new ValueCreator() {
-					@Override
-					public void write(PacketWrapper packetWrapper) throws Exception {
-						packetWrapper.write(Type.VAR_INT, 1);
-					}
-				});
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						short flags = packetWrapper.get(Type.UNSIGNED_BYTE, 0);
+				create(wrapper -> wrapper.write(Type.VAR_INT, 1));
 
-						PacketWrapper updateSkin = new PacketWrapper(0x1C, null, packetWrapper.user());
-						updateSkin.write(Type.VAR_INT, packetWrapper.user().get(EntityTracker.class).getPlayerId());
+				handler(wrapper -> {
+					short flags = wrapper.get(Type.UNSIGNED_BYTE, 0);
 
-						ArrayList<Metadata> metadata = new ArrayList<>();
-						metadata.add(new Metadata(10, MetaType1_8.Byte, (byte) flags));
+					PacketWrapper updateSkin = new PacketWrapper(0x1C, null, wrapper.user());
+					updateSkin.write(Type.VAR_INT, wrapper.user().get(EntityTracker.class).getPlayerId());
 
-						updateSkin.write(Types1_8.METADATA_LIST, metadata);
+					List<Metadata> metadata = new ArrayList<>(1);
+					metadata.add(new Metadata(10, MetaType1_8.Byte, (byte) flags));
 
-						PacketUtil.sendPacket(updateSkin, Protocol1_8TO1_9.class);
-					}
+					updateSkin.write(Types1_8.METADATA_LIST, metadata);
+
+					PacketUtil.sendPacket(updateSkin, Protocol1_8TO1_9.class);
 				});
 			}
 		});
@@ -715,26 +604,24 @@ public class PlayerPackets {
 			@Override
 			public void registerMap() {
 				map(Type.STRING);
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						String channel = packetWrapper.get(Type.STRING, 0);
-						if (channel.equalsIgnoreCase("MC|BEdit") || channel.equalsIgnoreCase("MC|BSign")) {
-							Item book = packetWrapper.passthrough(Type.ITEM);
-							book.setIdentifier(386);
-							CompoundTag tag = book.getTag();
-							if (tag.contains("pages")) {
-								ListTag pages = tag.get("pages");
-								for (int i = 0; i < pages.size(); i++) {
-									StringTag page = pages.get(i);
-									String value = page.getValue();
-									value = ChatUtil.jsonToLegacy(value);
-									page.setValue(value);
-								}
+
+				handler(wrapper -> {
+					String channel = wrapper.get(Type.STRING, 0);
+					if (channel.equalsIgnoreCase("MC|BEdit") || channel.equalsIgnoreCase("MC|BSign")) {
+						Item book = wrapper.passthrough(Type.ITEM);
+						book.setIdentifier(386);
+						CompoundTag tag = book.getTag();
+						if (tag.contains("pages")) {
+							ListTag pages = tag.get("pages");
+							for (int i = 0; i < pages.size(); i++) {
+								StringTag page = pages.get(i);
+								String value = page.getValue();
+								value = ChatUtil.jsonToLegacy(value);
+								page.setValue(value);
 							}
-						} else if (channel.equalsIgnoreCase("MC|AdvCdm")) {
-							packetWrapper.set(Type.STRING, 0, channel = "MC|AdvCmd");
 						}
+					} else if (channel.equalsIgnoreCase("MC|AdvCdm")) {
+						wrapper.set(Type.STRING, 0, channel = "MC|AdvCmd");
 					}
 				});
 			}

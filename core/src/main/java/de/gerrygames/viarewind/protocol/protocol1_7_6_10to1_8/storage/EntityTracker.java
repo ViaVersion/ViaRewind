@@ -21,8 +21,8 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class EntityTracker extends StoredObject implements ExternalJoinGameListener {
-	private final Map<Integer, Entity1_10Types.EntityType> clientEntityTypes = new ConcurrentHashMap();
-	private final Map<Integer, List<Metadata>> metadataBuffer = new ConcurrentHashMap();
+	private final Map<Integer, Entity1_10Types.EntityType> clientEntityTypes = new ConcurrentHashMap<>();
+	private final Map<Integer, List<Metadata>> metadataBuffer = new ConcurrentHashMap<>();
 	private final Map<Integer, Integer> vehicles = new ConcurrentHashMap<>();
 	private final Map<Integer, EntityReplacement> entityReplacements = new ConcurrentHashMap<>();
 	private final Map<Integer, UUID> playersByEntityId = new HashMap<>();
@@ -112,7 +112,7 @@ public class EntityTracker extends StoredObject implements ExternalJoinGameListe
 
 	public int getVehicle(int passengerId) {
 		for (Map.Entry<Integer, Integer> vehicle : vehicles.entrySet()) {
-			if (vehicle.getValue()==passengerId) return vehicle.getValue();
+			if (vehicle.getValue() == passengerId) return vehicle.getValue();
 		}
 		return -1;
 	}
@@ -122,7 +122,7 @@ public class EntityTracker extends StoredObject implements ExternalJoinGameListe
 	}
 
 	public void setPassenger(int vehicleId, int passengerId) {
-		if (vehicleId==this.spectating && this.spectating!=this.playerId) {
+		if (vehicleId == this.spectating && this.spectating != this.playerId) {
 			try {
 				PacketWrapper sneakPacket = new PacketWrapper(0x0B, null, getUser());
 				sneakPacket.write(Type.VAR_INT, playerId);
@@ -137,12 +137,14 @@ public class EntityTracker extends StoredObject implements ExternalJoinGameListe
 				PacketUtil.sendToServer(sneakPacket, Protocol1_7_6_10TO1_8.class, true, true);
 
 				setSpectating(playerId);
-			} catch (Exception ex) {ex.printStackTrace();}
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
 		}
-		if (vehicleId==-1) {
+		if (vehicleId == -1) {
 			int oldVehicleId = getVehicle(passengerId);
 			vehicles.remove(oldVehicleId);
-		} else if (passengerId==-1) {
+		} else if (passengerId == -1) {
 			vehicles.remove(vehicleId);
 		} else {
 			vehicles.put(vehicleId, passengerId);
@@ -154,7 +156,7 @@ public class EntityTracker extends StoredObject implements ExternalJoinGameListe
 	}
 
 	public boolean setSpectating(int spectating) {
-		if (spectating!=this.playerId && getPassenger(spectating)!=-1) {
+		if (spectating != this.playerId && getPassenger(spectating) != -1) {
 
 			PacketWrapper sneakPacket = new PacketWrapper(0x0B, null, getUser());
 			sneakPacket.write(Type.VAR_INT, playerId);
@@ -172,7 +174,7 @@ public class EntityTracker extends StoredObject implements ExternalJoinGameListe
 			return false;  //Entity has Passenger
 		}
 
-		if (this.spectating!=spectating && this.spectating!=this.playerId) {
+		if (this.spectating != spectating && this.spectating != this.playerId) {
 			PacketWrapper unmount = new PacketWrapper(0x1B, null, this.getUser());
 			unmount.write(Type.INT, this.playerId);
 			unmount.write(Type.INT, -1);
@@ -180,7 +182,7 @@ public class EntityTracker extends StoredObject implements ExternalJoinGameListe
 			PacketUtil.sendPacket(unmount, Protocol1_7_6_10TO1_8.class);
 		}
 		this.spectating = spectating;
-		if (spectating!=this.playerId) {
+		if (spectating != this.playerId) {
 			PacketWrapper mount = new PacketWrapper(0x1B, null, this.getUser());
 			mount.write(Type.INT, this.playerId);
 			mount.write(Type.INT, this.spectating);
@@ -203,7 +205,7 @@ public class EntityTracker extends StoredObject implements ExternalJoinGameListe
 	}
 
 	public void setPlayerId(int playerId) {
-		if (this.playerId!=-1) throw new IllegalStateException("playerId was already set!");
+		if (this.playerId != -1) throw new IllegalStateException("playerId was already set!");
 		this.playerId = this.spectating = playerId;
 	}
 

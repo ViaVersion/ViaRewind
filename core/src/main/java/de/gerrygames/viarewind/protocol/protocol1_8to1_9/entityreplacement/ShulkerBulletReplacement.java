@@ -28,7 +28,7 @@ public class ShulkerBulletReplacement implements EntityReplacement {
 	}
 
 	public void setLocation(double x, double y, double z) {
-		if (x!=this.locX || y!=this.locY || z!=this.locZ) {
+		if (x != this.locX || y != this.locY || z != this.locZ) {
 			this.locX = x;
 			this.locY = y;
 			this.locZ = z;
@@ -37,7 +37,7 @@ public class ShulkerBulletReplacement implements EntityReplacement {
 	}
 
 	public void relMove(double x, double y, double z) {
-		if (x==0.0 && y==0.0 && z==0.0) return;
+		if (x == 0.0 && y == 0.0 && z == 0.0) return;
 		this.locX += x;
 		this.locY += y;
 		this.locZ += z;
@@ -45,7 +45,7 @@ public class ShulkerBulletReplacement implements EntityReplacement {
 	}
 
 	public void setYawPitch(float yaw, float pitch) {
-		if (this.yaw!=yaw && this.pitch!=pitch) {
+		if (this.yaw != yaw && this.pitch != pitch) {
 			this.yaw = yaw;
 			this.pitch = pitch;
 			updateLocation();
@@ -71,7 +71,7 @@ public class ShulkerBulletReplacement implements EntityReplacement {
 
 		PacketWrapper head = new PacketWrapper(0x19, null, user);
 		head.write(Type.VAR_INT, entityId);
-		head.write(Type.BYTE, (byte)((headYaw / 360f) * 256));
+		head.write(Type.BYTE, (byte) ((headYaw / 360f) * 256));
 
 		PacketUtil.sendPacket(teleport, Protocol1_8TO1_9.class, true, true);
 		PacketUtil.sendPacket(head, Protocol1_8TO1_9.class, true, true);
@@ -95,7 +95,7 @@ public class ShulkerBulletReplacement implements EntityReplacement {
 	@Override
 	public void despawn() {
 		PacketWrapper despawn = new PacketWrapper(0x13, null, user);
-		despawn.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[] {entityId});
+		despawn.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[]{entityId});
 
 		PacketUtil.sendPacket(despawn, Protocol1_8TO1_9.class, true, true);
 	}

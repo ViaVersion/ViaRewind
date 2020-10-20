@@ -4,7 +4,6 @@ import io.netty.buffer.ByteBuf;
 import us.myles.ViaVersion.api.type.Type;
 
 public class VarLongType extends Type<Long> {
-
 	public static final VarLongType VAR_LONG = new VarLongType();
 
 	public VarLongType() {

@@ -21,7 +21,6 @@ import io.netty.channel.Channel;
 import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.protocol.Protocol;
-import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.api.type.types.CustomByteType;
@@ -50,17 +49,7 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 		});
 
 		//Set Compression
-		this.registerOutgoing(State.PLAY, 0x46, -1, new PacketRemapper() {
-			@Override
-			public void registerMap() {
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						packetWrapper.cancel();
-					}
-				});
-			}
-		});
+		this.cancelOutgoing(State.PLAY, 0x46);
 
 		//Keep Alive
 		this.registerIncoming(State.PLAY, 0x00, 0x00, new PacketRemapper() {
@@ -75,17 +64,14 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 			@Override
 			public void registerMap() {
 				map(Type.STRING);  //Server ID
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						int publicKeyLength = packetWrapper.read(Type.VAR_INT);
-						packetWrapper.write(Type.SHORT, (short) publicKeyLength);
-						packetWrapper.passthrough(new CustomByteType(publicKeyLength));
+				handler(wrapper -> {
+					int publicKeyLength = wrapper.read(Type.VAR_INT);
+					wrapper.write(Type.SHORT, (short) publicKeyLength);
+					wrapper.passthrough(new CustomByteType(publicKeyLength));
 
-						int verifyTokenLength = packetWrapper.read(Type.VAR_INT);
-						packetWrapper.write(Type.SHORT, (short) verifyTokenLength);
-						packetWrapper.passthrough(new CustomByteType(verifyTokenLength));
-					}
+					int verifyTokenLength = wrapper.read(Type.VAR_INT);
+					wrapper.write(Type.SHORT, (short) verifyTokenLength);
+					wrapper.passthrough(new CustomByteType(verifyTokenLength));
 				});
 			}
 		});
@@ -94,12 +80,9 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 		this.registerOutgoing(State.LOGIN, 0x03, 0x03, new PacketRemapper() {
 			@Override
 			public void registerMap() {
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						packetWrapper.cancel();
-						packetWrapper.user().get(CompressionSendStorage.class).setCompressionSend(true);
-					}
+				handler(wrapper -> {
+					wrapper.cancel();
+					wrapper.user().get(CompressionSendStorage.class).setCompressionSend(true);
 				});
 			}
 		});
@@ -108,27 +91,24 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 		this.registerIncoming(State.LOGIN, 0x01, 0x01, new PacketRemapper() {
 			@Override
 			public void registerMap() {
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						int sharedSecretLength = packetWrapper.read(Type.SHORT);
-						packetWrapper.write(Type.VAR_INT, sharedSecretLength);
-						packetWrapper.passthrough(new CustomByteType(sharedSecretLength));
+				handler(wrapper -> {
+					int sharedSecretLength = wrapper.read(Type.SHORT);
+					wrapper.write(Type.VAR_INT, sharedSecretLength);
+					wrapper.passthrough(new CustomByteType(sharedSecretLength));
 
-						int verifyTokenLength = packetWrapper.read(Type.SHORT);
-						packetWrapper.write(Type.VAR_INT, verifyTokenLength);
-						packetWrapper.passthrough(new CustomByteType(verifyTokenLength));
-					}
+					int verifyTokenLength = wrapper.read(Type.SHORT);
+					wrapper.write(Type.VAR_INT, verifyTokenLength);
+					wrapper.passthrough(new CustomByteType(verifyTokenLength));
 				});
 			}
 		});
 	}
 
 	@Override
-	public void transform(Direction direction, State state, PacketWrapper packetWrapper) throws Exception {
-		CompressionSendStorage compressionSendStorage = packetWrapper.user().get(CompressionSendStorage.class);
+	public void transform(Direction direction, State state, PacketWrapper wrapper) throws Exception {
+		CompressionSendStorage compressionSendStorage = wrapper.user().get(CompressionSendStorage.class);
 		if (compressionSendStorage.isCompressionSend()) {
-			Channel channel = packetWrapper.user().getChannel();
+			Channel channel = wrapper.user().getChannel();
 			if (channel.pipeline().get("compress") != null) {
 				channel.pipeline().replace("decompress", "decompress", new EmptyChannelHandler());
 				channel.pipeline().replace("compress", "compress", new ForwardMessageToByteEncoder());
@@ -140,7 +120,7 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 			compressionSendStorage.setCompressionSend(false);
 		}
 
-		super.transform(direction, state, packetWrapper);
+		super.transform(direction, state, wrapper);
 	}
 
 	@Override

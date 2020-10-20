@@ -6,7 +6,6 @@ import us.myles.ViaVersion.api.data.UserConnection;
 
 @Data
 public class CompressionSendStorage extends StoredObject {
-
 	private boolean compressionSend = false;
 
 	public CompressionSendStorage(UserConnection user) {

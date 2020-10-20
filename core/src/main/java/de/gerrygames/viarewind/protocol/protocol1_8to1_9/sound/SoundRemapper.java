@@ -1,28 +1,29 @@
 package de.gerrygames.viarewind.protocol.protocol1_8to1_9.sound;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class SoundRemapper {
-	private static final HashMap<Integer, String> sounds1_9 = new HashMap<>();
-	private static final HashMap<String, String> sound1_9to1_8 = new HashMap<>();
+	private static final Map<Integer, String> SOUNDS_1_9 = new HashMap<>();
+	private static final Map<String, String> SOUNDS_1_9_TO_1_8 = new HashMap<>();
 	private static int id;
 
 	private static void register1_9Sound(String sound1_9) {
-		sounds1_9.put(id++, sound1_9);
+		SOUNDS_1_9.put(id++, sound1_9);
 	}
 
 	private static void registerSoundRemapping(String sound1_9, String sound1_8) {
-		sound1_9to1_8.put(sound1_9, sound1_8);
+		SOUNDS_1_9_TO_1_8.put(sound1_9, sound1_8);
 	}
 
 	public static String oldNameFromId(int id) {
-		String sound1_9 = sounds1_9.get(id);
+		String sound1_9 = SOUNDS_1_9.get(id);
 		if (sound1_9==null) return null;
 		return getOldName(sound1_9);
 	}
 
 	public static String getOldName(String sound1_9) {
-		return sound1_9to1_8.getOrDefault(sound1_9, sound1_9);
+		return SOUNDS_1_9_TO_1_8.getOrDefault(sound1_9, sound1_9);
 	}
 
 	static {

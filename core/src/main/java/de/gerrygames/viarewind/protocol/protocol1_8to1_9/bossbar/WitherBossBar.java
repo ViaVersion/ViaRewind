@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-public class WitherBossBar extends BossBar {
+public class WitherBossBar extends BossBar<UserConnection> {
 	private static int highestId = Integer.MAX_VALUE-10000;
 
 	private final UUID uuid;
@@ -28,7 +28,7 @@ public class WitherBossBar extends BossBar {
 	private float health;
 	private boolean visible = false;
 
-	private UserConnection connection;
+	private final UserConnection connection;
 
 	private final int entityId = highestId++;
 	private double locX, locY, locZ;
@@ -46,7 +46,7 @@ public class WitherBossBar extends BossBar {
 	}
 
 	@Override
-	public BossBar setTitle(String title) {
+	public WitherBossBar setTitle(String title) {
 		this.title = title;
 		if (this.visible) updateMetadata();
 		return this;
@@ -58,7 +58,7 @@ public class WitherBossBar extends BossBar {
 	}
 
 	@Override
-	public BossBar setHealth(float health) {
+	public WitherBossBar setHealth(float health) {
 		this.health  = health;
 		if (this.health<=0) this.health = 0.0001f;
 		if (this.visible) updateMetadata();
@@ -71,7 +71,7 @@ public class WitherBossBar extends BossBar {
 	}
 
 	@Override
-	public BossBar setColor(BossColor bossColor) {
+	public WitherBossBar setColor(BossColor bossColor) {
 		throw new UnsupportedOperationException(this.getClass().getName() + " does not support color");
 	}
 
@@ -81,37 +81,37 @@ public class WitherBossBar extends BossBar {
 	}
 
 	@Override
-	public BossBar setStyle(BossStyle bossStyle) {
+	public WitherBossBar setStyle(BossStyle bossStyle) {
 		throw new UnsupportedOperationException(this.getClass().getName() + " does not support styles");
 	}
 
 	@Override
-	public BossBar addPlayer(UUID uuid) {
+	public WitherBossBar addPlayer(UUID uuid) {
 		throw new UnsupportedOperationException(this.getClass().getName() + " is only for one UserConnection!");
 	}
 
     @Override
-    public BossBar addConnection(UserConnection userConnection) {
+    public WitherBossBar addConnection(UserConnection userConnection) {
         throw new UnsupportedOperationException(this.getClass().getName() + " is only for one UserConnection!");
     }
 
     @Override
-	public BossBar removePlayer(UUID uuid) {
+	public WitherBossBar removePlayer(UUID uuid) {
 		throw new UnsupportedOperationException(this.getClass().getName() + " is only for one UserConnection!");
 	}
 
     @Override
-    public BossBar removeConnection(UserConnection userConnection) {
+    public WitherBossBar removeConnection(UserConnection userConnection) {
         throw new UnsupportedOperationException(this.getClass().getName() + " is only for one UserConnection!");
     }
 
     @Override
-	public BossBar addFlag(BossFlag bossFlag) {
+	public WitherBossBar addFlag(BossFlag bossFlag) {
 		throw new UnsupportedOperationException(this.getClass().getName() + " does not support flags");
 	}
 
 	@Override
-	public BossBar removeFlag(BossFlag bossFlag) {
+	public WitherBossBar removeFlag(BossFlag bossFlag) {
 		throw new UnsupportedOperationException(this.getClass().getName() + " does not support flags");
 	}
 
@@ -131,7 +131,7 @@ public class WitherBossBar extends BossBar {
     }
 
     @Override
-	public BossBar show() {
+	public WitherBossBar show() {
 		if (!this.visible) {
 			this.visible = true;
 			spawnWither();
@@ -140,7 +140,7 @@ public class WitherBossBar extends BossBar {
 	}
 
 	@Override
-	public BossBar hide() {
+	public WitherBossBar hide() {
 		if (this.visible) {
 			this.visible = false;
 			despawnWither();
@@ -166,18 +166,18 @@ public class WitherBossBar extends BossBar {
 	}
 
 	private void spawnWither() {
-		PacketWrapper packetWrapper = new PacketWrapper(0x0F, null, this.connection);
-		packetWrapper.write(Type.VAR_INT, entityId);
-		packetWrapper.write(Type.UNSIGNED_BYTE, (short)64);
-		packetWrapper.write(Type.INT, (int) (locX * 32d));
-		packetWrapper.write(Type.INT, (int) (locY * 32d));
-		packetWrapper.write(Type.INT, (int) (locZ * 32d));
-		packetWrapper.write(Type.BYTE, (byte)0);
-		packetWrapper.write(Type.BYTE, (byte)0);
-		packetWrapper.write(Type.BYTE, (byte)0);
-		packetWrapper.write(Type.SHORT, (short)0);
-		packetWrapper.write(Type.SHORT, (short)0);
-		packetWrapper.write(Type.SHORT, (short)0);
+		PacketWrapper wrapper = new PacketWrapper(0x0F, null, this.connection);
+		wrapper.write(Type.VAR_INT, entityId);
+		wrapper.write(Type.UNSIGNED_BYTE, (short)64);
+		wrapper.write(Type.INT, (int) (locX * 32d));
+		wrapper.write(Type.INT, (int) (locY * 32d));
+		wrapper.write(Type.INT, (int) (locZ * 32d));
+		wrapper.write(Type.BYTE, (byte)0);
+		wrapper.write(Type.BYTE, (byte)0);
+		wrapper.write(Type.BYTE, (byte)0);
+		wrapper.write(Type.SHORT, (short)0);
+		wrapper.write(Type.SHORT, (short)0);
+		wrapper.write(Type.SHORT, (short)0);
 
 		List<Metadata> metadata = new ArrayList<>();
 		metadata.add(new Metadata(0, MetaType1_8.Byte, (byte) 0x20));
@@ -185,42 +185,42 @@ public class WitherBossBar extends BossBar {
 		metadata.add(new Metadata(3, MetaType1_8.Byte, (byte) 1));
 		metadata.add(new Metadata(6, MetaType1_8.Float, health * 300f));
 
-		packetWrapper.write(Types1_8.METADATA_LIST, metadata);
+		wrapper.write(Types1_8.METADATA_LIST, metadata);
 
-		PacketUtil.sendPacket(packetWrapper, Protocol1_8TO1_9.class, true, true);
+		PacketUtil.sendPacket(wrapper, Protocol1_8TO1_9.class, true, true);
 	}
 
 	private void updateLocation() {
-		PacketWrapper packetWrapper = new PacketWrapper(0x18, null, this.connection);
-		packetWrapper.write(Type.VAR_INT, entityId);
-		packetWrapper.write(Type.INT, (int) (locX * 32d));
-		packetWrapper.write(Type.INT, (int) (locY * 32d));
-		packetWrapper.write(Type.INT, (int) (locZ * 32d));
-		packetWrapper.write(Type.BYTE, (byte)0);
-		packetWrapper.write(Type.BYTE, (byte)0);
-		packetWrapper.write(Type.BOOLEAN, false);
+		PacketWrapper wrapper = new PacketWrapper(0x18, null, this.connection);
+		wrapper.write(Type.VAR_INT, entityId);
+		wrapper.write(Type.INT, (int) (locX * 32d));
+		wrapper.write(Type.INT, (int) (locY * 32d));
+		wrapper.write(Type.INT, (int) (locZ * 32d));
+		wrapper.write(Type.BYTE, (byte)0);
+		wrapper.write(Type.BYTE, (byte)0);
+		wrapper.write(Type.BOOLEAN, false);
 
-		PacketUtil.sendPacket(packetWrapper, Protocol1_8TO1_9.class, true, true);
+		PacketUtil.sendPacket(wrapper, Protocol1_8TO1_9.class, true, true);
 	}
 
 	private void updateMetadata() {
-		PacketWrapper packetWrapper = new PacketWrapper(0x1C, null, this.connection);
-		packetWrapper.write(Type.VAR_INT, entityId);
+		PacketWrapper wrapper = new PacketWrapper(0x1C, null, this.connection);
+		wrapper.write(Type.VAR_INT, entityId);
 
 		List<Metadata> metadata = new ArrayList<>();
 		metadata.add(new Metadata(2, MetaType1_8.String, title));
 		metadata.add(new Metadata(6, MetaType1_8.Float, health * 300f));
 
-		packetWrapper.write(Types1_8.METADATA_LIST, metadata);
+		wrapper.write(Types1_8.METADATA_LIST, metadata);
 
-		PacketUtil.sendPacket(packetWrapper, Protocol1_8TO1_9.class, true, true);
+		PacketUtil.sendPacket(wrapper, Protocol1_8TO1_9.class, true, true);
 	}
 
 	private void despawnWither() {
-		PacketWrapper packetWrapper = new PacketWrapper(0x13, null, this.connection);
-		packetWrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[] {entityId});
+		PacketWrapper wrapper = new PacketWrapper(0x13, null, this.connection);
+		wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[] {entityId});
 
-		PacketUtil.sendPacket(packetWrapper, Protocol1_8TO1_9.class, true, true);
+		PacketUtil.sendPacket(wrapper, Protocol1_8TO1_9.class, true, true);
 	}
 
 	public void setPlayerLocation(double posX, double posY, double posZ, float yaw, float pitch) {

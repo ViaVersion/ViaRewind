@@ -48,7 +48,7 @@ public class Protocol1_8TO1_9 extends Protocol {
 	};
 	public static final ValueTransformer<Float, Byte> DEGREES_TO_ANGLE = new ValueTransformer<Float, Byte>(Type.BYTE) {
 		@Override
-		public Byte transform(PacketWrapper packetWrapper, Float degrees) throws Exception {
+		public Byte transform(PacketWrapper wrapper, Float degrees) throws Exception {
 			return (byte) ((degrees / 360F) * 256);
 		}
 	};

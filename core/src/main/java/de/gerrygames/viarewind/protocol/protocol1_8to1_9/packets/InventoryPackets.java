@@ -2,10 +2,8 @@ package de.gerrygames.viarewind.protocol.protocol1_8to1_9.packets;
 
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.items.ItemRewriter;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage.Windows;
-import us.myles.ViaVersion.api.PacketWrapper;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 import us.myles.ViaVersion.api.protocol.Protocol;
-import us.myles.ViaVersion.api.remapper.PacketHandler;
 import us.myles.ViaVersion.api.remapper.PacketRemapper;
 import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
@@ -24,12 +22,9 @@ public class InventoryPackets {
 			@Override
 			public void registerMap() {
 				map(Type.UNSIGNED_BYTE);
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						short windowsId = packetWrapper.get(Type.UNSIGNED_BYTE, 0);
-						packetWrapper.user().get(Windows.class).remove(windowsId);
-					}
+				handler(wrapper -> {
+					short windowsId = wrapper.get(Type.UNSIGNED_BYTE, 0);
+					wrapper.user().get(Windows.class).remove(windowsId);
 				});
 			}
 		});
@@ -42,32 +37,24 @@ public class InventoryPackets {
 				map(Type.STRING);
 				map(Type.COMPONENT);
 				map(Type.UNSIGNED_BYTE);
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						String type = packetWrapper.get(Type.STRING, 0);
-						if (type.equals("EntityHorse")) packetWrapper.passthrough(Type.INT);
-					}
+
+				handler(wrapper -> {
+					String type = wrapper.get(Type.STRING, 0);
+					if (type.equals("EntityHorse")) wrapper.passthrough(Type.INT);
 				});
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						short windowId = packetWrapper.get(Type.UNSIGNED_BYTE, 0);
-						String windowType = packetWrapper.get(Type.STRING, 0);
-						packetWrapper.user().get(Windows.class).put(windowId, windowType);
-					}
+				handler(wrapper -> {
+					short windowId = wrapper.get(Type.UNSIGNED_BYTE, 0);
+					String windowType = wrapper.get(Type.STRING, 0);
+					wrapper.user().get(Windows.class).put(windowId, windowType);
 				});
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						String type = packetWrapper.get(Type.STRING, 0);
-						if (type.equalsIgnoreCase("minecraft:shulker_box")) {
-							packetWrapper.set(Type.STRING, 0, type = "minecraft:container");
-						}
-						String name = packetWrapper.get(Type.COMPONENT, 0).toString();
-						if (name.equalsIgnoreCase("{\"translate\":\"container.shulkerBox\"}")) {
-							packetWrapper.set(Type.COMPONENT, 0, GsonUtil.getJsonParser().parse("{\"text\":\"Shulker Box\"}"));
-						}
+				handler(wrapper -> {
+					String type = wrapper.get(Type.STRING, 0);
+					if (type.equalsIgnoreCase("minecraft:shulker_box")) {
+						wrapper.set(Type.STRING, 0, type = "minecraft:container");
+					}
+					String name = wrapper.get(Type.COMPONENT, 0).toString();
+					if (name.equalsIgnoreCase("{\"translate\":\"container.shulkerBox\"}")) {
+						wrapper.set(Type.COMPONENT, 0, GsonUtil.getJsonParser().parse("{\"text\":\"Shulker Box\"}"));
 					}
 				});
 			}
@@ -78,30 +65,27 @@ public class InventoryPackets {
 			@Override
 			public void registerMap() {
 				map(Type.UNSIGNED_BYTE);
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						short windowId = packetWrapper.get(Type.UNSIGNED_BYTE, 0);
-						Item[] items = packetWrapper.read(Type.ITEM_ARRAY);
-						for (int i = 0; i < items.length; i++) {
-							items[i] = ItemRewriter.toClient(items[i]);
-						}
-						if (windowId == 0 && items.length == 46) {
+				map(Type.ITEM_ARRAY);
+
+				handler(wrapper -> {
+					Item[] items = wrapper.get(Type.ITEM_ARRAY, 0);
+					for (Item item : items) ItemRewriter.toClient(item);
+
+					short windowId = wrapper.get(Type.UNSIGNED_BYTE, 0);
+					if (windowId == 0 && items.length == 46) {
+						Item[] old = items;
+						items = new Item[45];
+						System.arraycopy(old, 0, items, 0, 45);
+					} else {
+						String type = wrapper.user().get(Windows.class).get(windowId);
+						if (type != null && type.equalsIgnoreCase("minecraft:brewing_stand")) {
+							System.arraycopy(items, 0, wrapper.user().get(Windows.class).getBrewingItems(windowId), 0, 4);
+							Windows.updateBrewingStand(wrapper.user(), items[4], windowId);
 							Item[] old = items;
-							items = new Item[45];
-							System.arraycopy(old, 0, items, 0, 45);
-						} else {
-							String type = packetWrapper.user().get(Windows.class).get(windowId);
-							if (type != null && type.equalsIgnoreCase("minecraft:brewing_stand")) {
-								System.arraycopy(items, 0, packetWrapper.user().get(Windows.class).getBrewingItems(windowId), 0, 4);
-								Windows.updateBrewingStand(packetWrapper.user(), items[4], windowId);
-								Item[] old = items;
-								items = new Item[old.length - 1];
-								System.arraycopy(old, 0, items, 0, 4);
-								System.arraycopy(old, 5, items, 4, old.length - 5);
-							}
+							items = new Item[old.length - 1];
+							System.arraycopy(old, 0, items, 0, 4);
+							System.arraycopy(old, 5, items, 4, old.length - 5);
 						}
-						packetWrapper.write(Type.ITEM_ARRAY, items);
 					}
 				});
 			}
@@ -117,28 +101,25 @@ public class InventoryPackets {
 				map(Type.BYTE);
 				map(Type.SHORT);
 				map(Type.ITEM);
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						packetWrapper.set(Type.ITEM, 0, ItemRewriter.toClient(packetWrapper.get(Type.ITEM, 0)));
-						byte windowId = packetWrapper.get(Type.BYTE, 0);
-						short slot = packetWrapper.get(Type.SHORT, 0);
-						if (windowId == 0 && slot == 45) {
-							packetWrapper.cancel();
-							return;
-						}
-						String type = packetWrapper.user().get(Windows.class).get(windowId);
-						if (type == null) return;
-						if (type.equalsIgnoreCase("minecraft:brewing_stand")) {
-							if (slot > 4) {
-								packetWrapper.set(Type.SHORT, 0, slot -= 1);
-							} else if (slot == 4) {
-								packetWrapper.cancel();
-								Windows.updateBrewingStand(packetWrapper.user(), packetWrapper.get(Type.ITEM, 0), windowId);
-								return;
-							} else {
-								packetWrapper.user().get(Windows.class).getBrewingItems(windowId)[slot] = packetWrapper.get(Type.ITEM, 0);
-							}
+
+				handler(wrapper -> ItemRewriter.toClient(wrapper.get(Type.ITEM, 0)));
+				handler(wrapper -> {
+					byte windowId = wrapper.get(Type.BYTE, 0);
+					short slot = wrapper.get(Type.SHORT, 0);
+					if (windowId == 0 && slot == 45) {
+						wrapper.cancel();
+						return;
+					}
+					String type = wrapper.user().get(Windows.class).get(windowId);
+					if (type == null) return;
+					if (type.equalsIgnoreCase("minecraft:brewing_stand")) {
+						if (slot > 4) {
+							wrapper.set(Type.SHORT, 0, slot -= 1);
+						} else if (slot == 4) {
+							wrapper.cancel();
+							Windows.updateBrewingStand(wrapper.user(), wrapper.get(Type.ITEM, 0), windowId);
+						} else {
+							wrapper.user().get(Windows.class).getBrewingItems(windowId)[slot] = wrapper.get(Type.ITEM, 0);
 						}
 					}
 				});
@@ -152,12 +133,9 @@ public class InventoryPackets {
 			@Override
 			public void registerMap() {
 				map(Type.UNSIGNED_BYTE);
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						short windowsId = packetWrapper.get(Type.UNSIGNED_BYTE, 0);
-						packetWrapper.user().get(Windows.class).remove(windowsId);
-					}
+				handler(wrapper -> {
+					short windowsId = wrapper.get(Type.UNSIGNED_BYTE, 0);
+					wrapper.user().get(Windows.class).remove(windowsId);
 				});
 			}
 		});
@@ -172,24 +150,17 @@ public class InventoryPackets {
 				map(Type.SHORT);
 				map(Type.BYTE, Type.VAR_INT);
 				map(Type.ITEM);
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						packetWrapper.set(Type.ITEM, 0, ItemRewriter.toServer(packetWrapper.get(Type.ITEM, 0)));
-					}
-				});
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						short windowId = packetWrapper.get(Type.UNSIGNED_BYTE, 0);
-						Windows windows = packetWrapper.user().get(Windows.class);
-						String type = windows.get(windowId);
-						if (type == null) return;
-						if (type.equalsIgnoreCase("minecraft:brewing_stand")) {
-							short slot = packetWrapper.get(Type.SHORT, 0);
-							if (slot > 3) {
-								packetWrapper.set(Type.SHORT, 0, slot += 1);
-							}
+
+				handler(wrapper -> ItemRewriter.toServer(wrapper.get(Type.ITEM, 0)));
+				handler(wrapper -> {
+					short windowId = wrapper.get(Type.UNSIGNED_BYTE, 0);
+					Windows windows = wrapper.user().get(Windows.class);
+					String type = windows.get(windowId);
+					if (type == null) return;
+					if (type.equalsIgnoreCase("minecraft:brewing_stand")) {
+						short slot = wrapper.get(Type.SHORT, 0);
+						if (slot > 3) {
+							wrapper.set(Type.SHORT, 0, slot += 1);
 						}
 					}
 				});
@@ -202,12 +173,8 @@ public class InventoryPackets {
 			public void registerMap() {
 				map(Type.SHORT);
 				map(Type.ITEM);
-				handler(new PacketHandler() {
-					@Override
-					public void handle(PacketWrapper packetWrapper) throws Exception {
-						packetWrapper.set(Type.ITEM, 0, ItemRewriter.toServer(packetWrapper.get(Type.ITEM, 0)));
-					}
-				});
+
+				handler(wrapper -> ItemRewriter.toServer(wrapper.get(Type.ITEM, 0)));
 			}
 		});
 
