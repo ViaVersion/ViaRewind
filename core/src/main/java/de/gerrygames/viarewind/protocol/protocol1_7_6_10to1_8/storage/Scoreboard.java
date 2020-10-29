@@ -15,10 +15,10 @@ public class Scoreboard extends StoredObject {
 	private final HashMap<String, ScoreTeam> scoreTeams = new HashMap<>();
 	private final HashMap<String, Byte> teamColors = new HashMap<>();
 	private final HashSet<String> scoreTeamNames = new HashSet<>();
-	private String colorIndependentSidebar;
 	private final HashMap<Byte, String> colorDependentSidebar = new HashMap<>();
+	private String colorIndependentSidebar;
 
-    public Scoreboard(UserConnection user) {
+	public Scoreboard(UserConnection user) {
 		super(user);
 	}
 
@@ -50,7 +50,7 @@ public class Scoreboard extends StoredObject {
 
 	public void removePlayerFromTeam(String player, String team) {
 		List<String> teamPlayers = teams.get(team);
-		if (teamPlayers!=null) teamPlayers.remove(player);
+		if (teamPlayers != null) teamPlayers.remove(player);
 	}
 
 	public boolean isPlayerInTeam(String player, String team) {
@@ -94,22 +94,22 @@ public class Scoreboard extends StoredObject {
 	}
 
 	public String sendTeamForScore(String score) {
-		if (score.length()<=16) return score;
+		if (score.length() <= 16) return score;
 		if (scoreTeams.containsKey(score)) return scoreTeams.get(score).name;
 		int l = 16;
-		int i = Math.min(16, score.length()-16);
-		String name = score.substring(i, i+l);
+		int i = Math.min(16, score.length() - 16);
+		String name = score.substring(i, i + l);
 		while (scoreTeamNames.contains(name) || teams.containsKey(name)) {
 			i--;
-			while (score.length()-l-i>16) {
+			while (score.length() - l - i > 16) {
 				l--;
-				if (l<1) return score;
-				i = Math.min(16, score.length()-l);
+				if (l < 1) return score;
+				i = Math.min(16, score.length() - l);
 			}
-			name = score.substring(i, i+l);
+			name = score.substring(i, i + l);
 		}
 		String prefix = score.substring(0, i);
-		String suffix = i+l>=score.length() ? "" : score.substring(i+l);
+		String suffix = i + l >= score.length() ? "" : score.substring(i + l);
 
 		ScoreTeam scoreTeam = new ScoreTeam(name, prefix, suffix);
 		scoreTeams.put(score, scoreTeam);
@@ -131,7 +131,7 @@ public class Scoreboard extends StoredObject {
 
 	public String removeTeamForScore(String score) {
 		ScoreTeam scoreTeam = scoreTeams.remove(score);
-		if (scoreTeam==null) return score;
+		if (scoreTeam == null) return score;
 		scoreTeamNames.remove(scoreTeam.name);
 
 		PacketWrapper teamPacket = new PacketWrapper(0x3E, null, getUser());
@@ -140,6 +140,18 @@ public class Scoreboard extends StoredObject {
 		PacketUtil.sendPacket(teamPacket, Protocol1_7_6_10TO1_8.class, true, true);
 
 		return scoreTeam.name;
+	}
+
+	public String getColorIndependentSidebar() {
+		return colorIndependentSidebar;
+	}
+
+	public void setColorIndependentSidebar(String colorIndependentSidebar) {
+		this.colorIndependentSidebar = colorIndependentSidebar;
+	}
+
+	public HashMap<Byte, String> getColorDependentSidebar() {
+		return colorDependentSidebar;
 	}
 
 	private class ScoreTeam {
@@ -152,17 +164,5 @@ public class Scoreboard extends StoredObject {
 			this.suffix = suffix;
 			this.name = name;
 		}
-	}
-
-	public String getColorIndependentSidebar() {
-		return colorIndependentSidebar;
-	}
-
-	public HashMap<Byte, String> getColorDependentSidebar() {
-		return colorDependentSidebar;
-	}
-
-	public void setColorIndependentSidebar(String colorIndependentSidebar) {
-		this.colorIndependentSidebar = colorIndependentSidebar;
 	}
 }

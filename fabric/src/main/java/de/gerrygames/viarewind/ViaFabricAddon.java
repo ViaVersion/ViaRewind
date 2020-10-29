@@ -9,16 +9,16 @@ import org.apache.logging.log4j.LogManager;
 import java.util.logging.Logger;
 
 public class ViaFabricAddon implements ViaRewindPlatform, Runnable {
-    private final Logger logger = new LoggerWrapper(LogManager.getLogger("ViaRewind"));
+	private final Logger logger = new LoggerWrapper(LogManager.getLogger("ViaRewind"));
 
-    @Override
-    public void run() {
-        ViaRewindConfigImpl conf = new ViaRewindConfigImpl(FabricLoader.getInstance().getConfigDirectory().toPath().resolve("ViaRewind").resolve("config.yml").toFile());
-        conf.reloadConfig();
-        this.init(conf);
-    }
+	@Override
+	public void run() {
+		ViaRewindConfigImpl conf = new ViaRewindConfigImpl(FabricLoader.getInstance().getConfigDirectory().toPath().resolve("ViaRewind").resolve("config.yml").toFile());
+		conf.reloadConfig();
+		this.init(conf);
+	}
 
-    public Logger getLogger() {
-        return this.logger;
-    }
+	public Logger getLogger() {
+		return this.logger;
+	}
 }

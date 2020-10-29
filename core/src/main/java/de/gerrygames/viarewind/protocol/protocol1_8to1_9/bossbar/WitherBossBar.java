@@ -17,16 +17,14 @@ import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 import java.util.*;
 
 public class WitherBossBar extends BossBar {
-	private static int highestId = Integer.MAX_VALUE-10000;
+	private static int highestId = Integer.MAX_VALUE - 10000;
 
 	private final UUID uuid;
+	private final UserConnection connection;
+	private final int entityId = highestId++;
 	private String title;
 	private float health;
 	private boolean visible = false;
-
-	private final UserConnection connection;
-
-	private final int entityId = highestId++;
 	private double locX, locY, locZ;
 
 	public WitherBossBar(UserConnection connection, UUID uuid, String title, float health) {
@@ -55,8 +53,8 @@ public class WitherBossBar extends BossBar {
 
 	@Override
 	public BossBar setHealth(float health) {
-		this.health  = health;
-		if (this.health<=0) this.health = 0.0001f;
+		this.health = health;
+		if (this.health <= 0) this.health = 0.0001f;
 		if (this.visible) updateMetadata();
 		return this;
 	}
@@ -86,22 +84,22 @@ public class WitherBossBar extends BossBar {
 		throw new UnsupportedOperationException(this.getClass().getName() + " is only for one UserConnection!");
 	}
 
-    @Override
-    public BossBar addConnection(UserConnection userConnection) {
-        throw new UnsupportedOperationException(this.getClass().getName() + " is only for one UserConnection!");
-    }
+	@Override
+	public BossBar addConnection(UserConnection userConnection) {
+		throw new UnsupportedOperationException(this.getClass().getName() + " is only for one UserConnection!");
+	}
 
-    @Override
+	@Override
 	public BossBar removePlayer(UUID uuid) {
 		throw new UnsupportedOperationException(this.getClass().getName() + " is only for one UserConnection!");
 	}
 
-    @Override
-    public BossBar removeConnection(UserConnection userConnection) {
-        throw new UnsupportedOperationException(this.getClass().getName() + " is only for one UserConnection!");
-    }
+	@Override
+	public BossBar removeConnection(UserConnection userConnection) {
+		throw new UnsupportedOperationException(this.getClass().getName() + " is only for one UserConnection!");
+	}
 
-    @Override
+	@Override
 	public BossBar addFlag(BossFlag bossFlag) {
 		throw new UnsupportedOperationException(this.getClass().getName() + " does not support flags");
 	}
@@ -121,12 +119,12 @@ public class WitherBossBar extends BossBar {
 		return Collections.singleton(connection.get(ProtocolInfo.class).getUuid());
 	}
 
-    @Override
-    public Set<UserConnection> getConnections() {
-        throw new UnsupportedOperationException(this.getClass().getName() + " is only for one UserConnection!");
-    }
+	@Override
+	public Set<UserConnection> getConnections() {
+		throw new UnsupportedOperationException(this.getClass().getName() + " is only for one UserConnection!");
+	}
 
-    @Override
+	@Override
 	public BossBar show() {
 		if (!this.visible) {
 			this.visible = true;
@@ -164,16 +162,16 @@ public class WitherBossBar extends BossBar {
 	private void spawnWither() {
 		PacketWrapper packetWrapper = new PacketWrapper(0x0F, null, this.connection);
 		packetWrapper.write(Type.VAR_INT, entityId);
-		packetWrapper.write(Type.UNSIGNED_BYTE, (short)64);
+		packetWrapper.write(Type.UNSIGNED_BYTE, (short) 64);
 		packetWrapper.write(Type.INT, (int) (locX * 32d));
 		packetWrapper.write(Type.INT, (int) (locY * 32d));
 		packetWrapper.write(Type.INT, (int) (locZ * 32d));
-		packetWrapper.write(Type.BYTE, (byte)0);
-		packetWrapper.write(Type.BYTE, (byte)0);
-		packetWrapper.write(Type.BYTE, (byte)0);
-		packetWrapper.write(Type.SHORT, (short)0);
-		packetWrapper.write(Type.SHORT, (short)0);
-		packetWrapper.write(Type.SHORT, (short)0);
+		packetWrapper.write(Type.BYTE, (byte) 0);
+		packetWrapper.write(Type.BYTE, (byte) 0);
+		packetWrapper.write(Type.BYTE, (byte) 0);
+		packetWrapper.write(Type.SHORT, (short) 0);
+		packetWrapper.write(Type.SHORT, (short) 0);
+		packetWrapper.write(Type.SHORT, (short) 0);
 
 		List<Metadata> metadata = new ArrayList<>();
 		metadata.add(new Metadata(0, MetaType1_8.Byte, (byte) 0x20));
@@ -192,8 +190,8 @@ public class WitherBossBar extends BossBar {
 		packetWrapper.write(Type.INT, (int) (locX * 32d));
 		packetWrapper.write(Type.INT, (int) (locY * 32d));
 		packetWrapper.write(Type.INT, (int) (locZ * 32d));
-		packetWrapper.write(Type.BYTE, (byte)0);
-		packetWrapper.write(Type.BYTE, (byte)0);
+		packetWrapper.write(Type.BYTE, (byte) 0);
+		packetWrapper.write(Type.BYTE, (byte) 0);
 		packetWrapper.write(Type.BOOLEAN, false);
 
 		PacketUtil.sendPacket(packetWrapper, Protocol1_8TO1_9.class, true, true);
@@ -214,7 +212,7 @@ public class WitherBossBar extends BossBar {
 
 	private void despawnWither() {
 		PacketWrapper packetWrapper = new PacketWrapper(0x13, null, this.connection);
-		packetWrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[] {entityId});
+		packetWrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[]{entityId});
 
 		PacketUtil.sendPacket(packetWrapper, Protocol1_8TO1_9.class, true, true);
 	}

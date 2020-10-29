@@ -20,13 +20,13 @@ import java.util.logging.Logger;
 		version = VersionInfo.VERSION,
 		authors = {"Gerrygames"},
 		dependencies = {
-			@Dependency(id = "viaversion"),
-			@Dependency(id = "viabackwards", optional = true)
+				@Dependency(id = "viaversion"),
+				@Dependency(id = "viabackwards", optional = true)
 		},
 		url = "https://viaversion.com/rewind"
 )
 public class VelocityPlugin implements ViaRewindPlatform {
-    private Logger logger;
+	private Logger logger;
 	@Inject
 	private org.slf4j.Logger loggerSlf4j;
 

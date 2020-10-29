@@ -193,7 +193,7 @@ public class PlayerPackets {
 							y += playerPosition.getPosY();
 						}
 						playerPosition.setReceivedPosY(y);
-						y += (double) 1.62F;
+						y += 1.62F;
 						packetWrapper.set(Type.DOUBLE, 1, y);
 						if ((flags & 0x04) == 0x04) {
 							double z = packetWrapper.get(Type.DOUBLE, 2);
