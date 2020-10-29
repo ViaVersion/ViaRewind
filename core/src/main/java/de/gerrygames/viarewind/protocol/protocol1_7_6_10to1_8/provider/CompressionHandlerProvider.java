@@ -49,7 +49,6 @@ public class CompressionHandlerProvider implements Provider {
 				decompressor = "compression-decoder";
 			}
 			if (compressor != null) { // We can neutralize the effect of compressor to the client
-				System.out.println("stop decompressing");
 				pipeline.replace(decompressor, decompressor, new EmptyChannelHandler());
 				pipeline.replace(compressor, compressor, new ForwardMessageToByteEncoder());
 			} else {
