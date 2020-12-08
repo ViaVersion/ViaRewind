@@ -20,4 +20,12 @@ public class PlayerPosition extends StoredObject {
 		this.posY = y;
 		this.posZ = z;
 	}
+
+	public void setYaw(float yaw) {
+		this.yaw = yaw % 360f;
+	}
+
+	public void setPitch(float pitch) {
+		this.pitch = pitch % 360f;
+	}
 }
