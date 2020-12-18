@@ -29,6 +29,7 @@ Do you use a proxy (eg. BungeeCord)? What software do you use and what plugins?
 - [] I have included a ViaVersion dump
 - [] If applicable, I have included a paste (not a screenshot) of the error
 - [] I have tried a build from https://ci.viaversion.com/ and the issue still persists
-- [] I did not installed Viaversion, viabackwards & Viarewind on my bungeecord(or fork) and installed Viaversion, viabackwards(If your server is 1.10+) & Viarewind only on my all backend(spigot, paper etc.) servers.
+- [] I did not installed Viaversion, viabackwards & Viarewind on my bungeecord(or fork) and only installed Viaversion, viabackwards(If your server is 1.10+) & Viarewind on my all backend(spigot, paper etc.) servers.
+- [] (If your server is spigot or fork) I have tried installing viarewindlegacysupport from https://www.spigotmc.org/resources/viarewind-legacy-support.52924/download?version=371096
 
 **IMPORTANT: Follow the Checklist or we can't reproduce your issue and your issue will be close**
