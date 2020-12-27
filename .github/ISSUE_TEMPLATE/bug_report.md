@@ -25,7 +25,7 @@ If applicable, add screenshots to help explain your problem.
 **Additional server info**
 Do you use a proxy (eg. BungeeCord)? What software do you use and what plugins?
 
-**Checklist** (Mark with [X] to check it.)
+**Checklist** (mark with [X] to check)
 - [] I have included a ViaVersion dump
 - [] If applicable, I have included a paste (not a screenshot) of the error
 - [] I have tried a build from https://ci.viaversion.com/ and the issue still persists
