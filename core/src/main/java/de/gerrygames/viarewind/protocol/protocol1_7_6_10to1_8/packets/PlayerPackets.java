@@ -938,10 +938,11 @@ public class PlayerPackets {
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
-						byte flags = packetWrapper.get(Type.BYTE, 0);
 						PlayerAbilities abilities = packetWrapper.user().get(PlayerAbilities.class);
-						abilities.setAllowFly((flags & 4) == 4);
-						abilities.setFlying((flags & 2) == 2);
+						if (abilities.isAllowFly()) {
+							byte flags = packetWrapper.get(Type.BYTE, 0);
+							abilities.setFlying((flags & 2) == 2);
+						}
 						packetWrapper.set(Type.FLOAT, 0, abilities.getFlySpeed());
 					}
 				});
