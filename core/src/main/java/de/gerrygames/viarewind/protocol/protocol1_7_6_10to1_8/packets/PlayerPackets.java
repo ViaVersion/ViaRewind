@@ -341,7 +341,7 @@ public class PlayerPackets {
 								gameProfile.ping = ping;
 								gameProfile.gamemode = gamemode;
 								if (packetWrapper.read(Type.BOOLEAN)) {
-									gameProfile.setDisplayName(packetWrapper.read(Type.STRING));
+									gameProfile.setDisplayName(ChatUtil.jsonToLegacy(packetWrapper.read(Type.COMPONENT)));
 								}
 
 								PacketWrapper packet = new PacketWrapper(0x38, null, packetWrapper.user());
@@ -393,7 +393,7 @@ public class PlayerPackets {
 								packet.write(Type.SHORT, (short) ping);
 								PacketUtil.sendPacket(packet, Protocol1_7_6_10TO1_8.class);
 							} else if (action == 3) {
-								String displayName = packetWrapper.read(Type.BOOLEAN) ? packetWrapper.read(Type.STRING) : null;
+								String displayName = packetWrapper.read(Type.BOOLEAN) ? ChatUtil.jsonToLegacy(packetWrapper.read(Type.STRING)) : null;
 
 								GameProfileStorage.GameProfile gameProfile = gameProfileStorage.get(uuid);
 								if (gameProfile == null || gameProfile.displayName == null && displayName == null) continue;
