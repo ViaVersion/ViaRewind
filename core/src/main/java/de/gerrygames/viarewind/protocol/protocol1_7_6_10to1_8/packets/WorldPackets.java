@@ -285,15 +285,15 @@ public class WorldPackets {
 						short columns = packetWrapper.read(Type.UNSIGNED_BYTE);
 						if (columns > 0) {
 							short rows = packetWrapper.read(Type.UNSIGNED_BYTE);
-							byte x = packetWrapper.read(Type.BYTE);
-							byte z = packetWrapper.read(Type.BYTE);
+							short x = packetWrapper.read(Type.UNSIGNED_BYTE);
+							short z = packetWrapper.read(Type.UNSIGNED_BYTE);
 							byte[] data = packetWrapper.read(Type.BYTE_ARRAY_PRIMITIVE);
 
 							for (int column = 0; column < columns; column++) {
 								byte[] columnData = new byte[rows + 3];
 								columnData[0] = 0;
 								columnData[1] = (byte) (x + column);
-								columnData[2] = z;
+								columnData[2] = (byte) z;
 
 								for (int i = 0; i < rows; i++) {
 									columnData[i + 3] = data[column + i * columns];
