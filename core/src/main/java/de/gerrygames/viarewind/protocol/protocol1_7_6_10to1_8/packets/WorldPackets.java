@@ -89,7 +89,7 @@ public class WorldPackets {
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						Position position = packetWrapper.read(Type.POSITION);
 						packetWrapper.write(Type.INT, position.getX());
-						packetWrapper.write(Type.UNSIGNED_BYTE, position.getY());
+						packetWrapper.write(Type.UNSIGNED_BYTE, (short) position.getY());
 						packetWrapper.write(Type.INT, position.getZ());
 					}
 				});
@@ -122,7 +122,7 @@ public class WorldPackets {
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						Position position = packetWrapper.read(Type.POSITION);
 						packetWrapper.write(Type.INT, position.getX());
-						packetWrapper.write(Type.SHORT, position.getY());
+						packetWrapper.write(Type.SHORT, (short) position.getY());
 						packetWrapper.write(Type.INT, position.getZ());
 					}
 				});
@@ -240,7 +240,7 @@ public class WorldPackets {
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						Position position = packetWrapper.read(Type.POSITION);
 						packetWrapper.write(Type.INT, position.getX());
-						packetWrapper.write(Type.SHORT, position.getY());
+						packetWrapper.write(Type.SHORT, (short) position.getY());
 						packetWrapper.write(Type.INT, position.getZ());
 					}
 				});
@@ -343,7 +343,7 @@ public class WorldPackets {
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						Position position = packetWrapper.read(Type.POSITION);
 						packetWrapper.write(Type.INT, position.getX());
-						packetWrapper.write(Type.SHORT, position.getY());
+						packetWrapper.write(Type.SHORT, (short) position.getY());
 						packetWrapper.write(Type.INT, position.getZ());
 					}
 				});
