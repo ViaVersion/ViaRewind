@@ -446,7 +446,7 @@ public class PlayerPackets {
 							if (pos.getPosX() == x && pos.getPosY() == y && pos.getPosZ() == z && pos.getYaw() == yaw && pos.getPitch() == pitch) {
 								PacketWrapper confirmTeleport = packetWrapper.create(0x00);
 								confirmTeleport.write(Type.VAR_INT, pos.getConfirmId());
-								PacketUtil.sendToServer(confirmTeleport, Protocol1_8TO1_9.class, true, false);
+								PacketUtil.sendToServer(confirmTeleport, Protocol1_8TO1_9.class, true, true);
 
 								pos.setConfirmId(-1);
 							}
