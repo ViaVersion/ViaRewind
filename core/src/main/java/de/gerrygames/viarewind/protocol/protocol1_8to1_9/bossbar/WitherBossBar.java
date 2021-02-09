@@ -187,7 +187,7 @@ public class WitherBossBar extends BossBar {
 
 		packetWrapper.write(Types1_8.METADATA_LIST, metadata);
 
-		PacketUtil.sendPacket(packetWrapper, Protocol1_8TO1_9.class, true, true);
+		PacketUtil.sendPacket(packetWrapper, Protocol1_8TO1_9.class, true, false);
 	}
 
 	private void updateLocation() {
@@ -200,7 +200,7 @@ public class WitherBossBar extends BossBar {
 		packetWrapper.write(Type.BYTE, (byte)0);
 		packetWrapper.write(Type.BOOLEAN, false);
 
-		PacketUtil.sendPacket(packetWrapper, Protocol1_8TO1_9.class, true, true);
+		PacketUtil.sendPacket(packetWrapper, Protocol1_8TO1_9.class, true, false);
 	}
 
 	private void updateMetadata() {
@@ -213,14 +213,14 @@ public class WitherBossBar extends BossBar {
 
 		packetWrapper.write(Types1_8.METADATA_LIST, metadata);
 
-		PacketUtil.sendPacket(packetWrapper, Protocol1_8TO1_9.class, true, true);
+		PacketUtil.sendPacket(packetWrapper, Protocol1_8TO1_9.class, true, false);
 	}
 
 	private void despawnWither() {
 		PacketWrapper packetWrapper = new PacketWrapper(0x13, null, this.connection);
 		packetWrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[] {entityId});
 
-		PacketUtil.sendPacket(packetWrapper, Protocol1_8TO1_9.class, true, true);
+		PacketUtil.sendPacket(packetWrapper, Protocol1_8TO1_9.class, true, false);
 	}
 
 	public void setPlayerLocation(double posX, double posY, double posZ, float yaw, float pitch) {
