@@ -1,11 +1,8 @@
 package de.gerrygames.viarewind.replacement;
 
-import de.gerrygames.viarewind.storage.BlockState;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import us.myles.ViaVersion.api.minecraft.item.Item;
-
-import java.util.HashMap;
+import us.myles.viaversion.libs.fastutil.ints.Int2ObjectMap;
+import us.myles.viaversion.libs.fastutil.ints.Int2ObjectOpenHashMap;
 
 public class ReplacementRegistry {
 	private final Int2ObjectMap<Replacement> itemReplacements = new Int2ObjectOpenHashMap<>();
