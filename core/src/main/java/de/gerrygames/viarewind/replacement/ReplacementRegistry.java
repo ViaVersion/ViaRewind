@@ -1,13 +1,15 @@
 package de.gerrygames.viarewind.replacement;
 
 import de.gerrygames.viarewind.storage.BlockState;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import us.myles.ViaVersion.api.minecraft.item.Item;
 
 import java.util.HashMap;
 
 public class ReplacementRegistry {
-	private HashMap<Integer, Replacement> itemReplacements = new HashMap<>();
-	private HashMap<Integer, Replacement> blockReplacements = new HashMap<>();
+	private final Int2ObjectMap<Replacement> itemReplacements = new Int2ObjectOpenHashMap<>();
+	private final Int2ObjectMap<Replacement> blockReplacements = new Int2ObjectOpenHashMap<>();
 
 
 	public void registerItem(int id, Replacement replacement) {
@@ -41,13 +43,15 @@ public class ReplacementRegistry {
 		return replacement==null ? item : replacement.replace(item);
 	}
 
-	public BlockState replace(BlockState block) {
-		Replacement replacement = blockReplacements.get(combine(block.getId(), block.getData()));
-		if (replacement==null) replacement = blockReplacements.get(combine(block.getId(), -1));
-		return replacement==null ? block : replacement.replace(block);
+	public Replacement replace(int id, int data) {
+		Replacement replacement = blockReplacements.get(combine(id, data));
+		if (replacement == null) {
+			replacement = blockReplacements.get(combine(id, -1));
+		}
+		return replacement;
 	}
 
-	private static int combine(int id, int data) {
+	public static int combine(int id, int data) {
 		return (id << 16) | (data & 0xFFFF);
 	}
 }

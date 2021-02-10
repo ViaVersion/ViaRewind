@@ -1,6 +1,7 @@
 package de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.chunks;
 
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.items.ReplacementRegistry1_7_6_10to1_8;
+import de.gerrygames.viarewind.replacement.Replacement;
 import de.gerrygames.viarewind.storage.BlockState;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -25,15 +26,22 @@ public class ChunkPacketTransformer {
 				short blockData = (short) ((data[(dataSize + 1)] & 0xFF) << 8 | data[dataSize] & 0xFF);
 				dataSize += 2;
 
-				BlockState state = BlockState.rawToState(blockData);
-				state = ReplacementRegistry1_7_6_10to1_8.replace(state);
+				int id = BlockState.extractId(blockData);
+				int meta = BlockState.extractData(blockData);
 
-				buf.writeByte(state.getId());
+				Replacement replace = ReplacementRegistry1_7_6_10to1_8.getReplacement(id, meta);
+
+				if (replace != null) {
+					id = replace.getId();
+					meta = replace.replaceData(meta);
+				}
+
+				buf.writeByte(id);
 
 				if (j % 2 == 0) {
-					tmp = (byte) (state.getData() & 0xF);
+					tmp = (byte) (meta & 0xF);
 				} else {
-					blockDataBuf.writeByte(tmp | (state.getData() & 15) << 4);
+					blockDataBuf.writeByte(tmp | (meta & 15) << 4);
 				}
 			}
 		}
