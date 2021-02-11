@@ -9,6 +9,7 @@ import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.metadata.MetadataR
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage.EntityTracker;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage.GameProfileStorage;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
+import de.gerrygames.viarewind.replacement.Replacement;
 import de.gerrygames.viarewind.storage.BlockState;
 import de.gerrygames.viarewind.utils.PacketUtil;
 import us.myles.ViaVersion.api.PacketWrapper;
@@ -177,9 +178,14 @@ public class SpawnPackets {
 						int data = packetWrapper.get(Type.INT, 3);
 
 						if (type != null && type.isOrHasParent(Entity1_10Types.EntityType.FALLING_BLOCK)) {
-							BlockState state = new BlockState(data & 0xFFF, data >> 12 & 0xF);
-							state = ReplacementRegistry1_7_6_10to1_8.replace(state);
-							packetWrapper.set(Type.INT, 3, data = (state.getId() | state.getData() << 16));
+							int blockId = data & 0xFFF;
+							int blockData = data >> 12 & 0xF;
+							Replacement replace = ReplacementRegistry1_7_6_10to1_8.getReplacement(blockId, blockData);
+							if (replace != null) {
+								blockId = replace.getId();
+								blockData = replace.replaceData(blockData);
+							}
+							packetWrapper.set(Type.INT, 3, data = (blockId | blockData << 16));
 						}
 
 						if (data > 0) {

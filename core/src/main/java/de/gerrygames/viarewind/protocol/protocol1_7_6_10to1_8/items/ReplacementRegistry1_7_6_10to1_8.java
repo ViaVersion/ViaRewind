@@ -92,7 +92,14 @@ public class ReplacementRegistry1_7_6_10to1_8 {
 		return registry.replace(item);
 	}
 
-	public static BlockState replace(BlockState block) {
-		return registry.replace(block);
+	public static int replace(int raw) {
+		int data = BlockState.extractData(raw);
+		Replacement replace = registry.replace(BlockState.extractId(raw), data);
+		return replace != null ? BlockState.stateToRaw(replace.getId(), replace.replaceData(data)) : raw;
 	}
+
+	public static Replacement getReplacement(int id, int data) {
+		return registry.replace(id, data);
+	}
+
 }
