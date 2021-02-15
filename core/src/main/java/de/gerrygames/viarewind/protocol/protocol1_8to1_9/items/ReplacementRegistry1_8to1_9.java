@@ -67,6 +67,7 @@ public class ReplacementRegistry1_8to1_9 {
 	public static int replace(int raw) {
 		int data = BlockState.extractData(raw);
 		Replacement replace = registry.replace(BlockState.extractId(raw), data);
+		if (replace == null) return raw;
 		return BlockState.stateToRaw(replace.getId(), replace.replaceData(data));
 	}
 
