@@ -12,7 +12,7 @@ public class MetadataListType extends MetaListTypeTemplate {
 
 	@Override
 	public List<Metadata> read(ByteBuf buffer) throws Exception {
-		ArrayList<Metadata> list = new ArrayList();
+		ArrayList<Metadata> list = new ArrayList<>();
 
 		Metadata m;
 		do {
