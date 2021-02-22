@@ -7,6 +7,7 @@ import de.gerrygames.viarewind.protocol.protocol1_8to1_9.entityreplacement.Shulk
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.items.ReplacementRegistry1_8to1_9;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.metadata.MetadataRewriter;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage.EntityTracker;
+import de.gerrygames.viarewind.replacement.Replacement;
 import de.gerrygames.viarewind.storage.BlockState;
 import de.gerrygames.viarewind.utils.PacketUtil;
 import us.myles.ViaVersion.api.PacketWrapper;
@@ -92,9 +93,10 @@ public class SpawnPackets {
 							packetWrapper.set(Type.INT, 3, --data);
 						}
 						if (type.is(Entity1_10Types.EntityType.FALLING_BLOCK)) {
-							BlockState state = new BlockState(data & 0xFFF, data >> 12 & 0xF);
-							state = ReplacementRegistry1_8to1_9.replace(state);
-							packetWrapper.set(Type.INT, 3, state.getId() | state.getData() << 12);
+							int blockId = data & 0xFFF;
+							int blockData = data >> 12 & 0xF;
+							Replacement replace = ReplacementRegistry1_8to1_9.getReplacement(blockId, blockData);
+							packetWrapper.set(Type.INT, 3, replace.getId() | replace.replaceData(data) << 12);
 						}
 
 						if (data > 0) {

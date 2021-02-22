@@ -62,7 +62,7 @@ public class Replacement {
 		return item;
 	}
 
-	public BlockState replace(BlockState block) {
-		return new BlockState(id, data==-1 ? block.getData() : data);
+	public int replaceData(int data) {
+		return data == -1 ? data : this.data;
 	}
 }
