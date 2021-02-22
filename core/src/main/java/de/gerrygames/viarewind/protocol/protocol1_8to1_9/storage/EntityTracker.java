@@ -19,9 +19,9 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class EntityTracker extends StoredObject implements ExternalJoinGameListener {
-	private final Map<Integer, List<Integer>> vehicleMap = new ConcurrentHashMap();
-	private final Map<Integer, Entity1_10Types.EntityType> clientEntityTypes = new ConcurrentHashMap();
-	private final Map<Integer, List<Metadata>> metadataBuffer = new ConcurrentHashMap();
+	private final Map<Integer, List<Integer>> vehicleMap = new ConcurrentHashMap<>();
+	private final Map<Integer, Entity1_10Types.EntityType> clientEntityTypes = new ConcurrentHashMap<>();
+	private final Map<Integer, List<Metadata>> metadataBuffer = new ConcurrentHashMap<>();
 	private final Map<Integer, EntityReplacement> entityReplacements = new ConcurrentHashMap<>();
 	private final Map<Integer, Vector> entityOffsets = new ConcurrentHashMap<>();
 	private int playerId;

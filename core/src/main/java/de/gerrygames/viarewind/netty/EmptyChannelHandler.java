@@ -1,21 +1,8 @@
 package de.gerrygames.viarewind.netty;
 
 import io.netty.channel.ChannelHandler;
-import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelHandlerAdapter;
 
-public class EmptyChannelHandler implements ChannelHandler {
-	@Override
-	public void handlerAdded(ChannelHandlerContext channelHandlerContext) throws Exception {
-
-	}
-
-	@Override
-	public void handlerRemoved(ChannelHandlerContext channelHandlerContext) throws Exception {
-
-	}
-
-	@Override
-	public void exceptionCaught(ChannelHandlerContext channelHandlerContext, Throwable throwable) throws Exception {
-
-	}
+@ChannelHandler.Sharable
+public class EmptyChannelHandler extends ChannelHandlerAdapter {
 }
