@@ -85,9 +85,8 @@ public class WorldPackets {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						int combined = packetWrapper.get(Type.VAR_INT, 0);
-						BlockState state = BlockState.rawToState(combined);
-						state = ReplacementRegistry1_8to1_9.replace(state);
-						packetWrapper.set(Type.VAR_INT, 0, BlockState.stateToRaw(state));
+						int replacedCombined = ReplacementRegistry1_8to1_9.replace(combined);
+						packetWrapper.set(Type.VAR_INT, 0, replacedCombined);
 					}
 				});
 			}
@@ -107,9 +106,8 @@ public class WorldPackets {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						for (BlockChangeRecord record : packetWrapper.get(Type.BLOCK_CHANGE_RECORD_ARRAY, 0)) {
-							BlockState state = BlockState.rawToState(record.getBlockId());
-							state = ReplacementRegistry1_8to1_9.replace(state);
-							record.setBlockId(BlockState.stateToRaw(state));
+							int replacedCombined = ReplacementRegistry1_8to1_9.replace(record.getBlockId());
+							record.setBlockId(replacedCombined);
 						}
 					}
 				});
@@ -204,9 +202,8 @@ public class WorldPackets {
 							if (section == null) continue;
 							for (int i = 0; i < section.getPaletteSize(); i++) {
 								int block = section.getPaletteEntry(i);
-								BlockState state = BlockState.rawToState(block);
-								state = ReplacementRegistry1_8to1_9.replace(state);
-								section.setPaletteEntry(i, BlockState.stateToRaw(state));
+								int replacedBlock = ReplacementRegistry1_8to1_9.replace(block);
+								section.setPaletteEntry(i, replacedBlock);
 							}
 						}
 
@@ -283,9 +280,8 @@ public class WorldPackets {
 						}
 						packetWrapper.set(Type.INT, 0, id);
 						if (id == 2001) {
-							BlockState state = BlockState.rawToState(packetWrapper.get(Type.INT, 1));
-							state = ReplacementRegistry1_8to1_9.replace(state);
-							packetWrapper.set(Type.INT, 1, BlockState.stateToRaw(state));
+							int replacedBlock = ReplacementRegistry1_8to1_9.replace(packetWrapper.get(Type.INT, 1));
+							packetWrapper.set(Type.INT, 1, replacedBlock);
 						}
 					}
 				});

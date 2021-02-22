@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Enchantments {
-	public static Map<Short, String> ENCHANTMENTS = new HashMap<>();
+	public static final Map<Short, String> ENCHANTMENTS = new HashMap<>();
 
 	static {
 		ENCHANTMENTS.put((short) 1, "I");
