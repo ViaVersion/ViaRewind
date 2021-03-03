@@ -1,6 +1,5 @@
 package de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.packets;
 
-import com.google.common.base.Charsets;
 import de.gerrygames.viarewind.ViaRewind;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10TO1_8;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.entityreplacements.ArmorStandReplacement;
@@ -41,6 +40,7 @@ import us.myles.viaversion.libs.opennbt.tag.builtin.CompoundTag;
 import us.myles.viaversion.libs.opennbt.tag.builtin.ListTag;
 import us.myles.viaversion.libs.opennbt.tag.builtin.StringTag;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.UUID;
 
@@ -483,7 +483,7 @@ public class PlayerPackets {
 								packetWrapper.read(Type.INT); //Max Uses
 							}
 						} else if (channel.equalsIgnoreCase("MC|Brand")) {
-							packetWrapper.write(Type.REMAINING_BYTES, packetWrapper.read(Type.STRING).getBytes(Charsets.UTF_8));
+							packetWrapper.write(Type.REMAINING_BYTES, packetWrapper.read(Type.STRING).getBytes(StandardCharsets.UTF_8));
 						}
 
 						packetWrapper.cancel();
@@ -1019,7 +1019,7 @@ public class PlayerPackets {
 						if (channel.equalsIgnoreCase("MC|ItemName")) {
 							CustomByteType customByteType = new CustomByteType(length);
 							byte[] data = packetWrapper.read(customByteType);
-							String name = new String(data, Charsets.UTF_8);
+							String name = new String(data, StandardCharsets.UTF_8);
 							ByteBuf buf = packetWrapper.user().getChannel().alloc().buffer();
 							Type.STRING.write(buf, name);
 							data = new byte[buf.readableBytes()];

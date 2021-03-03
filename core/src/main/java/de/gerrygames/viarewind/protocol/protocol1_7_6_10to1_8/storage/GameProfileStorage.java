@@ -1,10 +1,10 @@
 package de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage;
 
 import de.gerrygames.viarewind.utils.ChatUtil;
-import net.md_5.bungee.api.ChatColor;
 import us.myles.ViaVersion.api.data.StoredObject;
 import us.myles.ViaVersion.api.data.UserConnection;
 import us.myles.ViaVersion.api.minecraft.item.Item;
+import us.myles.ViaVersion.util.ChatColorUtil;
 import us.myles.viaversion.libs.opennbt.tag.builtin.CompoundTag;
 import us.myles.viaversion.libs.opennbt.tag.builtin.ListTag;
 import us.myles.viaversion.libs.opennbt.tag.builtin.StringTag;
@@ -115,7 +115,7 @@ public class GameProfileStorage extends StoredObject {
 		public String getDisplayName() {
 			String displayName = this.displayName == null ? name : this.displayName;
 			if (displayName.length() > 16) displayName = ChatUtil.removeUnusedColor(displayName, 'f');
-			if (displayName.length() > 16) displayName = ChatColor.stripColor(displayName);
+			if (displayName.length() > 16) displayName = ChatColorUtil.stripColor(displayName);
 			if (displayName.length() > 16) displayName = displayName.substring(0, 16);
 			return displayName;
 		}

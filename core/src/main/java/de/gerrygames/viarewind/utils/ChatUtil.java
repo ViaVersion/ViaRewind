@@ -1,9 +1,9 @@
 package de.gerrygames.viarewind.utils;
 
 import de.gerrygames.viarewind.ViaRewind;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.chat.ComponentSerializer;
 import us.myles.viaversion.libs.gson.JsonElement;
+import us.myles.viaversion.libs.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
+import us.myles.viaversion.libs.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
 import java.util.logging.Level;
 import java.util.regex.Pattern;
@@ -12,9 +12,9 @@ public class ChatUtil {
 	private static final Pattern UNUSED_COLOR_PATTERN = Pattern.compile("(?>(?>§[0-fk-or])*(§r|\\Z))|(?>(?>§[0-f])*(§[0-f]))");
 
 	public static String jsonToLegacy(String json) {
-		if (json == null || json.equals("null") || json.equals("")) return "";
+		if (json == null || json.equals("null") || json.isEmpty()) return "";
 		try {
-			String legacy = TextComponent.toLegacyText(ComponentSerializer.parse(json));
+			String legacy = LegacyComponentSerializer.legacySection().serialize(GsonComponentSerializer.gson().deserialize(json));
 			while (legacy.startsWith("§f")) legacy = legacy.substring(2);
 			return legacy;
 		} catch (Exception ex) {
@@ -35,7 +35,7 @@ public class ChatUtil {
 
 	public static String legacyToJson(String legacy) {
 		if (legacy == null) return "";
-		return ComponentSerializer.toString(TextComponent.fromLegacyText(legacy));
+		return GsonComponentSerializer.gson().serialize(LegacyComponentSerializer.legacySection().deserialize(legacy));
 	}
 
 	public static String removeUnusedColor(String legacy, char last) {
