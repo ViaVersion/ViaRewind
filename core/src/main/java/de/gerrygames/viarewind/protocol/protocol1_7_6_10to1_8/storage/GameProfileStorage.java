@@ -90,20 +90,20 @@ public class GameProfileStorage extends StoredObject {
 		}
 
 		public Item getSkull() {
-			CompoundTag tag = new CompoundTag("");
-			CompoundTag ownerTag = new CompoundTag("SkullOwner");
-			tag.put(ownerTag);
-			ownerTag.put(new StringTag("Id", uuid.toString()));
-			CompoundTag properties = new CompoundTag("Properties");
-			ownerTag.put(properties);
-			ListTag textures = new ListTag("textures", CompoundTag.class);
-			properties.put(textures);
+			CompoundTag tag = new CompoundTag();
+			CompoundTag ownerTag = new CompoundTag();
+			tag.put("SkullOwner", ownerTag);
+			ownerTag.put("Id", new StringTag(uuid.toString()));
+			CompoundTag properties = new CompoundTag();
+			ownerTag.put("Properties", properties);
+			ListTag textures = new ListTag(CompoundTag.class);
+			properties.put("textures", textures);
 			for (GameProfileStorage.Property property : this.properties) {
 				if (property.name.equals("textures")) {
-					CompoundTag textureTag = new CompoundTag("");
-					textureTag.put(new StringTag("Value", property.value));
+					CompoundTag textureTag = new CompoundTag();
+					textureTag.put("Value", new StringTag(property.value));
 					if (property.signature != null) {
-						textureTag.put(new StringTag("Signature", property.signature));
+						textureTag.put("Signature", new StringTag(property.signature));
 					}
 					textures.add(textureTag);
 				}

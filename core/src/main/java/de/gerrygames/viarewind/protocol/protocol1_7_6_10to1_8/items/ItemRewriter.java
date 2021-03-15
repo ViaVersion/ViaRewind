@@ -19,21 +19,21 @@ public class ItemRewriter {
 		if (item==null) return null;
 
 		CompoundTag tag = item.getTag();
-		if (tag==null) item.setTag(tag = new CompoundTag(""));
+		if (tag==null) item.setTag(tag = new CompoundTag());
 
-		CompoundTag viaVersionTag = new CompoundTag("ViaRewind1_7_6_10to1_8");
-		tag.put(viaVersionTag);
+		CompoundTag viaVersionTag = new CompoundTag();
+		tag.put("ViaRewind1_7_6_10to1_8", viaVersionTag);
 
-		viaVersionTag.put(new ShortTag("id", (short) item.getIdentifier()));
-		viaVersionTag.put(new ShortTag("data", item.getData()));
+		viaVersionTag.put("id", new ShortTag((short) item.getIdentifier()));
+		viaVersionTag.put("data", new ShortTag(item.getData()));
 
 		CompoundTag display = tag.get("display");
 		if (display!=null && display.contains("Name")) {
-			viaVersionTag.put(new StringTag("displayName", (String) display.get("Name").getValue()));
+			viaVersionTag.put("displayName", new StringTag((String) display.get("Name").getValue()));
 		}
 
 		if (display!=null && display.contains("Lore")) {
-			viaVersionTag.put(new ListTag("lore", ((ListTag)display.get("Lore")).getValue()));
+			viaVersionTag.put("lore", new ListTag(((ListTag)display.get("Lore")).getValue()));
 		}
 
 		if (tag.contains("ench") || tag.contains("StoredEnchantments")) {
@@ -51,15 +51,15 @@ public class ItemRewriter {
 				}
 				enchTag.remove(ench);
 				s += Enchantments.ENCHANTMENTS.getOrDefault(lvl, "enchantment.level." + lvl);
-				lore.add(new StringTag("", s));
+				lore.add(new StringTag(s));
 			}
 			if (!lore.isEmpty()) {
 				if (display==null) {
-					tag.put(display = new CompoundTag("display"));
-					viaVersionTag.put(new ByteTag("noDisplay"));
+					tag.put("display", display = new CompoundTag());
+					viaVersionTag.put("noDisplay", new ByteTag());
 				}
 				ListTag loreTag = display.get("Lore");
-				if (loreTag==null) display.put(loreTag = new ListTag("Lore", StringTag.class));
+				if (loreTag==null) display.put("Lore", loreTag = new ListTag(StringTag.class));
 				lore.addAll(loreTag.getValue());
 				loreTag.setValue(lore);
 			}
@@ -67,13 +67,13 @@ public class ItemRewriter {
 
 		if (item.getIdentifier()==387 && tag.contains("pages")) {
 			ListTag pages = tag.get("pages");
-			ListTag oldPages = new ListTag("pages", StringTag.class);
-			viaVersionTag.put(oldPages);
+			ListTag oldPages = new ListTag(StringTag.class);
+			viaVersionTag.put("pages", oldPages);
 
 			for (int i = 0; i<pages.size(); i++) {
 				StringTag page = pages.get(i);
 				String value = page.getValue();
-				oldPages.add(new StringTag(page.getName(), value));
+				oldPages.add(new StringTag(value));
 				value = ChatUtil.jsonToLegacy(value);
 				page.setValue(value);
 			}
@@ -105,9 +105,9 @@ public class ItemRewriter {
 
 		if (viaVersionTag.contains("displayName")) {
 			CompoundTag display = tag.get("display");
-			if (display==null) tag.put(display = new CompoundTag("display"));
+			if (display==null) tag.put("display", display = new CompoundTag());
 			StringTag name = display.get("Name");
-			if (name==null) display.put(new StringTag("Name", (String) viaVersionTag.get("displayName").getValue()));
+			if (name==null) display.put("Name", new StringTag((String) viaVersionTag.get("displayName").getValue()));
 			else name.setValue((String) viaVersionTag.get("displayName").getValue());
 		} else if (tag.contains("display")) {
 			((CompoundTag)tag.get("display")).remove("Name");
@@ -116,7 +116,7 @@ public class ItemRewriter {
 		if (item.getIdentifier()==387) {
 			ListTag oldPages = viaVersionTag.get("pages");
 			tag.remove("pages");
-			tag.put(oldPages);
+			tag.put("pages", oldPages);
 		}
 
 		return item;

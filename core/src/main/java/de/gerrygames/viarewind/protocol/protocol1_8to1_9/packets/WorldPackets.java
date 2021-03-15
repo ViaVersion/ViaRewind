@@ -48,7 +48,7 @@ public class WorldPackets {
 						if (tag != null && tag.contains("SpawnData")) {
 							String entity = (String) ((CompoundTag) tag.get("SpawnData")).get("id").getValue();
 							tag.remove("SpawnData");
-							tag.put(new StringTag("entityId", entity));
+							tag.put("entityId", new StringTag(entity));
 						}
 					}
 				});
