@@ -38,9 +38,8 @@ public class ItemRewriter {
 
 		if (tag.contains("ench") || tag.contains("StoredEnchantments")) {
 			ListTag enchTag = tag.contains("ench") ? tag.get("ench") : tag.get("StoredEnchantments");
-			List<Tag> enchants = enchTag.getValue();
 			List<Tag> lore = new ArrayList<>();
-			for (Tag ench : enchants) {
+			for (Tag ench : new ArrayList<>(enchTag.getValue())) {
 				short id = (short) ((CompoundTag)ench).get("id").getValue();
 				short lvl = (short) ((CompoundTag)ench).get("lvl").getValue();
 				String s;
