@@ -561,18 +561,13 @@ public class PlayerPackets {
 					@Override
 					public void write(PacketWrapper packetWrapper) throws Exception {
 						packetWrapper.cancel();
-						final PacketWrapper delayedPacket = new PacketWrapper(0x1A, null, packetWrapper.user());
-						delayedPacket.write(Type.VAR_INT, 0);  //Main Hand
+						final PacketWrapper newArm = new PacketWrapper(0x1A, null, packetWrapper.user());
+						newArm.write(Type.VAR_INT, 0);  //Main Hand
 						//delay packet in order to deal damage to entities
 						//the cooldown value gets reset by this packet
 						//1.8 sends it before the use entity packet
 						//1.9 afterwards
-						Protocol1_8TO1_9.TIMER.schedule(new TimerTask() {
-							@Override
-							public void run() {
-								PacketUtil.sendToServer(delayedPacket, Protocol1_8TO1_9.class);
-							}
-						}, 5);
+						PacketUtil.sendToServer(newArm, Protocol1_8TO1_9.class, true, true);
 					}
 				});
 				handler(new PacketHandler() {
