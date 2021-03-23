@@ -28,9 +28,7 @@ import us.myles.viaversion.libs.opennbt.tag.builtin.ListTag;
 import us.myles.viaversion.libs.opennbt.tag.builtin.StringTag;
 
 import java.util.ArrayList;
-import java.util.TimerTask;
 import java.util.UUID;
-import java.util.concurrent.*;
 
 public class PlayerPackets {
 	//Bodge fix for animation ordering
