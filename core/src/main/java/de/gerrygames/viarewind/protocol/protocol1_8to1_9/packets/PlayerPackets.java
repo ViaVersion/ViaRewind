@@ -31,7 +31,6 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 public class PlayerPackets {
-	//Bodge fix for animation ordering
 
 	public static void register(Protocol protocol) {
 		/*  OUTGOING  */
