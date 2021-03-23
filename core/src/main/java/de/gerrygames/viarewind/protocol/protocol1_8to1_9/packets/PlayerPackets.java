@@ -30,8 +30,10 @@ import us.myles.viaversion.libs.opennbt.tag.builtin.StringTag;
 import java.util.ArrayList;
 import java.util.TimerTask;
 import java.util.UUID;
+import java.util.concurrent.*;
 
 public class PlayerPackets {
+	//Bodge fix for animation ordering
 
 	public static void register(Protocol protocol) {
 		/*  OUTGOING  */
@@ -361,6 +363,12 @@ public class PlayerPackets {
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
+						//Sending any queued animations.
+						PacketWrapper animation = null;
+						while((animation = ((Protocol1_8TO1_9)protocol).animationsToSend.poll()) != null) {
+							PacketUtil.sendToServer(animation, Protocol1_8TO1_9.class, true, true);
+						}
+
 						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
 						int playerId = tracker.getPlayerId();
 						if (tracker.isInsideVehicle(playerId)) packetWrapper.cancel();
@@ -380,6 +388,12 @@ public class PlayerPackets {
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
+						//Sending any queued animations.
+						PacketWrapper animation = null;
+						while((animation = ((Protocol1_8TO1_9)protocol).animationsToSend.poll()) != null) {
+							PacketUtil.sendToServer(animation, Protocol1_8TO1_9.class, true, true);
+						}
+
 						PlayerPosition pos = packetWrapper.user().get(PlayerPosition.class);
 						if (pos.getConfirmId() != -1) return;
 						pos.setPos(packetWrapper.get(Type.DOUBLE, 0), packetWrapper.get(Type.DOUBLE, 1), packetWrapper.get(Type.DOUBLE, 2));
@@ -405,6 +419,12 @@ public class PlayerPackets {
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
+						//Sending any queued animations.
+						PacketWrapper animation = null;
+						while((animation = ((Protocol1_8TO1_9)protocol).animationsToSend.poll()) != null) {
+							PacketUtil.sendToServer(animation, Protocol1_8TO1_9.class, true, true);
+						}
+
 						PlayerPosition pos = packetWrapper.user().get(PlayerPosition.class);
 						if (pos.getConfirmId() != -1) return;
 						pos.setYaw(packetWrapper.get(Type.FLOAT, 0));
@@ -434,6 +454,12 @@ public class PlayerPackets {
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
+						//Sending any queued animations.
+						PacketWrapper animation = null;
+						while((animation = ((Protocol1_8TO1_9)protocol).animationsToSend.poll()) != null) {
+							PacketUtil.sendToServer(animation, Protocol1_8TO1_9.class, true, true);
+						}
+
 						double x = packetWrapper.get(Type.DOUBLE, 0);
 						double y = packetWrapper.get(Type.DOUBLE, 1);
 						double z = packetWrapper.get(Type.DOUBLE, 2);
@@ -561,13 +587,19 @@ public class PlayerPackets {
 					@Override
 					public void write(PacketWrapper packetWrapper) throws Exception {
 						packetWrapper.cancel();
-						final PacketWrapper newArm = new PacketWrapper(0x1A, null, packetWrapper.user());
-						newArm.write(Type.VAR_INT, 0);  //Main Hand
-						//delay packet in order to deal damage to entities
-						//the cooldown value gets reset by this packet
-						//1.8 sends it before the use entity packet
-						//1.9 afterwards
-						PacketUtil.sendToServer(newArm, Protocol1_8TO1_9.class, true, true);
+
+						/* We have to add ArmAnimation to a queue to be sent on PacketPlayInFlying. In 1.9,
+						 * PacketPlayInArmAnimation is sent after PacketPlayInUseEntity, not before like it used to be.
+						 * However, all packets are sent before PacketPlayInFlying. We'd just do a normal delay, but
+						 * it would cause the packet to be sent after PacketPlayInFlying, potentially false flagging
+						 * anticheats that check for this behavior from clients. Since all packets are sent before
+						 * PacketPlayInFlying, if we queue it to be sent right before PacketPlayInFlying is processed,
+						 * we can be certain it will be sent after PacketPlayInUseEntity */
+						final PacketWrapper delayedPacket =
+								new PacketWrapper(0x1A, null, packetWrapper.user());
+						delayedPacket.write(Type.VAR_INT, 0);  //Main Hand
+
+						((Protocol1_8TO1_9)protocol).animationsToSend.add(delayedPacket);
 					}
 				});
 				handler(new PacketHandler() {

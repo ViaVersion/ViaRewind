@@ -23,11 +23,15 @@ import us.myles.ViaVersion.api.type.Type;
 import us.myles.ViaVersion.packets.State;
 import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
-import java.util.Timer;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 
 public class Protocol1_8TO1_9 extends Protocol {
 	public static final Timer TIMER = new Timer("ViaRewind-1_8TO1_9", true);
 	public static final ImmutableSet<Object> VALID_ATTRIBUTES;
+
+	public Queue<PacketWrapper> animationsToSend = new LinkedList<>();
 
 	static {
 		ImmutableSet.Builder<Object> builder = ImmutableSet.builder();
