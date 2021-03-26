@@ -40,6 +40,7 @@ public class ReplacementRegistry1_8to1_9 {
 		registry.registerBlock(205, 0, new Replacement(44, 7));
 		registry.registerBlock(205, 8, new Replacement(44, 15));
 		registry.registerBlock(207, new Replacement(141));
+		registry.registerBlock(137, new Replacement(137, 0));
 
 		registry.registerItemBlock(199, new Replacement(35, 10, "Chorus Plant"));
 		registry.registerItemBlock(200, new Replacement(35, 2, "Chorus Flower"));
@@ -50,8 +51,8 @@ public class ReplacementRegistry1_8to1_9 {
 		registry.registerItemBlock(207, new Replacement(141, "Beetroot Block"));
 		registry.registerItemBlock(208, new Replacement(2, "Grass Path"));
 		registry.registerItemBlock(209, new Replacement(90, "End Gateway"));
-		registry.registerItemBlock(210, new Replacement(137, "Repeating Command Block"));
-		registry.registerItemBlock(211, new Replacement(137, "Chain Command Block"));
+		registry.registerItemBlock(210, new Replacement(137, 0, "Repeating Command Block"));
+		registry.registerItemBlock(211, new Replacement(137, 0, "Chain Command Block"));
 		registry.registerItemBlock(212, new Replacement(79, 0, "Frosted Ice"));
 		registry.registerItemBlock(214, new Replacement(87, "Nether Wart Block"));
 		registry.registerItemBlock(215, new Replacement(112, "Red Nether Brick"));
