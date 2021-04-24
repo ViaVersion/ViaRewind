@@ -48,7 +48,7 @@
         <dependency>
             <groupId>us.myles</groupId>
             <artifactId>viaversion</artifactId>
-            <version>3.3.0-21w11a</version>
+            <version>4.0.0-21w16a</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
