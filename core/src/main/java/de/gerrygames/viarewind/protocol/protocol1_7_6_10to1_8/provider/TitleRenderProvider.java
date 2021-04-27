@@ -1,6 +1,6 @@
 package de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.provider;
 
-import us.myles.ViaVersion.api.platform.providers.Provider;
+import com.viaversion.viaversion.api.platform.providers.Provider;
 
 import java.util.HashMap;
 import java.util.Map;

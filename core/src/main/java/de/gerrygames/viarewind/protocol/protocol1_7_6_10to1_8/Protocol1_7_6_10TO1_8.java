@@ -1,23 +1,23 @@
 package de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8;
 
+import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.packets.*;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.provider.CompressionHandlerProvider;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage.*;
 import de.gerrygames.viarewind.utils.Ticker;
-import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.platform.providers.ViaProviders;
-import us.myles.ViaVersion.api.protocol.Protocol;
-import us.myles.ViaVersion.api.remapper.PacketRemapper;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.api.type.types.CustomByteType;
-import us.myles.ViaVersion.packets.Direction;
-import us.myles.ViaVersion.packets.State;
-import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.storage.ClientChunks;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.platform.providers.ViaProviders;
+import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.types.CustomByteType;
+import com.viaversion.viaversion.api.protocol.packet.Direction;
+import com.viaversion.viaversion.api.protocol.packet.State;
+import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.ClientChunks;
 
-public class Protocol1_7_6_10TO1_8 extends Protocol {
+public class Protocol1_7_6_10TO1_8 extends AbstractProtocol {
 
 	@Override
 	protected void registerPackets() {
@@ -123,7 +123,7 @@ public class Protocol1_7_6_10TO1_8 extends Protocol {
 	}
 
 	@Override
-	protected void register(ViaProviders providers) {
+	public void register(ViaProviders providers) {
 		providers.register(CompressionHandlerProvider.class, new CompressionHandlerProvider());
 	}
 }

@@ -2,13 +2,13 @@ package de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.items;
 
 import de.gerrygames.viarewind.utils.Enchantments;
 import de.gerrygames.viarewind.utils.ChatUtil;
-import us.myles.ViaVersion.api.minecraft.item.Item;
-import us.myles.viaversion.libs.opennbt.tag.builtin.ByteTag;
-import us.myles.viaversion.libs.opennbt.tag.builtin.CompoundTag;
-import us.myles.viaversion.libs.opennbt.tag.builtin.ListTag;
-import us.myles.viaversion.libs.opennbt.tag.builtin.ShortTag;
-import us.myles.viaversion.libs.opennbt.tag.builtin.StringTag;
-import us.myles.viaversion.libs.opennbt.tag.builtin.Tag;
+import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.libs.opennbt.tag.builtin.ByteTag;
+import com.viaversion.viaversion.libs.opennbt.tag.builtin.CompoundTag;
+import com.viaversion.viaversion.libs.opennbt.tag.builtin.ListTag;
+import com.viaversion.viaversion.libs.opennbt.tag.builtin.ShortTag;
+import com.viaversion.viaversion.libs.opennbt.tag.builtin.StringTag;
+import com.viaversion.viaversion.libs.opennbt.tag.builtin.Tag;
 
 import java.util.ArrayList;
 import java.util.List;

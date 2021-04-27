@@ -6,15 +6,15 @@ import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage.GameProfil
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage.Windows;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
 import de.gerrygames.viarewind.utils.ChatUtil;
-import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.minecraft.item.Item;
-import us.myles.ViaVersion.api.protocol.Protocol;
-import us.myles.ViaVersion.api.remapper.PacketHandler;
-import us.myles.ViaVersion.api.remapper.PacketRemapper;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.packets.State;
-import us.myles.ViaVersion.protocols.base.ProtocolInfo;
-import us.myles.viaversion.libs.gson.JsonElement;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.protocol.Protocol;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
+import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.protocol.packet.State;
+import com.viaversion.viaversion.api.connection.ProtocolInfo;
+import com.viaversion.viaversion.libs.gson.JsonElement;
 
 import java.util.UUID;
 
@@ -108,7 +108,7 @@ public class InventoryPackets {
 						if (slot < 5 || slot > 8) return;
 						Item item = packetWrapper.get(Types1_7_6_10.COMPRESSED_NBT_ITEM, 0);
 						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-						UUID uuid = packetWrapper.user().get(ProtocolInfo.class).getUuid();
+						UUID uuid = packetWrapper.user().getProtocolInfo().getUuid();
 						Item[] equipment = tracker.getPlayerEquipment(uuid);
 						if (equipment == null) {
 							tracker.setPlayerEquipment(uuid, equipment = new Item[5]);
@@ -148,7 +148,7 @@ public class InventoryPackets {
 						if (windowId != 0) return;
 						Item[] items = packetWrapper.get(Types1_7_6_10.COMPRESSED_NBT_ITEM_ARRAY, 0);
 						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-						UUID uuid = packetWrapper.user().get(ProtocolInfo.class).getUuid();
+						UUID uuid = packetWrapper.user().getProtocolInfo().getUuid();
 						Item[] equipment = tracker.getPlayerEquipment(uuid);
 						if (equipment == null) {
 							tracker.setPlayerEquipment(uuid, equipment = new Item[5]);

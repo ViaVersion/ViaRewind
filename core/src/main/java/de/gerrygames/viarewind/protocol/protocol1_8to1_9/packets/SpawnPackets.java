@@ -10,15 +10,15 @@ import de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage.EntityTracker;
 import de.gerrygames.viarewind.replacement.EntityReplacement;
 import de.gerrygames.viarewind.replacement.Replacement;
 import de.gerrygames.viarewind.utils.PacketUtil;
-import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.entities.Entity1_10Types;
-import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
-import us.myles.ViaVersion.api.protocol.Protocol;
-import us.myles.ViaVersion.api.remapper.PacketRemapper;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.api.type.types.version.Types1_8;
-import us.myles.ViaVersion.api.type.types.version.Types1_9;
-import us.myles.ViaVersion.packets.State;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
+import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
+import com.viaversion.viaversion.api.protocol.Protocol;
+import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.types.version.Types1_8;
+import com.viaversion.viaversion.api.type.types.version.Types1_9;
+import com.viaversion.viaversion.api.protocol.packet.State;
 
 import java.util.List;
 
@@ -100,7 +100,7 @@ public class SpawnPackets {
 						short vX = packetWrapper.read(Type.SHORT);
 						short vY = packetWrapper.read(Type.SHORT);
 						short vZ = packetWrapper.read(Type.SHORT);
-						PacketWrapper velocityPacket = new PacketWrapper(0x12, null, packetWrapper.user());
+						PacketWrapper velocityPacket = PacketWrapper.create(0x12, null, packetWrapper.user());
 						velocityPacket.write(Type.VAR_INT, entityId);
 						velocityPacket.write(Type.SHORT, vX);
 						velocityPacket.write(Type.SHORT, vY);

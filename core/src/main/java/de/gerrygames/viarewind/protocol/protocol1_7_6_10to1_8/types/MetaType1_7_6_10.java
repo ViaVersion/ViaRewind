@@ -1,7 +1,7 @@
 package de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types;
 
-import us.myles.ViaVersion.api.minecraft.metadata.MetaType;
-import us.myles.ViaVersion.api.type.Type;
+import com.viaversion.viaversion.api.minecraft.metadata.MetaType;
+import com.viaversion.viaversion.api.type.Type;
 
 public enum MetaType1_7_6_10 implements MetaType {
 	Byte(0, Type.BYTE),

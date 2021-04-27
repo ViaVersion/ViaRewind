@@ -1,9 +1,9 @@
 package de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types;
 
-import us.myles.ViaVersion.api.minecraft.item.Item;
-import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.viaversion.libs.opennbt.tag.builtin.CompoundTag;
+import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.libs.opennbt.tag.builtin.CompoundTag;
 
 import java.util.List;
 

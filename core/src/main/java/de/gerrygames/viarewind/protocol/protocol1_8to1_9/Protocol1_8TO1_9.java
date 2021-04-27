@@ -1,6 +1,7 @@
 package de.gerrygames.viarewind.protocol.protocol1_8to1_9;
 
 import com.google.common.collect.ImmutableSet;
+import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.packets.EntityPackets;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.packets.InventoryPackets;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.packets.PlayerPackets;
@@ -15,17 +16,16 @@ import de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage.Levitation;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage.PlayerPosition;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage.Windows;
 import de.gerrygames.viarewind.utils.Ticker;
-import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.protocol.Protocol;
-import us.myles.ViaVersion.api.remapper.ValueTransformer;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.packets.State;
-import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.protocol.remapper.ValueTransformer;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.protocol.packet.State;
+import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
 import java.util.Timer;
 
-public class Protocol1_8TO1_9 extends Protocol {
+public class Protocol1_8TO1_9 extends AbstractProtocol {
 	public static final Timer TIMER = new Timer("ViaRewind-1_8TO1_9", true);
 	public static final ImmutableSet<Object> VALID_ATTRIBUTES;
 

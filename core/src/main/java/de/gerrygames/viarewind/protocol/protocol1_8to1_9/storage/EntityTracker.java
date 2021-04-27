@@ -3,15 +3,15 @@ package de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.Protocol1_8TO1_9;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.metadata.MetadataRewriter;
 import de.gerrygames.viarewind.replacement.EntityReplacement;
-import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.data.ExternalJoinGameListener;
-import us.myles.ViaVersion.api.data.StoredObject;
-import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.entities.Entity1_10Types;
-import us.myles.ViaVersion.api.minecraft.Vector;
-import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.api.type.types.version.Types1_8;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.platform.ExternalJoinGameListener;
+import com.viaversion.viaversion.api.connection.StoredObject;
+import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
+import com.viaversion.viaversion.api.minecraft.Vector;
+import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.types.version.Types1_8;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -151,7 +151,7 @@ public class EntityTracker extends StoredObject implements ExternalJoinGameListe
 		if (entityReplacements.containsKey(entityId)) {
 			entityReplacements.get(entityId).updateMetadata(this.metadataBuffer.remove(entityId));
 		} else {
-			PacketWrapper wrapper = new PacketWrapper(0x1C, null, this.getUser());
+			PacketWrapper wrapper = PacketWrapper.create(0x1C, null, this.getUser());
 			wrapper.write(Type.VAR_INT, entityId);
 			wrapper.write(Types1_8.METADATA_LIST, this.metadataBuffer.get(entityId));
 			MetadataRewriter.transform(this.getClientEntityTypes().get(entityId), this.metadataBuffer.get(entityId));

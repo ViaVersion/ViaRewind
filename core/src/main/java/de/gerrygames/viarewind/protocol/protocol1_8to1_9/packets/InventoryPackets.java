@@ -1,15 +1,16 @@
 package de.gerrygames.viarewind.protocol.protocol1_8to1_9.packets;
 
+import com.viaversion.viaversion.libs.gson.JsonParser;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.items.ItemRewriter;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage.Windows;
-import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.minecraft.item.Item;
-import us.myles.ViaVersion.api.protocol.Protocol;
-import us.myles.ViaVersion.api.remapper.PacketHandler;
-import us.myles.ViaVersion.api.remapper.PacketRemapper;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.packets.State;
-import us.myles.ViaVersion.util.GsonUtil;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.protocol.Protocol;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
+import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.protocol.packet.State;
+import com.viaversion.viaversion.util.GsonUtil;
 
 public class InventoryPackets {
 
@@ -66,7 +67,7 @@ public class InventoryPackets {
 						}
 						String name = packetWrapper.get(Type.COMPONENT, 0).toString();
 						if (name.equalsIgnoreCase("{\"translate\":\"container.shulkerBox\"}")) {
-							packetWrapper.set(Type.COMPONENT, 0, GsonUtil.getJsonParser().parse("{\"text\":\"Shulker Box\"}"));
+							packetWrapper.set(Type.COMPONENT, 0, JsonParser.parseString("{\"text\":\"Shulker Box\"}"));
 						}
 					}
 				});

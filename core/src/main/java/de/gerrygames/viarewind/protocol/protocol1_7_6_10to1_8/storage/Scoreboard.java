@@ -4,10 +4,10 @@ import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10TO
 import de.gerrygames.viarewind.utils.PacketUtil;
 import lombok.Getter;
 import lombok.Setter;
-import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.data.StoredObject;
-import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.type.Type;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.connection.StoredObject;
+import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.type.Type;
 
 import java.util.*;
 
@@ -120,7 +120,7 @@ public class Scoreboard extends StoredObject {
 		scoreTeams.put(score, scoreTeam);
 		scoreTeamNames.add(name);
 
-		PacketWrapper teamPacket = new PacketWrapper(0x3E, null, getUser());
+		PacketWrapper teamPacket = PacketWrapper.create(0x3E, null, getUser());
 		teamPacket.write(Type.STRING, name);
 		teamPacket.write(Type.BYTE, (byte) 0);
 		teamPacket.write(Type.STRING, "ViaRewind");
@@ -139,7 +139,7 @@ public class Scoreboard extends StoredObject {
 		if (scoreTeam==null) return score;
 		scoreTeamNames.remove(scoreTeam.name);
 
-		PacketWrapper teamPacket = new PacketWrapper(0x3E, null, getUser());
+		PacketWrapper teamPacket = PacketWrapper.create(0x3E, null, getUser());
 		teamPacket.write(Type.STRING, scoreTeam.name);
 		teamPacket.write(Type.BYTE, (byte) 1);
 		PacketUtil.sendPacket(teamPacket, Protocol1_7_6_10TO1_8.class, true, true);

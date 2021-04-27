@@ -1,6 +1,6 @@
 package de.gerrygames.viarewind.utils;
 
-import us.myles.ViaVersion.api.Via;
+import com.viaversion.viaversion.api.Via;
 
 public class Ticker {
 	private static boolean init = false;

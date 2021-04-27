@@ -5,9 +5,9 @@ import de.gerrygames.viarewind.replacement.Replacement;
 import de.gerrygames.viarewind.storage.BlockState;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.api.type.types.CustomByteType;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.types.CustomByteType;
 
 import java.util.zip.Deflater;
 

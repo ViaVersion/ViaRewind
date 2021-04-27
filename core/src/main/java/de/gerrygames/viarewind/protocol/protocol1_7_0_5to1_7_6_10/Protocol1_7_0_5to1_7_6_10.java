@@ -1,19 +1,19 @@
 package de.gerrygames.viarewind.protocol.protocol1_7_0_5to1_7_6_10;
 
+import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
-import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.protocol.Protocol;
-import us.myles.ViaVersion.api.remapper.PacketHandler;
-import us.myles.ViaVersion.api.remapper.PacketRemapper;
-import us.myles.ViaVersion.api.remapper.ValueTransformer;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.packets.State;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
+import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.ValueTransformer;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.protocol.packet.State;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Protocol1_7_0_5to1_7_6_10 extends Protocol {
+public class Protocol1_7_0_5to1_7_6_10 extends AbstractProtocol {
 	public static final ValueTransformer<String,String> REMOVE_DASHES = new ValueTransformer<String,String>(Type.STRING) {
 		@Override
 		public String transform(PacketWrapper packetWrapper, String s) {

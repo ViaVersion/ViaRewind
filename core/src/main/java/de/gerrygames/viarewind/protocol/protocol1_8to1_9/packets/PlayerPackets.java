@@ -9,23 +9,23 @@ import de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage.EntityTracker;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage.PlayerPosition;
 import de.gerrygames.viarewind.utils.ChatUtil;
 import de.gerrygames.viarewind.utils.PacketUtil;
-import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.entities.Entity1_10Types;
-import us.myles.ViaVersion.api.minecraft.Position;
-import us.myles.ViaVersion.api.minecraft.item.Item;
-import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
-import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_8;
-import us.myles.ViaVersion.api.protocol.Protocol;
-import us.myles.ViaVersion.api.remapper.PacketHandler;
-import us.myles.ViaVersion.api.remapper.PacketRemapper;
-import us.myles.ViaVersion.api.remapper.ValueCreator;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.api.type.types.version.Types1_8;
-import us.myles.ViaVersion.packets.State;
-import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
-import us.myles.viaversion.libs.opennbt.tag.builtin.CompoundTag;
-import us.myles.viaversion.libs.opennbt.tag.builtin.ListTag;
-import us.myles.viaversion.libs.opennbt.tag.builtin.StringTag;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
+import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
+import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_8;
+import com.viaversion.viaversion.api.protocol.Protocol;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
+import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.ValueCreator;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.types.version.Types1_8;
+import com.viaversion.viaversion.api.protocol.packet.State;
+import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
+import com.viaversion.viaversion.libs.opennbt.tag.builtin.CompoundTag;
+import com.viaversion.viaversion.libs.opennbt.tag.builtin.ListTag;
+import com.viaversion.viaversion.libs.opennbt.tag.builtin.StringTag;
 
 import java.util.ArrayList;
 import java.util.TimerTask;
@@ -315,7 +315,7 @@ public class PlayerPackets {
 						String msg = packetWrapper.get(Type.STRING, 0);
 						if (msg.toLowerCase().startsWith("/offhand")) {
 							packetWrapper.cancel();
-							PacketWrapper swapItems = new PacketWrapper(0x13, null, packetWrapper.user());
+							PacketWrapper swapItems = PacketWrapper.create(0x13, null, packetWrapper.user());
 							swapItems.write(Type.VAR_INT, 6);
 							swapItems.write(Type.POSITION, new Position(0, (short) 0, 0));
 							swapItems.write(Type.BYTE, (byte) 255);
@@ -522,7 +522,7 @@ public class PlayerPackets {
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						if (packetWrapper.get(Type.VAR_INT, 0) == -1) {
 							packetWrapper.cancel();
-							PacketWrapper useItem = new PacketWrapper(0x1D, null, packetWrapper.user());
+							PacketWrapper useItem = PacketWrapper.create(0x1D, null, packetWrapper.user());
 							useItem.write(Type.VAR_INT, 0);
 
 							PacketUtil.sendToServer(useItem, Protocol1_8TO1_9.class, true, true);
@@ -561,7 +561,7 @@ public class PlayerPackets {
 					@Override
 					public void write(PacketWrapper packetWrapper) throws Exception {
 						packetWrapper.cancel();
-						final PacketWrapper delayedPacket = new PacketWrapper(0x1A, null, packetWrapper.user());
+						final PacketWrapper delayedPacket = PacketWrapper.create(0x1A, null, packetWrapper.user());
 						delayedPacket.write(Type.VAR_INT, 0);  //Main Hand
 						//delay packet in order to deal damage to entities
 						//the cooldown value gets reset by this packet
@@ -601,7 +601,7 @@ public class PlayerPackets {
 						} else if (action == 0) {
 							PlayerPosition pos = packetWrapper.user().get(PlayerPosition.class);
 							if (!pos.isOnGround()) {
-								PacketWrapper elytra = new PacketWrapper(0x14, null, packetWrapper.user());
+								PacketWrapper elytra = PacketWrapper.create(0x14, null, packetWrapper.user());
 								elytra.write(Type.VAR_INT, packetWrapper.get(Type.VAR_INT, 0));
 								elytra.write(Type.VAR_INT, 8);
 								elytra.write(Type.VAR_INT, 0);
@@ -627,7 +627,7 @@ public class PlayerPackets {
 						int playerId = tracker.getPlayerId();
 						int vehicle = tracker.getVehicle(playerId);
 						if (vehicle != -1 && tracker.getClientEntityTypes().get(vehicle) == Entity1_10Types.EntityType.BOAT) {
-							PacketWrapper steerBoat = new PacketWrapper(0x11, null, packetWrapper.user());
+							PacketWrapper steerBoat = PacketWrapper.create(0x11, null, packetWrapper.user());
 							float left = packetWrapper.get(Type.FLOAT, 0);
 							float forward = packetWrapper.get(Type.FLOAT, 1);
 							steerBoat.write(Type.BOOLEAN, forward != 0.0f || left < 0.0f);
@@ -693,7 +693,7 @@ public class PlayerPackets {
 					public void handle(PacketWrapper packetWrapper) throws Exception {
 						short flags = packetWrapper.get(Type.UNSIGNED_BYTE, 0);
 
-						PacketWrapper updateSkin = new PacketWrapper(0x1C, null, packetWrapper.user());
+						PacketWrapper updateSkin = PacketWrapper.create(0x1C, null, packetWrapper.user());
 						updateSkin.write(Type.VAR_INT, packetWrapper.user().get(EntityTracker.class).getPlayerId());
 
 						ArrayList<Metadata> metadata = new ArrayList<>();

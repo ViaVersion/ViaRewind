@@ -3,10 +3,10 @@ package de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage;
 import de.gerrygames.viarewind.utils.Tickable;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10TO1_8;
 import de.gerrygames.viarewind.utils.PacketUtil;
-import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.data.StoredObject;
-import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.type.Type;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.connection.StoredObject;
+import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.type.Type;
 
 public class WorldBorder extends StoredObject implements Tickable {
 	private double x, z;
@@ -86,7 +86,7 @@ public class WorldBorder extends StoredObject implements Tickable {
 
 			double b = 2.5;
 
-			PacketWrapper particles = new PacketWrapper(0x2A, null, getUser());
+			PacketWrapper particles = PacketWrapper.create(0x2A, null, getUser());
 			particles.write(Type.STRING, "fireworksSpark");
 			particles.write(Type.FLOAT, (float)(side.modX!=0 ? x + (radius * side.modX) : centerH));
 			particles.write(Type.FLOAT, (float)centerV);

@@ -12,18 +12,18 @@ import de.gerrygames.viarewind.replacement.Replacement;
 import de.gerrygames.viarewind.types.VarLongType;
 import de.gerrygames.viarewind.utils.ChatUtil;
 import de.gerrygames.viarewind.utils.PacketUtil;
-import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.minecraft.BlockChangeRecord;
-import us.myles.ViaVersion.api.minecraft.Position;
-import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
-import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
-import us.myles.ViaVersion.api.protocol.Protocol;
-import us.myles.ViaVersion.api.remapper.PacketRemapper;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.api.type.types.CustomByteType;
-import us.myles.ViaVersion.packets.State;
-import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
-import us.myles.ViaVersion.util.ChatColorUtil;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
+import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
+import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
+import com.viaversion.viaversion.api.protocol.Protocol;
+import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.types.CustomByteType;
+import com.viaversion.viaversion.api.protocol.packet.State;
+import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
+import com.viaversion.viaversion.util.ChatColorUtil;
 
 public class WorldPackets {
 
@@ -258,7 +258,7 @@ public class WorldPackets {
 								columnData[i + 3] = data[column + i * columns];
 							}
 
-							PacketWrapper columnUpdate = new PacketWrapper(0x34, null, packetWrapper.user());
+							PacketWrapper columnUpdate = PacketWrapper.create(0x34, null, packetWrapper.user());
 							columnUpdate.write(Type.VAR_INT, id);
 							columnUpdate.write(Type.SHORT, (short) columnData.length);
 							columnUpdate.write(new CustomByteType(columnData.length), columnData);
@@ -275,7 +275,7 @@ public class WorldPackets {
 							iconData[i * 3 + 2] = icons[i * 4 + 1];
 							iconData[i * 3 + 3] = icons[i * 4 + 2];
 						}
-						PacketWrapper iconUpdate = new PacketWrapper(0x34, null, packetWrapper.user());
+						PacketWrapper iconUpdate = PacketWrapper.create(0x34, null, packetWrapper.user());
 						iconUpdate.write(Type.VAR_INT, id);
 						iconUpdate.write(Type.SHORT, (short) iconData.length);
 						CustomByteType customByteType = new CustomByteType(iconData.length);
@@ -283,7 +283,7 @@ public class WorldPackets {
 						PacketUtil.sendPacket(iconUpdate, Protocol1_7_6_10TO1_8.class, true, true);
 					}
 
-					PacketWrapper scaleUpdate = new PacketWrapper(0x34, null, packetWrapper.user());
+					PacketWrapper scaleUpdate = PacketWrapper.create(0x34, null, packetWrapper.user());
 					scaleUpdate.write(Type.VAR_INT, id);
 					scaleUpdate.write(Type.SHORT, (short) 2);
 					scaleUpdate.write(new CustomByteType(2), new byte[] {2, scale});

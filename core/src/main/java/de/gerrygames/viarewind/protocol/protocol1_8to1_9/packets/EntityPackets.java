@@ -10,19 +10,19 @@ import de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage.PlayerPosition;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.util.RelativeMoveUtil;
 import de.gerrygames.viarewind.replacement.EntityReplacement;
 import de.gerrygames.viarewind.utils.PacketUtil;
-import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.Pair;
-import us.myles.ViaVersion.api.entities.Entity1_10Types;
-import us.myles.ViaVersion.api.minecraft.Vector;
-import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
-import us.myles.ViaVersion.api.protocol.Protocol;
-import us.myles.ViaVersion.api.remapper.PacketHandler;
-import us.myles.ViaVersion.api.remapper.PacketRemapper;
-import us.myles.ViaVersion.api.remapper.ValueCreator;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.api.type.types.version.Types1_8;
-import us.myles.ViaVersion.api.type.types.version.Types1_9;
-import us.myles.ViaVersion.packets.State;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.util.Pair;
+import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
+import com.viaversion.viaversion.api.minecraft.Vector;
+import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
+import com.viaversion.viaversion.api.protocol.Protocol;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
+import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.ValueCreator;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.types.version.Types1_8;
+import com.viaversion.viaversion.api.type.types.version.Types1_9;
+import com.viaversion.viaversion.api.protocol.packet.State;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -84,7 +84,7 @@ public class EntityPackets {
 						boolean onGround = packetWrapper.passthrough(Type.BOOLEAN);
 
 						if (moves.length > 1) {
-							PacketWrapper secondPacket = new PacketWrapper(0x15, null, packetWrapper.user());
+							PacketWrapper secondPacket = PacketWrapper.create(0x15, null, packetWrapper.user());
 							secondPacket.write(Type.VAR_INT, packetWrapper.get(Type.VAR_INT, 0));
 							secondPacket.write(Type.BYTE, (byte) moves[1].getBlockX());
 							secondPacket.write(Type.BYTE, (byte) moves[1].getBlockY());
@@ -137,7 +137,7 @@ public class EntityPackets {
 						}
 
 						if (moves.length > 1) {
-							PacketWrapper secondPacket = new PacketWrapper(0x17, null, packetWrapper.user());
+							PacketWrapper secondPacket = PacketWrapper.create(0x17, null, packetWrapper.user());
 							secondPacket.write(Type.VAR_INT, packetWrapper.get(Type.VAR_INT, 0));
 							secondPacket.write(Type.BYTE, (byte) moves[1].getBlockX());
 							secondPacket.write(Type.BYTE, (byte) moves[1].getBlockY());
@@ -392,7 +392,7 @@ public class EntityPackets {
 						entityTracker.setPassengers(vehicle, passengers);
 						if (!oldPassengers.isEmpty()) {
 							for (Integer passenger : oldPassengers) {
-								PacketWrapper detach = new PacketWrapper(0x1B, null, packetWrapper.user());
+								PacketWrapper detach = PacketWrapper.create(0x1B, null, packetWrapper.user());
 								detach.write(Type.INT, passenger);
 								detach.write(Type.INT, -1);
 								detach.write(Type.BOOLEAN, false);
@@ -402,7 +402,7 @@ public class EntityPackets {
 						for (int i = 0; i < count; i++) {
 							int v = i == 0 ? vehicle : passengers.get(i - 1);
 							int p = passengers.get(i);
-							PacketWrapper attach = new PacketWrapper(0x1B, null, packetWrapper.user());
+							PacketWrapper attach = PacketWrapper.create(0x1B, null, packetWrapper.user());
 							attach.write(Type.INT, p);
 							attach.write(Type.INT, v);
 							attach.write(Type.BOOLEAN, false);

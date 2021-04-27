@@ -11,7 +11,7 @@ import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
 import org.spongepowered.api.plugin.Dependency;
 import org.spongepowered.api.plugin.Plugin;
-import us.myles.ViaVersion.sponge.util.LoggerWrapper;
+import com.viaversion.viaversion.sponge.util.LoggerWrapper;
 
 import java.nio.file.Path;
 import java.util.logging.Logger;

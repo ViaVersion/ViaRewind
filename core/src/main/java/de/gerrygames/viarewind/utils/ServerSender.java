@@ -1,7 +1,7 @@
 package de.gerrygames.viarewind.utils;
 
-import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.protocol.Protocol;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.protocol.Protocol;
 
 public interface ServerSender {
 

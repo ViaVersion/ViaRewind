@@ -1,8 +1,8 @@
 package de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types;
 
 import io.netty.buffer.ByteBuf;
-import us.myles.ViaVersion.api.minecraft.item.Item;
-import us.myles.ViaVersion.api.type.Type;
+import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.type.Type;
 
 public class ItemType extends Type<Item> {
 	private final boolean compressed;

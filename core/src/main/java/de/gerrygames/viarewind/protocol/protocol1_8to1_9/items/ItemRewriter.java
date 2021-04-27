@@ -2,13 +2,13 @@ package de.gerrygames.viarewind.protocol.protocol1_8to1_9.items;
 
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.Protocol1_8TO1_9;
 import de.gerrygames.viarewind.utils.Enchantments;
-import us.myles.ViaVersion.api.minecraft.item.Item;
-import us.myles.viaversion.libs.opennbt.tag.builtin.ByteTag;
-import us.myles.viaversion.libs.opennbt.tag.builtin.CompoundTag;
-import us.myles.viaversion.libs.opennbt.tag.builtin.ListTag;
-import us.myles.viaversion.libs.opennbt.tag.builtin.ShortTag;
-import us.myles.viaversion.libs.opennbt.tag.builtin.StringTag;
-import us.myles.viaversion.libs.opennbt.tag.builtin.Tag;
+import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.libs.opennbt.tag.builtin.ByteTag;
+import com.viaversion.viaversion.libs.opennbt.tag.builtin.CompoundTag;
+import com.viaversion.viaversion.libs.opennbt.tag.builtin.ListTag;
+import com.viaversion.viaversion.libs.opennbt.tag.builtin.ShortTag;
+import com.viaversion.viaversion.libs.opennbt.tag.builtin.StringTag;
+import com.viaversion.viaversion.libs.opennbt.tag.builtin.Tag;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static us.myles.ViaVersion.protocols.protocol1_9to1_8.ItemRewriter.potionNameFromDamage;
+import static com.viaversion.viaversion.protocols.protocol1_9to1_8.ItemRewriter.potionNameFromDamage;
 
 @SuppressWarnings({"MismatchedQueryAndUpdateOfCollection", "unused"})
 public class ItemRewriter {
@@ -29,7 +29,7 @@ public class ItemRewriter {
 	static {
 		for (Field field : de.gerrygames.viarewind.protocol.protocol1_8to1_9.items.ItemRewriter.class.getDeclaredFields()) {
 			try {
-				Field other = us.myles.ViaVersion.protocols.protocol1_9to1_8.ItemRewriter.class.getDeclaredField(field.getName());
+				Field other = com.viaversion.viaversion.protocols.protocol1_9to1_8.ItemRewriter.class.getDeclaredField(field.getName());
 				other.setAccessible(true);
 				field.setAccessible(true);
 				field.set(null, other.get(null));

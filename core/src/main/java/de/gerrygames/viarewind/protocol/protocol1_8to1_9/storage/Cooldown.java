@@ -5,11 +5,11 @@ import de.gerrygames.viarewind.utils.Tickable;
 import de.gerrygames.viarewind.api.ViaRewindConfig;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.Protocol1_8TO1_9;
 import de.gerrygames.viarewind.utils.PacketUtil;
-import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.Pair;
-import us.myles.ViaVersion.api.data.StoredObject;
-import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.type.Type;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.util.Pair;
+import com.viaversion.viaversion.api.connection.StoredObject;
+import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.type.Type;
 
 import java.util.ArrayList;
 import java.util.UUID;
@@ -82,7 +82,7 @@ public class Cooldown extends StoredObject implements Tickable {
 
 	private void hideBossBar() {
 		if (bossUUID==null) return;
-		PacketWrapper wrapper = new PacketWrapper(0x0C, null, getUser());
+		PacketWrapper wrapper = PacketWrapper.create(0x0C, null, getUser());
 		wrapper.write(Type.UUID, bossUUID);
 		wrapper.write(Type.VAR_INT, 1);
 		PacketUtil.sendPacket(wrapper, Protocol1_8TO1_9.class, false, true);
@@ -90,7 +90,7 @@ public class Cooldown extends StoredObject implements Tickable {
 	}
 
 	private void sendBossBar(float cooldown) {
-		PacketWrapper wrapper = new PacketWrapper(0x0C, null, getUser());
+		PacketWrapper wrapper = PacketWrapper.create(0x0C, null, getUser());
 		if (bossUUID==null) {
 			bossUUID = UUID.randomUUID();
 			wrapper.write(Type.UUID, bossUUID);
@@ -109,21 +109,21 @@ public class Cooldown extends StoredObject implements Tickable {
 	}
 
 	private void hideTitle() {
-		PacketWrapper hide = new PacketWrapper(0x45, null, getUser());
+		PacketWrapper hide = PacketWrapper.create(0x45, null, getUser());
 		hide.write(Type.VAR_INT, 3);
 		PacketUtil.sendPacket(hide, Protocol1_8TO1_9.class);
 	}
 
 	private void sendTitle(String title, String subTitle, int fadeIn, int stay, int fadeOut) {
-		PacketWrapper timePacket = new PacketWrapper(0x45, null, getUser());
+		PacketWrapper timePacket = PacketWrapper.create(0x45, null, getUser());
 		timePacket.write(Type.VAR_INT, 2);
 		timePacket.write(Type.INT, fadeIn);
 		timePacket.write(Type.INT, stay);
 		timePacket.write(Type.INT, fadeOut);
-		PacketWrapper titlePacket = new PacketWrapper(0x45, null, getUser());
+		PacketWrapper titlePacket = PacketWrapper.create(0x45, null, getUser());
 		titlePacket.write(Type.VAR_INT, 0);
 		titlePacket.write(Type.STRING, title);
-		PacketWrapper subtitlePacket = new PacketWrapper(0x45, null, getUser());
+		PacketWrapper subtitlePacket = PacketWrapper.create(0x45, null, getUser());
 		subtitlePacket.write(Type.VAR_INT, 1);
 		subtitlePacket.write(Type.STRING, subTitle);
 
@@ -133,7 +133,7 @@ public class Cooldown extends StoredObject implements Tickable {
 	}
 
 	private void sendActionBar(String bar) {
-		PacketWrapper actionBarPacket = new PacketWrapper(0x02, null, getUser());
+		PacketWrapper actionBarPacket = PacketWrapper.create(0x02, null, getUser());
 		actionBarPacket.write(Type.STRING, bar);
 		actionBarPacket.write(Type.BYTE, (byte) 2);
 

@@ -1,9 +1,9 @@
 package de.gerrygames.viarewind.replacement;
 
 import de.gerrygames.viarewind.storage.BlockState;
-import us.myles.ViaVersion.api.minecraft.item.Item;
-import us.myles.viaversion.libs.opennbt.tag.builtin.CompoundTag;
-import us.myles.viaversion.libs.opennbt.tag.builtin.StringTag;
+import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.libs.opennbt.tag.builtin.CompoundTag;
+import com.viaversion.viaversion.libs.opennbt.tag.builtin.StringTag;
 
 public class Replacement {
 	private int id, data;

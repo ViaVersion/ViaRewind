@@ -2,17 +2,17 @@ package de.gerrygames.viarewind.protocol.protocol1_8to1_9.bossbar;
 
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.Protocol1_8TO1_9;
 import de.gerrygames.viarewind.utils.PacketUtil;
-import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.boss.BossBar;
-import us.myles.ViaVersion.api.boss.BossColor;
-import us.myles.ViaVersion.api.boss.BossFlag;
-import us.myles.ViaVersion.api.boss.BossStyle;
-import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
-import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_8;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.api.type.types.version.Types1_8;
-import us.myles.ViaVersion.protocols.base.ProtocolInfo;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.boss.BossBar;
+import com.viaversion.viaversion.api.boss.BossColor;
+import com.viaversion.viaversion.api.boss.BossFlag;
+import com.viaversion.viaversion.api.boss.BossStyle;
+import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
+import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_8;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.types.version.Types1_8;
+import com.viaversion.viaversion.api.connection.ProtocolInfo;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -122,7 +122,7 @@ public class WitherBossBar extends BossBar {
 
 	@Override
 	public Set<UUID> getPlayers() {
-		return Collections.singleton(connection.get(ProtocolInfo.class).getUuid());
+		return Collections.singleton(connection.getProtocolInfo().getUuid());
 	}
 
     @Override
@@ -166,7 +166,7 @@ public class WitherBossBar extends BossBar {
 	}
 
 	private void spawnWither() {
-		PacketWrapper packetWrapper = new PacketWrapper(0x0F, null, this.connection);
+		PacketWrapper packetWrapper = PacketWrapper.create(0x0F, null, this.connection);
 		packetWrapper.write(Type.VAR_INT, entityId);
 		packetWrapper.write(Type.UNSIGNED_BYTE, (short)64);
 		packetWrapper.write(Type.INT, (int) (locX * 32d));
@@ -191,7 +191,7 @@ public class WitherBossBar extends BossBar {
 	}
 
 	private void updateLocation() {
-		PacketWrapper packetWrapper = new PacketWrapper(0x18, null, this.connection);
+		PacketWrapper packetWrapper = PacketWrapper.create(0x18, null, this.connection);
 		packetWrapper.write(Type.VAR_INT, entityId);
 		packetWrapper.write(Type.INT, (int) (locX * 32d));
 		packetWrapper.write(Type.INT, (int) (locY * 32d));
@@ -204,7 +204,7 @@ public class WitherBossBar extends BossBar {
 	}
 
 	private void updateMetadata() {
-		PacketWrapper packetWrapper = new PacketWrapper(0x1C, null, this.connection);
+		PacketWrapper packetWrapper = PacketWrapper.create(0x1C, null, this.connection);
 		packetWrapper.write(Type.VAR_INT, entityId);
 
 		List<Metadata> metadata = new ArrayList<>();
@@ -217,7 +217,7 @@ public class WitherBossBar extends BossBar {
 	}
 
 	private void despawnWither() {
-		PacketWrapper packetWrapper = new PacketWrapper(0x13, null, this.connection);
+		PacketWrapper packetWrapper = PacketWrapper.create(0x13, null, this.connection);
 		packetWrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[] {entityId});
 
 		PacketUtil.sendPacket(packetWrapper, Protocol1_8TO1_9.class, true, false);

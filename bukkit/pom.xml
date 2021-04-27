@@ -5,9 +5,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>de.gerrygames</groupId>
+        <groupId>com.viaversion</groupId>
         <artifactId>viarewind-parent</artifactId>
-        <version>1.5.4-SNAPSHOT</version>
+        <version>2.0.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>viarewind-bukkit</artifactId>
@@ -30,7 +30,7 @@
 
         <!-- Core Module -->
         <dependency>
-            <groupId>de.gerrygames</groupId>
+            <groupId>com.viaversion</groupId>
             <artifactId>viarewind-core</artifactId>
             <version>${project.parent.version}</version>
         </dependency>

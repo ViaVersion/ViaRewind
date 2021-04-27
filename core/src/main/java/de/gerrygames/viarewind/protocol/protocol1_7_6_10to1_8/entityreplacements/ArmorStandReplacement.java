@@ -9,12 +9,12 @@ import de.gerrygames.viarewind.utils.PacketUtil;
 import de.gerrygames.viarewind.utils.math.AABB;
 import de.gerrygames.viarewind.utils.math.Vector3d;
 import lombok.Getter;
-import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.entities.Entity1_10Types;
-import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
-import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_8;
-import us.myles.ViaVersion.api.type.Type;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
+import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
+import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_8;
+import com.viaversion.viaversion.api.type.Type;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -125,7 +125,7 @@ public class ArmorStandReplacement implements EntityReplacement {
 		if (entityIds == null) return;
 
 		if (currentState == State.ZOMBIE) {
-			PacketWrapper teleport = new PacketWrapper(0x18, null, user);
+			PacketWrapper teleport = PacketWrapper.create(0x18, null, user);
 			teleport.write(Type.INT, entityId);
 			teleport.write(Type.INT, (int) (locX * 32.0));
 			teleport.write(Type.INT, (int) (locY * 32.0));
@@ -133,19 +133,19 @@ public class ArmorStandReplacement implements EntityReplacement {
 			teleport.write(Type.BYTE, (byte) ((yaw / 360f) * 256));
 			teleport.write(Type.BYTE, (byte) ((pitch / 360f) * 256));
 
-			PacketWrapper head = new PacketWrapper(0x19, null, user);
+			PacketWrapper head = PacketWrapper.create(0x19, null, user);
 			head.write(Type.INT, entityId);
 			head.write(Type.BYTE, (byte) ((headYaw / 360f) * 256));
 
 			PacketUtil.sendPacket(teleport, Protocol1_7_6_10TO1_8.class, true, true);
 			PacketUtil.sendPacket(head, Protocol1_7_6_10TO1_8.class, true, true);
 		} else if (currentState == State.HOLOGRAM) {
-			PacketWrapper detach = new PacketWrapper(0x1B, null, user);
+			PacketWrapper detach = PacketWrapper.create(0x1B, null, user);
 			detach.write(Type.INT, entityIds[1]);
 			detach.write(Type.INT, -1);
 			detach.write(Type.BOOLEAN, false);
 
-			PacketWrapper teleportSkull = new PacketWrapper(0x18, null, user);
+			PacketWrapper teleportSkull = PacketWrapper.create(0x18, null, user);
 			teleportSkull.write(Type.INT, entityIds[0]);
 			teleportSkull.write(Type.INT, (int) (locX * 32.0));
 			teleportSkull.write(Type.INT, (int) ((locY + (marker ? 54.85 : small ? 56 : 57)) * 32.0));  //Don't ask me where this offset is coming from
@@ -153,7 +153,7 @@ public class ArmorStandReplacement implements EntityReplacement {
 			teleportSkull.write(Type.BYTE, (byte) 0);
 			teleportSkull.write(Type.BYTE, (byte) 0);
 
-			PacketWrapper teleportHorse = new PacketWrapper(0x18, null, user);
+			PacketWrapper teleportHorse = PacketWrapper.create(0x18, null, user);
 			teleportHorse.write(Type.INT, entityIds[1]);
 			teleportHorse.write(Type.INT, (int) (locX * 32.0));
 			teleportHorse.write(Type.INT, (int) ((locY + 56.75) * 32.0));
@@ -161,7 +161,7 @@ public class ArmorStandReplacement implements EntityReplacement {
 			teleportHorse.write(Type.BYTE, (byte) 0);
 			teleportHorse.write(Type.BYTE, (byte) 0);
 
-			PacketWrapper attach = new PacketWrapper(0x1B, null, user);
+			PacketWrapper attach = PacketWrapper.create(0x1B, null, user);
 			attach.write(Type.INT, entityIds[1]);
 			attach.write(Type.INT, entityIds[0]);
 			attach.write(Type.BOOLEAN, false);
@@ -176,7 +176,7 @@ public class ArmorStandReplacement implements EntityReplacement {
 	public void updateMetadata() {
 		if (entityIds == null) return;
 
-		PacketWrapper metadataPacket = new PacketWrapper(0x1C, null, user);
+		PacketWrapper metadataPacket = PacketWrapper.create(0x1C, null, user);
 
 		if (currentState == State.ZOMBIE) {
 			metadataPacket.write(Type.INT, entityIds[0]);
@@ -210,7 +210,7 @@ public class ArmorStandReplacement implements EntityReplacement {
 		if (entityIds != null) despawn();
 
 		if (currentState == State.ZOMBIE) {
-			PacketWrapper spawn = new PacketWrapper(0x0F, null, user);
+			PacketWrapper spawn = PacketWrapper.create(0x0F, null, user);
 			spawn.write(Type.VAR_INT, entityId);
 			spawn.write(Type.UNSIGNED_BYTE, (short) 54);
 			spawn.write(Type.INT, (int) (locX * 32.0));
@@ -230,7 +230,7 @@ public class ArmorStandReplacement implements EntityReplacement {
 		} else if (currentState == State.HOLOGRAM) {
 			int[] entityIds = new int[] {entityId, ENTITY_ID--};
 
-			PacketWrapper spawnSkull = new PacketWrapper(0x0E, null, user);
+			PacketWrapper spawnSkull = PacketWrapper.create(0x0E, null, user);
 			spawnSkull.write(Type.VAR_INT, entityIds[0]);
 			spawnSkull.write(Type.BYTE, (byte) 66);
 			spawnSkull.write(Type.INT, (int) (locX * 32.0));
@@ -240,7 +240,7 @@ public class ArmorStandReplacement implements EntityReplacement {
 			spawnSkull.write(Type.BYTE, (byte) 0);
 			spawnSkull.write(Type.INT, 0);
 
-			PacketWrapper spawnHorse = new PacketWrapper(0x0F, null, user);
+			PacketWrapper spawnHorse = PacketWrapper.create(0x0F, null, user);
 			spawnHorse.write(Type.VAR_INT, entityIds[1]);
 			spawnHorse.write(Type.UNSIGNED_BYTE, (short) 100);
 			spawnHorse.write(Type.INT, (int) (locX * 32.0));
@@ -274,7 +274,7 @@ public class ArmorStandReplacement implements EntityReplacement {
 
 	public void despawn() {
 		if (entityIds == null) return;
-		PacketWrapper despawn = new PacketWrapper(0x13, null, user);
+		PacketWrapper despawn = PacketWrapper.create(0x13, null, user);
 		despawn.write(Type.BYTE, (byte) entityIds.length);
 		for (int id : entityIds) {
 			despawn.write(Type.INT, id);

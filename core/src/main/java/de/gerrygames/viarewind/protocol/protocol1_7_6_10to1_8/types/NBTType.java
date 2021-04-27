@@ -3,9 +3,9 @@ package de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.ByteBufOutputStream;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.viaversion.libs.opennbt.NBTIO;
-import us.myles.viaversion.libs.opennbt.tag.builtin.CompoundTag;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.libs.opennbt.NBTIO;
+import com.viaversion.viaversion.libs.opennbt.tag.builtin.CompoundTag;
 
 import java.io.DataInput;
 import java.io.DataInputStream;

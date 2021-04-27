@@ -1,5 +1,6 @@
 package de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.packets;
 
+import com.viaversion.viaversion.libs.gson.JsonParser;
 import de.gerrygames.viarewind.ViaRewind;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10TO1_8;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.entityreplacements.ArmorStandReplacement;
@@ -21,24 +22,24 @@ import de.gerrygames.viarewind.utils.math.RayTracing;
 import de.gerrygames.viarewind.utils.math.Vector3d;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.entities.Entity1_10Types;
-import us.myles.ViaVersion.api.minecraft.Position;
-import us.myles.ViaVersion.api.minecraft.item.Item;
-import us.myles.ViaVersion.api.protocol.Protocol;
-import us.myles.ViaVersion.api.remapper.PacketHandler;
-import us.myles.ViaVersion.api.remapper.PacketRemapper;
-import us.myles.ViaVersion.api.remapper.ValueCreator;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.api.type.types.CustomByteType;
-import us.myles.ViaVersion.packets.State;
-import us.myles.ViaVersion.protocols.base.ProtocolInfo;
-import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
-import us.myles.ViaVersion.util.GsonUtil;
-import us.myles.viaversion.libs.opennbt.tag.builtin.CompoundTag;
-import us.myles.viaversion.libs.opennbt.tag.builtin.ListTag;
-import us.myles.viaversion.libs.opennbt.tag.builtin.StringTag;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
+import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.protocol.Protocol;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
+import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.ValueCreator;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.types.CustomByteType;
+import com.viaversion.viaversion.api.protocol.packet.State;
+import com.viaversion.viaversion.api.connection.ProtocolInfo;
+import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
+import com.viaversion.viaversion.util.GsonUtil;
+import com.viaversion.viaversion.libs.opennbt.tag.builtin.CompoundTag;
+import com.viaversion.viaversion.libs.opennbt.tag.builtin.ListTag;
+import com.viaversion.viaversion.libs.opennbt.tag.builtin.StringTag;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -259,7 +260,7 @@ public class PlayerPackets {
 						int gamemode = packetWrapper.get(Type.FLOAT, 0).intValue();
 						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
 						if (gamemode == 3 || tracker.getGamemode() == 3) {
-							UUID uuid = packetWrapper.user().get(ProtocolInfo.class).getUuid();
+							UUID uuid = packetWrapper.user().getProtocolInfo().getUuid();
 							Item[] equipment;
 							if (gamemode == 3) {
 								GameProfileStorage.GameProfile profile = packetWrapper.user().get(GameProfileStorage.class).get(uuid);
@@ -271,7 +272,7 @@ public class PlayerPackets {
 							}
 
 							for (int i = 1; i < 5; i++) {
-								PacketWrapper setSlot = new PacketWrapper(0x2F, null, packetWrapper.user());
+								PacketWrapper setSlot = PacketWrapper.create(0x2F, null, packetWrapper.user());
 								setSlot.write(Type.BYTE, (byte) 0);
 								setSlot.write(Type.SHORT, (short) (9 - i));
 								setSlot.write(Types1_7_6_10.COMPRESSED_NBT_ITEM, equipment[i]);
@@ -344,7 +345,7 @@ public class PlayerPackets {
 									gameProfile.setDisplayName(ChatUtil.jsonToLegacy(packetWrapper.read(Type.COMPONENT)));
 								}
 
-								PacketWrapper packet = new PacketWrapper(0x38, null, packetWrapper.user());
+								PacketWrapper packet = PacketWrapper.create(0x38, null, packetWrapper.user());
 								packet.write(Type.STRING, gameProfile.name);
 								packet.write(Type.BOOLEAN, true);
 								packet.write(Type.SHORT, (short) ping);
@@ -369,7 +370,7 @@ public class PlayerPackets {
 										}
 
 										for (short slot = 0; slot < 5; slot++) {
-											PacketWrapper equipmentPacket = new PacketWrapper(0x04, null, packetWrapper.user());
+											PacketWrapper equipmentPacket = PacketWrapper.create(0x04, null, packetWrapper.user());
 											equipmentPacket.write(Type.INT, entityId);
 											equipmentPacket.write(Type.SHORT, slot);
 											equipmentPacket.write(Types1_7_6_10.COMPRESSED_NBT_ITEM, equipment[slot]);
@@ -387,7 +388,7 @@ public class PlayerPackets {
 
 								gameProfile.ping = ping;
 
-								PacketWrapper packet = new PacketWrapper(0x38, null, packetWrapper.user());
+								PacketWrapper packet = PacketWrapper.create(0x38, null, packetWrapper.user());
 								packet.write(Type.STRING, gameProfile.name);
 								packet.write(Type.BOOLEAN, true);
 								packet.write(Type.SHORT, (short) ping);
@@ -405,7 +406,7 @@ public class PlayerPackets {
 								GameProfileStorage.GameProfile gameProfile = gameProfileStorage.remove(uuid);
 								if (gameProfile == null) continue;
 
-								PacketWrapper packet = new PacketWrapper(0x38, null, packetWrapper.user());
+								PacketWrapper packet = PacketWrapper.create(0x38, null, packetWrapper.user());
 								//packet.write(Type.STRING, gameProfile.getDisplayName());
 								packet.write(Type.STRING, gameProfile.name);
 								packet.write(Type.BOOLEAN, false);
@@ -490,7 +491,7 @@ public class PlayerPackets {
 						packetWrapper.setId(-1);
 						ByteBuf newPacketBuf = Unpooled.buffer();
 						packetWrapper.writeToBuffer(newPacketBuf);
-						PacketWrapper newWrapper = new PacketWrapper(0x3F, newPacketBuf, packetWrapper.user());
+						PacketWrapper newWrapper = PacketWrapper.create(0x3F, newPacketBuf, packetWrapper.user());
 						newWrapper.passthrough(Type.STRING);
 						if (newPacketBuf.readableBytes() <= Short.MAX_VALUE) {
 							newWrapper.write(Type.SHORT, (short) newPacketBuf.readableBytes());
@@ -602,7 +603,7 @@ public class PlayerPackets {
 							if (profile != null && profile.uuid != null) {
 								packetWrapper.cancel();
 
-								PacketWrapper teleportPacket = new PacketWrapper(0x18, null, packetWrapper.user());
+								PacketWrapper teleportPacket = PacketWrapper.create(0x18, null, packetWrapper.user());
 								teleportPacket.write(Type.UUID, profile.uuid);
 
 								PacketUtil.sendToServer(teleportPacket, Protocol1_7_6_10TO1_8.class, true, true);
@@ -830,7 +831,7 @@ public class PlayerPackets {
 							default:
 								return;
 						}
-						PacketWrapper entityAction = new PacketWrapper(0x0B, null, packetWrapper.user());
+						PacketWrapper entityAction = PacketWrapper.create(0x0B, null, packetWrapper.user());
 						entityAction.write(Type.VAR_INT, entityId);
 						entityAction.write(Type.VAR_INT, animation);
 						entityAction.write(Type.VAR_INT, 0);
@@ -859,7 +860,7 @@ public class PlayerPackets {
 						if (action == 3 || action == 4) {
 							PlayerAbilities abilities = packetWrapper.user().get(PlayerAbilities.class);
 							abilities.setSprinting(action == 3);
-							PacketWrapper abilitiesPacket = new PacketWrapper(0x39, null, packetWrapper.user());
+							PacketWrapper abilitiesPacket = PacketWrapper.create(0x39, null, packetWrapper.user());
 							abilitiesPacket.write(Type.BYTE, abilities.getFlags());
 							abilitiesPacket.write(Type.FLOAT, abilities.isSprinting() ? abilities.getFlySpeed() * 2.0f : abilities.getFlySpeed());
 							abilitiesPacket.write(Type.FLOAT, abilities.getWalkSpeed());
@@ -889,12 +890,12 @@ public class PlayerPackets {
 						if (unmount) {
 							EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
 							if (tracker.getSpectating() != tracker.getPlayerId()) {
-								PacketWrapper sneakPacket = new PacketWrapper(0x0B, null, packetWrapper.user());
+								PacketWrapper sneakPacket = PacketWrapper.create(0x0B, null, packetWrapper.user());
 								sneakPacket.write(Type.VAR_INT, tracker.getPlayerId());
 								sneakPacket.write(Type.VAR_INT, 0);  //Start sneaking
 								sneakPacket.write(Type.VAR_INT, 0);  //Action Parameter
 
-								PacketWrapper unsneakPacket = new PacketWrapper(0x0B, null, packetWrapper.user());
+								PacketWrapper unsneakPacket = PacketWrapper.create(0x0B, null, packetWrapper.user());
 								unsneakPacket.write(Type.VAR_INT, tracker.getPlayerId());
 								unsneakPacket.write(Type.VAR_INT, 1);  //Stop sneaking
 								unsneakPacket.write(Type.VAR_INT, 0);  //Action Parameter
@@ -921,7 +922,7 @@ public class PlayerPackets {
 						for (int i = 0; i < 4; i++) {
 							String line = packetWrapper.read(Type.STRING);
 							line = ChatUtil.legacyToJson(line);
-							packetWrapper.write(Type.COMPONENT, GsonUtil.getJsonParser().parse(line));
+							packetWrapper.write(Type.COMPONENT, JsonParser.parseString(line));
 						}
 					}
 				});
@@ -972,7 +973,7 @@ public class PlayerPackets {
 								GameProfileStorage storage = packetWrapper.user().get(GameProfileStorage.class);
 								List<GameProfileStorage.GameProfile> profiles = storage.getAllWithPrefix(prefix, true);
 
-								PacketWrapper tabComplete = new PacketWrapper(0x3A, null, packetWrapper.user());
+								PacketWrapper tabComplete = PacketWrapper.create(0x3A, null, packetWrapper.user());
 								tabComplete.write(Type.VAR_INT, profiles.size());
 								for (GameProfileStorage.GameProfile profile : profiles) {
 									tabComplete.write(Type.STRING, profile.name);
@@ -1028,7 +1029,7 @@ public class PlayerPackets {
 							packetWrapper.write(Type.REMAINING_BYTES, data);
 
 							Windows windows = packetWrapper.user().get(Windows.class);
-							PacketWrapper updateCost = new PacketWrapper(0x31, null, packetWrapper.user());
+							PacketWrapper updateCost = PacketWrapper.create(0x31, null, packetWrapper.user());
 							updateCost.write(Type.UNSIGNED_BYTE, windows.anvilId);
 							updateCost.write(Type.SHORT, (short) 0);
 							updateCost.write(Type.SHORT, windows.levelCost);

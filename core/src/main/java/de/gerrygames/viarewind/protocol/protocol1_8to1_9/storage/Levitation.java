@@ -3,10 +3,10 @@ package de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage;
 import de.gerrygames.viarewind.utils.Tickable;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.Protocol1_8TO1_9;
 import de.gerrygames.viarewind.utils.PacketUtil;
-import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.data.StoredObject;
-import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.type.Type;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.connection.StoredObject;
+import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.type.Type;
 
 public class Levitation extends StoredObject implements Tickable {
 	private int amplifier;
@@ -23,7 +23,7 @@ public class Levitation extends StoredObject implements Tickable {
 		}
 
 		int vY = (amplifier+1) * 360;
-		PacketWrapper packet = new PacketWrapper(0x12, null, Levitation.this.getUser());
+		PacketWrapper packet = PacketWrapper.create(0x12, null, Levitation.this.getUser());
 		packet.write(Type.VAR_INT, getUser().get(EntityTracker.class).getPlayerId());
 		packet.write(Type.SHORT, (short)0);
 		packet.write(Type.SHORT, (short)vY);

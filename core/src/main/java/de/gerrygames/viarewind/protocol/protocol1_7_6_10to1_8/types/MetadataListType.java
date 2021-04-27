@@ -1,8 +1,8 @@
 package de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types;
 
 import io.netty.buffer.ByteBuf;
-import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
-import us.myles.ViaVersion.api.type.types.minecraft.MetaListTypeTemplate;
+import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
+import com.viaversion.viaversion.api.type.types.minecraft.MetaListTypeTemplate;
 
 import java.util.ArrayList;
 import java.util.List;

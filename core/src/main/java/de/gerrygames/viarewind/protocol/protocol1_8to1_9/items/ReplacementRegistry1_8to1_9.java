@@ -3,7 +3,7 @@ package de.gerrygames.viarewind.protocol.protocol1_8to1_9.items;
 import de.gerrygames.viarewind.replacement.Replacement;
 import de.gerrygames.viarewind.replacement.ReplacementRegistry;
 import de.gerrygames.viarewind.storage.BlockState;
-import us.myles.ViaVersion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.minecraft.item.Item;
 
 public class ReplacementRegistry1_8to1_9 {
 	private static final ReplacementRegistry registry = new ReplacementRegistry();

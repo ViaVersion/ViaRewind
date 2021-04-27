@@ -9,17 +9,17 @@ import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.IntArrayType
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
 import de.gerrygames.viarewind.replacement.EntityReplacement;
 import de.gerrygames.viarewind.utils.PacketUtil;
-import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.entities.Entity1_10Types;
-import us.myles.ViaVersion.api.minecraft.Position;
-import us.myles.ViaVersion.api.minecraft.item.Item;
-import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
-import us.myles.ViaVersion.api.protocol.Protocol;
-import us.myles.ViaVersion.api.remapper.PacketHandler;
-import us.myles.ViaVersion.api.remapper.PacketRemapper;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.api.type.types.version.Types1_8;
-import us.myles.ViaVersion.packets.State;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
+import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
+import com.viaversion.viaversion.api.protocol.Protocol;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
+import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.types.version.Types1_8;
+import com.viaversion.viaversion.api.protocol.packet.State;
 
 import java.util.List;
 import java.util.UUID;
@@ -125,7 +125,7 @@ public class EntityPackets {
 							System.arraycopy(entityIds, 127, temp, 0, temp.length);
 							entityIds = temp;
 
-							PacketWrapper destroy = new PacketWrapper(0x13, null, packetWrapper.user());
+							PacketWrapper destroy = PacketWrapper.create(0x13, null, packetWrapper.user());
 							destroy.write(Types1_7_6_10.INT_ARRAY, entityIds2);
 							PacketUtil.sendPacket(destroy, Protocol1_7_6_10TO1_8.class);
 						}

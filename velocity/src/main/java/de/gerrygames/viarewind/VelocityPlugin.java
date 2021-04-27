@@ -11,7 +11,7 @@ import de.gerrygames.viarewind.api.ViaRewindConfigImpl;
 import de.gerrygames.viarewind.api.ViaRewindPlatform;
 import de.gerrygames.viarewind.velocity.VersionInfo;
 import lombok.Getter;
-import us.myles.ViaVersion.sponge.util.LoggerWrapper;
+import com.viaversion.viaversion.sponge.util.LoggerWrapper;
 
 import java.nio.file.Path;
 import java.util.logging.Logger;

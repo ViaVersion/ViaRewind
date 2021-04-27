@@ -12,16 +12,16 @@ import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_1
 import de.gerrygames.viarewind.replacement.Replacement;
 import de.gerrygames.viarewind.storage.BlockState;
 import de.gerrygames.viarewind.utils.PacketUtil;
-import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.entities.Entity1_10Types;
-import us.myles.ViaVersion.api.minecraft.Position;
-import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
-import us.myles.ViaVersion.api.protocol.Protocol;
-import us.myles.ViaVersion.api.remapper.PacketHandler;
-import us.myles.ViaVersion.api.remapper.PacketRemapper;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.api.type.types.version.Types1_8;
-import us.myles.ViaVersion.packets.State;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
+import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
+import com.viaversion.viaversion.api.protocol.Protocol;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
+import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.types.version.Types1_8;
+import com.viaversion.viaversion.api.protocol.packet.State;
 
 import java.util.List;
 import java.util.UUID;
@@ -62,7 +62,7 @@ public class SpawnPackets {
 						if (gameProfile != null && gameProfile.gamemode == 3) {
 							int entityId = packetWrapper.get(Type.VAR_INT, 0);
 
-							PacketWrapper equipmentPacket = new PacketWrapper(0x04, null, packetWrapper.user());
+							PacketWrapper equipmentPacket = PacketWrapper.create(0x04, null, packetWrapper.user());
 							equipmentPacket.write(Type.INT, entityId);
 							equipmentPacket.write(Type.SHORT, (short) 4);
 							equipmentPacket.write(Types1_7_6_10.COMPRESSED_NBT_ITEM, gameProfile.getSkull());
@@ -70,7 +70,7 @@ public class SpawnPackets {
 							PacketUtil.sendPacket(equipmentPacket, Protocol1_7_6_10TO1_8.class);
 
 							for (short i = 0; i < 4; i++) {
-								equipmentPacket = new PacketWrapper(0x04, null, packetWrapper.user());
+								equipmentPacket = PacketWrapper.create(0x04, null, packetWrapper.user());
 								equipmentPacket.write(Type.INT, entityId);
 								equipmentPacket.write(Type.SHORT, i);
 								equipmentPacket.write(Types1_7_6_10.COMPRESSED_NBT_ITEM, null);
