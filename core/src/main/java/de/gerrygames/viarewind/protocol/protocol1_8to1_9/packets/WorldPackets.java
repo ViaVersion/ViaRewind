@@ -32,10 +32,10 @@ public class WorldPackets {
 		/*  OUTGOING  */
 
 		//Block Break Animation
-		protocol.registerOutgoing(State.PLAY, 0x08, 0x25);
+		protocol.registerClientbound(State.PLAY, 0x08, 0x25);
 
 		//Update Block Entity
-		protocol.registerOutgoing(State.PLAY, 0x09, 0x35, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x09, 0x35, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.POSITION);
@@ -56,7 +56,7 @@ public class WorldPackets {
 		});
 
 		//Block Action
-		protocol.registerOutgoing(State.PLAY, 0x0A, 0x24, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x0A, 0x24, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.POSITION);
@@ -76,7 +76,7 @@ public class WorldPackets {
 		});
 
 		//Block Change
-		protocol.registerOutgoing(State.PLAY, 0x0B, 0x23, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x0B, 0x23, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.POSITION);
@@ -93,10 +93,10 @@ public class WorldPackets {
 		});
 
 		//Server Difficulty
-		protocol.registerOutgoing(State.PLAY, 0x0D, 0x41);
+		protocol.registerClientbound(State.PLAY, 0x0D, 0x41);
 
 		//Multi Block Change
-		protocol.registerOutgoing(State.PLAY, 0x10, 0x22, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x10, 0x22, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.INT);
@@ -115,7 +115,7 @@ public class WorldPackets {
 		});
 
 		//Named Sound Effect
-		protocol.registerOutgoing(State.PLAY, 0x19, 0x29, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x19, 0x29, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.STRING);
@@ -146,7 +146,7 @@ public class WorldPackets {
 		});
 
 		//Explosion
-		protocol.registerOutgoing(State.PLAY, 0x1C, 0x27, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x1C, 0x27, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.FLOAT);
@@ -172,7 +172,7 @@ public class WorldPackets {
 		});
 
 		//Unload Chunk
-		protocol.registerOutgoing(State.PLAY, 0x1D, 0x21, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x1D, 0x21, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				handler(new PacketHandler() {
@@ -188,7 +188,7 @@ public class WorldPackets {
 		});
 
 		//Chunk Data
-		protocol.registerOutgoing(State.PLAY, 0x20, 0x21, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x20, 0x21, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				handler(new PacketHandler() {
@@ -262,7 +262,7 @@ public class WorldPackets {
 		});
 
 		//Effect
-		protocol.registerOutgoing(State.PLAY, 0x21, 0x28, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x21, 0x28, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.INT);
@@ -289,7 +289,7 @@ public class WorldPackets {
 		});
 
 		//Particle
-		protocol.registerOutgoing(State.PLAY, 0x22, 0x2A, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x22, 0x2A, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.INT);
@@ -316,7 +316,7 @@ public class WorldPackets {
 		});
 
 		//Map
-		protocol.registerOutgoing(State.PLAY, 0x24, 0x34, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x24, 0x34, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT);
@@ -331,19 +331,19 @@ public class WorldPackets {
 		});
 
 		//Combat Event
-		protocol.registerOutgoing(State.PLAY, 0x2C, 0x42);
+		protocol.registerClientbound(State.PLAY, 0x2C, 0x42);
 
 		//World Border
-		protocol.registerOutgoing(State.PLAY, 0x35, 0x44);
+		protocol.registerClientbound(State.PLAY, 0x35, 0x44);
 
 		//Update Time
-		protocol.registerOutgoing(State.PLAY, 0x44, 0x03);
+		protocol.registerClientbound(State.PLAY, 0x44, 0x03);
 
 		//Update Sign
-		protocol.registerOutgoing(State.PLAY, 0x46, 0x33);
+		protocol.registerClientbound(State.PLAY, 0x46, 0x33);
 
 		//Sound Effects
-		protocol.registerOutgoing(State.PLAY, 0x47, 0x29, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x47, 0x29, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				handler(new PacketHandler() {

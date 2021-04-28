@@ -31,7 +31,7 @@ public class EntityPackets {
 		/*  OUTGOING  */
 
 		//Entity Equipment
-		protocol.registerOutgoing(State.PLAY, 0x04, 0x04, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x04, 0x04, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT, Type.INT);  //Entity Id
@@ -70,7 +70,7 @@ public class EntityPackets {
 		});
 
 		//Use Bed
-		protocol.registerOutgoing(State.PLAY, 0x0A, 0x0A, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x0A, 0x0A, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT, Type.INT);  //Entity Id
@@ -87,7 +87,7 @@ public class EntityPackets {
 		});
 
 		//Collect Item
-		protocol.registerOutgoing(State.PLAY, 0x0D, 0x0D, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x0D, 0x0D, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT, Type.INT);  //Collected Entity ID
@@ -96,7 +96,7 @@ public class EntityPackets {
 		});
 
 		//Entity Velocity
-		protocol.registerOutgoing(State.PLAY, 0x12, 0x12, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x12, 0x12, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT, Type.INT);  //Entity Id
@@ -107,7 +107,7 @@ public class EntityPackets {
 		});
 
 		//Destroy Entities
-		protocol.registerOutgoing(State.PLAY, 0x13, 0x13, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x13, 0x13, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				handler(new PacketHandler() {
@@ -137,7 +137,7 @@ public class EntityPackets {
 		});
 
 		//Entity
-		protocol.registerOutgoing(State.PLAY, 0x14, 0x14, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x14, 0x14, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT, Type.INT);  //Entity Id
@@ -145,7 +145,7 @@ public class EntityPackets {
 		});
 
 		//Entity Relative Move
-		protocol.registerOutgoing(State.PLAY, 0x15, 0x15, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x15, 0x15, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT, Type.INT);  //Entity Id
@@ -177,7 +177,7 @@ public class EntityPackets {
 		});
 
 		//Entity Look
-		protocol.registerOutgoing(State.PLAY, 0x16, 0x16, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x16, 0x16, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT, Type.INT);  //Entity Id
@@ -207,7 +207,7 @@ public class EntityPackets {
 		});
 
 		//Entity Look and Relative Move
-		protocol.registerOutgoing(State.PLAY, 0x17, 0x17, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x17, 0x17, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT, Type.INT);  //Entity Id
@@ -244,7 +244,7 @@ public class EntityPackets {
 		});
 
 		//Entity Teleport
-		protocol.registerOutgoing(State.PLAY, 0x18, 0x18, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x18, 0x18, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT, Type.INT);  //Entity Id
@@ -294,7 +294,7 @@ public class EntityPackets {
 		});
 
 		//Entity Head Look
-		protocol.registerOutgoing(State.PLAY, 0x19, 0x19, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x19, 0x19, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT, Type.INT);  //Entity Id
@@ -316,7 +316,7 @@ public class EntityPackets {
 		});
 
 		//Attach Entity
-		protocol.registerOutgoing(State.PLAY, 0x1B, 0x1B, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x1B, 0x1B, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.INT);
@@ -337,7 +337,7 @@ public class EntityPackets {
 		});
 
 		//Entity Metadata
-		protocol.registerOutgoing(State.PLAY, 0x1C, 0x1C, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x1C, 0x1C, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT, Type.INT);  //Entity Id
@@ -366,7 +366,7 @@ public class EntityPackets {
 		});
 
 		//Entity Effect
-		protocol.registerOutgoing(State.PLAY, 0x1D, 0x1D, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x1D, 0x1D, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT, Type.INT);  //Entity Id
@@ -383,7 +383,7 @@ public class EntityPackets {
 		});
 
 		//Remove Entity Effect
-		protocol.registerOutgoing(State.PLAY, 0x1E, 0x1E, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x1E, 0x1E, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT, Type.INT);  //Entity Id
@@ -392,7 +392,7 @@ public class EntityPackets {
 		});
 
 		//Entity Properties
-		protocol.registerOutgoing(State.PLAY, 0x20, 0x20, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x20, 0x20, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT, Type.INT);  //Entity Id
@@ -424,7 +424,7 @@ public class EntityPackets {
 		});
 
 		//Update Entity NBT
-		protocol.registerOutgoing(State.PLAY, 0x49, -1, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x49, -1, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				handler(new PacketHandler() {

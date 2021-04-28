@@ -29,7 +29,7 @@ public class Protocol1_7_6_10TO1_8 extends AbstractProtocol {
 		WorldPackets.register(this);
 
 		//Keep Alive
-		this.registerOutgoing(State.PLAY, 0x00, 0x00, new PacketRemapper() {
+		this.registerClientbound(State.PLAY, 0x00, 0x00, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT, Type.INT);
@@ -37,7 +37,7 @@ public class Protocol1_7_6_10TO1_8 extends AbstractProtocol {
 		});
 
 		//Set Compression
-		this.registerOutgoing(State.PLAY, 0x46, -1, new PacketRemapper() {
+		this.registerClientbound(State.PLAY, 0x46, -1, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				handler(packetWrapper -> packetWrapper.cancel());
@@ -45,7 +45,7 @@ public class Protocol1_7_6_10TO1_8 extends AbstractProtocol {
 		});
 
 		//Keep Alive
-		this.registerIncoming(State.PLAY, 0x00, 0x00, new PacketRemapper() {
+		this.registerServerbound(State.PLAY, 0x00, 0x00, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.INT, Type.VAR_INT);
@@ -53,7 +53,7 @@ public class Protocol1_7_6_10TO1_8 extends AbstractProtocol {
 		});
 
 		//Encryption Request
-		this.registerOutgoing(State.LOGIN, 0x01, 0x01, new PacketRemapper() {
+		this.registerClientbound(State.LOGIN, 0x01, 0x01, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.STRING);  //Server ID
@@ -70,7 +70,7 @@ public class Protocol1_7_6_10TO1_8 extends AbstractProtocol {
 		});
 
 		//Set Compression
-		this.registerOutgoing(State.LOGIN, 0x03, 0x03, new PacketRemapper() {
+		this.registerClientbound(State.LOGIN, 0x03, 0x03, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				handler(packetWrapper -> {
@@ -82,7 +82,7 @@ public class Protocol1_7_6_10TO1_8 extends AbstractProtocol {
 		});
 
 		//Encryption Response
-		this.registerIncoming(State.LOGIN, 0x01, 0x01, new PacketRemapper() {
+		this.registerServerbound(State.LOGIN, 0x01, 0x01, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				handler(packetWrapper -> {

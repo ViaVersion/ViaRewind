@@ -33,7 +33,7 @@ public class SpawnPackets {
 		/*  OUTGOING  */
 
 		//Spawn Player
-		protocol.registerOutgoing(State.PLAY, 0x0C, 0x0C, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x0C, 0x0C, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT);
@@ -109,7 +109,7 @@ public class SpawnPackets {
 		});
 
 		//Spawn Object
-		protocol.registerOutgoing(State.PLAY, 0x0E, 0x0E, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x0E, 0x0E, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT);
@@ -199,7 +199,7 @@ public class SpawnPackets {
 		});
 
 		//Spawn Mob
-		protocol.registerOutgoing(State.PLAY, 0x0F, 0x0F, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x0F, 0x0F, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT);
@@ -286,7 +286,7 @@ public class SpawnPackets {
 		});
 
 		//Spawn Painting
-		protocol.registerOutgoing(State.PLAY, 0x10, 0x10, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x10, 0x10, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT);  //Entity Id
@@ -314,7 +314,7 @@ public class SpawnPackets {
 		});
 
 		//Spawn Experience Orb
-		protocol.registerOutgoing(State.PLAY, 0x11, 0x11, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x11, 0x11, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT);
@@ -335,7 +335,7 @@ public class SpawnPackets {
 		});
 
 		//Spawn Global Entity
-		protocol.registerOutgoing(State.PLAY, 0x2C, 0x2C, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x2C, 0x2C, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT);

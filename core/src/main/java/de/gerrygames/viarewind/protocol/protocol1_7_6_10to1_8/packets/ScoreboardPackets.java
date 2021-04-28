@@ -23,7 +23,7 @@ public class ScoreboardPackets {
 		/*  OUTGOING  */
 
 		//Scoreboard Objective
-		protocol.registerOutgoing(State.PLAY, 0x3B, 0x3B, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x3B, 0x3B, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				handler(new PacketHandler() {
@@ -84,7 +84,7 @@ public class ScoreboardPackets {
 		});
 
 		//Update Score
-		protocol.registerOutgoing(State.PLAY, 0x3C, 0x3C, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x3C, 0x3C, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				handler(new PacketHandler() {
@@ -124,7 +124,7 @@ public class ScoreboardPackets {
 		});
 
 		//Display Scoreboard
-		protocol.registerOutgoing(State.PLAY, 0x3D, 0x3D, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x3D, 0x3D, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.BYTE); // Position
@@ -165,7 +165,7 @@ public class ScoreboardPackets {
 		});
 
 		//Scoreboard Teams
-		protocol.registerOutgoing(State.PLAY, 0x3E, 0x3E, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x3E, 0x3E, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.STRING);

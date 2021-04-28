@@ -1,18 +1,17 @@
 package de.gerrygames.viarewind.protocol.protocol1_8to1_9.bossbar;
 
+import com.viaversion.viaversion.api.legacy.bossbar.BossBar;
+import com.viaversion.viaversion.api.legacy.bossbar.BossColor;
+import com.viaversion.viaversion.api.legacy.bossbar.BossFlag;
+import com.viaversion.viaversion.api.legacy.bossbar.BossStyle;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.Protocol1_8TO1_9;
 import de.gerrygames.viarewind.utils.PacketUtil;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.boss.BossBar;
-import com.viaversion.viaversion.api.boss.BossColor;
-import com.viaversion.viaversion.api.boss.BossFlag;
-import com.viaversion.viaversion.api.boss.BossStyle;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_8;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_8;
-import com.viaversion.viaversion.api.connection.ProtocolInfo;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,7 +19,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-public class WitherBossBar extends BossBar {
+public class WitherBossBar implements BossBar {
 	private static int highestId = Integer.MAX_VALUE-10000;
 
 	private final UUID uuid;

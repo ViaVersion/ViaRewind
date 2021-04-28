@@ -13,13 +13,13 @@ public class ScoreboardPackets {
 		/*  OUTGOING  */
 
 		//Display Scoreboard
-		protocol.registerOutgoing(State.PLAY, 0x38, 0x3D);
+		protocol.registerClientbound(State.PLAY, 0x38, 0x3D);
 
 		//Scoreboard Objective
-		protocol.registerOutgoing(State.PLAY, 0x3F, 0x3B);
+		protocol.registerClientbound(State.PLAY, 0x3F, 0x3B);
 
 		//Scoreboard Team
-		protocol.registerOutgoing(State.PLAY, 0x41, 0x3E, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x41, 0x3E, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.STRING);
@@ -47,6 +47,6 @@ public class ScoreboardPackets {
 		});
 
 		//Update Score
-		protocol.registerOutgoing(State.PLAY, 0x42, 0x3C);
+		protocol.registerClientbound(State.PLAY, 0x42, 0x3C);
 	}
 }

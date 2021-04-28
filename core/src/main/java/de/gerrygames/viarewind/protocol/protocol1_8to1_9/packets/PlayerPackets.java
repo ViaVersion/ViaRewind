@@ -37,13 +37,13 @@ public class PlayerPackets {
 		/*  OUTGOING  */
 
 		//Animation
-		protocol.registerOutgoing(State.PLAY, 0x06, 0x0B);
+		protocol.registerClientbound(State.PLAY, 0x06, 0x0B);
 
 		//Statistics
-		protocol.registerOutgoing(State.PLAY, 0x07, 0x37);
+		protocol.registerClientbound(State.PLAY, 0x07, 0x37);
 
 		//Boss Bar
-		protocol.registerOutgoing(State.PLAY, 0x0C, -1, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x0C, -1, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				handler(new PacketHandler() {
@@ -73,13 +73,13 @@ public class PlayerPackets {
 		});
 
 		//Tab-Complete
-		protocol.registerOutgoing(State.PLAY, 0x0E, 0x3A);
+		protocol.registerClientbound(State.PLAY, 0x0E, 0x3A);
 
 		//Chat Message
-		protocol.registerOutgoing(State.PLAY, 0x0F, 0x02);
+		protocol.registerClientbound(State.PLAY, 0x0F, 0x02);
 
 		//Set Cooldown
-		protocol.registerOutgoing(State.PLAY, 0x17, -1, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x17, -1, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				handler(new PacketHandler() {
@@ -92,7 +92,7 @@ public class PlayerPackets {
 		});
 
 		//Custom Payload
-		protocol.registerOutgoing(State.PLAY, 0x18, 0x3F, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x18, 0x3F, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.STRING);
@@ -132,10 +132,10 @@ public class PlayerPackets {
 		});
 
 		//Disconnect
-		protocol.registerOutgoing(State.PLAY, 0x1A, 0x40);
+		protocol.registerClientbound(State.PLAY, 0x1A, 0x40);
 
 		//Change Game State
-		protocol.registerOutgoing(State.PLAY, 0x1E, 0x2B, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x1E, 0x2B, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.UNSIGNED_BYTE);
@@ -151,7 +151,7 @@ public class PlayerPackets {
 		});
 
 		//Join Game
-		protocol.registerOutgoing(State.PLAY, 0x23, 0x01, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x23, 0x01, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.INT);
@@ -181,16 +181,16 @@ public class PlayerPackets {
 		});
 
 		//Open Sign Editor
-		protocol.registerOutgoing(State.PLAY, 0x2A, 0x36);
+		protocol.registerClientbound(State.PLAY, 0x2A, 0x36);
 
 		//Player Abilities
-		protocol.registerOutgoing(State.PLAY, 0x2B, 0x39);
+		protocol.registerClientbound(State.PLAY, 0x2B, 0x39);
 
 		//Player List Item
-		protocol.registerOutgoing(State.PLAY, 0x2D, 0x38);
+		protocol.registerClientbound(State.PLAY, 0x2D, 0x38);
 
 		//Player Position And Look
-		protocol.registerOutgoing(State.PLAY, 0x2E, 0x08, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x2E, 0x08, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.DOUBLE);
@@ -248,10 +248,10 @@ public class PlayerPackets {
 		});
 
 		//Resource Pack Send
-		protocol.registerOutgoing(State.PLAY, 0x32, 0x48);
+		protocol.registerClientbound(State.PLAY, 0x32, 0x48);
 
 		//Respawn
-		protocol.registerOutgoing(State.PLAY, 0x33, 0x07, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x33, 0x07, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.INT);
@@ -282,30 +282,30 @@ public class PlayerPackets {
 		});
 
 		//Camera
-		protocol.registerOutgoing(State.PLAY, 0x36, 0x43);
+		protocol.registerClientbound(State.PLAY, 0x36, 0x43);
 
 		//Held Item Change
-		protocol.registerOutgoing(State.PLAY, 0x37, 0x09);
+		protocol.registerClientbound(State.PLAY, 0x37, 0x09);
 
 		//Set Experience
-		protocol.registerOutgoing(State.PLAY, 0x3D, 0x1F);
+		protocol.registerClientbound(State.PLAY, 0x3D, 0x1F);
 
 		//Update Health
-		protocol.registerOutgoing(State.PLAY, 0x3E, 0x06);
+		protocol.registerClientbound(State.PLAY, 0x3E, 0x06);
 
 		//Spawn Position
-		protocol.registerOutgoing(State.PLAY, 0x43, 0x05);
+		protocol.registerClientbound(State.PLAY, 0x43, 0x05);
 
 		//Title
-		protocol.registerOutgoing(State.PLAY, 0x45, 0x45);
+		protocol.registerClientbound(State.PLAY, 0x45, 0x45);
 
 		//Player List Header And Footer
-		protocol.registerOutgoing(State.PLAY, 0x48, 0x47);
+		protocol.registerClientbound(State.PLAY, 0x48, 0x47);
 
 		/*  INCMOING  */
 
 		//Chat Message
-		protocol.registerIncoming(State.PLAY, 0x02, 0x01, new PacketRemapper() {
+		protocol.registerServerbound(State.PLAY, 0x02, 0x01, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.STRING);
@@ -328,10 +328,10 @@ public class PlayerPackets {
 		});
 
 		//Confirm Transaction
-		protocol.registerIncoming(State.PLAY, 0x05, 0x0F);
+		protocol.registerServerbound(State.PLAY, 0x05, 0x0F);
 
 		//Use Entity
-		protocol.registerIncoming(State.PLAY, 0x0A, 0x02, new PacketRemapper() {
+		protocol.registerServerbound(State.PLAY, 0x0A, 0x02, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT);
@@ -354,7 +354,7 @@ public class PlayerPackets {
 		});
 
 		//Player
-		protocol.registerIncoming(State.PLAY, 0x0F, 0x03, new PacketRemapper() {
+		protocol.registerServerbound(State.PLAY, 0x0F, 0x03, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.BOOLEAN);
@@ -370,7 +370,7 @@ public class PlayerPackets {
 		});
 
 		//Player Position
-		protocol.registerIncoming(State.PLAY, 0x0C, 0x04, new PacketRemapper() {
+		protocol.registerServerbound(State.PLAY, 0x0C, 0x04, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.DOUBLE);
@@ -396,7 +396,7 @@ public class PlayerPackets {
 		});
 
 		//Player Look
-		protocol.registerIncoming(State.PLAY, 0x0E, 0x05, new PacketRemapper() {
+		protocol.registerServerbound(State.PLAY, 0x0E, 0x05, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.FLOAT);
@@ -422,7 +422,7 @@ public class PlayerPackets {
 		});
 
 		//Player Position And Look
-		protocol.registerIncoming(State.PLAY, 0x0D, 0x06, new PacketRemapper() {
+		protocol.registerServerbound(State.PLAY, 0x0D, 0x06, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.DOUBLE);
@@ -468,7 +468,7 @@ public class PlayerPackets {
 		});
 
 		//Player Digging
-		protocol.registerIncoming(State.PLAY, 0x13, 0x07, new PacketRemapper() {
+		protocol.registerServerbound(State.PLAY, 0x13, 0x07, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.BYTE, Type.VAR_INT);
@@ -497,7 +497,7 @@ public class PlayerPackets {
 		});
 
 		//Player Block Placement
-		protocol.registerIncoming(State.PLAY, 0x1C, 0x08, new PacketRemapper() {
+		protocol.registerServerbound(State.PLAY, 0x1C, 0x08, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.POSITION);
@@ -541,7 +541,7 @@ public class PlayerPackets {
 		});
 
 		//Held Item Change
-		protocol.registerIncoming(State.PLAY, 0x17, 0x09, new PacketRemapper() {
+		protocol.registerServerbound(State.PLAY, 0x17, 0x09, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				handler(new PacketHandler() {
@@ -554,7 +554,7 @@ public class PlayerPackets {
 		});
 
 		//Animation
-		protocol.registerIncoming(State.PLAY, 0x1A, 0x0A, new PacketRemapper() {
+		protocol.registerServerbound(State.PLAY, 0x1A, 0x0A, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				create(new ValueCreator() {
@@ -586,7 +586,7 @@ public class PlayerPackets {
 		});
 
 		//Entity Action
-		protocol.registerIncoming(State.PLAY, 0x14, 0x0B, new PacketRemapper() {
+		protocol.registerServerbound(State.PLAY, 0x14, 0x0B, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT);
@@ -614,7 +614,7 @@ public class PlayerPackets {
 		});
 
 		//Steer Vehicle
-		protocol.registerIncoming(State.PLAY, 0x15, 0x0C, new PacketRemapper() {
+		protocol.registerServerbound(State.PLAY, 0x15, 0x0C, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.FLOAT);
@@ -640,7 +640,7 @@ public class PlayerPackets {
 		});
 
 		//Update Sign
-		protocol.registerIncoming(State.PLAY, 0x19, 0x12, new PacketRemapper() {
+		protocol.registerServerbound(State.PLAY, 0x19, 0x12, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.POSITION);
@@ -656,10 +656,10 @@ public class PlayerPackets {
 		});
 
 		//Player Abilities
-		protocol.registerIncoming(State.PLAY, 0x12, 0x13);
+		protocol.registerServerbound(State.PLAY, 0x12, 0x13);
 
 		//Tab Complete
-		protocol.registerIncoming(State.PLAY, 0x01, 0x14, new PacketRemapper() {
+		protocol.registerServerbound(State.PLAY, 0x01, 0x14, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.STRING);
@@ -674,7 +674,7 @@ public class PlayerPackets {
 		});
 
 		//Client Settings
-		protocol.registerIncoming(State.PLAY, 0x04, 0x15, new PacketRemapper() {
+		protocol.registerServerbound(State.PLAY, 0x04, 0x15, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.STRING);
@@ -708,10 +708,10 @@ public class PlayerPackets {
 		});
 
 		//Client Status
-		protocol.registerIncoming(State.PLAY, 0x03, 0x16);
+		protocol.registerServerbound(State.PLAY, 0x03, 0x16);
 
 		//Custom Payload
-		protocol.registerIncoming(State.PLAY, 0x09, 0x17, new PacketRemapper() {
+		protocol.registerServerbound(State.PLAY, 0x09, 0x17, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.STRING);
@@ -741,9 +741,9 @@ public class PlayerPackets {
 		});
 
 		//Spectate
-		protocol.registerIncoming(State.PLAY, 0x1B, 0x18);
+		protocol.registerServerbound(State.PLAY, 0x1B, 0x18);
 
 		//Resource Pack Status
-		protocol.registerIncoming(State.PLAY, 0x16, 0x19);
+		protocol.registerServerbound(State.PLAY, 0x16, 0x19);
 	}
 }

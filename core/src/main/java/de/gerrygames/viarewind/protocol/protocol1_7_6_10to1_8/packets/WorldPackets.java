@@ -32,7 +32,7 @@ public class WorldPackets {
 		/*  OUTGOING  */
 
 		//Chunk Data
-		protocol.registerOutgoing(State.PLAY, 0x21, 0x21, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x21, 0x21, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				handler(packetWrapper -> {
@@ -52,7 +52,7 @@ public class WorldPackets {
 		});
 
 		//Multi Block Change
-		protocol.registerOutgoing(State.PLAY, 0x22, 0x22, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x22, 0x22, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.INT);
@@ -72,7 +72,7 @@ public class WorldPackets {
 		});
 
 		//Block Change
-		protocol.registerOutgoing(State.PLAY, 0x23, 0x23, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x23, 0x23, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				handler(packetWrapper -> {
@@ -101,7 +101,7 @@ public class WorldPackets {
 		});
 
 		//Block Action
-		protocol.registerOutgoing(State.PLAY, 0x24, 0x24, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x24, 0x24, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				handler(packetWrapper -> {
@@ -117,7 +117,7 @@ public class WorldPackets {
 		});
 
 		//Block Break Animation
-		protocol.registerOutgoing(State.PLAY, 0x25, 0x25, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x25, 0x25, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT);  //Entity Id
@@ -132,7 +132,7 @@ public class WorldPackets {
 		});
 
 		//Map Chunk Bulk
-		protocol.registerOutgoing(State.PLAY, 0x26, 0x26, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x26, 0x26, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				handler(ChunkPacketTransformer::transformChunkBulk);
@@ -140,7 +140,7 @@ public class WorldPackets {
 		});
 
 		//Effect
-		protocol.registerOutgoing(State.PLAY, 0x28, 0x28, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x28, 0x28, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.INT);
@@ -156,7 +156,7 @@ public class WorldPackets {
 		});
 
 		//Particle
-		protocol.registerOutgoing(State.PLAY, 0x2A, 0x2A, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x2A, 0x2A, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				handler(packetWrapper -> {
@@ -199,7 +199,7 @@ public class WorldPackets {
 		});
 
 		//Update Sign
-		protocol.registerOutgoing(State.PLAY, 0x33, 0x33, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x33, 0x33, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				handler(packetWrapper -> {
@@ -224,7 +224,7 @@ public class WorldPackets {
 		});
 
 		//Map
-		protocol.registerOutgoing(State.PLAY, 0x34, 0x34, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x34, 0x34, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				handler(packetWrapper -> {
@@ -293,7 +293,7 @@ public class WorldPackets {
 		});
 
 		//Update Block Entity
-		protocol.registerOutgoing(State.PLAY, 0x35, 0x35, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x35, 0x35, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				handler(packetWrapper -> {
@@ -308,7 +308,7 @@ public class WorldPackets {
 		});
 
 		//Server Difficulty
-		protocol.registerOutgoing(State.PLAY, 0x41, -1, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x41, -1, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				handler(packetWrapper -> packetWrapper.cancel());
@@ -316,7 +316,7 @@ public class WorldPackets {
 		});
 
 		//Combat Event
-		protocol.registerOutgoing(State.PLAY, 0x42, -1, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x42, -1, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				handler(packetWrapper -> packetWrapper.cancel());
@@ -324,7 +324,7 @@ public class WorldPackets {
 		});
 
 		//World Border
-		protocol.registerOutgoing(State.PLAY, 0x44, -1, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x44, -1, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				handler(packetWrapper -> {

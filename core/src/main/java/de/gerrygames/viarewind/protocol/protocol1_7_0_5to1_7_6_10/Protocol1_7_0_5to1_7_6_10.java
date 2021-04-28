@@ -23,7 +23,7 @@ public class Protocol1_7_0_5to1_7_6_10 extends AbstractProtocol {
 	@Override
 	protected void registerPackets() {
 		//Login Success
-		this.registerOutgoing(State.LOGIN, 0x02, 0x02, new PacketRemapper() {
+		this.registerClientbound(State.LOGIN, 0x02, 0x02, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.STRING, REMOVE_DASHES);
@@ -32,7 +32,7 @@ public class Protocol1_7_0_5to1_7_6_10 extends AbstractProtocol {
 		});
 
 		//Spawn Player
-		this.registerOutgoing(State.PLAY, 0x0C, 0x0C, new PacketRemapper() {
+		this.registerClientbound(State.PLAY, 0x0C, 0x0C, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT);
@@ -56,7 +56,7 @@ public class Protocol1_7_0_5to1_7_6_10 extends AbstractProtocol {
 		});
 
 		//Teams
-		this.registerOutgoing(State.PLAY, 0x3E, 0x3E, new PacketRemapper() {
+		this.registerClientbound(State.PLAY, 0x3E, 0x3E, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.STRING);

@@ -63,10 +63,10 @@ public class Protocol1_8TO1_9 extends AbstractProtocol {
 		WorldPackets.register(this);
 
 		//Keep Alive
-		this.registerOutgoing(State.PLAY, 0x1F, 0x00);
+		this.registerClientbound(State.PLAY, 0x1F, 0x00);
 
 		//Keep Alive
-		this.registerIncoming(State.PLAY, 0x0B, 0x00);
+		this.registerServerbound(State.PLAY, 0x0B, 0x00);
 	}
 
 	@Override

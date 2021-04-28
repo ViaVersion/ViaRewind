@@ -18,10 +18,10 @@ public class InventoryPackets {
 		/*  OUTGOING  */
 
 		//Confirm Transaction
-		protocol.registerOutgoing(State.PLAY, 0x11, 0x32);
+		protocol.registerClientbound(State.PLAY, 0x11, 0x32);
 
 		//Close Window
-		protocol.registerOutgoing(State.PLAY, 0x12, 0x2E, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x12, 0x2E, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.UNSIGNED_BYTE);
@@ -36,7 +36,7 @@ public class InventoryPackets {
 		});
 
 		//Open Window
-		protocol.registerOutgoing(State.PLAY, 0x13, 0x2D, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x13, 0x2D, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.UNSIGNED_BYTE);
@@ -75,7 +75,7 @@ public class InventoryPackets {
 		});
 
 		//Window Items
-		protocol.registerOutgoing(State.PLAY, 0x14, 0x30, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x14, 0x30, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.UNSIGNED_BYTE);
@@ -109,10 +109,10 @@ public class InventoryPackets {
 		});
 
 		//Window Property
-		protocol.registerOutgoing(State.PLAY, 0x15, 0x31);
+		protocol.registerClientbound(State.PLAY, 0x15, 0x31);
 
 		//Set Slot
-		protocol.registerOutgoing(State.PLAY, 0x16, 0x2F, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x16, 0x2F, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.BYTE);
@@ -149,7 +149,7 @@ public class InventoryPackets {
 		/*  INCMOING  */
 
 		//Close Window
-		protocol.registerIncoming(State.PLAY, 0x08, 0x0D, new PacketRemapper() {
+		protocol.registerServerbound(State.PLAY, 0x08, 0x0D, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.UNSIGNED_BYTE);
@@ -164,7 +164,7 @@ public class InventoryPackets {
 		});
 
 		//Click Window
-		protocol.registerIncoming(State.PLAY, 0x07, 0x0E, new PacketRemapper() {
+		protocol.registerServerbound(State.PLAY, 0x07, 0x0E, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.UNSIGNED_BYTE);
@@ -198,7 +198,7 @@ public class InventoryPackets {
 		});
 
 		//Creative Inventory Action
-		protocol.registerIncoming(State.PLAY, 0x18, 0x10, new PacketRemapper() {
+		protocol.registerServerbound(State.PLAY, 0x18, 0x10, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.SHORT);
@@ -213,6 +213,6 @@ public class InventoryPackets {
 		});
 
 		//Enchant Item
-		protocol.registerIncoming(State.PLAY, 0x06, 0x11);
+		protocol.registerServerbound(State.PLAY, 0x06, 0x11);
 	}
 }
