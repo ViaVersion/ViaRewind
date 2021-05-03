@@ -44,10 +44,10 @@ public class ReplacementRegistry1_8to1_9 {
 
 		registry.registerItemBlock(199, new Replacement(35, 10, "Chorus Plant"));
 		registry.registerItemBlock(200, new Replacement(35, 2, "Chorus Flower"));
-		registry.registerItemBlock(201, new Replacement(155, "Purpur Block"));
+		registry.registerItemBlock(201, new Replacement(155, 0, "Purpur Block"));
 		registry.registerItemBlock(202, new Replacement(155, 2, "Purpur Pillar"));
-		registry.registerItemBlock(203, new Replacement(156, "Purpur Stairs"));
-		registry.registerItemBlock(206, new Replacement(121, "Endstone Bricks"));
+		registry.registerItemBlock(203, new Replacement(156, 0, "Purpur Stairs"));
+		registry.registerItemBlock(206, new Replacement(121, 0, "Endstone Bricks"));
 		registry.registerItemBlock(207, new Replacement(141, "Beetroot Block"));
 		registry.registerItemBlock(208, new Replacement(2, "Grass Path"));
 		registry.registerItemBlock(209, new Replacement(90, "End Gateway"));
