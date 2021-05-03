@@ -46,7 +46,15 @@ public class ReplacementRegistry1_8to1_9 {
 		registry.registerItemBlock(200, new Replacement(35, 2, "Chorus Flower"));
 		registry.registerItemBlock(201, new Replacement(155, 0, "Purpur Block"));
 		registry.registerItemBlock(202, new Replacement(155, 2, "Purpur Pillar"));
-		registry.registerItemBlock(203, new Replacement(156, 0, "Purpur Stairs"));
+		registry.registerItemBlock(203, 0, new Replacement(156, 0, "Purpur Stairs"));
+		registry.registerItemBlock(203, 1, new Replacement(156, 1, "Purpur Stairs"));
+		registry.registerItemBlock(203, 2, new Replacement(156, 2, "Purpur Stairs"));
+		registry.registerItemBlock(203, 3, new Replacement(156, 3, "Purpur Stairs"));
+		registry.registerItemBlock(203, 4, new Replacement(156, 4, "Purpur Stairs"));
+		registry.registerItemBlock(203, 5, new Replacement(156, 5, "Purpur Stairs"));
+		registry.registerItemBlock(203, 6, new Replacement(156, 6, "Purpur Stairs"));
+		registry.registerItemBlock(203, 7, new Replacement(156, 7, "Purpur Stairs"));
+		registry.registerItemBlock(203, 8, new Replacement(156, 8, "Purpur Stairs"));
 		registry.registerItemBlock(206, new Replacement(121, 0, "Endstone Bricks"));
 		registry.registerItemBlock(207, new Replacement(141, "Beetroot Block"));
 		registry.registerItemBlock(208, new Replacement(2, "Grass Path"));
@@ -54,9 +62,9 @@ public class ReplacementRegistry1_8to1_9 {
 		registry.registerItemBlock(210, new Replacement(137, 0, "Repeating Command Block"));
 		registry.registerItemBlock(211, new Replacement(137, 0, "Chain Command Block"));
 		registry.registerItemBlock(212, new Replacement(79, 0, "Frosted Ice"));
-		registry.registerItemBlock(214, new Replacement(87, "Nether Wart Block"));
-		registry.registerItemBlock(215, new Replacement(112, "Red Nether Brick"));
-		registry.registerItemBlock(217, new Replacement(166, "Structure Void"));
+		registry.registerItemBlock(214, new Replacement(87, 0, "Nether Wart Block"));
+		registry.registerItemBlock(215, new Replacement(112, 0, "Red Nether Brick"));
+		registry.registerItemBlock(217, new Replacement(166, 0, "Structure Void"));
 		registry.registerItemBlock(255, new Replacement(137, 0, "Structure Block"));
 		registry.registerItemBlock(397, 5, new Replacement(397, 0, "Dragon Head"));
 	}
