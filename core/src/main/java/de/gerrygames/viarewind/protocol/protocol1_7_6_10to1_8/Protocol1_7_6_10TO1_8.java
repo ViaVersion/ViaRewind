@@ -9,7 +9,6 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.types.CustomByteType;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.ClientChunks;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.packets.*;
@@ -57,15 +56,8 @@ public class Protocol1_7_6_10TO1_8 extends AbstractProtocol {
 			@Override
 			public void registerMap() {
 				map(Type.STRING);  //Server ID
-				handler(packetWrapper -> {
-					int publicKeyLength = packetWrapper.read(Type.VAR_INT);
-					packetWrapper.write(Type.SHORT, (short) publicKeyLength);
-					packetWrapper.passthrough(new CustomByteType(publicKeyLength));
-
-					int verifyTokenLength = packetWrapper.read(Type.VAR_INT);
-					packetWrapper.write(Type.SHORT, (short) verifyTokenLength);
-					packetWrapper.passthrough(new CustomByteType(verifyTokenLength));
-				});
+				map(Type.BYTE_ARRAY_PRIMITIVE, Type.SHORT_BYTE_ARRAY); // Public key
+				map(Type.BYTE_ARRAY_PRIMITIVE, Type.SHORT_BYTE_ARRAY); // Verification token
 			}
 		});
 
@@ -85,15 +77,8 @@ public class Protocol1_7_6_10TO1_8 extends AbstractProtocol {
 		this.registerServerbound(State.LOGIN, 0x01, 0x01, new PacketRemapper() {
 			@Override
 			public void registerMap() {
-				handler(packetWrapper -> {
-					int sharedSecretLength = packetWrapper.read(Type.SHORT);
-					packetWrapper.write(Type.VAR_INT, sharedSecretLength);
-					packetWrapper.passthrough(new CustomByteType(sharedSecretLength));
-
-					int verifyTokenLength = packetWrapper.read(Type.SHORT);
-					packetWrapper.write(Type.VAR_INT, verifyTokenLength);
-					packetWrapper.passthrough(new CustomByteType(verifyTokenLength));
-				});
+				map(Type.SHORT_BYTE_ARRAY, Type.BYTE_ARRAY_PRIMITIVE); // Shared secret
+				map(Type.SHORT_BYTE_ARRAY, Type.BYTE_ARRAY_PRIMITIVE); // Verification token
 			}
 		});
 	}
