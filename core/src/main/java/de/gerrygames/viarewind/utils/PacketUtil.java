@@ -1,7 +1,7 @@
 package de.gerrygames.viarewind.utils;
 
-import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.Protocol;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.exception.CancelException;
 
 public class PacketUtil {

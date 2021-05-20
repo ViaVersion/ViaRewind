@@ -36,19 +36,11 @@
     </repositories>
 
     <dependencies>
-        <!-- Lombok -->
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.18.20</version>
-            <scope>provided</scope>
-        </dependency>
-
         <!-- ViaVersion -->
         <dependency>
             <groupId>com.viaversion</groupId>
             <artifactId>viaversion</artifactId>
-            <version>4.0.0-21w19a-SNAPSHOT</version>
+            <version>4.0.0-21w20a-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

@@ -1,18 +1,18 @@
 package de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage;
 
-import com.viaversion.viaversion.api.platform.ExternalJoinGameListener;
-import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10TO1_8;
-import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.metadata.MetadataRewriter;
-import de.gerrygames.viarewind.replacement.EntityReplacement;
-import de.gerrygames.viarewind.utils.PacketUtil;
-import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.connection.StoredObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
+import com.viaversion.viaversion.api.platform.ExternalJoinGameListener;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_8;
+import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10TO1_8;
+import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.metadata.MetadataRewriter;
+import de.gerrygames.viarewind.replacement.EntityReplacement;
+import de.gerrygames.viarewind.utils.PacketUtil;
 
 import java.util.HashMap;
 import java.util.List;

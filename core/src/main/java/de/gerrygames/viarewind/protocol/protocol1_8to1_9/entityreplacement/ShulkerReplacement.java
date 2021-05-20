@@ -1,23 +1,21 @@
 package de.gerrygames.viarewind.protocol.protocol1_8to1_9.entityreplacement;
 
-import de.gerrygames.viarewind.protocol.protocol1_8to1_9.Protocol1_8TO1_9;
-import de.gerrygames.viarewind.protocol.protocol1_8to1_9.metadata.MetadataRewriter;
-import de.gerrygames.viarewind.replacement.EntityReplacement;
-import de.gerrygames.viarewind.utils.PacketUtil;
-import lombok.Getter;
-import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_9;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_8;
+import de.gerrygames.viarewind.protocol.protocol1_8to1_9.Protocol1_8TO1_9;
+import de.gerrygames.viarewind.protocol.protocol1_8to1_9.metadata.MetadataRewriter;
+import de.gerrygames.viarewind.replacement.EntityReplacement;
+import de.gerrygames.viarewind.utils.PacketUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ShulkerReplacement implements EntityReplacement {
-	@Getter
 	private int entityId;
 	private List<Metadata> datawatcher = new ArrayList<>();
 	private double locX, locY, locZ;
@@ -111,5 +109,9 @@ public class ShulkerReplacement implements EntityReplacement {
 		despawn.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[] {entityId});
 
 		PacketUtil.sendPacket(despawn, Protocol1_8TO1_9.class, true, true);
+	}
+
+	public int getEntityId() {
+		return this.entityId;
 	}
 }

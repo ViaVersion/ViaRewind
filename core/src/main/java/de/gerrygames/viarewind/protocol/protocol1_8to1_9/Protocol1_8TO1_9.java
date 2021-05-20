@@ -1,46 +1,23 @@
 package de.gerrygames.viarewind.protocol.protocol1_8to1_9;
 
-import com.google.common.collect.ImmutableSet;
-import com.viaversion.viaversion.api.protocol.AbstractProtocol;
-import de.gerrygames.viarewind.protocol.protocol1_8to1_9.packets.EntityPackets;
-import de.gerrygames.viarewind.protocol.protocol1_8to1_9.packets.InventoryPackets;
-import de.gerrygames.viarewind.protocol.protocol1_8to1_9.packets.PlayerPackets;
-import de.gerrygames.viarewind.protocol.protocol1_8to1_9.packets.ScoreboardPackets;
-import de.gerrygames.viarewind.protocol.protocol1_8to1_9.packets.SpawnPackets;
-import de.gerrygames.viarewind.protocol.protocol1_8to1_9.packets.WorldPackets;
-import de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage.BlockPlaceDestroyTracker;
-import de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage.BossBarStorage;
-import de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage.Cooldown;
-import de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage.EntityTracker;
-import de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage.Levitation;
-import de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage.PlayerPosition;
-import de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage.Windows;
-import de.gerrygames.viarewind.utils.Ticker;
-import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.protocol.AbstractProtocol;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.ValueTransformer;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
+import de.gerrygames.viarewind.protocol.protocol1_8to1_9.packets.*;
+import de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage.*;
+import de.gerrygames.viarewind.utils.Ticker;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.Timer;
 
 public class Protocol1_8TO1_9 extends AbstractProtocol {
 	public static final Timer TIMER = new Timer("ViaRewind-1_8TO1_9", true);
-	public static final ImmutableSet<Object> VALID_ATTRIBUTES;
-
-	static {
-		ImmutableSet.Builder<Object> builder = ImmutableSet.builder();
-		builder.add("generic.maxHealth");
-		builder.add("generic.followRange");
-		builder.add("generic.knockbackResistance");
-		builder.add("generic.movementSpeed");
-		builder.add("generic.attackDamage");
-		builder.add("horse.jumpStrength");
-		builder.add("zombie.spawnReinforcements");
-		VALID_ATTRIBUTES = builder.build();
-	}
-
+	public static final Set<String> VALID_ATTRIBUTES = new HashSet<>();
 	public static final ValueTransformer<Double, Integer> TO_OLD_INT = new ValueTransformer<Double, Integer>(Type.INT) {
 		public Integer transform(PacketWrapper wrapper, Double inputValue) {
 			return (int) (inputValue * 32.0D);
@@ -52,6 +29,16 @@ public class Protocol1_8TO1_9 extends AbstractProtocol {
 			return (byte) ((degrees / 360F) * 256);
 		}
 	};
+
+	static {
+		VALID_ATTRIBUTES.add("generic.maxHealth");
+		VALID_ATTRIBUTES.add("generic.followRange");
+		VALID_ATTRIBUTES.add("generic.knockbackResistance");
+		VALID_ATTRIBUTES.add("generic.movementSpeed");
+		VALID_ATTRIBUTES.add("generic.attackDamage");
+		VALID_ATTRIBUTES.add("horse.jumpStrength");
+		VALID_ATTRIBUTES.add("zombie.spawnReinforcements");
+	}
 
 	@Override
 	protected void registerPackets() {

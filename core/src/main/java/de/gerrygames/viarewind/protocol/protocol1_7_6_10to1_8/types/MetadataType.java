@@ -1,8 +1,8 @@
 package de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types;
 
-import io.netty.buffer.ByteBuf;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.type.types.minecraft.MetaTypeTemplate;
+import io.netty.buffer.ByteBuf;
 
 public class MetadataType extends MetaTypeTemplate {
 	@Override

@@ -1,16 +1,18 @@
 package de.gerrygames.viarewind.utils.math;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import java.util.Objects;
 
-@AllArgsConstructor
-@NoArgsConstructor
-@Data
 public class Vector3d {
 	double x, y, z;
+
+	public Vector3d(double x, double y, double z) {
+		this.x = x;
+		this.y = y;
+		this.z = z;
+	}
+
+	public Vector3d() {
+	}
 
 	public void set(Vector3d vec) {
 		this.x = vec.x;
@@ -80,5 +82,29 @@ public class Vector3d {
 	@Override
 	public String toString() {
 		return "Vector3d{" + "x=" + x + ", y=" + y + ", z=" + z + '}';
+	}
+
+	public double getX() {
+		return this.x;
+	}
+
+	public double getY() {
+		return this.y;
+	}
+
+	public double getZ() {
+		return this.z;
+	}
+
+	public void setX(double x) {
+		this.x = x;
+	}
+
+	public void setY(double y) {
+		this.y = y;
+	}
+
+	public void setZ(double z) {
+		this.z = z;
 	}
 }

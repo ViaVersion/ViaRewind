@@ -1,6 +1,5 @@
 package de.gerrygames.viarewind.protocol.protocol1_8to1_9.types;
 
-import io.netty.buffer.ByteBuf;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.Environment;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
@@ -9,6 +8,7 @@ import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.type.PartialType;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
+import io.netty.buffer.ByteBuf;
 
 import java.util.ArrayList;
 import java.util.logging.Level;

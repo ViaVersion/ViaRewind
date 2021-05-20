@@ -24,7 +24,7 @@
         <dependency>
             <groupId>net.fabricmc</groupId>
             <artifactId>fabric-loader</artifactId>
-            <version>0.4.8+build.154</version>
+            <version>0.11.3</version>
             <scope>provided</scope>
         </dependency>
 

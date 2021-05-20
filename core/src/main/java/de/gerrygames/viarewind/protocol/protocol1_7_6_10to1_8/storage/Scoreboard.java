@@ -1,13 +1,11 @@
 package de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage;
 
-import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10TO1_8;
-import de.gerrygames.viarewind.utils.PacketUtil;
-import lombok.Getter;
-import lombok.Setter;
-import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.connection.StoredObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
+import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10TO1_8;
+import de.gerrygames.viarewind.utils.PacketUtil;
 
 import java.util.*;
 
@@ -17,10 +15,7 @@ public class Scoreboard extends StoredObject {
 	private HashMap<String, ScoreTeam> scoreTeams = new HashMap<>();
 	private HashMap<String, Byte> teamColors = new HashMap<>();
 	private HashSet<String> scoreTeamNames = new HashSet<>();
-	@Getter
-    @Setter
 	private String colorIndependentSidebar;
-	@Getter
 	private HashMap<Byte, String> colorDependentSidebar = new HashMap<>();
 
     public Scoreboard(UserConnection user) {
@@ -145,6 +140,18 @@ public class Scoreboard extends StoredObject {
 		PacketUtil.sendPacket(teamPacket, Protocol1_7_6_10TO1_8.class, true, true);
 
 		return scoreTeam.name;
+	}
+
+	public String getColorIndependentSidebar() {
+		return this.colorIndependentSidebar;
+	}
+
+	public HashMap<Byte, String> getColorDependentSidebar() {
+		return this.colorDependentSidebar;
+	}
+
+	public void setColorIndependentSidebar(String colorIndependentSidebar) {
+		this.colorIndependentSidebar = colorIndependentSidebar;
 	}
 
 	private class ScoreTeam {

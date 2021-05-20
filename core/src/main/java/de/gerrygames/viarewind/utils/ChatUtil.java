@@ -1,9 +1,9 @@
 package de.gerrygames.viarewind.utils;
 
-import de.gerrygames.viarewind.ViaRewind;
 import com.viaversion.viaversion.libs.gson.JsonElement;
 import com.viaversion.viaversion.libs.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import com.viaversion.viaversion.libs.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import de.gerrygames.viarewind.ViaRewind;
 
 import java.util.logging.Level;
 import java.util.regex.Pattern;

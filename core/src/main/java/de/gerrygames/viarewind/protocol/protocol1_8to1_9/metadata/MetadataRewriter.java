@@ -1,15 +1,15 @@
 package de.gerrygames.viarewind.protocol.protocol1_8to1_9.metadata;
 
-import de.gerrygames.viarewind.ViaRewind;
-import de.gerrygames.viarewind.protocol.protocol1_8to1_9.items.ItemRewriter;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
 import com.viaversion.viaversion.api.minecraft.EulerAngle;
 import com.viaversion.viaversion.api.minecraft.Vector;
+import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_8;
 import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_9;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.metadata.MetaIndex;
+import de.gerrygames.viarewind.ViaRewind;
+import de.gerrygames.viarewind.protocol.protocol1_8to1_9.items.ItemRewriter;
 
 import java.util.ArrayList;
 import java.util.List;

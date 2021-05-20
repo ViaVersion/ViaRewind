@@ -1,9 +1,9 @@
 package de.gerrygames.viarewind.protocol.protocol1_8to1_7_6_10.metadata;
 
-import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.MetaType1_7_6_10;
-import com.viaversion.viaversion.util.Pair;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
 import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_8;
+import com.viaversion.viaversion.util.Pair;
+import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.MetaType1_7_6_10;
 
 import java.util.HashMap;
 import java.util.Optional;

@@ -1,5 +1,11 @@
 package de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.entityreplacements;
 
+import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
+import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
+import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_8;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.type.Type;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10TO1_8;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.metadata.MetadataRewriter;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.MetaType1_7_6_10;
@@ -8,19 +14,11 @@ import de.gerrygames.viarewind.replacement.EntityReplacement;
 import de.gerrygames.viarewind.utils.PacketUtil;
 import de.gerrygames.viarewind.utils.math.AABB;
 import de.gerrygames.viarewind.utils.math.Vector3d;
-import lombok.Getter;
-import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
-import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
-import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_8;
-import com.viaversion.viaversion.api.type.Type;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ArmorStandReplacement implements EntityReplacement {
-	@Getter
 	private int entityId;
 	private List<Metadata> datawatcher = new ArrayList<>();
 	private int[] entityIds = null;
@@ -35,6 +33,10 @@ public class ArmorStandReplacement implements EntityReplacement {
 	private boolean small = false;
 	private boolean marker = false;
 	private static int ENTITY_ID = Integer.MAX_VALUE - 16000;
+
+	public int getEntityId() {
+		return this.entityId;
+	}
 
 	private enum State {
 		HOLOGRAM, ZOMBIE;

@@ -1,14 +1,5 @@
 package de.gerrygames.viarewind.protocol.protocol1_8to1_9.packets;
 
-import de.gerrygames.viarewind.ViaRewind;
-import de.gerrygames.viarewind.protocol.protocol1_8to1_9.Protocol1_8TO1_9;
-import de.gerrygames.viarewind.protocol.protocol1_8to1_9.items.ReplacementRegistry1_8to1_9;
-import de.gerrygames.viarewind.protocol.protocol1_8to1_9.sound.Effect;
-import de.gerrygames.viarewind.protocol.protocol1_8to1_9.sound.SoundRemapper;
-import de.gerrygames.viarewind.protocol.protocol1_8to1_9.types.Chunk1_8Type;
-import de.gerrygames.viarewind.storage.BlockState;
-import de.gerrygames.viarewind.utils.PacketUtil;
-import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
 import com.viaversion.viaversion.api.minecraft.Environment;
@@ -17,14 +8,22 @@ import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk1_8;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.protocol.Protocol;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.protocol.packet.State;
-import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
-import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.types.Chunk1_9_1_2Type;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.CompoundTag;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.StringTag;
+import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
+import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.types.Chunk1_9_1_2Type;
+import de.gerrygames.viarewind.ViaRewind;
+import de.gerrygames.viarewind.protocol.protocol1_8to1_9.Protocol1_8TO1_9;
+import de.gerrygames.viarewind.protocol.protocol1_8to1_9.items.ReplacementRegistry1_8to1_9;
+import de.gerrygames.viarewind.protocol.protocol1_8to1_9.sound.Effect;
+import de.gerrygames.viarewind.protocol.protocol1_8to1_9.sound.SoundRemapper;
+import de.gerrygames.viarewind.protocol.protocol1_8to1_9.types.Chunk1_8Type;
+import de.gerrygames.viarewind.utils.PacketUtil;
 
 public class WorldPackets {
 

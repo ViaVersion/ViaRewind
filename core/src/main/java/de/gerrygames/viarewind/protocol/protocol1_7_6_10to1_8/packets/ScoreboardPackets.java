@@ -1,16 +1,15 @@
 package de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.packets;
 
-import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10TO1_8;
-import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage.Scoreboard;
-import de.gerrygames.viarewind.utils.PacketUtil;
-import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.Protocol;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.protocol.packet.State;
-import com.viaversion.viaversion.api.connection.ProtocolInfo;
 import com.viaversion.viaversion.util.ChatColorUtil;
+import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10TO1_8;
+import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage.Scoreboard;
+import de.gerrygames.viarewind.utils.PacketUtil;
 
 import java.util.ArrayList;
 import java.util.List;

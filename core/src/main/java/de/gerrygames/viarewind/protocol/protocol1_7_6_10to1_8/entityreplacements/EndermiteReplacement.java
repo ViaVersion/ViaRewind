@@ -1,22 +1,20 @@
 package de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.entityreplacements;
 
+import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
+import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.type.Type;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10TO1_8;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.metadata.MetadataRewriter;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
 import de.gerrygames.viarewind.replacement.EntityReplacement;
 import de.gerrygames.viarewind.utils.PacketUtil;
-import lombok.Getter;
-import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
-import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
-import com.viaversion.viaversion.api.type.Type;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class EndermiteReplacement implements EntityReplacement {
-	@Getter
 	private int entityId;
 	private List<Metadata> datawatcher = new ArrayList<>();
 	private double locX, locY, locZ;
@@ -125,5 +123,9 @@ public class EndermiteReplacement implements EntityReplacement {
 		despawn.write(Types1_7_6_10.INT_ARRAY, new int[] {entityId});
 
 		PacketUtil.sendPacket(despawn, Protocol1_7_6_10TO1_8.class, true, true);
+	}
+
+	public int getEntityId() {
+		return this.entityId;
 	}
 }

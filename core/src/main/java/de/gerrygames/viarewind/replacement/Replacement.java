@@ -1,6 +1,5 @@
 package de.gerrygames.viarewind.replacement;
 
-import de.gerrygames.viarewind.storage.BlockState;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.CompoundTag;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.StringTag;
