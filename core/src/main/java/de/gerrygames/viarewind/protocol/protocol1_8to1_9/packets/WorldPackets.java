@@ -7,6 +7,7 @@ import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk1_8;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
+import com.viaversion.viaversion.api.minecraft.chunks.ChunkSectionImpl;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
@@ -209,10 +210,10 @@ public class WorldPackets {
 						if (chunk.isFullChunk() && chunk.getBitmask() == 0) {  //This would be an unload packet for 1.8 clients. Just set one air section
 							boolean skylight = world.getEnvironment() == Environment.NORMAL;
 							ChunkSection[] sections = new ChunkSection[16];
-							ChunkSection section = new ChunkSection();
+							ChunkSection section = new ChunkSectionImpl(true);
 							sections[0] = section;
 							section.addPaletteEntry(0);
-							if (skylight) section.setSkyLight(new byte[2048]);
+							if (skylight) section.getLight().setSkyLight(new byte[2048]);
 							chunk = new Chunk1_8(chunk.getX(), chunk.getZ(), true, 1, sections, chunk.getBiomeData(), chunk.getBlockEntities());
 						}
 

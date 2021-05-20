@@ -1,6 +1,7 @@
 package de.gerrygames.viarewind.protocol.protocol1_8to1_9.types;
 
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
+import com.viaversion.viaversion.api.minecraft.chunks.ChunkSectionImpl;
 import com.viaversion.viaversion.api.type.Type;
 import io.netty.buffer.ByteBuf;
 
@@ -15,7 +16,7 @@ public class ChunkSectionType1_8 extends Type<ChunkSection> {
 	}
 
 	public ChunkSection read(ByteBuf buffer) throws Exception {
-		ChunkSection chunkSection = new ChunkSection();
+		ChunkSection chunkSection = new ChunkSectionImpl(true);
 		byte[] blockData = new byte[8192];
 		buffer.readBytes(blockData);
 		ShortBuffer blockBuf = ByteBuffer.wrap(blockData).order(ByteOrder.LITTLE_ENDIAN).asShortBuffer();
@@ -24,7 +25,7 @@ public class ChunkSectionType1_8 extends Type<ChunkSection> {
 			int mask = blockBuf.get();
 			int type = mask >> 4;
 			int data = mask & 15;
-			chunkSection.setBlock(i, type, data);
+			chunkSection.setBlockWithData(i, type, data);
 		}
 
 		return chunkSection;

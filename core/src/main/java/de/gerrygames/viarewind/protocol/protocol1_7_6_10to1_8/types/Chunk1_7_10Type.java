@@ -58,14 +58,14 @@ public class Chunk1_7_10Type extends PartialType<Chunk, ClientWorld> {
 
         for (int i = 0; i < chunk.getSections().length; i++) {
             if ((chunk.getBitmask() & 1 << i) == 0) continue;
-            chunk.getSections()[i].writeBlockLight(dataToCompress);
+            chunk.getSections()[i].getLight().writeBlockLight(dataToCompress);
         }
 
         boolean skyLight = clientWorld != null && clientWorld.getEnvironment() == Environment.NORMAL;
         if (skyLight) {
             for (int i = 0; i < chunk.getSections().length; i++) {
                 if ((chunk.getBitmask() & 1 << i) == 0) continue;
-                chunk.getSections()[i].writeSkyLight(dataToCompress);
+                chunk.getSections()[i].getLight().writeSkyLight(dataToCompress);
             }
         }
 
