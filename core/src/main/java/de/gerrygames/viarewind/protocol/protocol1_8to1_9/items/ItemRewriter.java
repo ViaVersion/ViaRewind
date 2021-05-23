@@ -106,8 +106,8 @@ public class ItemRewriter {
 			ListTag enchTag = tag.contains("ench") ? tag.get("ench") : tag.get("StoredEnchantments");
 			List<Tag> lore = new ArrayList<>();
 			for (Tag ench : new ArrayList<>(enchTag.getValue())) {
-				short id = (short) ((CompoundTag)ench).get("id").getValue();
-				short lvl = (short) ((CompoundTag)ench).get("lvl").getValue();
+				short id = ((NumberTag) ((CompoundTag)ench).get("id")).asShort();
+				short lvl = ((NumberTag) ((CompoundTag)ench).get("lvl")).asShort();
 				String s;
 				if (id==70) {
 					s  = "§r§7Mending ";
