@@ -2,10 +2,10 @@ package de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage;
 
 import com.viaversion.viaversion.api.connection.StoredObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.data.entity.ClientEntityIdChangeListener;
 import com.viaversion.viaversion.api.minecraft.Vector;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
-import com.viaversion.viaversion.api.platform.ExternalJoinGameListener;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_8;
@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class EntityTracker extends StoredObject implements ExternalJoinGameListener {
+public class EntityTracker extends StoredObject implements ClientEntityIdChangeListener {
 	private final Map<Integer, List<Integer>> vehicleMap = new ConcurrentHashMap<>();
 	private final Map<Integer, Entity1_10Types.EntityType> clientEntityTypes = new ConcurrentHashMap<>();
 	private final Map<Integer, List<Metadata>> metadataBuffer = new ConcurrentHashMap<>();
@@ -168,7 +168,7 @@ public class EntityTracker extends StoredObject implements ExternalJoinGameListe
 	}
 
 	@Override
-	public void onExternalJoinGame(int playerEntityId) {
+	public void setClientEntityId(int playerEntityId) {
 		clientEntityTypes.remove(this.playerId);
 		this.playerId = playerEntityId;
 		clientEntityTypes.put(this.playerId, Entity1_10Types.EntityType.ENTITY_HUMAN);

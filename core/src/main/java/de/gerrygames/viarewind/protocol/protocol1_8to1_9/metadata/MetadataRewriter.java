@@ -18,7 +18,7 @@ import java.util.UUID;
 public class MetadataRewriter {
 	public static void transform(Entity1_10Types.EntityType type, List<Metadata> list) {
 		for (Metadata entry : new ArrayList<>(list)) {
-			MetaIndex metaIndex = MetaIndex1_8to1_9.searchIndex(type, entry.getId());
+			MetaIndex metaIndex = MetaIndex1_8to1_9.searchIndex(type, entry.id());
 			try {
 				if (metaIndex != null) {
 					if (metaIndex.getOldType() == MetaType1_8.NonExistent || metaIndex.getNewType()==MetaType1_9.Discontinued) {
@@ -91,7 +91,7 @@ public class MetadataRewriter {
 							break;
 					}
 
-					if (!metaIndex.getOldType().getType().getOutputClass().isAssignableFrom(entry.getValue().getClass())) {
+					if (!metaIndex.getOldType().type().getOutputClass().isAssignableFrom(entry.getValue().getClass())) {
 						list.remove(entry);
 					}
 

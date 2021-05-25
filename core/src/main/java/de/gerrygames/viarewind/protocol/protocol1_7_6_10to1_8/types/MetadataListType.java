@@ -23,14 +23,14 @@ public class MetadataListType extends MetaListTypeTemplate {
 		} while(m != null);
 
 		if (find(2, "Slot", list)!=null && find(8, "Slot", list)!=null) {
-			list.removeIf(metadata -> metadata.getId()==2 || metadata.getId()==3);
+			list.removeIf(metadata -> metadata.id()==2 || metadata.id()==3);
 		}
 
 		return list;
 	}
 
 	private Metadata find(int id, String type, List<Metadata> list) {
-		for (Metadata metadata : list) if (metadata.getId()==id && metadata.getMetaType().toString().equals(type)) return metadata;
+		for (Metadata metadata : list) if (metadata.id()==id && metadata.metaType().toString().equals(type)) return metadata;
 		return null;
 	}
 

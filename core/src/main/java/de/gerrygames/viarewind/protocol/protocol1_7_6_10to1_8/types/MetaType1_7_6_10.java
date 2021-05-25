@@ -25,11 +25,11 @@ public enum MetaType1_7_6_10 implements MetaType {
 		this.type = type;
 	}
 
-	public int getTypeID() {
+	public int typeId() {
 		return this.typeID;
 	}
 
-	public Type getType() {
+	public Type type() {
 		return this.type;
 	}
 }

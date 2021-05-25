@@ -14,14 +14,14 @@ public class MetadataType extends MetaTypeTemplate {
 			int typeID = (item & 224) >> 5;
 			MetaType1_7_6_10 type = MetaType1_7_6_10.byId(typeID);
 			int id = item & 31;
-			return new Metadata(id, type, type.getType().read(buffer));
+			return new Metadata(id, type, type.type().read(buffer));
 		}
 	}
 
 	@Override
 	public void write(ByteBuf buffer, Metadata meta) throws Exception {
-		int item = (meta.getMetaType().getTypeID() << 5 | meta.getId() & 31) & 255;
+		int item = (meta.metaType().typeId() << 5 | meta.id() & 31) & 255;
 		buffer.writeByte(item);
-		meta.getMetaType().getType().write(buffer, meta.getValue());
+		meta.metaType().type().write(buffer, meta.getValue());
 	}
 }

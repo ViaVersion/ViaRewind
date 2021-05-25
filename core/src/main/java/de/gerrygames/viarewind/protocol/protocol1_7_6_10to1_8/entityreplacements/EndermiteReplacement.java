@@ -59,7 +59,7 @@ public class EndermiteReplacement implements EntityReplacement {
 
 	public void updateMetadata(List<Metadata> metadataList) {
 		for (Metadata metadata : metadataList) {
-			datawatcher.removeIf(m -> m.getId()==metadata.getId());
+			datawatcher.removeIf(m -> m.id()==metadata.id());
 			datawatcher.add(metadata);
 		}
 		updateMetadata();
@@ -88,7 +88,7 @@ public class EndermiteReplacement implements EntityReplacement {
 
 		List<Metadata> metadataList = new ArrayList<>();
 		for (Metadata metadata : datawatcher) {
-			metadataList.add(new Metadata(metadata.getId(), metadata.getMetaType(), metadata.getValue()));
+			metadataList.add(new Metadata(metadata.id(), metadata.metaType(), metadata.getValue()));
 		}
 
 		MetadataRewriter.transform(Entity1_10Types.EntityType.SQUID, metadataList);

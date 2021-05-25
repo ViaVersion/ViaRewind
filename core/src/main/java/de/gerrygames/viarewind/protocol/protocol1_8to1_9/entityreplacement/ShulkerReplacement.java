@@ -47,7 +47,7 @@ public class ShulkerReplacement implements EntityReplacement {
 
 	public void updateMetadata(List<Metadata> metadataList) {
 		for (Metadata metadata : metadataList) {
-			datawatcher.removeIf(m -> m.getId()==metadata.getId());
+			datawatcher.removeIf(m -> m.id()==metadata.id());
 			datawatcher.add(metadata);
 		}
 		updateMetadata();
@@ -72,8 +72,8 @@ public class ShulkerReplacement implements EntityReplacement {
 
 		List<Metadata> metadataList = new ArrayList<>();
 		for (Metadata metadata : datawatcher) {
-			if (metadata.getId()==11 || metadata.getId()==12 || metadata.getId()==13) continue;
-			metadataList.add(new Metadata(metadata.getId(), metadata.getMetaType(), metadata.getValue()));
+			if (metadata.id()==11 || metadata.id()==12 || metadata.id()==13) continue;
+			metadataList.add(new Metadata(metadata.id(), metadata.metaType(), metadata.getValue()));
 		}
 		metadataList.add(new Metadata(11, MetaType1_9.VarInt, 2));
 

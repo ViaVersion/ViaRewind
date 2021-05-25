@@ -82,7 +82,7 @@ public class ArmorStandReplacement implements EntityReplacement {
 
 	public void updateMetadata(List<Metadata> metadataList) {
 		for (Metadata metadata : metadataList) {
-			datawatcher.removeIf(m -> m.getId() == metadata.getId());
+			datawatcher.removeIf(m -> m.id() == metadata.id());
 			datawatcher.add(metadata);
 		}
 		updateState();
@@ -92,15 +92,15 @@ public class ArmorStandReplacement implements EntityReplacement {
 		byte flags = 0;
 		byte armorStandFlags = 0;
 		for (Metadata metadata : datawatcher) {
-			if (metadata.getId() == 0 && metadata.getMetaType() == MetaType1_8.Byte) {
+			if (metadata.id() == 0 && metadata.metaType() == MetaType1_8.Byte) {
 				flags = (byte) metadata.getValue();
-			} else if (metadata.getId() == 2 && metadata.getMetaType() == MetaType1_8.String) {
+			} else if (metadata.id() == 2 && metadata.metaType() == MetaType1_8.String) {
 				name = (String) metadata.getValue();
 				if (name != null && name.equals("")) name = null;
-			} else if (metadata.getId() == 10 && metadata.getMetaType() == MetaType1_8.Byte) {
+			} else if (metadata.id() == 10 && metadata.metaType() == MetaType1_8.Byte) {
 				armorStandFlags = (byte) metadata.getValue();
-			} else if (metadata.getId() == 3 && metadata.getMetaType() == MetaType1_8.Byte) {
-				nameTagVisible = (byte) metadata.getId() != 0;
+			} else if (metadata.id() == 3 && metadata.metaType() == MetaType1_8.Byte) {
+				nameTagVisible = (byte) metadata.id() != 0;
 			}
 		}
 		invisible = (flags & 0x20) != 0;
@@ -185,8 +185,8 @@ public class ArmorStandReplacement implements EntityReplacement {
 
 			List<Metadata> metadataList = new ArrayList<>();
 			for (Metadata metadata : datawatcher) {
-				if (metadata.getId() < 0 || metadata.getId() > 9) continue;
-				metadataList.add(new Metadata(metadata.getId(), metadata.getMetaType(), metadata.getValue()));
+				if (metadata.id() < 0 || metadata.id() > 9) continue;
+				metadataList.add(new Metadata(metadata.id(), metadata.metaType(), metadata.getValue()));
 			}
 			if (small) metadataList.add(new Metadata(12, MetaType1_8.Byte, (byte) 1));
 			MetadataRewriter.transform(Entity1_10Types.EntityType.ZOMBIE, metadataList);
