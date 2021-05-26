@@ -21,12 +21,12 @@ public class MetadataRewriter {
 			MetaIndex metaIndex = MetaIndex1_8to1_9.searchIndex(type, entry.id());
 			try {
 				if (metaIndex != null) {
-					if (metaIndex.getOldType() == MetaType1_8.NonExistent || metaIndex.getNewType()==MetaType1_9.Discontinued) {
+					if (metaIndex.getOldType() == MetaType1_8.NonExistent || metaIndex.getNewType()==null) {
 						list.remove(entry);
 						continue;
 					}
 					Object value = entry.getValue();
-					entry.setMetaType(metaIndex.getOldType());
+					entry.setMetaTypeUnsafe(metaIndex.getOldType());
 					entry.setId(metaIndex.getIndex());
 					switch (metaIndex.getNewType()) {
 						case Byte:

@@ -28,7 +28,7 @@ public class MetadataRewriter {
 					list.remove(entry);
 					continue;
 				}
-				entry.setMetaType(metaIndex.getOldType());
+				entry.setMetaTypeUnsafe(metaIndex.getOldType());
 				entry.setId(metaIndex.getIndex());
 				switch (metaIndex.getOldType()) {
 					case Int:
