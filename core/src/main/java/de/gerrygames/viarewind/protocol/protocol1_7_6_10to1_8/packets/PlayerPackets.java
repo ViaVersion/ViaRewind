@@ -489,7 +489,7 @@ public class PlayerPackets {
 						newWrapper.passthrough(Type.STRING);
 						if (newPacketBuf.readableBytes() <= Short.MAX_VALUE) {
 							newWrapper.write(Type.SHORT, (short) newPacketBuf.readableBytes());
-							newWrapper.send(Protocol1_7_6_10TO1_8.class, true, true);
+							newWrapper.send(Protocol1_7_6_10TO1_8.class);
 						}
 					}
 				});
