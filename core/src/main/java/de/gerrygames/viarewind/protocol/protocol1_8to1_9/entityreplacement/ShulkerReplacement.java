@@ -98,7 +98,9 @@ public class ShulkerReplacement implements EntityReplacement {
 		spawn.write(Type.SHORT, (short) 0);
 		spawn.write(Type.SHORT, (short) 0);
 		spawn.write(Type.SHORT, (short) 0);
-		spawn.write(Types1_8.METADATA_LIST, new ArrayList<>());
+		List<Metadata> list = new ArrayList<>();
+		list.add(new Metadata(0, MetaType1_9.Byte, (byte) 0)); // Old clients don't like empty metadata
+		spawn.write(Types1_8.METADATA_LIST, list);
 
 		PacketUtil.sendPacket(spawn, Protocol1_8TO1_9.class, true, true);
 	}
