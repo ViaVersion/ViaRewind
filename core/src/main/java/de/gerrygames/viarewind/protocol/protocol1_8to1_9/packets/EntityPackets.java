@@ -8,7 +8,6 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
-import com.viaversion.viaversion.api.protocol.remapper.ValueCreator;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_8;
 import com.viaversion.viaversion.api.type.types.version.Types1_9;
@@ -197,9 +196,9 @@ public class EntityPackets {
 		protocol.registerClientbound(State.PLAY, 0x29, 0x18, new PacketRemapper() {
 			@Override
 			public void registerMap() {
-				create(new ValueCreator() {
+				handler(new PacketHandler() {
 					@Override
-					public void write(PacketWrapper packetWrapper) throws Exception {
+					public void handle(PacketWrapper packetWrapper) throws Exception {
 						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
 						int vehicle = tracker.getVehicle(tracker.getPlayerId());
 						if (vehicle == -1) packetWrapper.cancel();
@@ -222,9 +221,9 @@ public class EntityPackets {
 						position.setPos(x, y, z);
 					}
 				});
-				create(new ValueCreator() {
+				handler(new PacketHandler() {
 					@Override
-					public void write(PacketWrapper packetWrapper) throws Exception {
+					public void handle(PacketWrapper packetWrapper) throws Exception {
 						packetWrapper.write(Type.BOOLEAN, true);
 					}
 				});
@@ -336,9 +335,9 @@ public class EntityPackets {
 			public void registerMap() {
 				map(Type.INT);
 				map(Type.INT);
-				create(new ValueCreator() {
+				handler(new PacketHandler() {
 					@Override
-					public void write(PacketWrapper packetWrapper) throws Exception {
+					public void handle(PacketWrapper packetWrapper) throws Exception {
 						packetWrapper.write(Type.BOOLEAN, true);
 					}
 				});

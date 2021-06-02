@@ -10,7 +10,6 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
-import com.viaversion.viaversion.api.protocol.remapper.ValueCreator;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_8;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.CompoundTag;
@@ -504,9 +503,9 @@ public class PlayerPackets {
 						packetWrapper.read(Type.ITEM);
 					}
 				});
-				create(new ValueCreator() {
+				handler(new PacketHandler() {
 					@Override
-					public void write(PacketWrapper packetWrapper) throws Exception {
+					public void handle(PacketWrapper packetWrapper) throws Exception {
 						packetWrapper.write(Type.VAR_INT, 0);  //Main Hand
 					}
 				});
@@ -553,9 +552,9 @@ public class PlayerPackets {
 		protocol.registerServerbound(State.PLAY, 0x1A, 0x0A, new PacketRemapper() {
 			@Override
 			public void registerMap() {
-				create(new ValueCreator() {
+				handler(new PacketHandler() {
 					@Override
-					public void write(PacketWrapper packetWrapper) throws Exception {
+					public void handle(PacketWrapper packetWrapper) throws Exception {
 						packetWrapper.cancel();
 						final PacketWrapper delayedPacket = PacketWrapper.create(0x1A, null, packetWrapper.user());
 						delayedPacket.write(Type.VAR_INT, 0);  //Main Hand
@@ -659,9 +658,9 @@ public class PlayerPackets {
 			@Override
 			public void registerMap() {
 				map(Type.STRING);
-				create(new ValueCreator() {
+				handler(new PacketHandler() {
 					@Override
-					public void write(PacketWrapper packetWrapper) throws Exception {
+					public void handle(PacketWrapper packetWrapper) throws Exception {
 						packetWrapper.write(Type.BOOLEAN, false);
 					}
 				});
@@ -678,9 +677,9 @@ public class PlayerPackets {
 				map(Type.BYTE, Type.VAR_INT);
 				map(Type.BOOLEAN);
 				map(Type.UNSIGNED_BYTE);
-				create(new ValueCreator() {
+				handler(new PacketHandler() {
 					@Override
-					public void write(PacketWrapper packetWrapper) throws Exception {
+					public void handle(PacketWrapper packetWrapper) throws Exception {
 						packetWrapper.write(Type.VAR_INT, 1);
 					}
 				});

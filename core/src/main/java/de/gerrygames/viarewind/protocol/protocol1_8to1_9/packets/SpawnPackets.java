@@ -241,7 +241,7 @@ public class SpawnPackets {
 				map(Type.DOUBLE, Protocol1_8TO1_9.TO_OLD_INT);
 				map(Type.BYTE);
 				map(Type.BYTE);
-				create(packetWrapper -> packetWrapper.write(Type.SHORT, (short) 0));
+				handler(packetWrapper -> packetWrapper.write(Type.SHORT, (short) 0));
 				map(Types1_9.METADATA_LIST, Types1_8.METADATA_LIST);
 				this.handler(wrapper -> {
 					List<Metadata> metadataList = wrapper.get(Types1_8.METADATA_LIST, 0);

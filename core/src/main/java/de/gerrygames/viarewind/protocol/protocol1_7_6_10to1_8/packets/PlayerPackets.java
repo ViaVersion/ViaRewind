@@ -9,7 +9,6 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
-import com.viaversion.viaversion.api.protocol.remapper.ValueCreator;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.CustomByteType;
 import com.viaversion.viaversion.libs.gson.JsonParser;
@@ -211,9 +210,9 @@ public class PlayerPackets {
 						}
 					}
 				});
-				create(new ValueCreator() {
+				handler(new PacketHandler() {
 					@Override
-					public void write(PacketWrapper packetWrapper) throws Exception {
+					public void handle(PacketWrapper packetWrapper) throws Exception {
 						PlayerPosition playerPosition = packetWrapper.user().get(PlayerPosition.class);
 						packetWrapper.write(Type.BOOLEAN, playerPosition.isOnGround());
 					}
@@ -949,9 +948,9 @@ public class PlayerPackets {
 			@Override
 			public void registerMap() {
 				map(Type.STRING);
-				create(new ValueCreator() {
+				handler(new PacketHandler() {
 					@Override
-					public void write(PacketWrapper packetWrapper) throws Exception {
+					public void handle(PacketWrapper packetWrapper) throws Exception {
 						packetWrapper.write(Type.OPTIONAL_POSITION, null);
 					}
 				});
