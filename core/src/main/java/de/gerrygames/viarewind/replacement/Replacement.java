@@ -46,7 +46,7 @@ public class Replacement {
 		item.setIdentifier(id);
 		if (data!=-1) item.setData((short)data);
 		if (name!=null) {
-			CompoundTag compoundTag = item.getTag()==null ? new CompoundTag() : item.getTag();
+			CompoundTag compoundTag = item.tag()==null ? new CompoundTag() : item.tag();
 			if (!compoundTag.contains("display")) compoundTag.put("display", new CompoundTag());
 			CompoundTag display = compoundTag.get("display");
 			if (display.contains("Name")) {

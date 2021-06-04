@@ -84,14 +84,14 @@ public class ItemRewriter {
 	public static Item toClient(Item item) {
 		if (item==null) return null;
 
-		CompoundTag tag = item.getTag();
+		CompoundTag tag = item.tag();
 		if (tag==null) item.setTag(tag = new CompoundTag());
 
 		CompoundTag viaVersionTag = new CompoundTag();
 		tag.put("ViaRewind1_8to1_9", viaVersionTag);
 
-		viaVersionTag.put("id", new ShortTag((short) item.getIdentifier()));
-		viaVersionTag.put("data", new ShortTag(item.getData()));
+		viaVersionTag.put("id", new ShortTag((short) item.identifier()));
+		viaVersionTag.put("data", new ShortTag(item.data()));
 
 		CompoundTag display = tag.get("display");
 		if (display!=null && display.contains("Name")) {
@@ -132,7 +132,7 @@ public class ItemRewriter {
 			}
 		}
 
-		if (item.getData()!=0 && tag.contains("Unbreakable")) {
+		if (item.data()!=0 && tag.contains("Unbreakable")) {
 			ByteTag unbreakable = tag.get("Unbreakable");
 			if (unbreakable.asByte()!=0) {
 				viaVersionTag.put("Unbreakable", new ByteTag(unbreakable.asByte()));
@@ -152,7 +152,7 @@ public class ItemRewriter {
 			viaVersionTag.put("AttributeModifiers", tag.get("AttributeModifiers").clone());
 		}
 
-		if (item.getIdentifier()==383 && item.getData()==0) {
+		if (item.identifier()==383 && item.data()==0) {
 			int data = 0;
 			if (tag.contains("EntityTag")) {
 				CompoundTag entityTag = tag.get("EntityTag");
@@ -173,7 +173,7 @@ public class ItemRewriter {
 
 		ReplacementRegistry1_8to1_9.replace(item);
 
-		if (item.getIdentifier()==373 || item.getIdentifier()==438 || item.getIdentifier()==441) {
+		if (item.identifier()==373 || item.identifier()==438 || item.identifier()==441) {
 			int data = 0;
 			if (tag.contains("Potion")) {
 				StringTag potion = tag.get("Potion");
@@ -181,8 +181,8 @@ public class ItemRewriter {
 				if (POTION_NAME_TO_ID.containsKey(potionName)) {
 					data = POTION_NAME_TO_ID.get(potionName);
 				}
-				if (item.getIdentifier()==438) potionName += "_splash";
-				else if (item.getIdentifier()==441) potionName += "_lingering";
+				if (item.identifier()==438) potionName += "_splash";
+				else if (item.identifier()==441) potionName += "_lingering";
 				if ((display==null || !display.contains("Name")) && POTION_NAME_INDEX.containsKey(potionName)) {
 					if (display==null) {
 						tag.put("display", display = new CompoundTag());
@@ -192,7 +192,7 @@ public class ItemRewriter {
 				}
 			}
 
-			if (item.getIdentifier()==438 || item.getIdentifier()==441) {
+			if (item.identifier()==438 || item.identifier()==441) {
 				item.setIdentifier(373);
 				data += 8192;
 			}
@@ -212,9 +212,9 @@ public class ItemRewriter {
 			}
 		}
 
-		if (viaVersionTag.size()==2 && (short)viaVersionTag.get("id").getValue()==item.getIdentifier() && (short)viaVersionTag.get("data").getValue()==item.getData()) {
-			item.getTag().remove("ViaRewind1_8to1_9");
-			if (item.getTag().isEmpty()) item.setTag(null);
+		if (viaVersionTag.size()==2 && (short)viaVersionTag.get("id").getValue()==item.identifier() && (short)viaVersionTag.get("data").getValue()==item.data()) {
+			item.tag().remove("ViaRewind1_8to1_9");
+			if (item.tag().isEmpty()) item.setTag(null);
 		}
 
 		return item;
@@ -223,33 +223,33 @@ public class ItemRewriter {
 	public static Item toServer(Item item) {
 		if (item==null) return null;
 
-		CompoundTag tag = item.getTag();
+		CompoundTag tag = item.tag();
 
-		if (item.getIdentifier() == 383 && item.getData() != 0) {
+		if (item.identifier() == 383 && item.data() != 0) {
 			if (tag == null) item.setTag(tag = new CompoundTag());
-			if (!tag.contains("EntityTag") && ENTTIY_ID_TO_NAME.containsKey((int) item.getData())) {
+			if (!tag.contains("EntityTag") && ENTTIY_ID_TO_NAME.containsKey((int) item.data())) {
 				CompoundTag entityTag = new CompoundTag();
-				entityTag.put("id", new StringTag(ENTTIY_ID_TO_NAME.get((int) item.getData())));
+				entityTag.put("id", new StringTag(ENTTIY_ID_TO_NAME.get((int) item.data())));
 				tag.put("EntityTag", entityTag);
 			}
 
 			item.setData((short) 0);
 		}
 
-		if (item.getIdentifier() == 373 && (tag==null || !tag.contains("Potion"))) {
+		if (item.identifier() == 373 && (tag==null || !tag.contains("Potion"))) {
 			if (tag == null) item.setTag(tag = new CompoundTag());
 
-			if (item.getData() >= 16384) {
+			if (item.data() >= 16384) {
 				item.setIdentifier(438);
-				item.setData((short) (item.getData() - 8192));
+				item.setData((short) (item.data() - 8192));
 			}
 
-			String name = item.getData() == 8192 ? "water" : potionNameFromDamage(item.getData());
+			String name = item.data() == 8192 ? "water" : potionNameFromDamage(item.data());
 			tag.put("Potion", new StringTag("minecraft:" + name));
 			item.setData((short) 0);
 		}
 		
-		 if (tag==null || !item.getTag().contains("ViaRewind1_8to1_9")) return item;
+		 if (tag==null || !item.tag().contains("ViaRewind1_8to1_9")) return item;
 
 		CompoundTag viaVersionTag = tag.remove("ViaRewind1_8to1_9");
 

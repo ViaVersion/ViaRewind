@@ -13,14 +13,14 @@ public class ItemRewriter {
 	public static Item toClient(Item item) {
 		if (item==null) return null;
 
-		CompoundTag tag = item.getTag();
+		CompoundTag tag = item.tag();
 		if (tag==null) item.setTag(tag = new CompoundTag());
 
 		CompoundTag viaVersionTag = new CompoundTag();
 		tag.put("ViaRewind1_7_6_10to1_8", viaVersionTag);
 
-		viaVersionTag.put("id", new ShortTag((short) item.getIdentifier()));
-		viaVersionTag.put("data", new ShortTag(item.getData()));
+		viaVersionTag.put("id", new ShortTag((short) item.identifier()));
+		viaVersionTag.put("data", new ShortTag(item.data()));
 
 		CompoundTag display = tag.get("display");
 		if (display!=null && display.contains("Name")) {
@@ -59,7 +59,7 @@ public class ItemRewriter {
 			}
 		}
 
-		if (item.getIdentifier()==387 && tag.contains("pages")) {
+		if (item.identifier()==387 && tag.contains("pages")) {
 			ListTag pages = tag.get("pages");
 			ListTag oldPages = new ListTag(StringTag.class);
 			viaVersionTag.put("pages", oldPages);
@@ -75,9 +75,9 @@ public class ItemRewriter {
 
 		ReplacementRegistry1_7_6_10to1_8.replace(item);
 
-		if (viaVersionTag.size()==2 && (short)viaVersionTag.get("id").getValue()==item.getIdentifier() && (short)viaVersionTag.get("data").getValue()==item.getData()) {
-			item.getTag().remove("ViaRewind1_7_6_10to1_8");
-			if (item.getTag().isEmpty()) item.setTag(null);
+		if (viaVersionTag.size()==2 && (short)viaVersionTag.get("id").getValue()==item.identifier() && (short)viaVersionTag.get("data").getValue()==item.data()) {
+			item.tag().remove("ViaRewind1_7_6_10to1_8");
+			if (item.tag().isEmpty()) item.setTag(null);
 		}
 
 		return item;
@@ -86,9 +86,9 @@ public class ItemRewriter {
 	public static Item toServer(Item item) {
 		if (item==null) return null;
 
-		CompoundTag tag = item.getTag();
+		CompoundTag tag = item.tag();
 
-		if (tag==null || !item.getTag().contains("ViaRewind1_7_6_10to1_8")) return item;
+		if (tag==null || !item.tag().contains("ViaRewind1_7_6_10to1_8")) return item;
 
 		CompoundTag viaVersionTag = tag.remove("ViaRewind1_7_6_10to1_8");
 
@@ -107,7 +107,7 @@ public class ItemRewriter {
 			((CompoundTag)tag.get("display")).remove("Name");
 		}
 
-		if (item.getIdentifier()==387) {
+		if (item.identifier()==387) {
 			ListTag oldPages = viaVersionTag.get("pages");
 			tag.remove("pages");
 			tag.put("pages", oldPages);

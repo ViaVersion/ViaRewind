@@ -2,6 +2,7 @@ package de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage;
 
 import com.viaversion.viaversion.api.connection.StoredObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.CompoundTag;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.ListTag;
@@ -105,7 +106,7 @@ public class GameProfileStorage extends StoredObject {
 				}
 			}
 
-			return new Item((short) 397, (byte) 1, (short) 3, tag);
+			return new DataItem(397, (byte) 1, (short) 3, tag);
 		}
 
 		public String getDisplayName() {

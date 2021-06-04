@@ -2,6 +2,7 @@ package de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage;
 
 import com.viaversion.viaversion.api.connection.StoredObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
@@ -33,16 +34,16 @@ public class Windows extends StoredObject {
 
 	public Item[] getBrewingItems(short windowId) {
 		return brewingItems.computeIfAbsent(windowId, key -> new Item[] {
-				new Item(),
-				new Item(),
-				new Item(),
-				new Item()
+				new DataItem(),
+				new DataItem(),
+				new DataItem(),
+				new DataItem()
 		});
 	}
 
 	public static void updateBrewingStand(UserConnection user, Item blazePowder, short windowId) {
-		if (blazePowder != null && blazePowder.getIdentifier() != 377) return;
-		int amount = blazePowder == null ? 0 : blazePowder.getAmount();
+		if (blazePowder != null && blazePowder.identifier() != 377) return;
+		int amount = blazePowder == null ? 0 : blazePowder.amount();
 		PacketWrapper openWindow = PacketWrapper.create(0x2D, null, user);
 		openWindow.write(Type.UNSIGNED_BYTE, windowId);
 		openWindow.write(Type.STRING, "minecraft:brewing_stand");

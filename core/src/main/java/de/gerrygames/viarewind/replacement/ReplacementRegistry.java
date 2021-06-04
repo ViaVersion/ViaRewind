@@ -35,8 +35,8 @@ public class ReplacementRegistry {
 	}
 
 	public Item replace(Item item) {
-		Replacement replacement = itemReplacements.get(combine(item.getIdentifier(), item.getData()));
-		if (replacement==null) replacement = itemReplacements.get(combine(item.getIdentifier(), -1));
+		Replacement replacement = itemReplacements.get(combine(item.identifier(), item.data()));
+		if (replacement==null) replacement = itemReplacements.get(combine(item.identifier(), -1));
 		return replacement==null ? item : replacement.replace(item);
 	}
 

@@ -717,7 +717,7 @@ public class PlayerPackets {
 						if (channel.equalsIgnoreCase("MC|BEdit") || channel.equalsIgnoreCase("MC|BSign")) {
 							Item book = packetWrapper.passthrough(Type.ITEM);
 							book.setIdentifier(386);
-							CompoundTag tag = book.getTag();
+							CompoundTag tag = book.tag();
 							if (tag.contains("pages")) {
 								ListTag pages = tag.get("pages");
 								for (int i = 0; i < pages.size(); i++) {

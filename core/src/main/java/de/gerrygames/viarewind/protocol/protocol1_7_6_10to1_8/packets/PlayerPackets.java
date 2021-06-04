@@ -1030,7 +1030,7 @@ public class PlayerPackets {
 							PacketUtil.sendPacket(updateCost, Protocol1_7_6_10TO1_8.class, true, true);
 						} else if (channel.equalsIgnoreCase("MC|BEdit") || channel.equalsIgnoreCase("MC|BSign")) {
 							Item book = packetWrapper.read(Types1_7_6_10.COMPRESSED_NBT_ITEM);
-							CompoundTag tag = book.getTag();
+							CompoundTag tag = book.tag();
 							if (tag != null && tag.contains("pages")) {
 								ListTag pages = tag.get("pages");
 								for (int i = 0; i < pages.size(); i++) {
