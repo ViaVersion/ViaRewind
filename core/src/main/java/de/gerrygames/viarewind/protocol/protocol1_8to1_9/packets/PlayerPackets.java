@@ -38,7 +38,7 @@ public class PlayerPackets {
 		//Statistics
 
 		//Boss Bar
-		protocol.registerClientbound(ClientboundPackets1_9.BOSSBAR, new PacketRemapper() {
+		protocol.registerClientbound(ClientboundPackets1_9.BOSSBAR, null, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				handler(packetWrapper -> {

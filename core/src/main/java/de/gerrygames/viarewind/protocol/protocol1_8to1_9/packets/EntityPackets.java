@@ -180,7 +180,7 @@ public class EntityPackets {
 		//Entity
 
 		//Vehicle Move -> Entity Teleport
-		protocol.registerClientbound(ClientboundPackets1_9.VEHICLE_MOVE, new PacketRemapper() {
+		protocol.registerClientbound(ClientboundPackets1_9.VEHICLE_MOVE, ClientboundPackets1_8.ENTITY_TELEPORT, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				handler(packetWrapper -> {
