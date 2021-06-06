@@ -324,7 +324,7 @@ public class EntityPackets {
 		});
 
 		//Set Passengers
-		protocol.registerClientbound(ClientboundPackets1_9.SET_PASSENGERS, new PacketRemapper() {
+		protocol.registerClientbound(ClientboundPackets1_9.SET_PASSENGERS, null, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				handler(packetWrapper -> {
