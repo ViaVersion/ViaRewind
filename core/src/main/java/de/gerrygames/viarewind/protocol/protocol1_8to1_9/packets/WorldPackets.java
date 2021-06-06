@@ -150,7 +150,7 @@ public class WorldPackets {
 		});
 
 		//Unload Chunk
-		protocol.registerClientbound(ClientboundPackets1_9.UNLOAD_CHUNK, new PacketRemapper() {
+		protocol.registerClientbound(ClientboundPackets1_9.UNLOAD_CHUNK, ClientboundPackets1_8.CHUNK_DATA, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				handler(packetWrapper -> {
@@ -298,7 +298,7 @@ public class WorldPackets {
 		//Update Sign
 
 		//Sound Effects
-		protocol.registerClientbound(ClientboundPackets1_9.SOUND, new PacketRemapper() {
+		protocol.registerClientbound(ClientboundPackets1_9.SOUND, ClientboundPackets1_8.NAMED_SOUND, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				handler(packetWrapper -> {
