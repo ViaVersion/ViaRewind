@@ -44,7 +44,7 @@ public class Protocol1_8TO1_9 extends AbstractProtocol<ClientboundPackets1_9, Cl
 		VALID_ATTRIBUTES.add("zombie.spawnReinforcements");
 	}
 
-	protected Protocol1_8TO1_9() {
+	public Protocol1_8TO1_9() {
 		super(ClientboundPackets1_9.class, ClientboundPackets1_8.class, ServerboundPackets1_9.class, ServerboundPackets1_8.class);
 	}
 
