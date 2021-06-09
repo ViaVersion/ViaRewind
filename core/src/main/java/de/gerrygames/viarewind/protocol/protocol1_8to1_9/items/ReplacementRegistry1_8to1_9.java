@@ -57,7 +57,7 @@ public class ReplacementRegistry1_8to1_9 {
 		registry.registerItemBlock(203, 8, new Replacement(156, 8, "Purpur Stairs"));
 		registry.registerItemBlock(206, new Replacement(121, 0, "Endstone Bricks"));
 		registry.registerItemBlock(207, new Replacement(141, "Beetroot Block"));
-		registry.registerItemBlock(208, new Replacement(2, "Grass Path"));
+		registry.registerItemBlock(208, new Replacement(2, 0, "Grass Path"));
 		registry.registerItemBlock(209, new Replacement(90, "End Gateway"));
 		registry.registerItemBlock(210, new Replacement(137, 0, "Repeating Command Block"));
 		registry.registerItemBlock(211, new Replacement(137, 0, "Chain Command Block"));
