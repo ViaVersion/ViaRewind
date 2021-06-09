@@ -62,6 +62,6 @@ public class Replacement {
 	}
 
 	public int replaceData(int data) {
-		return data == -1 ? data : this.data;
+		return this.data == -1 ? data : this.data;
 	}
 }
