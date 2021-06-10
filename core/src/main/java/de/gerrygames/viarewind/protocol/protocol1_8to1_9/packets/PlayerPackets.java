@@ -360,9 +360,9 @@ public class PlayerPackets {
 						pos.setYaw(yaw);
 						pos.setPitch(pitch);
 						pos.setOnGround(onGround);
+                        packetWrapper.user().get(BossBarStorage.class).updateLocation();
 					}
 				});
-				handler(packetWrapper -> packetWrapper.user().get(BossBarStorage.class).updateLocation());
 			}
 		});
 
