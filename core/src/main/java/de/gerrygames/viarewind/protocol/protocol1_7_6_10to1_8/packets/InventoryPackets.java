@@ -74,9 +74,9 @@ public class InventoryPackets {
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
-						short windowId = packetWrapper.read(Type.BYTE);  //Window Id
+						short windowId = packetWrapper.read(Type.UNSIGNED_BYTE);  //Window Id
 						short windowType = packetWrapper.user().get(Windows.class).get(windowId);
-						packetWrapper.write(Type.BYTE, (byte) windowId);
+						packetWrapper.write(Type.UNSIGNED_BYTE, (short) windowId);
 						short slot = packetWrapper.read(Type.SHORT);
 						if (windowType == 4) {
 							if (slot == 1) {
@@ -101,7 +101,7 @@ public class InventoryPackets {
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
-						short windowId = packetWrapper.get(Type.BYTE, 0);
+						short windowId = packetWrapper.get(Type.UNSIGNED_BYTE, 0);
 						if (windowId != 0) return;
 						short slot = packetWrapper.get(Type.SHORT, 0);
 						if (slot < 5 || slot > 8) return;
