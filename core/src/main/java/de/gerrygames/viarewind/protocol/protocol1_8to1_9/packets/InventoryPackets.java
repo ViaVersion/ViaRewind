@@ -99,12 +99,12 @@ public class InventoryPackets {
 		protocol.registerClientbound(ClientboundPackets1_9.SET_SLOT, new PacketRemapper() {
 			@Override
 			public void registerMap() {
-				map(Type.BYTE);
+				map(Type.UNSIGNED_BYTE);
 				map(Type.SHORT);
 				map(Type.ITEM);
 				handler(packetWrapper -> {
 					packetWrapper.set(Type.ITEM, 0, ItemRewriter.toClient(packetWrapper.get(Type.ITEM, 0)));
-					byte windowId = packetWrapper.get(Type.BYTE, 0);
+					byte windowId = packetWrapper.get(Type.UNSIGNED_BYTE, 0).byteValue();
 					short slot = packetWrapper.get(Type.SHORT, 0);
 					if (windowId == 0 && slot == 45) {
 						packetWrapper.cancel();
