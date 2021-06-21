@@ -3,7 +3,7 @@
   "id": "viarewind",
   "name": "ViaRewind",
   "version": "${project.version}",
-  "license": "MIT",
+  "license": "GPL-3.0",
   "contact": {
     "homepage": "https://viaversion.com/rewind",
     "issues": "https://github.com/ViaVersion/ViaRewind/issues",
@@ -19,7 +19,7 @@
     ]
   },
   "depends": {
-    "fabricloader": ">=0.4.0",
+    "fabricloader": ">=0.10.0",
     "viafabric": "*"
   },
   "recommends": {

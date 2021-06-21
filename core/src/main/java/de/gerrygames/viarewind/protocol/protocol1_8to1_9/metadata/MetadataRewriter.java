@@ -1,15 +1,15 @@
 package de.gerrygames.viarewind.protocol.protocol1_8to1_9.metadata;
 
+import com.viaversion.viaversion.api.minecraft.EulerAngle;
+import com.viaversion.viaversion.api.minecraft.Vector;
+import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
+import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
+import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_8;
+import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_9;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.metadata.MetaIndex;
 import de.gerrygames.viarewind.ViaRewind;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.items.ItemRewriter;
-import us.myles.ViaVersion.api.entities.Entity1_10Types;
-import us.myles.ViaVersion.api.minecraft.EulerAngle;
-import us.myles.ViaVersion.api.minecraft.Vector;
-import us.myles.ViaVersion.api.minecraft.item.Item;
-import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
-import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_8;
-import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_9;
-import us.myles.ViaVersion.protocols.protocol1_9to1_8.metadata.MetaIndex;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,15 +18,15 @@ import java.util.UUID;
 public class MetadataRewriter {
 	public static void transform(Entity1_10Types.EntityType type, List<Metadata> list) {
 		for (Metadata entry : new ArrayList<>(list)) {
-			MetaIndex metaIndex = MetaIndex1_8to1_9.searchIndex(type, entry.getId());
+			MetaIndex metaIndex = MetaIndex1_8to1_9.searchIndex(type, entry.id());
 			try {
 				if (metaIndex != null) {
-					if (metaIndex.getOldType() == MetaType1_8.NonExistent || metaIndex.getNewType()==MetaType1_9.Discontinued) {
+					if (metaIndex.getOldType() == MetaType1_8.NonExistent || metaIndex.getNewType()==null) {
 						list.remove(entry);
 						continue;
 					}
 					Object value = entry.getValue();
-					entry.setMetaType(metaIndex.getOldType());
+					entry.setMetaTypeUnsafe(metaIndex.getOldType());
 					entry.setId(metaIndex.getIndex());
 					switch (metaIndex.getNewType()) {
 						case Byte:
@@ -91,7 +91,7 @@ public class MetadataRewriter {
 							break;
 					}
 
-					if (!metaIndex.getOldType().getType().getOutputClass().isAssignableFrom(entry.getValue().getClass())) {
+					if (!metaIndex.getOldType().type().getOutputClass().isAssignableFrom(entry.getValue().getClass())) {
 						list.remove(entry);
 					}
 

@@ -1,5 +1,17 @@
 package de.gerrygames.viarewind.protocol.protocol1_8to1_9.packets;
 
+import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
+import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
+import com.viaversion.viaversion.api.protocol.Protocol;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.types.version.Types1_8;
+import com.viaversion.viaversion.api.type.types.version.Types1_9;
+import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
+import com.viaversion.viaversion.protocols.protocol1_8.ServerboundPackets1_8;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.ClientboundPackets1_9;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.ServerboundPackets1_9;
 import de.gerrygames.viarewind.ViaRewind;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.Protocol1_8TO1_9;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.entityreplacement.ShulkerBulletReplacement;
@@ -10,29 +22,21 @@ import de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage.EntityTracker;
 import de.gerrygames.viarewind.replacement.EntityReplacement;
 import de.gerrygames.viarewind.replacement.Replacement;
 import de.gerrygames.viarewind.utils.PacketUtil;
-import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.entities.Entity1_10Types;
-import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
-import us.myles.ViaVersion.api.protocol.Protocol;
-import us.myles.ViaVersion.api.remapper.PacketRemapper;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.api.type.types.version.Types1_8;
-import us.myles.ViaVersion.api.type.types.version.Types1_9;
-import us.myles.ViaVersion.packets.State;
 
 import java.util.List;
 
 public class SpawnPackets {
 
-	public static void register(Protocol protocol) {
+	public static void register(Protocol<ClientboundPackets1_9, ClientboundPackets1_8,
+			ServerboundPackets1_9, ServerboundPackets1_8> protocol) {
 		/*  OUTGOING  */
 
 		//Spawn Object
-		protocol.registerOutgoing(State.PLAY, 0x00, 0x0E, new PacketRemapper() {
+		protocol.registerClientbound(ClientboundPackets1_9.SPAWN_ENTITY, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT);
-				handler(packetWrapper -> packetWrapper.read(Type.UUID));
+				map(Type.UUID, Type.NOTHING);
 				map(Type.BYTE);
 				map(Type.DOUBLE, Protocol1_8TO1_9.TO_OLD_INT);
 				map(Type.DOUBLE, Protocol1_8TO1_9.TO_OLD_INT);
@@ -100,7 +104,7 @@ public class SpawnPackets {
 						short vX = packetWrapper.read(Type.SHORT);
 						short vY = packetWrapper.read(Type.SHORT);
 						short vZ = packetWrapper.read(Type.SHORT);
-						PacketWrapper velocityPacket = new PacketWrapper(0x12, null, packetWrapper.user());
+						PacketWrapper velocityPacket = PacketWrapper.create(0x12, null, packetWrapper.user());
 						velocityPacket.write(Type.VAR_INT, entityId);
 						velocityPacket.write(Type.SHORT, vX);
 						velocityPacket.write(Type.SHORT, vY);
@@ -115,7 +119,7 @@ public class SpawnPackets {
 		});
 
 		//Spawn Experience Orb
-		protocol.registerOutgoing(State.PLAY, 0x01, 0x11, new PacketRemapper() {
+		protocol.registerClientbound(ClientboundPackets1_9.SPAWN_EXPERIENCE_ORB, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT);
@@ -133,7 +137,7 @@ public class SpawnPackets {
 		});
 
 		//Spawn Global Entity
-		protocol.registerOutgoing(State.PLAY, 0x02, 0x2C, new PacketRemapper() {
+		protocol.registerClientbound(ClientboundPackets1_9.SPAWN_GLOBAL_ENTITY, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT);
@@ -151,11 +155,11 @@ public class SpawnPackets {
 		});
 
 		//Spawn Mob
-		protocol.registerOutgoing(State.PLAY, 0x03, 0x0F, new PacketRemapper() {
+		protocol.registerClientbound(ClientboundPackets1_9.SPAWN_MOB, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT);
-				handler(packetWrapper -> packetWrapper.read(Type.UUID));
+				map(Type.UUID, Type.NOTHING);
 				map(Type.UNSIGNED_BYTE);
 				map(Type.DOUBLE, Protocol1_8TO1_9.TO_OLD_INT);
 				map(Type.DOUBLE, Protocol1_8TO1_9.TO_OLD_INT);
@@ -213,11 +217,11 @@ public class SpawnPackets {
 		});
 
 		//Spawn Painting
-		protocol.registerOutgoing(State.PLAY, 0x04, 0x10, new PacketRemapper() {
+		protocol.registerClientbound(ClientboundPackets1_9.SPAWN_PAINTING, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT);
-				handler(packetWrapper -> packetWrapper.read(Type.UUID));
+				map(Type.UUID, Type.NOTHING);
 				map(Type.STRING);
 				map(Type.POSITION);
 				map(Type.BYTE, Type.UNSIGNED_BYTE);
@@ -231,7 +235,7 @@ public class SpawnPackets {
 		});
 
 		//Spawn Player
-		protocol.registerOutgoing(State.PLAY, 0x05, 0x0C, new PacketRemapper() {
+		protocol.registerClientbound(ClientboundPackets1_9.SPAWN_PLAYER, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT);
@@ -241,7 +245,7 @@ public class SpawnPackets {
 				map(Type.DOUBLE, Protocol1_8TO1_9.TO_OLD_INT);
 				map(Type.BYTE);
 				map(Type.BYTE);
-				create(packetWrapper -> packetWrapper.write(Type.SHORT, (short) 0));
+				handler(packetWrapper -> packetWrapper.write(Type.SHORT, (short) 0));
 				map(Types1_9.METADATA_LIST, Types1_8.METADATA_LIST);
 				this.handler(wrapper -> {
 					List<Metadata> metadataList = wrapper.get(Types1_8.METADATA_LIST, 0);

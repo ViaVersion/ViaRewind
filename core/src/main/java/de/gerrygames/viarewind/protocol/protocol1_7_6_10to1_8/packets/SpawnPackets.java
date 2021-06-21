@@ -1,5 +1,15 @@
 package de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.packets;
 
+import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
+import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
+import com.viaversion.viaversion.api.protocol.Protocol;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.protocol.packet.State;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
+import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.types.version.Types1_8;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10TO1_8;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.entityreplacements.ArmorStandReplacement;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.entityreplacements.EndermiteReplacement;
@@ -10,18 +20,7 @@ import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage.EntityTrac
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage.GameProfileStorage;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
 import de.gerrygames.viarewind.replacement.Replacement;
-import de.gerrygames.viarewind.storage.BlockState;
 import de.gerrygames.viarewind.utils.PacketUtil;
-import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.entities.Entity1_10Types;
-import us.myles.ViaVersion.api.minecraft.Position;
-import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
-import us.myles.ViaVersion.api.protocol.Protocol;
-import us.myles.ViaVersion.api.remapper.PacketHandler;
-import us.myles.ViaVersion.api.remapper.PacketRemapper;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.api.type.types.version.Types1_8;
-import us.myles.ViaVersion.packets.State;
 
 import java.util.List;
 import java.util.UUID;
@@ -33,7 +32,7 @@ public class SpawnPackets {
 		/*  OUTGOING  */
 
 		//Spawn Player
-		protocol.registerOutgoing(State.PLAY, 0x0C, 0x0C, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x0C, 0x0C, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT);
@@ -62,7 +61,7 @@ public class SpawnPackets {
 						if (gameProfile != null && gameProfile.gamemode == 3) {
 							int entityId = packetWrapper.get(Type.VAR_INT, 0);
 
-							PacketWrapper equipmentPacket = new PacketWrapper(0x04, null, packetWrapper.user());
+							PacketWrapper equipmentPacket = PacketWrapper.create(0x04, null, packetWrapper.user());
 							equipmentPacket.write(Type.INT, entityId);
 							equipmentPacket.write(Type.SHORT, (short) 4);
 							equipmentPacket.write(Types1_7_6_10.COMPRESSED_NBT_ITEM, gameProfile.getSkull());
@@ -70,7 +69,7 @@ public class SpawnPackets {
 							PacketUtil.sendPacket(equipmentPacket, Protocol1_7_6_10TO1_8.class);
 
 							for (short i = 0; i < 4; i++) {
-								equipmentPacket = new PacketWrapper(0x04, null, packetWrapper.user());
+								equipmentPacket = PacketWrapper.create(0x04, null, packetWrapper.user());
 								equipmentPacket.write(Type.INT, entityId);
 								equipmentPacket.write(Type.SHORT, i);
 								equipmentPacket.write(Types1_7_6_10.COMPRESSED_NBT_ITEM, null);
@@ -109,7 +108,7 @@ public class SpawnPackets {
 		});
 
 		//Spawn Object
-		protocol.registerOutgoing(State.PLAY, 0x0E, 0x0E, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x0E, 0x0E, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT);
@@ -199,7 +198,7 @@ public class SpawnPackets {
 		});
 
 		//Spawn Mob
-		protocol.registerOutgoing(State.PLAY, 0x0F, 0x0F, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x0F, 0x0F, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT);
@@ -286,7 +285,7 @@ public class SpawnPackets {
 		});
 
 		//Spawn Painting
-		protocol.registerOutgoing(State.PLAY, 0x10, 0x10, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x10, 0x10, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT);  //Entity Id
@@ -314,7 +313,7 @@ public class SpawnPackets {
 		});
 
 		//Spawn Experience Orb
-		protocol.registerOutgoing(State.PLAY, 0x11, 0x11, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x11, 0x11, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT);
@@ -335,7 +334,7 @@ public class SpawnPackets {
 		});
 
 		//Spawn Global Entity
-		protocol.registerOutgoing(State.PLAY, 0x2C, 0x2C, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x2C, 0x2C, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT);

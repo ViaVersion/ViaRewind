@@ -1,6 +1,6 @@
 package de.gerrygames.viarewind.replacement;
 
-import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
+import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 
 import java.util.List;
 

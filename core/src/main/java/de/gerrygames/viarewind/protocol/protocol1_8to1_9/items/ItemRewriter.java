@@ -1,14 +1,9 @@
 package de.gerrygames.viarewind.protocol.protocol1_8to1_9.items;
 
+import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.libs.opennbt.tag.builtin.*;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.Protocol1_8TO1_9;
 import de.gerrygames.viarewind.utils.Enchantments;
-import us.myles.ViaVersion.api.minecraft.item.Item;
-import us.myles.viaversion.libs.opennbt.tag.builtin.ByteTag;
-import us.myles.viaversion.libs.opennbt.tag.builtin.CompoundTag;
-import us.myles.viaversion.libs.opennbt.tag.builtin.ListTag;
-import us.myles.viaversion.libs.opennbt.tag.builtin.ShortTag;
-import us.myles.viaversion.libs.opennbt.tag.builtin.StringTag;
-import us.myles.viaversion.libs.opennbt.tag.builtin.Tag;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -16,7 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static us.myles.ViaVersion.protocols.protocol1_9to1_8.ItemRewriter.potionNameFromDamage;
+import static com.viaversion.viaversion.protocols.protocol1_9to1_8.ItemRewriter.potionNameFromDamage;
 
 @SuppressWarnings({"MismatchedQueryAndUpdateOfCollection", "unused"})
 public class ItemRewriter {
@@ -29,7 +24,7 @@ public class ItemRewriter {
 	static {
 		for (Field field : de.gerrygames.viarewind.protocol.protocol1_8to1_9.items.ItemRewriter.class.getDeclaredFields()) {
 			try {
-				Field other = us.myles.ViaVersion.protocols.protocol1_9to1_8.ItemRewriter.class.getDeclaredField(field.getName());
+				Field other = com.viaversion.viaversion.protocols.protocol1_9to1_8.ItemRewriter.class.getDeclaredField(field.getName());
 				other.setAccessible(true);
 				field.setAccessible(true);
 				field.set(null, other.get(null));
@@ -89,31 +84,30 @@ public class ItemRewriter {
 	public static Item toClient(Item item) {
 		if (item==null) return null;
 
-		CompoundTag tag = item.getTag();
-		if (tag==null) item.setTag(tag = new CompoundTag(""));
+		CompoundTag tag = item.tag();
+		if (tag==null) item.setTag(tag = new CompoundTag());
 
-		CompoundTag viaVersionTag = new CompoundTag("ViaRewind1_8to1_9");
-		tag.put(viaVersionTag);
+		CompoundTag viaVersionTag = new CompoundTag();
+		tag.put("ViaRewind1_8to1_9", viaVersionTag);
 
-		viaVersionTag.put(new ShortTag("id", (short) item.getIdentifier()));
-		viaVersionTag.put(new ShortTag("data", item.getData()));
+		viaVersionTag.put("id", new ShortTag((short) item.identifier()));
+		viaVersionTag.put("data", new ShortTag(item.data()));
 
 		CompoundTag display = tag.get("display");
 		if (display!=null && display.contains("Name")) {
-			viaVersionTag.put(new StringTag("displayName", (String) display.get("Name").getValue()));
+			viaVersionTag.put("displayName", new StringTag((String) display.get("Name").getValue()));
 		}
 
 		if (display!=null && display.contains("Lore")) {
-			viaVersionTag.put(new ListTag("lore", ((ListTag)display.get("Lore")).getValue()));
+			viaVersionTag.put("lore", new ListTag(((ListTag)display.get("Lore")).getValue()));
 		}
 
 		if (tag.contains("ench") || tag.contains("StoredEnchantments")) {
 			ListTag enchTag = tag.contains("ench") ? tag.get("ench") : tag.get("StoredEnchantments");
-			List<Tag> enchants = enchTag.getValue();
 			List<Tag> lore = new ArrayList<>();
-			for (Tag ench : enchants) {
-				short id = (short) ((CompoundTag)ench).get("id").getValue();
-				short lvl = (short) ((CompoundTag)ench).get("lvl").getValue();
+			for (Tag ench : new ArrayList<>(enchTag.getValue())) {
+				short id = ((NumberTag) ((CompoundTag)ench).get("id")).asShort();
+				short lvl = ((NumberTag) ((CompoundTag)ench).get("lvl")).asShort();
 				String s;
 				if (id==70) {
 					s  = "§r§7Mending ";
@@ -124,41 +118,41 @@ public class ItemRewriter {
 				}
 				enchTag.remove(ench);
 				s += Enchantments.ENCHANTMENTS.getOrDefault(lvl, "enchantment.level." + lvl);
-				lore.add(new StringTag("", s));
+				lore.add(new StringTag(s));
 			}
 			if (!lore.isEmpty()) {
 				if (display==null) {
-					tag.put(display = new CompoundTag("display"));
-					viaVersionTag.put(new ByteTag("noDisplay"));
+					tag.put("display", display = new CompoundTag());
+					viaVersionTag.put("noDisplay", new ByteTag());
 				}
 				ListTag loreTag = display.get("Lore");
-				if (loreTag==null) display.put(loreTag = new ListTag("Lore", StringTag.class));
+				if (loreTag==null) display.put("Lore", loreTag = new ListTag(StringTag.class));
 				lore.addAll(loreTag.getValue());
 				loreTag.setValue(lore);
 			}
 		}
 
-		if (item.getData()!=0 && tag.contains("Unbreakable")) {
+		if (item.data()!=0 && tag.contains("Unbreakable")) {
 			ByteTag unbreakable = tag.get("Unbreakable");
-			if (unbreakable.getValue()!=0) {
-				viaVersionTag.put(new ByteTag("Unbreakable", unbreakable.getValue()));
+			if (unbreakable.asByte()!=0) {
+				viaVersionTag.put("Unbreakable", new ByteTag(unbreakable.asByte()));
 				tag.remove("Unbreakable");
 
 				if (display==null) {
-					tag.put(display = new CompoundTag("display"));
-					viaVersionTag.put(new ByteTag("noDisplay"));
+					tag.put("display", display = new CompoundTag());
+					viaVersionTag.put("noDisplay", new ByteTag());
 				}
 				ListTag loreTag = display.get("Lore");
-				if (loreTag==null) display.put(loreTag = new ListTag("Lore", StringTag.class));
-				loreTag.add(new StringTag("", "§9Unbreakable"));
+				if (loreTag==null) display.put("Lore", loreTag = new ListTag(StringTag.class));
+				loreTag.add(new StringTag("§9Unbreakable"));
 			}
 		}
 
 		if (tag.contains("AttributeModifiers")) {
-			viaVersionTag.put(tag.get("AttributeModifiers").clone());
+			viaVersionTag.put("AttributeModifiers", tag.get("AttributeModifiers").clone());
 		}
 
-		if (item.getIdentifier()==383 && item.getData()==0) {
+		if (item.identifier()==383 && item.data()==0) {
 			int data = 0;
 			if (tag.contains("EntityTag")) {
 				CompoundTag entityTag = tag.get("EntityTag");
@@ -167,9 +161,9 @@ public class ItemRewriter {
 					if (ENTTIY_NAME_TO_ID.containsKey(id.getValue())) {
 						data = ENTTIY_NAME_TO_ID.get(id.getValue());
 					} else if (display==null) {
-						tag.put(display = new CompoundTag("display"));
-						viaVersionTag.put(new ByteTag("noDisplay"));
-						display.put(new StringTag("Name", "§rSpawn " + id.getValue()));
+						tag.put("display", display = new CompoundTag());
+						viaVersionTag.put("noDisplay", new ByteTag());
+						display.put("Name", new StringTag("§rSpawn " + id.getValue()));
 					}
 				}
 			}
@@ -179,7 +173,7 @@ public class ItemRewriter {
 
 		ReplacementRegistry1_8to1_9.replace(item);
 
-		if (item.getIdentifier()==373 || item.getIdentifier()==438 || item.getIdentifier()==441) {
+		if (item.identifier()==373 || item.identifier()==438 || item.identifier()==441) {
 			int data = 0;
 			if (tag.contains("Potion")) {
 				StringTag potion = tag.get("Potion");
@@ -187,18 +181,18 @@ public class ItemRewriter {
 				if (POTION_NAME_TO_ID.containsKey(potionName)) {
 					data = POTION_NAME_TO_ID.get(potionName);
 				}
-				if (item.getIdentifier()==438) potionName += "_splash";
-				else if (item.getIdentifier()==441) potionName += "_lingering";
+				if (item.identifier()==438) potionName += "_splash";
+				else if (item.identifier()==441) potionName += "_lingering";
 				if ((display==null || !display.contains("Name")) && POTION_NAME_INDEX.containsKey(potionName)) {
 					if (display==null) {
-						tag.put(display = new CompoundTag("display"));
-						viaVersionTag.put(new ByteTag("noDisplay"));
+						tag.put("display", display = new CompoundTag());
+						viaVersionTag.put("noDisplay", new ByteTag());
 					}
-					display.put(new StringTag("Name", POTION_NAME_INDEX.get(potionName)));
+					display.put("Name", new StringTag(POTION_NAME_INDEX.get(potionName)));
 				}
 			}
 
-			if (item.getIdentifier()==438 || item.getIdentifier()==441) {
+			if (item.identifier()==438 || item.identifier()==441) {
 				item.setIdentifier(373);
 				data += 8192;
 			}
@@ -218,9 +212,9 @@ public class ItemRewriter {
 			}
 		}
 
-		if (viaVersionTag.size()==2 && (short)viaVersionTag.get("id").getValue()==item.getIdentifier() && (short)viaVersionTag.get("data").getValue()==item.getData()) {
-			item.getTag().remove("ViaRewind1_8to1_9");
-			if (item.getTag().isEmpty()) item.setTag(null);
+		if (viaVersionTag.size()==2 && (short)viaVersionTag.get("id").getValue()==item.identifier() && (short)viaVersionTag.get("data").getValue()==item.data()) {
+			item.tag().remove("ViaRewind1_8to1_9");
+			if (item.tag().isEmpty()) item.setTag(null);
 		}
 
 		return item;
@@ -229,33 +223,33 @@ public class ItemRewriter {
 	public static Item toServer(Item item) {
 		if (item==null) return null;
 
-		CompoundTag tag = item.getTag();
+		CompoundTag tag = item.tag();
 
-		if (item.getIdentifier() == 383 && item.getData() != 0) {
-			if (tag == null) item.setTag(tag = new CompoundTag(""));
-			if (!tag.contains("EntityTag") && ENTTIY_ID_TO_NAME.containsKey((int) item.getData())) {
-				CompoundTag entityTag = new CompoundTag("EntityTag");
-				entityTag.put(new StringTag("id", ENTTIY_ID_TO_NAME.get((int) item.getData())));
-				tag.put(entityTag);
+		if (item.identifier() == 383 && item.data() != 0) {
+			if (tag == null) item.setTag(tag = new CompoundTag());
+			if (!tag.contains("EntityTag") && ENTTIY_ID_TO_NAME.containsKey((int) item.data())) {
+				CompoundTag entityTag = new CompoundTag();
+				entityTag.put("id", new StringTag(ENTTIY_ID_TO_NAME.get((int) item.data())));
+				tag.put("EntityTag", entityTag);
 			}
 
 			item.setData((short) 0);
 		}
 
-		if (item.getIdentifier() == 373 && (tag==null || !tag.contains("Potion"))) {
-			if (tag == null) item.setTag(tag = new CompoundTag(""));
+		if (item.identifier() == 373 && (tag==null || !tag.contains("Potion"))) {
+			if (tag == null) item.setTag(tag = new CompoundTag());
 
-			if (item.getData() >= 16384) {
+			if (item.data() >= 16384) {
 				item.setIdentifier(438);
-				item.setData((short) (item.getData() - 8192));
+				item.setData((short) (item.data() - 8192));
 			}
 
-			String name = item.getData() == 8192 ? "water" : potionNameFromDamage(item.getData());
-			tag.put(new StringTag("Potion", "minecraft:" + name));
+			String name = item.data() == 8192 ? "water" : potionNameFromDamage(item.data());
+			tag.put("Potion", new StringTag("minecraft:" + name));
 			item.setData((short) 0);
 		}
 		
-		 if (tag==null || !item.getTag().contains("ViaRewind1_8to1_9")) return item;
+		 if (tag==null || !item.tag().contains("ViaRewind1_8to1_9")) return item;
 
 		CompoundTag viaVersionTag = tag.remove("ViaRewind1_8to1_9");
 
@@ -265,14 +259,14 @@ public class ItemRewriter {
 		if (viaVersionTag.contains("noDisplay")) tag.remove("display");
 
 		if (viaVersionTag.contains("Unbreakable")) {
-			tag.put(viaVersionTag.get("Unbreakable").clone());
+			tag.put("Unbreakable", viaVersionTag.get("Unbreakable").clone());
 		}
 
 		if (viaVersionTag.contains("displayName")) {
 			CompoundTag display = tag.get("display");
-			if (display==null) tag.put(display = new CompoundTag("display"));
+			if (display==null) tag.put("display", display = new CompoundTag());
 			StringTag name = display.get("Name");
-			if (name==null) display.put(new StringTag("Name", (String) viaVersionTag.get("displayName").getValue()));
+			if (name==null) display.put("Name", new StringTag((String) viaVersionTag.get("displayName").getValue()));
 			else name.setValue((String) viaVersionTag.get("displayName").getValue());
 		} else if (tag.contains("display")) {
 			((CompoundTag)tag.get("display")).remove("Name");
@@ -280,9 +274,9 @@ public class ItemRewriter {
 
 		if (viaVersionTag.contains("lore")) {
 			CompoundTag display = tag.get("display");
-			if (display==null) tag.put(display = new CompoundTag("display"));
+			if (display==null) tag.put("display", display = new CompoundTag());
 			ListTag lore = display.get("Lore");
-			if (lore==null) display.put(new ListTag("Lore", (List<Tag>) viaVersionTag.get("lore").getValue()));
+			if (lore==null) display.put("Lore", new ListTag((List<Tag>) viaVersionTag.get("lore").getValue()));
 			else lore.setValue((List<Tag>) viaVersionTag.get("lore").getValue());
 		} else if (tag.contains("display")) {
 			((CompoundTag)tag.get("display")).remove("Lore");
@@ -290,7 +284,7 @@ public class ItemRewriter {
 
 		tag.remove("AttributeModifiers");
 		if (viaVersionTag.contains("AttributeModifiers")) {
-			tag.put(viaVersionTag.get("AttributeModifiers"));
+			tag.put("AttributeModifiers", viaVersionTag.get("AttributeModifiers"));
 		}
 
 		return item;

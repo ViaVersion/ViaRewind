@@ -1,16 +1,15 @@
 package de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.packets;
 
+import com.viaversion.viaversion.api.protocol.Protocol;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.protocol.packet.State;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
+import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.util.ChatColorUtil;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10TO1_8;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage.Scoreboard;
 import de.gerrygames.viarewind.utils.PacketUtil;
-import net.md_5.bungee.api.ChatColor;
-import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.protocol.Protocol;
-import us.myles.ViaVersion.api.remapper.PacketHandler;
-import us.myles.ViaVersion.api.remapper.PacketRemapper;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.packets.State;
-import us.myles.ViaVersion.protocols.base.ProtocolInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +22,7 @@ public class ScoreboardPackets {
 		/*  OUTGOING  */
 
 		//Scoreboard Objective
-		protocol.registerOutgoing(State.PLAY, 0x3B, 0x3B, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x3B, 0x3B, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				handler(new PacketHandler() {
@@ -48,12 +47,12 @@ public class ScoreboardPackets {
 								return;
 							}
 							if (scoreboard.getColorIndependentSidebar() != null) {
-								String username = packetWrapper.user().get(ProtocolInfo.class).getUsername();
+								String username = packetWrapper.user().getProtocolInfo().getUsername();
 								Optional<Byte> color = scoreboard.getPlayerTeamColor(username);
 								if (color.isPresent()) {
 									String sidebar = scoreboard.getColorDependentSidebar().get(color.get());
 									if (name.equals(sidebar)) {
-										PacketWrapper sidebarPacket = new PacketWrapper(0x3D, null, packetWrapper.user());
+										PacketWrapper sidebarPacket = PacketWrapper.create(0x3D, null, packetWrapper.user());
 										sidebarPacket.write(Type.BYTE, (byte) 1);
 										sidebarPacket.write(Type.STRING, scoreboard.getColorIndependentSidebar());
 										PacketUtil.sendPacket(sidebarPacket, Protocol1_7_6_10TO1_8.class);
@@ -84,7 +83,7 @@ public class ScoreboardPackets {
 		});
 
 		//Update Score
-		protocol.registerOutgoing(State.PLAY, 0x3C, 0x3C, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x3C, 0x3C, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				handler(new PacketHandler() {
@@ -101,7 +100,7 @@ public class ScoreboardPackets {
 						}
 
 						if (name.length() > 16) {
-							name = ChatColor.stripColor(name);
+							name = ChatColorUtil.stripColor(name);
 							if (name.length() > 16) {
 								name = name.substring(0, 16);
 							}
@@ -124,7 +123,7 @@ public class ScoreboardPackets {
 		});
 
 		//Display Scoreboard
-		protocol.registerOutgoing(State.PLAY, 0x3D, 0x3D, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x3D, 0x3D, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.BYTE); // Position
@@ -139,7 +138,7 @@ public class ScoreboardPackets {
 							byte receiverTeamColor = (byte) (position - 3);
 							scoreboard.getColorDependentSidebar().put(receiverTeamColor, name);
 
-							String username = packetWrapper.user().get(ProtocolInfo.class).getUsername();
+							String username = packetWrapper.user().getProtocolInfo().getUsername();
 							Optional<Byte> color = scoreboard.getPlayerTeamColor(username);
 							if (color.isPresent() && color.get() == receiverTeamColor) {
 								position = 1;
@@ -148,7 +147,7 @@ public class ScoreboardPackets {
 							}
 						} else if (position == 1) { // team independent sidebar
 							scoreboard.setColorIndependentSidebar(name);
-							String username = packetWrapper.user().get(ProtocolInfo.class).getUsername();
+							String username = packetWrapper.user().getProtocolInfo().getUsername();
 							Optional<Byte> color = scoreboard.getPlayerTeamColor(username);
 							if (color.isPresent() && scoreboard.getColorDependentSidebar().containsKey(color.get())) {
 								position = -1;
@@ -165,7 +164,7 @@ public class ScoreboardPackets {
 		});
 
 		//Scoreboard Teams
-		protocol.registerOutgoing(State.PLAY, 0x3E, 0x3E, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x3E, 0x3E, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.STRING);
@@ -187,7 +186,7 @@ public class ScoreboardPackets {
 						} else if (mode == 0 && scoreboard.teamExists(team)) {
 							scoreboard.removeTeam(team);
 
-							PacketWrapper remove = new PacketWrapper(0x3E, null, packetWrapper.user());
+							PacketWrapper remove = PacketWrapper.create(0x3E, null, packetWrapper.user());
 							remove.write(Type.STRING, team);
 							remove.write(Type.BYTE, (byte) 1);
 							PacketUtil.sendPacket(remove, Protocol1_7_6_10TO1_8.class, true, true);
@@ -207,7 +206,7 @@ public class ScoreboardPackets {
 							packetWrapper.read(Type.STRING); // name tag visibility
 							byte color = packetWrapper.read(Type.BYTE);
 							if (mode == 2 && scoreboard.getTeamColor(team).get() != color) {
-								String username = packetWrapper.user().get(ProtocolInfo.class).getUsername();
+								String username = packetWrapper.user().getProtocolInfo().getUsername();
 								String sidebar = scoreboard.getColorDependentSidebar().get(color);
 								PacketWrapper sidebarPacket = packetWrapper.create(0x3D);
 								sidebarPacket.write(Type.BYTE, (byte) 1);
@@ -223,7 +222,7 @@ public class ScoreboardPackets {
 
 							for (int i = 0; i < entries.length; i++) {
 								String entry = entries[i];
-								String username = packetWrapper.user().get(ProtocolInfo.class).getUsername();
+								String username = packetWrapper.user().getProtocolInfo().getUsername();
 
 								if (mode == 4) {
 									if (!scoreboard.isPlayerInTeam(entry, team)) continue;

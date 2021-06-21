@@ -1,8 +1,8 @@
 package de.gerrygames.viarewind.replacement;
 
-import us.myles.ViaVersion.api.minecraft.item.Item;
-import us.myles.viaversion.libs.fastutil.ints.Int2ObjectMap;
-import us.myles.viaversion.libs.fastutil.ints.Int2ObjectOpenHashMap;
+import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.libs.fastutil.ints.Int2ObjectMap;
+import com.viaversion.viaversion.libs.fastutil.ints.Int2ObjectOpenHashMap;
 
 public class ReplacementRegistry {
 	private final Int2ObjectMap<Replacement> itemReplacements = new Int2ObjectOpenHashMap<>();
@@ -35,8 +35,8 @@ public class ReplacementRegistry {
 	}
 
 	public Item replace(Item item) {
-		Replacement replacement = itemReplacements.get(combine(item.getIdentifier(), item.getData()));
-		if (replacement==null) replacement = itemReplacements.get(combine(item.getIdentifier(), -1));
+		Replacement replacement = itemReplacements.get(combine(item.identifier(), item.data()));
+		if (replacement==null) replacement = itemReplacements.get(combine(item.identifier(), -1));
 		return replacement==null ? item : replacement.replace(item);
 	}
 

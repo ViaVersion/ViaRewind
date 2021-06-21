@@ -1,8 +1,8 @@
 package de.gerrygames.viarewind.utils;
 
-import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.protocol.Protocol;
-import us.myles.ViaVersion.exception.CancelException;
+import com.viaversion.viaversion.api.protocol.Protocol;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.exception.CancelException;
 
 public class PacketUtil {
 
@@ -16,7 +16,11 @@ public class PacketUtil {
 
 	public static void sendToServer(PacketWrapper packet, Class<? extends Protocol> packetProtocol, boolean skipCurrentPipeline, boolean currentThread) {
 		try {
-			packet.sendToServer(packetProtocol, skipCurrentPipeline, currentThread);
+		    if (currentThread) {
+                packet.sendToServer(packetProtocol, skipCurrentPipeline);
+            } else {
+                packet.scheduleSendToServer(packetProtocol, skipCurrentPipeline);
+            }
 		} catch (CancelException ignored) {
 			;
 		} catch (Exception ex) {
@@ -34,7 +38,11 @@ public class PacketUtil {
 
 	public static boolean sendPacket(PacketWrapper packet, Class<? extends Protocol> packetProtocol, boolean skipCurrentPipeline, boolean currentThread) {
 		try {
-			packet.send(packetProtocol, skipCurrentPipeline, currentThread);
+            if (currentThread) {
+                packet.send(packetProtocol, skipCurrentPipeline);
+            } else {
+                packet.scheduleSend(packetProtocol, skipCurrentPipeline);
+            }
 			return true;
 		} catch (CancelException ignored) {
 			;

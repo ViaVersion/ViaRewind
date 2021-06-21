@@ -1,14 +1,15 @@
 package de.gerrygames.viarewind.protocol.protocol1_8to1_9.types;
 
+import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.minecraft.Environment;
+import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
+import com.viaversion.viaversion.api.minecraft.chunks.Chunk1_8;
+import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
+import com.viaversion.viaversion.api.minecraft.chunks.ChunkSectionLight;
+import com.viaversion.viaversion.api.type.PartialType;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import io.netty.buffer.ByteBuf;
-import us.myles.ViaVersion.api.Via;
-import us.myles.ViaVersion.api.minecraft.Environment;
-import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
-import us.myles.ViaVersion.api.minecraft.chunks.Chunk1_8;
-import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
-import us.myles.ViaVersion.api.type.PartialType;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
 import java.util.ArrayList;
 import java.util.logging.Level;
@@ -52,16 +53,16 @@ public class Chunk1_8Type extends PartialType<Chunk, ClientWorld> {
         // Read block light
         for (int i = 0; i < 16; i++) {
             if ((bitmask & 1 << i) == 0) continue;
-            sections[i].readBlockLight(input);
+            sections[i].getLight().readBlockLight(input);
         }
 
         // Read sky light
         int bytesLeft = dataLength - (input.readerIndex() - startIndex);
-        if (bytesLeft >= ChunkSection.LIGHT_LENGTH) {
+        if (bytesLeft >= ChunkSectionLight.LIGHT_LENGTH) {
             for (int i = 0; i < 16; i++) {
                 if ((bitmask & 1 << i) == 0) continue;
-                sections[i].readSkyLight(input);
-                bytesLeft -= ChunkSection.LIGHT_LENGTH;
+                sections[i].getLight().readSkyLight(input);
+                bytesLeft -= ChunkSectionLight.LIGHT_LENGTH;
             }
         }
 
@@ -94,14 +95,14 @@ public class Chunk1_8Type extends PartialType<Chunk, ClientWorld> {
 
         for (int i = 0; i < chunk.getSections().length; i++) {
             if ((chunk.getBitmask() & 1 << i) == 0) continue;
-            chunk.getSections()[i].writeBlockLight(buf);
+            chunk.getSections()[i].getLight().writeBlockLight(buf);
         }
 
         boolean skyLight = world.getEnvironment() == Environment.NORMAL;
         if (skyLight) {
             for (int i = 0; i < chunk.getSections().length; i++) {
                 if ((chunk.getBitmask() & 1 << i) == 0) continue;
-                chunk.getSections()[i].writeSkyLight(buf);
+                chunk.getSections()[i].getLight().writeSkyLight(buf);
             }
         }
 

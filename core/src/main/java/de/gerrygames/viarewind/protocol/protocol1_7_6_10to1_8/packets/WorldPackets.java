@@ -1,5 +1,17 @@
 package de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.packets;
 
+import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
+import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
+import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
+import com.viaversion.viaversion.api.protocol.Protocol;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.protocol.packet.State;
+import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.types.CustomByteType;
+import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
+import com.viaversion.viaversion.util.ChatColorUtil;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10TO1_8;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.chunks.ChunkPacketTransformer;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.items.ReplacementRegistry1_7_6_10to1_8;
@@ -9,23 +21,9 @@ import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.Particle;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.types.Chunk1_8Type;
 import de.gerrygames.viarewind.replacement.Replacement;
-import de.gerrygames.viarewind.storage.BlockState;
 import de.gerrygames.viarewind.types.VarLongType;
 import de.gerrygames.viarewind.utils.ChatUtil;
 import de.gerrygames.viarewind.utils.PacketUtil;
-import net.md_5.bungee.api.ChatColor;
-import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.minecraft.BlockChangeRecord;
-import us.myles.ViaVersion.api.minecraft.Position;
-import us.myles.ViaVersion.api.minecraft.chunks.Chunk;
-import us.myles.ViaVersion.api.minecraft.chunks.ChunkSection;
-import us.myles.ViaVersion.api.protocol.Protocol;
-import us.myles.ViaVersion.api.remapper.PacketHandler;
-import us.myles.ViaVersion.api.remapper.PacketRemapper;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.api.type.types.CustomByteType;
-import us.myles.ViaVersion.packets.State;
-import us.myles.ViaVersion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
 public class WorldPackets {
 
@@ -34,7 +32,7 @@ public class WorldPackets {
 		/*  OUTGOING  */
 
 		//Chunk Data
-		protocol.registerOutgoing(State.PLAY, 0x21, 0x21, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x21, 0x21, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				handler(packetWrapper -> {
@@ -54,7 +52,7 @@ public class WorldPackets {
 		});
 
 		//Multi Block Change
-		protocol.registerOutgoing(State.PLAY, 0x22, 0x22, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x22, 0x22, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.INT);
@@ -74,13 +72,13 @@ public class WorldPackets {
 		});
 
 		//Block Change
-		protocol.registerOutgoing(State.PLAY, 0x23, 0x23, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x23, 0x23, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				handler(packetWrapper -> {
 					Position position = packetWrapper.read(Type.POSITION);
 					packetWrapper.write(Type.INT, position.getX());
-					packetWrapper.write(Type.UNSIGNED_BYTE, position.getY());
+					packetWrapper.write(Type.UNSIGNED_BYTE, (short) position.getY());
 					packetWrapper.write(Type.INT, position.getZ());
 				});
 				handler(packetWrapper -> {
@@ -103,13 +101,13 @@ public class WorldPackets {
 		});
 
 		//Block Action
-		protocol.registerOutgoing(State.PLAY, 0x24, 0x24, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x24, 0x24, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				handler(packetWrapper -> {
 					Position position = packetWrapper.read(Type.POSITION);
 					packetWrapper.write(Type.INT, position.getX());
-					packetWrapper.write(Type.SHORT, position.getY());
+					packetWrapper.write(Type.SHORT, (short) position.getY());
 					packetWrapper.write(Type.INT, position.getZ());
 				});
 				map(Type.UNSIGNED_BYTE);
@@ -119,7 +117,7 @@ public class WorldPackets {
 		});
 
 		//Block Break Animation
-		protocol.registerOutgoing(State.PLAY, 0x25, 0x25, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x25, 0x25, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT);  //Entity Id
@@ -134,7 +132,7 @@ public class WorldPackets {
 		});
 
 		//Map Chunk Bulk
-		protocol.registerOutgoing(State.PLAY, 0x26, 0x26, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x26, 0x26, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				handler(ChunkPacketTransformer::transformChunkBulk);
@@ -142,7 +140,7 @@ public class WorldPackets {
 		});
 
 		//Effect
-		protocol.registerOutgoing(State.PLAY, 0x28, 0x28, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x28, 0x28, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.INT);
@@ -158,7 +156,7 @@ public class WorldPackets {
 		});
 
 		//Particle
-		protocol.registerOutgoing(State.PLAY, 0x2A, 0x2A, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x2A, 0x2A, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				handler(packetWrapper -> {
@@ -201,13 +199,13 @@ public class WorldPackets {
 		});
 
 		//Update Sign
-		protocol.registerOutgoing(State.PLAY, 0x33, 0x33, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x33, 0x33, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				handler(packetWrapper -> {
 					Position position = packetWrapper.read(Type.POSITION);
 					packetWrapper.write(Type.INT, position.getX());
-					packetWrapper.write(Type.SHORT, position.getY());
+					packetWrapper.write(Type.SHORT, (short) position.getY());
 					packetWrapper.write(Type.INT, position.getZ());
 				});
 				handler(packetWrapper -> {
@@ -216,7 +214,7 @@ public class WorldPackets {
 						line = ChatUtil.jsonToLegacy(line);
 						line = ChatUtil.removeUnusedColor(line, '0');
 						if (line.length() > 15) {
-							line = ChatColor.stripColor(line);
+							line = ChatColorUtil.stripColor(line);
 							if (line.length() > 15) line = line.substring(0, 15);
 						}
 						packetWrapper.write(Type.STRING, line);
@@ -226,7 +224,7 @@ public class WorldPackets {
 		});
 
 		//Map
-		protocol.registerOutgoing(State.PLAY, 0x34, 0x34, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x34, 0x34, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				handler(packetWrapper -> {
@@ -260,7 +258,7 @@ public class WorldPackets {
 								columnData[i + 3] = data[column + i * columns];
 							}
 
-							PacketWrapper columnUpdate = new PacketWrapper(0x34, null, packetWrapper.user());
+							PacketWrapper columnUpdate = PacketWrapper.create(0x34, null, packetWrapper.user());
 							columnUpdate.write(Type.VAR_INT, id);
 							columnUpdate.write(Type.SHORT, (short) columnData.length);
 							columnUpdate.write(new CustomByteType(columnData.length), columnData);
@@ -277,7 +275,7 @@ public class WorldPackets {
 							iconData[i * 3 + 2] = icons[i * 4 + 1];
 							iconData[i * 3 + 3] = icons[i * 4 + 2];
 						}
-						PacketWrapper iconUpdate = new PacketWrapper(0x34, null, packetWrapper.user());
+						PacketWrapper iconUpdate = PacketWrapper.create(0x34, null, packetWrapper.user());
 						iconUpdate.write(Type.VAR_INT, id);
 						iconUpdate.write(Type.SHORT, (short) iconData.length);
 						CustomByteType customByteType = new CustomByteType(iconData.length);
@@ -285,7 +283,7 @@ public class WorldPackets {
 						PacketUtil.sendPacket(iconUpdate, Protocol1_7_6_10TO1_8.class, true, true);
 					}
 
-					PacketWrapper scaleUpdate = new PacketWrapper(0x34, null, packetWrapper.user());
+					PacketWrapper scaleUpdate = PacketWrapper.create(0x34, null, packetWrapper.user());
 					scaleUpdate.write(Type.VAR_INT, id);
 					scaleUpdate.write(Type.SHORT, (short) 2);
 					scaleUpdate.write(new CustomByteType(2), new byte[] {2, scale});
@@ -295,13 +293,13 @@ public class WorldPackets {
 		});
 
 		//Update Block Entity
-		protocol.registerOutgoing(State.PLAY, 0x35, 0x35, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x35, 0x35, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				handler(packetWrapper -> {
 					Position position = packetWrapper.read(Type.POSITION);
 					packetWrapper.write(Type.INT, position.getX());
-					packetWrapper.write(Type.SHORT, position.getY());
+					packetWrapper.write(Type.SHORT, (short) position.getY());
 					packetWrapper.write(Type.INT, position.getZ());
 				});
 				map(Type.UNSIGNED_BYTE);  //Action
@@ -310,7 +308,7 @@ public class WorldPackets {
 		});
 
 		//Server Difficulty
-		protocol.registerOutgoing(State.PLAY, 0x41, -1, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x41, -1, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				handler(packetWrapper -> packetWrapper.cancel());
@@ -318,7 +316,7 @@ public class WorldPackets {
 		});
 
 		//Combat Event
-		protocol.registerOutgoing(State.PLAY, 0x42, -1, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x42, -1, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				handler(packetWrapper -> packetWrapper.cancel());
@@ -326,7 +324,7 @@ public class WorldPackets {
 		});
 
 		//World Border
-		protocol.registerOutgoing(State.PLAY, 0x44, -1, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x44, -1, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				handler(packetWrapper -> {

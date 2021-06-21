@@ -1,18 +1,18 @@
 package de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage;
 
+import com.viaversion.viaversion.api.connection.StoredObject;
+import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.data.entity.ClientEntityIdChangeListener;
+import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
+import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.types.version.Types1_8;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10TO1_8;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.metadata.MetadataRewriter;
 import de.gerrygames.viarewind.replacement.EntityReplacement;
 import de.gerrygames.viarewind.utils.PacketUtil;
-import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.data.ExternalJoinGameListener;
-import us.myles.ViaVersion.api.data.StoredObject;
-import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.entities.Entity1_10Types;
-import us.myles.ViaVersion.api.minecraft.item.Item;
-import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.api.type.types.version.Types1_8;
 
 import java.util.HashMap;
 import java.util.List;
@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class EntityTracker extends StoredObject implements ExternalJoinGameListener {
+public class EntityTracker extends StoredObject implements ClientEntityIdChangeListener {
 	private final Map<Integer, Entity1_10Types.EntityType> clientEntityTypes = new ConcurrentHashMap();
 	private final Map<Integer, List<Metadata>> metadataBuffer = new ConcurrentHashMap();
 	private final Map<Integer, Integer> vehicles = new ConcurrentHashMap<>();
@@ -98,7 +98,7 @@ public class EntityTracker extends StoredObject implements ExternalJoinGameListe
 			entityReplacements.get(entityId).updateMetadata(this.metadataBuffer.remove(entityId));
 		} else {
 			Entity1_10Types.EntityType type = this.getClientEntityTypes().get(entityId);
-			PacketWrapper wrapper = new PacketWrapper(0x1C, null, this.getUser());
+			PacketWrapper wrapper = PacketWrapper.create(0x1C, null, this.getUser());
 			wrapper.write(Type.VAR_INT, entityId);
 			wrapper.write(Types1_8.METADATA_LIST, this.metadataBuffer.get(entityId));
 			MetadataRewriter.transform(type, this.metadataBuffer.get(entityId));
@@ -124,12 +124,12 @@ public class EntityTracker extends StoredObject implements ExternalJoinGameListe
 	public void setPassenger(int vehicleId, int passengerId) {
 		if (vehicleId==this.spectating && this.spectating!=this.playerId) {
 			try {
-				PacketWrapper sneakPacket = new PacketWrapper(0x0B, null, getUser());
+				PacketWrapper sneakPacket = PacketWrapper.create(0x0B, null, getUser());
 				sneakPacket.write(Type.VAR_INT, playerId);
 				sneakPacket.write(Type.VAR_INT, 0);  //Start sneaking
 				sneakPacket.write(Type.VAR_INT, 0);  //Action Parameter
 
-				PacketWrapper unsneakPacket = new PacketWrapper(0x0B, null, getUser());
+				PacketWrapper unsneakPacket = PacketWrapper.create(0x0B, null, getUser());
 				unsneakPacket.write(Type.VAR_INT, playerId);
 				unsneakPacket.write(Type.VAR_INT, 1);  //Stop sneaking
 				unsneakPacket.write(Type.VAR_INT, 0);  //Action Parameter
@@ -156,12 +156,12 @@ public class EntityTracker extends StoredObject implements ExternalJoinGameListe
 	public boolean setSpectating(int spectating) {
 		if (spectating!=this.playerId && getPassenger(spectating)!=-1) {
 
-			PacketWrapper sneakPacket = new PacketWrapper(0x0B, null, getUser());
+			PacketWrapper sneakPacket = PacketWrapper.create(0x0B, null, getUser());
 			sneakPacket.write(Type.VAR_INT, playerId);
 			sneakPacket.write(Type.VAR_INT, 0);  //Start sneaking
 			sneakPacket.write(Type.VAR_INT, 0);  //Action Parameter
 
-			PacketWrapper unsneakPacket = new PacketWrapper(0x0B, null, getUser());
+			PacketWrapper unsneakPacket = PacketWrapper.create(0x0B, null, getUser());
 			unsneakPacket.write(Type.VAR_INT, playerId);
 			unsneakPacket.write(Type.VAR_INT, 1);  //Stop sneaking
 			unsneakPacket.write(Type.VAR_INT, 0);  //Action Parameter
@@ -173,7 +173,7 @@ public class EntityTracker extends StoredObject implements ExternalJoinGameListe
 		}
 
 		if (this.spectating!=spectating && this.spectating!=this.playerId) {
-			PacketWrapper unmount = new PacketWrapper(0x1B, null, this.getUser());
+			PacketWrapper unmount = PacketWrapper.create(0x1B, null, this.getUser());
 			unmount.write(Type.INT, this.playerId);
 			unmount.write(Type.INT, -1);
 			unmount.write(Type.BOOLEAN, false);
@@ -181,7 +181,7 @@ public class EntityTracker extends StoredObject implements ExternalJoinGameListe
 		}
 		this.spectating = spectating;
 		if (spectating!=this.playerId) {
-			PacketWrapper mount = new PacketWrapper(0x1B, null, this.getUser());
+			PacketWrapper mount = PacketWrapper.create(0x1B, null, this.getUser());
 			mount.write(Type.INT, this.playerId);
 			mount.write(Type.INT, this.spectating);
 			mount.write(Type.BOOLEAN, false);
@@ -223,7 +223,7 @@ public class EntityTracker extends StoredObject implements ExternalJoinGameListe
 	}
 
 	@Override
-	public void onExternalJoinGame(int playerEntityId) {
+	public void setClientEntityId(int playerEntityId) {
 		if (this.spectating == this.playerId) {
 			this.spectating = playerEntityId;
 		}

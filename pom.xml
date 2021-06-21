@@ -4,9 +4,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>de.gerrygames</groupId>
+    <groupId>com.viaversion</groupId>
     <artifactId>viarewind-parent</artifactId>
-    <version>1.5.3</version>
+    <version>2.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>
@@ -36,27 +36,11 @@
     </repositories>
 
     <dependencies>
-        <!-- Lombok -->
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.18.12</version>
-            <scope>provided</scope>
-        </dependency>
-
         <!-- ViaVersion -->
         <dependency>
-            <groupId>us.myles</groupId>
+            <groupId>com.viaversion</groupId>
             <artifactId>viaversion</artifactId>
-            <version>3.2.1</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <!-- ViaBackwards -->
-        <dependency>
-            <groupId>nl.matsv</groupId>
-            <artifactId>viabackwards-all</artifactId>
-            <version>3.2.0-SNAPSHOT</version>
+            <version>4.0.0</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

@@ -1,7 +1,7 @@
 package de.gerrygames.viarewind.types;
 
+import com.viaversion.viaversion.api.type.Type;
 import io.netty.buffer.ByteBuf;
-import us.myles.ViaVersion.api.type.Type;
 
 public class VarLongType extends Type<Long> {
 

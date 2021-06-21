@@ -1,9 +1,8 @@
 package de.gerrygames.viarewind.replacement;
 
-import de.gerrygames.viarewind.storage.BlockState;
-import us.myles.ViaVersion.api.minecraft.item.Item;
-import us.myles.viaversion.libs.opennbt.tag.builtin.CompoundTag;
-import us.myles.viaversion.libs.opennbt.tag.builtin.StringTag;
+import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.libs.opennbt.tag.builtin.CompoundTag;
+import com.viaversion.viaversion.libs.opennbt.tag.builtin.StringTag;
 
 public class Replacement {
 	private int id, data;
@@ -47,15 +46,15 @@ public class Replacement {
 		item.setIdentifier(id);
 		if (data!=-1) item.setData((short)data);
 		if (name!=null) {
-			CompoundTag compoundTag = item.getTag()==null ? new CompoundTag("") : item.getTag();
-			if (!compoundTag.contains("display")) compoundTag.put(new CompoundTag("display"));
+			CompoundTag compoundTag = item.tag()==null ? new CompoundTag() : item.tag();
+			if (!compoundTag.contains("display")) compoundTag.put("display", new CompoundTag());
 			CompoundTag display = compoundTag.get("display");
 			if (display.contains("Name")) {
 				StringTag name = display.get("Name");
 				if (!name.getValue().equals(resetName) && !name.getValue().endsWith(bracketName))
 					name.setValue(name.getValue() + bracketName);
 			} else {
-				display.put(new StringTag("Name", resetName));
+				display.put("Name", new StringTag(resetName));
 			}
 			item.setTag(compoundTag);
 		}
@@ -63,6 +62,6 @@ public class Replacement {
 	}
 
 	public int replaceData(int data) {
-		return data == -1 ? data : this.data;
+		return this.data == -1 ? data : this.data;
 	}
 }

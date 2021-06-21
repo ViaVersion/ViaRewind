@@ -1,20 +1,19 @@
 package de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.packets;
 
+import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.protocol.Protocol;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.protocol.packet.State;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
+import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.libs.gson.JsonElement;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.items.ItemRewriter;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage.EntityTracker;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage.GameProfileStorage;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage.Windows;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
 import de.gerrygames.viarewind.utils.ChatUtil;
-import us.myles.ViaVersion.api.PacketWrapper;
-import us.myles.ViaVersion.api.minecraft.item.Item;
-import us.myles.ViaVersion.api.protocol.Protocol;
-import us.myles.ViaVersion.api.remapper.PacketHandler;
-import us.myles.ViaVersion.api.remapper.PacketRemapper;
-import us.myles.ViaVersion.api.type.Type;
-import us.myles.ViaVersion.packets.State;
-import us.myles.ViaVersion.protocols.base.ProtocolInfo;
-import us.myles.viaversion.libs.gson.JsonElement;
 
 import java.util.UUID;
 
@@ -25,7 +24,7 @@ public class InventoryPackets {
 		/*  OUTGOING  */
 
 		//Open Window
-		protocol.registerOutgoing(State.PLAY, 0x2D, 0x2D, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x2D, 0x2D, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				handler(new PacketHandler() {
@@ -54,7 +53,7 @@ public class InventoryPackets {
 		});
 
 		//Close Window
-		protocol.registerOutgoing(State.PLAY, 0x2E, 0x2E, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x2E, 0x2E, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.UNSIGNED_BYTE);
@@ -69,15 +68,15 @@ public class InventoryPackets {
 		});
 
 		//Set Slot
-		protocol.registerOutgoing(State.PLAY, 0x2F, 0x2F, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x2F, 0x2F, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
-						short windowId = packetWrapper.read(Type.BYTE);  //Window Id
+						short windowId = packetWrapper.read(Type.UNSIGNED_BYTE);  //Window Id
 						short windowType = packetWrapper.user().get(Windows.class).get(windowId);
-						packetWrapper.write(Type.BYTE, (byte) windowId);
+						packetWrapper.write(Type.UNSIGNED_BYTE, (short) windowId);
 						short slot = packetWrapper.read(Type.SHORT);
 						if (windowType == 4) {
 							if (slot == 1) {
@@ -102,13 +101,13 @@ public class InventoryPackets {
 				handler(new PacketHandler() {
 					@Override
 					public void handle(PacketWrapper packetWrapper) throws Exception {
-						short windowId = packetWrapper.get(Type.BYTE, 0);
+						short windowId = packetWrapper.get(Type.UNSIGNED_BYTE, 0);
 						if (windowId != 0) return;
 						short slot = packetWrapper.get(Type.SHORT, 0);
 						if (slot < 5 || slot > 8) return;
 						Item item = packetWrapper.get(Types1_7_6_10.COMPRESSED_NBT_ITEM, 0);
 						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-						UUID uuid = packetWrapper.user().get(ProtocolInfo.class).getUuid();
+						UUID uuid = packetWrapper.user().getProtocolInfo().getUuid();
 						Item[] equipment = tracker.getPlayerEquipment(uuid);
 						if (equipment == null) {
 							tracker.setPlayerEquipment(uuid, equipment = new Item[5]);
@@ -121,7 +120,7 @@ public class InventoryPackets {
 		});
 
 		//Window Items
-		protocol.registerOutgoing(State.PLAY, 0x30, 0x30, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x30, 0x30, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				handler(new PacketHandler() {
@@ -148,7 +147,7 @@ public class InventoryPackets {
 						if (windowId != 0) return;
 						Item[] items = packetWrapper.get(Types1_7_6_10.COMPRESSED_NBT_ITEM_ARRAY, 0);
 						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-						UUID uuid = packetWrapper.user().get(ProtocolInfo.class).getUuid();
+						UUID uuid = packetWrapper.user().getProtocolInfo().getUuid();
 						Item[] equipment = tracker.getPlayerEquipment(uuid);
 						if (equipment == null) {
 							tracker.setPlayerEquipment(uuid, equipment = new Item[5]);
@@ -167,7 +166,7 @@ public class InventoryPackets {
 		});
 
 		//Window Data
-		protocol.registerOutgoing(State.PLAY, 0x31, 0x31, new PacketRemapper() {
+		protocol.registerClientbound(State.PLAY, 0x31, 0x31, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.UNSIGNED_BYTE);
@@ -230,7 +229,7 @@ public class InventoryPackets {
 		/*  INCOMING  */
 
 		//Close Window
-		protocol.registerIncoming(State.PLAY, 0x0D, 0x0D, new PacketRemapper() {
+		protocol.registerServerbound(State.PLAY, 0x0D, 0x0D, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.UNSIGNED_BYTE);
@@ -245,7 +244,7 @@ public class InventoryPackets {
 		});
 
 		//Click Window
-		protocol.registerIncoming(State.PLAY, 0x0E, 0x0E, new PacketRemapper() {
+		protocol.registerServerbound(State.PLAY, 0x0E, 0x0E, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				handler(new PacketHandler() {
@@ -279,7 +278,7 @@ public class InventoryPackets {
 		});
 
 		//Confirm Transaction
-		protocol.registerIncoming(State.PLAY, 0x0F, 0x0F, new PacketRemapper() {
+		protocol.registerServerbound(State.PLAY, 0x0F, 0x0F, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.BYTE);
@@ -296,7 +295,7 @@ public class InventoryPackets {
 		});
 
 		//Creative Inventory Action
-		protocol.registerIncoming(State.PLAY, 0x10, 0x10, new PacketRemapper() {
+		protocol.registerServerbound(State.PLAY, 0x10, 0x10, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.SHORT);  //Slot

@@ -1,7 +1,7 @@
 package de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage;
 
-import us.myles.ViaVersion.api.data.StoredObject;
-import us.myles.ViaVersion.api.data.UserConnection;
+import com.viaversion.viaversion.api.connection.StoredObject;
+import com.viaversion.viaversion.api.connection.UserConnection;
 
 public class BlockPlaceDestroyTracker extends StoredObject {
 	private long blockPlaced, lastMining;

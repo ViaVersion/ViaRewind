@@ -1,19 +1,16 @@
 package de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage;
 
+import com.viaversion.viaversion.api.connection.StoredObject;
+import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.item.DataItem;
+import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.libs.opennbt.tag.builtin.CompoundTag;
+import com.viaversion.viaversion.libs.opennbt.tag.builtin.ListTag;
+import com.viaversion.viaversion.libs.opennbt.tag.builtin.StringTag;
+import com.viaversion.viaversion.util.ChatColorUtil;
 import de.gerrygames.viarewind.utils.ChatUtil;
-import net.md_5.bungee.api.ChatColor;
-import us.myles.ViaVersion.api.data.StoredObject;
-import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.minecraft.item.Item;
-import us.myles.viaversion.libs.opennbt.tag.builtin.CompoundTag;
-import us.myles.viaversion.libs.opennbt.tag.builtin.ListTag;
-import us.myles.viaversion.libs.opennbt.tag.builtin.StringTag;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class GameProfileStorage extends StoredObject {
 	private Map<UUID, GameProfile> properties = new HashMap<>();
@@ -90,32 +87,32 @@ public class GameProfileStorage extends StoredObject {
 		}
 
 		public Item getSkull() {
-			CompoundTag tag = new CompoundTag("");
-			CompoundTag ownerTag = new CompoundTag("SkullOwner");
-			tag.put(ownerTag);
-			ownerTag.put(new StringTag("Id", uuid.toString()));
-			CompoundTag properties = new CompoundTag("Properties");
-			ownerTag.put(properties);
-			ListTag textures = new ListTag("textures", CompoundTag.class);
-			properties.put(textures);
+			CompoundTag tag = new CompoundTag();
+			CompoundTag ownerTag = new CompoundTag();
+			tag.put("SkullOwner", ownerTag);
+			ownerTag.put("Id", new StringTag(uuid.toString()));
+			CompoundTag properties = new CompoundTag();
+			ownerTag.put("Properties", properties);
+			ListTag textures = new ListTag(CompoundTag.class);
+			properties.put("textures", textures);
 			for (GameProfileStorage.Property property : this.properties) {
 				if (property.name.equals("textures")) {
-					CompoundTag textureTag = new CompoundTag("");
-					textureTag.put(new StringTag("Value", property.value));
+					CompoundTag textureTag = new CompoundTag();
+					textureTag.put("Value", new StringTag(property.value));
 					if (property.signature != null) {
-						textureTag.put(new StringTag("Signature", property.signature));
+						textureTag.put("Signature", new StringTag(property.signature));
 					}
 					textures.add(textureTag);
 				}
 			}
 
-			return new Item((short) 397, (byte) 1, (short) 3, tag);
+			return new DataItem(397, (byte) 1, (short) 3, tag);
 		}
 
 		public String getDisplayName() {
 			String displayName = this.displayName == null ? name : this.displayName;
 			if (displayName.length() > 16) displayName = ChatUtil.removeUnusedColor(displayName, 'f');
-			if (displayName.length() > 16) displayName = ChatColor.stripColor(displayName);
+			if (displayName.length() > 16) displayName = ChatColorUtil.stripColor(displayName);
 			if (displayName.length() > 16) displayName = displayName.substring(0, 16);
 			return displayName;
 		}

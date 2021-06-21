@@ -1,8 +1,8 @@
 package de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types;
 
+import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
+import com.viaversion.viaversion.api.type.types.minecraft.MetaListTypeTemplate;
 import io.netty.buffer.ByteBuf;
-import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
-import us.myles.ViaVersion.api.type.types.minecraft.MetaListTypeTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,14 +23,14 @@ public class MetadataListType extends MetaListTypeTemplate {
 		} while(m != null);
 
 		if (find(2, "Slot", list)!=null && find(8, "Slot", list)!=null) {
-			list.removeIf(metadata -> metadata.getId()==2 || metadata.getId()==3);
+			list.removeIf(metadata -> metadata.id()==2 || metadata.id()==3);
 		}
 
 		return list;
 	}
 
 	private Metadata find(int id, String type, List<Metadata> list) {
-		for (Metadata metadata : list) if (metadata.getId()==id && metadata.getMetaType().toString().equals(type)) return metadata;
+		for (Metadata metadata : list) if (metadata.id()==id && metadata.metaType().toString().equals(type)) return metadata;
 		return null;
 	}
 

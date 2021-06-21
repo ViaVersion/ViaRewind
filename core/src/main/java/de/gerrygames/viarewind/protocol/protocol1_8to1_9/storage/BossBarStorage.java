@@ -1,8 +1,8 @@
 package de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage;
 
+import com.viaversion.viaversion.api.connection.StoredObject;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.bossbar.WitherBossBar;
-import us.myles.ViaVersion.api.data.StoredObject;
-import us.myles.ViaVersion.api.data.UserConnection;
 
 import java.util.HashMap;
 import java.util.Map;

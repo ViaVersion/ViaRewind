@@ -1,13 +1,13 @@
 package de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.metadata;
 
+import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
+import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
+import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_8;
 import de.gerrygames.viarewind.ViaRewind;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.items.ItemRewriter;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.MetaType1_7_6_10;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_7_6_10.metadata.MetaIndex1_8to1_7_6_10;
-import us.myles.ViaVersion.api.entities.Entity1_10Types;
-import us.myles.ViaVersion.api.minecraft.item.Item;
-import us.myles.ViaVersion.api.minecraft.metadata.Metadata;
-import us.myles.ViaVersion.api.minecraft.metadata.types.MetaType1_8;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +16,7 @@ public class MetadataRewriter {
 
 	public static void transform(Entity1_10Types.EntityType type, List<Metadata> list) {
 		for (Metadata entry : new ArrayList<>(list)) {
-			MetaIndex1_8to1_7_6_10 metaIndex = MetaIndex1_7_6_10to1_8.searchIndex(type, entry.getId());
+			MetaIndex1_8to1_7_6_10 metaIndex = MetaIndex1_7_6_10to1_8.searchIndex(type, entry.id());
 			try {
 				if (metaIndex == null) throw new Exception("Could not find valid metadata");
 				if (metaIndex.getOldType() == MetaType1_7_6_10.NonExistent) {
@@ -24,11 +24,11 @@ public class MetadataRewriter {
 					continue;
 				}
 				Object value = entry.getValue();
-				if (!value.getClass().isAssignableFrom(metaIndex.getNewType().getType().getOutputClass())) {
+				if (!value.getClass().isAssignableFrom(metaIndex.getNewType().type().getOutputClass())) {
 					list.remove(entry);
 					continue;
 				}
-				entry.setMetaType(metaIndex.getOldType());
+				entry.setMetaTypeUnsafe(metaIndex.getOldType());
 				entry.setId(metaIndex.getIndex());
 				switch (metaIndex.getOldType()) {
 					case Int:

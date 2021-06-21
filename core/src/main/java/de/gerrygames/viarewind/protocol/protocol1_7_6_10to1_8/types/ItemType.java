@@ -1,8 +1,9 @@
 package de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types;
 
+import com.viaversion.viaversion.api.minecraft.item.DataItem;
+import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.type.Type;
 import io.netty.buffer.ByteBuf;
-import us.myles.ViaVersion.api.minecraft.item.Item;
-import us.myles.ViaVersion.api.type.Type;
 
 public class ItemType extends Type<Item> {
 	private final boolean compressed;
@@ -19,7 +20,7 @@ public class ItemType extends Type<Item> {
 		if (id < 0) {
 			return null;
 		}
-		Item item = new Item();
+		Item item = new DataItem();
 		item.setIdentifier(id);
 		item.setAmount(buffer.readByte());
 		item.setData(buffer.readShort());
@@ -32,10 +33,10 @@ public class ItemType extends Type<Item> {
 		if (item == null) {
 			buffer.writeShort(-1);
 		} else {
-			buffer.writeShort(item.getIdentifier());
-			buffer.writeByte(item.getAmount());
-			buffer.writeShort(item.getData());
-			(compressed ? Types1_7_6_10.COMPRESSED_NBT : Types1_7_6_10.NBT).write(buffer, item.getTag());
+			buffer.writeShort(item.identifier());
+			buffer.writeByte(item.amount());
+			buffer.writeShort(item.data());
+			(compressed ? Types1_7_6_10.COMPRESSED_NBT : Types1_7_6_10.NBT).write(buffer, item.tag());
 		}
 	}
 }

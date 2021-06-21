@@ -1,8 +1,8 @@
 package de.gerrygames.viarewind.protocol.protocol1_8to1_9.util;
 
+import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.Vector;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage.EntityTracker;
-import us.myles.ViaVersion.api.data.UserConnection;
-import us.myles.ViaVersion.api.minecraft.Vector;
 
 public class RelativeMoveUtil {
 

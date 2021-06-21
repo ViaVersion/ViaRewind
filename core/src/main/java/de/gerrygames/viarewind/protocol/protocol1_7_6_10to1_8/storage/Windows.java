@@ -1,8 +1,7 @@
 package de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage;
 
-import lombok.Data;
-import us.myles.ViaVersion.api.data.StoredObject;
-import us.myles.ViaVersion.api.data.UserConnection;
+import com.viaversion.viaversion.api.connection.StoredObject;
+import com.viaversion.viaversion.api.connection.UserConnection;
 
 import java.util.HashMap;
 
@@ -58,11 +57,76 @@ public class Windows extends StoredObject {
 		}
 	}
 
-	@Data
 	public static class Furnace {
 		private short fuelLeft = 0;
 		private short maxFuel = 0;
 		private short progress = 0;
 		private short maxProgress = 200;
+
+		public Furnace() {
+		}
+
+		public short getFuelLeft() {
+			return this.fuelLeft;
+		}
+
+		public short getMaxFuel() {
+			return this.maxFuel;
+		}
+
+		public short getProgress() {
+			return this.progress;
+		}
+
+		public short getMaxProgress() {
+			return this.maxProgress;
+		}
+
+		public void setFuelLeft(short fuelLeft) {
+			this.fuelLeft = fuelLeft;
+		}
+
+		public void setMaxFuel(short maxFuel) {
+			this.maxFuel = maxFuel;
+		}
+
+		public void setProgress(short progress) {
+			this.progress = progress;
+		}
+
+		public void setMaxProgress(short maxProgress) {
+			this.maxProgress = maxProgress;
+		}
+
+		public boolean equals(final Object o) {
+			if (o == this) return true;
+			if (!(o instanceof Furnace))
+				return false;
+			final Furnace other = (Furnace) o;
+			if (!other.canEqual((Object) this)) return false;
+			if (this.getFuelLeft() != other.getFuelLeft()) return false;
+			if (this.getMaxFuel() != other.getMaxFuel()) return false;
+			if (this.getProgress() != other.getProgress()) return false;
+			if (this.getMaxProgress() != other.getMaxProgress()) return false;
+			return true;
+		}
+
+		protected boolean canEqual(final Object other) {
+			return other instanceof Furnace;
+		}
+
+		public int hashCode() {
+			final int PRIME = 59;
+			int result = 1;
+			result = result * PRIME + this.getFuelLeft();
+			result = result * PRIME + this.getMaxFuel();
+			result = result * PRIME + this.getProgress();
+			result = result * PRIME + this.getMaxProgress();
+			return result;
+		}
+
+		public String toString() {
+			return "Windows.Furnace(fuelLeft=" + this.getFuelLeft() + ", maxFuel=" + this.getMaxFuel() + ", progress=" + this.getProgress() + ", maxProgress=" + this.getMaxProgress() + ")";
+		}
 	}
 }
