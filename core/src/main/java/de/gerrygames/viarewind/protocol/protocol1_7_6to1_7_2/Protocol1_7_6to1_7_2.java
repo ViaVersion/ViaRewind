@@ -22,6 +22,10 @@ public class Protocol1_7_6to1_7_2 extends AbstractProtocol<ClientboundPackets1_7
 		}
 	};
 
+	public Protocol1_7_6to1_7_2() {
+		super(ClientboundPackets1_7.class, ClientboundPackets1_7.class, ServerboundPackets1_7.class, ServerboundPackets1_7.class);
+	}
+
 	@Override
 	protected void registerPackets() {
 		//Login Success
