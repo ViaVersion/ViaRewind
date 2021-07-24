@@ -140,7 +140,7 @@ public class PlayerPackets {
 			}
 		});
 
-		protocol.registerClientbound(ClientboundPackets1_8.ENTITY_POSITION_AND_ROTATION, new PacketRemapper() {
+		protocol.registerClientbound(ClientboundPackets1_8.PLAYER_POSITION, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.DOUBLE);  //x
