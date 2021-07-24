@@ -1,9 +1,7 @@
 package de.gerrygames.viarewind.protocol.protocol1_7_0_5to1_7_6_10;
 
-import com.sun.security.ntlm.Server;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
-import com.viaversion.viaversion.api.protocol.AbstractSimpleProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
@@ -18,16 +16,16 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Protocol1_7_0_5to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_7, ClientboundPackets1_7, ServerboundPackets1_7, ServerboundPackets1_7> {
-	public Protocol1_7_0_5to1_7_6_10() {
-		super(ClientboundPackets1_7.class, ClientboundPackets1_7.class, ServerboundPackets1_7.class, ServerboundPackets1_7.class);
-	}
-
 	public static final ValueTransformer<String, String> REMOVE_DASHES = new ValueTransformer<String, String>(Type.STRING) {
 		@Override
 		public String transform(PacketWrapper packetWrapper, String s) {
 			return s.replace("-", "");
 		}
 	};
+
+	public Protocol1_7_0_5to1_7_6_10() {
+		super(ClientboundPackets1_7.class, ClientboundPackets1_7.class, ServerboundPackets1_7.class, ServerboundPackets1_7.class);
+	}
 
 	@Override
 	protected void registerPackets() {
