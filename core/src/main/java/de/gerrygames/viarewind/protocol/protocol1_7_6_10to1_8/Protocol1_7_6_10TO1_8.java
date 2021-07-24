@@ -21,7 +21,7 @@ import de.gerrygames.viarewind.utils.Ticker;
 public class Protocol1_7_6_10TO1_8 extends AbstractProtocol<ClientboundPackets1_8, ClientboundPackets1_7,
 		ServerboundPackets1_8, ServerboundPackets1_7> {
 
-	protected Protocol1_7_6_10TO1_8() {
+	public Protocol1_7_6_10TO1_8() {
 		super(ClientboundPackets1_8.class, ClientboundPackets1_7.class, ServerboundPackets1_8.class, ServerboundPackets1_7.class);
 	}
 

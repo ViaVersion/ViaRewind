@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Protocol1_7_0_5to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_7, ClientboundPackets1_7, ServerboundPackets1_7, ServerboundPackets1_7> {
-	protected Protocol1_7_0_5to1_7_6_10() {
+	public Protocol1_7_0_5to1_7_6_10() {
 		super(ClientboundPackets1_7.class, ClientboundPackets1_7.class, ServerboundPackets1_7.class, ServerboundPackets1_7.class);
 	}
 
