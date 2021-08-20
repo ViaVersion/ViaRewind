@@ -1,6 +1,7 @@
 package de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.metadata;
 
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
+import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types.EntityType;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_8;
@@ -24,7 +25,7 @@ public class MetadataRewriter {
 					continue;
 				}
 				Object value = entry.getValue();
-				if (!value.getClass().isAssignableFrom(metaIndex.getNewType().type().getOutputClass())) {
+				if (!metaIndex.getNewType().type().getOutputClass().isAssignableFrom(value.getClass())) {
 					list.remove(entry);
 					continue;
 				}
