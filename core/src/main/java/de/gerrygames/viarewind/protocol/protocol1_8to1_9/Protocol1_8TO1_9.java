@@ -56,9 +56,6 @@ public class Protocol1_8TO1_9 extends AbstractProtocol<ClientboundPackets1_9, Cl
 		ScoreboardPackets.register(this);
 		SpawnPackets.register(this);
 		WorldPackets.register(this);
-
-		//Keep Alive
-		//Keep Alive
 	}
 
 	@Override

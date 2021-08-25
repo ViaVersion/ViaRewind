@@ -10,6 +10,7 @@ import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.CustomByteType;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.types.Chunk1_8Type;
 import com.viaversion.viaversion.util.ChatColorUtil;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10TO1_8;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.chunks.ChunkPacketTransformer;
@@ -18,7 +19,6 @@ import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage.WorldBorde
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.Chunk1_7_10Type;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.Particle;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
-import de.gerrygames.viarewind.protocol.protocol1_8to1_9.types.Chunk1_8Type;
 import de.gerrygames.viarewind.replacement.Replacement;
 import de.gerrygames.viarewind.types.VarLongType;
 import de.gerrygames.viarewind.utils.ChatUtil;

@@ -12,7 +12,6 @@ import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.protocol1_8.ServerboundPackets1_8;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
-import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.ClientChunks;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.packets.*;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.provider.CompressionHandlerProvider;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage.*;
@@ -98,7 +97,6 @@ public class Protocol1_7_6_10TO1_8 extends AbstractProtocol<ClientboundPackets1_
 		userConnection.put(new EntityTracker(userConnection));
 		userConnection.put(new PlayerPosition(userConnection));
 		userConnection.put(new GameProfileStorage(userConnection));
-		userConnection.put(new ClientChunks(userConnection));
 		userConnection.put(new Scoreboard(userConnection));
 		userConnection.put(new CompressionSendStorage(userConnection));
 		userConnection.put(new WorldBorder(userConnection));
