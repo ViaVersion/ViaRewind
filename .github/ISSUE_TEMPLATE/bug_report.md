@@ -31,4 +31,4 @@ Do you use a proxy (eg. BungeeCord)? What software do you use and what plugins?
 - [] I have tried a build from https://ci.viaversion.com/ and the issue still persists
 - [] I have looked at https://www.spigotmc.org/resources/viarewind-legacy-support.52924/ and it does not offer a fix for my problem
 
-**IMPORTANT: Follow the Checklist or we can't reproduce your issue and your issue will be close**
+**IMPORTANT: Follow the Checklist or we can't reproduce your issue and your issue will be closed**
