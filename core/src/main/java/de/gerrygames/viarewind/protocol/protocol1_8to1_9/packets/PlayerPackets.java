@@ -18,6 +18,7 @@ import com.viaversion.viaversion.protocols.protocol1_8.ServerboundPackets1_8;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ClientboundPackets1_9;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ServerboundPackets1_9;
+import de.gerrygames.viarewind.ViaRewind;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.Protocol1_8TO1_9;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.items.ItemRewriter;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage.*;
@@ -568,9 +569,17 @@ public class PlayerPackets {
 						CompoundTag tag = book.tag();
 						if (tag.contains("pages")) {
 							ListTag pages = tag.get("pages");
+							if (pages.size() > ViaRewind.getConfig().getMaxBookPages()) {
+								packetWrapper.user().disconnect("Too many book pages");
+								return;
+							}
 							for (int i = 0; i < pages.size(); i++) {
 								StringTag page = pages.get(i);
 								String value = page.getValue();
+								if (value.length() > ViaRewind.getConfig().getMaxBookPageSize()) {
+									packetWrapper.user().disconnect("Book page too large");
+									return;
+								}
 								value = ChatUtil.jsonToLegacy(value);
 								page.setValue(value);
 							}

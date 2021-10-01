@@ -30,6 +30,16 @@ public class ViaRewindConfigImpl extends Config implements ViaRewindConfig {
     }
 
     @Override
+    public int getMaxBookPages() {
+        return getInt("max-book-pages", 100);
+    }
+
+    @Override
+    public int getMaxBookPageSize() {
+        return getInt("max-book-page-length", 5000);
+    }
+
+    @Override
     public URL getDefaultConfigURL() {
         return getClass().getClassLoader().getResource("assets/viarewind/config.yml");
     }
