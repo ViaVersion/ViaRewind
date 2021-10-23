@@ -652,14 +652,13 @@ public class PlayerPackets {
 		protocol.registerServerbound(ServerboundPackets1_7.PLAYER_DIGGING, new PacketRemapper() {
 			@Override
 			public void registerMap() {
-				map(Type.BYTE);  //Status
+				map(Type.VAR_INT);  //Status
 				handler(packetWrapper -> {
 					int x = packetWrapper.read(Type.INT);
 					short y = packetWrapper.read(Type.UNSIGNED_BYTE);
 					int z = packetWrapper.read(Type.INT);
 					packetWrapper.write(Type.POSITION, new Position(x, y, z));
 				});
-				map(Type.BYTE);  //Face
 			}
 		});
 

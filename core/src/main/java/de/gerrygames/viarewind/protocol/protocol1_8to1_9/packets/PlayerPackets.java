@@ -371,9 +371,8 @@ public class PlayerPackets {
 		protocol.registerServerbound(ServerboundPackets1_8.PLAYER_DIGGING, new PacketRemapper() {
 			@Override
 			public void registerMap() {
-				map(Type.BYTE, Type.VAR_INT);
+				map(Type.VAR_INT);
 				map(Type.POSITION);
-				map(Type.BYTE);
 				handler(packetWrapper -> {
 					int state = packetWrapper.get(Type.VAR_INT, 0);
 					if (state == 0) {
