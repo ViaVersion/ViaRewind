@@ -7,7 +7,6 @@ import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.types.CustomByteType;
 import com.viaversion.viaversion.libs.gson.JsonParser;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.CompoundTag;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.ListTag;
@@ -855,42 +854,51 @@ public class PlayerPackets {
 			@Override
 			public void registerMap() {
 				map(Type.STRING);
+				map(Type.SHORT, Type.NOTHING); // Length
 				handler(packetWrapper -> {
 					String channel = packetWrapper.get(Type.STRING, 0);
-					int length = packetWrapper.read(Type.SHORT);
-					if (channel.equalsIgnoreCase("MC|ItemName")) {
-						CustomByteType customByteType = new CustomByteType(length);
-						byte[] data = packetWrapper.read(customByteType);
-						String name = new String(data, StandardCharsets.UTF_8);
-						ByteBuf buf = packetWrapper.user().getChannel().alloc().buffer();
-						Type.STRING.write(buf, name);
-						data = new byte[buf.readableBytes()];
-						buf.readBytes(data);
-						buf.release();
-						packetWrapper.write(Type.REMAINING_BYTES, data);
 
-						Windows windows = packetWrapper.user().get(Windows.class);
-						PacketWrapper updateCost = PacketWrapper.create(0x31, null, packetWrapper.user());
-						updateCost.write(Type.UNSIGNED_BYTE, windows.anvilId);
-						updateCost.write(Type.SHORT, (short) 0);
-						updateCost.write(Type.SHORT, windows.levelCost);
-
-						PacketUtil.sendPacket(updateCost, Protocol1_7_6_10TO1_8.class, true, true);
-					} else if (channel.equalsIgnoreCase("MC|BEdit") || channel.equalsIgnoreCase("MC|BSign")) {
-						Item book = packetWrapper.read(Types1_7_6_10.COMPRESSED_NBT_ITEM);
-						CompoundTag tag = book.tag();
-						if (tag != null && tag.contains("pages")) {
-							ListTag pages = tag.get("pages");
-							for (int i = 0; i < pages.size(); i++) {
-								StringTag page = pages.get(i);
-								String value = page.getValue();
-								value = ChatUtil.legacyToJson(value);
-								page.setValue(value);
-							}
+					switch (channel) {
+						case "MC|TrSel": {
+							packetWrapper.passthrough(Type.INT);
+							packetWrapper.read(Type.REMAINING_BYTES); // unused data ???
+							break;
 						}
-						packetWrapper.write(Type.ITEM, book);
-					} else if (channel.equalsIgnoreCase("MC|Brand")) {
-						packetWrapper.write(Type.VAR_INT, length);
+						case "MC|ItemName": {
+							byte[] data = packetWrapper.read(Type.REMAINING_BYTES);
+							String name = new String(data, StandardCharsets.UTF_8);
+
+							packetWrapper.write(Type.STRING, name);
+
+							Windows windows = packetWrapper.user().get(Windows.class);
+							PacketWrapper updateCost = PacketWrapper.create(0x31, null, packetWrapper.user());
+							updateCost.write(Type.UNSIGNED_BYTE, windows.anvilId);
+							updateCost.write(Type.SHORT, (short) 0);
+							updateCost.write(Type.SHORT, windows.levelCost);
+
+							PacketUtil.sendPacket(updateCost, Protocol1_7_6_10TO1_8.class, true, true);
+							break;
+						}
+						case "MC|BEdit":
+						case "MC|BSign": {
+							Item book = packetWrapper.read(Types1_7_6_10.COMPRESSED_NBT_ITEM);
+							CompoundTag tag = book.tag();
+							if (tag != null && tag.contains("pages")) {
+								ListTag pages = tag.get("pages");
+								for (int i = 0; i < pages.size(); i++) {
+									StringTag page = pages.get(i);
+									String value = page.getValue();
+									value = ChatUtil.legacyToJson(value);
+									page.setValue(value);
+								}
+							}
+							packetWrapper.write(Type.ITEM, book);
+							break;
+						}
+						case "MC|Brand": {
+							packetWrapper.write(Type.STRING, new String(packetWrapper.read(Type.REMAINING_BYTES), StandardCharsets.UTF_8));
+							break;
+						}
 					}
 				});
 			}
