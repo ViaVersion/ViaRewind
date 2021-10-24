@@ -5,7 +5,6 @@ import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.CustomByteType;
@@ -14,9 +13,9 @@ import com.viaversion.viaversion.libs.opennbt.tag.builtin.CompoundTag;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.ListTag;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.StringTag;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
-import com.viaversion.viaversion.protocols.protocol1_8.ServerboundPackets1_8;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import de.gerrygames.viarewind.ViaRewind;
+import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.ClientboundPackets1_7;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10TO1_8;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.ServerboundPackets1_7;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.entityreplacements.ArmorStandReplacement;
@@ -33,6 +32,7 @@ import de.gerrygames.viarewind.utils.math.Ray3d;
 import de.gerrygames.viarewind.utils.math.RayTracing;
 import de.gerrygames.viarewind.utils.math.Vector3d;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.Unpooled;
 
 import java.nio.charset.StandardCharsets;
@@ -490,17 +490,22 @@ public class PlayerPackets {
 		protocol.cancelClientbound(ClientboundPackets1_8.TAB_LIST);
 
 		//Resource Pack Send
-		protocol.registerClientbound(ClientboundPackets1_8.RESOURCE_PACK, null, new PacketRemapper() {
+		protocol.registerClientbound(ClientboundPackets1_8.RESOURCE_PACK, ClientboundPackets1_7.PLUGIN_MESSAGE, new PacketRemapper() {
 			@Override
 			public void registerMap() {
+				create(Type.STRING, "MC|RPack");
 				handler(packetWrapper -> {
-					packetWrapper.cancel();
+					ByteBuf buf = ByteBufAllocator.DEFAULT.buffer();
+					try {
+						// Url
+						Type.STRING.write(buf, packetWrapper.read(Type.STRING));
 
-					PacketWrapper response = packetWrapper.create(ServerboundPackets1_8.RESOURCE_PACK_STATUS);
-					response.write(Type.STRING, packetWrapper.read(Type.STRING)); // hash
-					response.write(Type.VAR_INT, 2); // Failed download
-					response.sendToServer(Protocol1_7_6_10TO1_8.class);
+						packetWrapper.write(Type.SHORT_BYTE_ARRAY, Type.REMAINING_BYTES.read(buf));
+					} finally {
+						buf.release();
+					}
 				});
+				map(Type.STRING, Type.NOTHING); // Hash
 			}
 		});
 
