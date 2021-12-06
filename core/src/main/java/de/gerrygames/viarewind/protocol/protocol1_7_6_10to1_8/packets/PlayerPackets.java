@@ -592,11 +592,14 @@ public class PlayerPackets {
 
 					PlayerPosition playerPosition = packetWrapper.user().get(PlayerPosition.class);
 
-					if (playerPosition.isPositionPacketReceived()) {
+					/*
+					Completely useless, this isn't vanilla behaviour so it would trigger anticheats.
+					*/
+					/*if (playerPosition.isPositionPacketReceived()) {
 						playerPosition.setPositionPacketReceived(false);
 						feetY -= 0.01;
 						packetWrapper.set(Type.DOUBLE, 1, feetY);
-					}
+					}*/
 
 					playerPosition.setOnGround(packetWrapper.get(Type.BOOLEAN, 0));
 					playerPosition.setPos(x, feetY, z);
@@ -639,11 +642,21 @@ public class PlayerPackets {
 
 					PlayerPosition playerPosition = packetWrapper.user().get(PlayerPosition.class);
 
-					if (playerPosition.isPositionPacketReceived()) {
+					/*
+					We can't track teleports like this, this packet could've just been a POSLOOK
+					sent before client accepted teleport, also there could be multiple teleports
+					and the #getReceivedPosY(), would be wrong y-coord
+					
+					Because of this inaccuracy it could teleport players to a wrong place
+					and trigger anticheats
+					
+					I've tested this change and there is no noticable glitchiness in client view.
+					*/
+					/*if (playerPosition.isPositionPacketReceived()) {
 						playerPosition.setPositionPacketReceived(false);
 						feetY = playerPosition.getReceivedPosY();
 						packetWrapper.set(Type.DOUBLE, 1, feetY);
-					}
+					}*/
 
 					playerPosition.setOnGround(packetWrapper.get(Type.BOOLEAN, 0));
 					playerPosition.setPos(x, feetY, z);
