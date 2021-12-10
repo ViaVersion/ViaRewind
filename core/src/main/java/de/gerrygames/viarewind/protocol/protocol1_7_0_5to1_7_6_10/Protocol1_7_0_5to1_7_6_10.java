@@ -1,25 +1,31 @@
 package de.gerrygames.viarewind.protocol.protocol1_7_0_5to1_7_6_10;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.protocol.AbstractSimpleProtocol;
+import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.protocol.remapper.ValueTransformer;
 import com.viaversion.viaversion.api.type.Type;
+import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.ClientboundPackets1_7;
+import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.ServerboundPackets1_7;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Protocol1_7_0_5to1_7_6_10 extends AbstractSimpleProtocol {
+public class Protocol1_7_0_5to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_7, ClientboundPackets1_7, ServerboundPackets1_7, ServerboundPackets1_7> {
 	public static final ValueTransformer<String, String> REMOVE_DASHES = new ValueTransformer<String, String>(Type.STRING) {
 		@Override
 		public String transform(PacketWrapper packetWrapper, String s) {
 			return s.replace("-", "");
 		}
 	};
+
+	public Protocol1_7_0_5to1_7_6_10() {
+		super(ClientboundPackets1_7.class, ClientboundPackets1_7.class, ServerboundPackets1_7.class, ServerboundPackets1_7.class);
+	}
 
 	@Override
 	protected void registerPackets() {
@@ -33,7 +39,7 @@ public class Protocol1_7_0_5to1_7_6_10 extends AbstractSimpleProtocol {
 		});
 
 		//Spawn Player
-		this.registerClientbound(State.PLAY, 0x0C, 0x0C, new PacketRemapper() {
+		this.registerClientbound(ClientboundPackets1_7.SPAWN_PLAYER, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT);
@@ -54,7 +60,7 @@ public class Protocol1_7_0_5to1_7_6_10 extends AbstractSimpleProtocol {
 		});
 
 		//Teams
-		this.registerClientbound(State.PLAY, 0x3E, 0x3E, new PacketRemapper() {
+		this.registerClientbound(ClientboundPackets1_7.TEAMS, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.STRING);

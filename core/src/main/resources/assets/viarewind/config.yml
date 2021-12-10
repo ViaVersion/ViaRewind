@@ -10,3 +10,7 @@ replace-adventure: false
 #Whether 1.9 particles should be replaced by similar ones in
 #1.8 and lower
 replace-particles: false
+#Max amount of pages for written books before a client gets kicked
+max-book-pages: 100
+#Max amount of characters in the json (!) string of a book page before a client gets kicked
+max-book-page-length: 5000

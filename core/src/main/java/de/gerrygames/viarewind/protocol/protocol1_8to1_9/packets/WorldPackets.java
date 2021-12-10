@@ -4,8 +4,8 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
 import com.viaversion.viaversion.api.minecraft.Environment;
 import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.chunks.BaseChunk;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
-import com.viaversion.viaversion.api.minecraft.chunks.Chunk1_8;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSectionImpl;
 import com.viaversion.viaversion.api.protocol.Protocol;
@@ -20,13 +20,15 @@ import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.Client
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.types.Chunk1_9_1_2Type;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ClientboundPackets1_9;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ServerboundPackets1_9;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.types.Chunk1_8Type;
 import de.gerrygames.viarewind.ViaRewind;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.Protocol1_8TO1_9;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.items.ReplacementRegistry1_8to1_9;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.sound.Effect;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.sound.SoundRemapper;
-import de.gerrygames.viarewind.protocol.protocol1_8to1_9.types.Chunk1_8Type;
 import de.gerrygames.viarewind.utils.PacketUtil;
+
+import java.util.ArrayList;
 
 public class WorldPackets {
 
@@ -157,7 +159,7 @@ public class WorldPackets {
 					int chunkX = packetWrapper.read(Type.INT);
 					int chunkZ = packetWrapper.read(Type.INT);
 					ClientWorld world = packetWrapper.user().get(ClientWorld.class);
-					packetWrapper.write(new Chunk1_8Type(world), new Chunk1_8(chunkX, chunkZ));
+					packetWrapper.write(new Chunk1_8Type(world), new BaseChunk(chunkX, chunkZ, true, false, 0, new ChunkSection[16], null, new ArrayList<>()));
 				});
 			}
 		});
@@ -187,7 +189,7 @@ public class WorldPackets {
 						sections[0] = section;
 						section.addPaletteEntry(0);
 						if (skylight) section.getLight().setSkyLight(new byte[2048]);
-						chunk = new Chunk1_8(chunk.getX(), chunk.getZ(), true, 1, sections, chunk.getBiomeData(), chunk.getBlockEntities());
+						chunk = new BaseChunk(chunk.getX(), chunk.getZ(), true, false, 1, sections, chunk.getBiomeData(), chunk.getBlockEntities());
 					}
 
 					packetWrapper.write(new Chunk1_8Type(world), chunk);

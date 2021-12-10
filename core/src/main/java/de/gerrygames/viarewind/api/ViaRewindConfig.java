@@ -11,4 +11,8 @@ public interface ViaRewindConfig {
 	boolean isReplaceAdventureMode();
 
 	boolean isReplaceParticles();
+
+	int getMaxBookPages();
+
+	int getMaxBookPageSize();
 }

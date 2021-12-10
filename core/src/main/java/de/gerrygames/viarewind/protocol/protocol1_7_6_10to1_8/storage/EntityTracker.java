@@ -203,7 +203,6 @@ public class EntityTracker extends StoredObject implements ClientEntityIdChangeL
 	}
 
 	public void setPlayerId(int playerId) {
-		if (this.playerId!=-1) throw new IllegalStateException("playerId was already set!");
 		this.playerId = this.spectating = playerId;
 	}
 

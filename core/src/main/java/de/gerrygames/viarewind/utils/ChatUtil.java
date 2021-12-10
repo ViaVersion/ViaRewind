@@ -3,6 +3,7 @@ package de.gerrygames.viarewind.utils;
 import com.viaversion.viaversion.libs.gson.JsonElement;
 import com.viaversion.viaversion.libs.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import com.viaversion.viaversion.libs.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ChatRewriter;
 import de.gerrygames.viarewind.ViaRewind;
 
 import java.util.logging.Level;
@@ -14,7 +15,7 @@ public class ChatUtil {
 	public static String jsonToLegacy(String json) {
 		if (json == null || json.equals("null") || json.isEmpty()) return "";
 		try {
-			String legacy = LegacyComponentSerializer.legacySection().serialize(GsonComponentSerializer.gson().deserialize(json));
+			String legacy = LegacyComponentSerializer.legacySection().serialize(ChatRewriter.HOVER_GSON_SERIALIZER.deserialize(json));
 			while (legacy.startsWith("§f")) legacy = legacy.substring(2);
 			return legacy;
 		} catch (Exception ex) {
@@ -24,7 +25,7 @@ public class ChatUtil {
 	}
 
 	public static String jsonToLegacy(JsonElement component) {
-		if (component.isJsonNull() || component.isJsonArray() && component.getAsJsonArray().size() == 0 || component.isJsonObject() && component.getAsJsonObject().size() == 0) {
+		if (component.isJsonNull() || component.isJsonArray() && component.getAsJsonArray().isEmpty() || component.isJsonObject() && component.getAsJsonObject().size() == 0) {
 			return "";
 		} else if (component.isJsonPrimitive()) {
 			return component.getAsString();

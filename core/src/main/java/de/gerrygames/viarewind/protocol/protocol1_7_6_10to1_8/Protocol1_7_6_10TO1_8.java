@@ -9,14 +9,20 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
+import com.viaversion.viaversion.protocols.protocol1_8.ServerboundPackets1_8;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
-import com.viaversion.viaversion.protocols.protocol1_9to1_8.storage.ClientChunks;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.packets.*;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.provider.CompressionHandlerProvider;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage.*;
 import de.gerrygames.viarewind.utils.Ticker;
 
-public class Protocol1_7_6_10TO1_8 extends AbstractProtocol {
+public class Protocol1_7_6_10TO1_8 extends AbstractProtocol<ClientboundPackets1_8, ClientboundPackets1_7,
+		ServerboundPackets1_8, ServerboundPackets1_7> {
+
+	public Protocol1_7_6_10TO1_8() {
+		super(ClientboundPackets1_8.class, ClientboundPackets1_7.class, ServerboundPackets1_8.class, ServerboundPackets1_7.class);
+	}
 
 	@Override
 	protected void registerPackets() {
@@ -27,24 +33,16 @@ public class Protocol1_7_6_10TO1_8 extends AbstractProtocol {
 		SpawnPackets.register(this);
 		WorldPackets.register(this);
 
-		//Keep Alive
-		this.registerClientbound(State.PLAY, 0x00, 0x00, new PacketRemapper() {
+		this.registerClientbound(ClientboundPackets1_8.KEEP_ALIVE, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.VAR_INT, Type.INT);
 			}
 		});
 
-		//Set Compression
-		this.registerClientbound(State.PLAY, 0x46, -1, new PacketRemapper() {
-			@Override
-			public void registerMap() {
-				handler(packetWrapper -> packetWrapper.cancel());
-			}
-		});
+		this.cancelClientbound(ClientboundPackets1_8.SET_COMPRESSION); // unused
 
-		//Keep Alive
-		this.registerServerbound(State.PLAY, 0x00, 0x00, new PacketRemapper() {
+		this.registerServerbound(ServerboundPackets1_7.KEEP_ALIVE, new PacketRemapper() {
 			@Override
 			public void registerMap() {
 				map(Type.INT, Type.VAR_INT);
@@ -99,7 +97,6 @@ public class Protocol1_7_6_10TO1_8 extends AbstractProtocol {
 		userConnection.put(new EntityTracker(userConnection));
 		userConnection.put(new PlayerPosition(userConnection));
 		userConnection.put(new GameProfileStorage(userConnection));
-		userConnection.put(new ClientChunks(userConnection));
 		userConnection.put(new Scoreboard(userConnection));
 		userConnection.put(new CompressionSendStorage(userConnection));
 		userConnection.put(new WorldBorder(userConnection));
