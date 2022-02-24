@@ -108,7 +108,7 @@ public class ArmorStandReplacement implements EntityReplacement {
 		marker = (armorStandFlags & 0x10) != 0;
 
 		State prevState = currentState;
-		if (invisible && name != null) {
+		if (invisible && marker) {
 			currentState = State.HOLOGRAM;
 		} else {
 			currentState = State.ZOMBIE;
