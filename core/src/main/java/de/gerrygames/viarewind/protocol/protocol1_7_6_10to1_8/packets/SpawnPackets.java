@@ -3,10 +3,7 @@ package de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.packets;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
-import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.protocol.packet.State;
-import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_8;
@@ -15,11 +12,13 @@ import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10TO
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.entityreplacements.ArmorStandReplacement;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.entityreplacements.EndermiteReplacement;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.entityreplacements.GuardianReplacement;
+import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.entityreplacements.RabbitReplacement;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.items.ReplacementRegistry1_7_6_10to1_8;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.metadata.MetadataRewriter;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage.EntityTracker;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage.GameProfileStorage;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
+import de.gerrygames.viarewind.replacement.EntityReplacement;
 import de.gerrygames.viarewind.replacement.Replacement;
 import de.gerrygames.viarewind.utils.PacketUtil;
 
@@ -209,34 +208,25 @@ public class SpawnPackets {
 					byte yaw = packetWrapper.get(Type.BYTE, 0);
 					byte headYaw = packetWrapper.get(Type.BYTE, 2);
 
-					if (typeId == 30) {
+					if (typeId == 30 || typeId == 68 || typeId == 67 || typeId == 101) {
 						packetWrapper.cancel();
 
 						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-						ArmorStandReplacement armorStand = new ArmorStandReplacement(entityId, packetWrapper.user());
-						armorStand.setLocation(x / 32.0, y / 32.0, z / 32.0);
-						armorStand.setYawPitch(yaw * 360f / 256, pitch * 360f / 256);
-						armorStand.setHeadYaw(headYaw * 360f / 256);
-						tracker.addEntityReplacement(armorStand);
-					} else if (typeId == 68) {
-						packetWrapper.cancel();
-
-						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-						GuardianReplacement guardian = new GuardianReplacement(entityId, packetWrapper.user());
-						guardian.setLocation(x / 32.0, y / 32.0, z / 32.0);
-						guardian.setYawPitch(yaw * 360f / 256, pitch * 360f / 256);
-						guardian.setHeadYaw(headYaw * 360f / 256);
-						tracker.addEntityReplacement(guardian);
-					} else if (typeId == 67) {
-						packetWrapper.cancel();
-
-						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-						EndermiteReplacement endermite = new EndermiteReplacement(entityId, packetWrapper.user());
-						endermite.setLocation(x / 32.0, y / 32.0, z / 32.0);
-						endermite.setYawPitch(yaw * 360f / 256, pitch * 360f / 256);
-						endermite.setHeadYaw(headYaw * 360f / 256);
-						tracker.addEntityReplacement(endermite);
-					} else if (typeId == 101 || typeId == 255 || typeId == -1) {
+						EntityReplacement replacement = null;
+						if (typeId == 30) {
+							replacement = new ArmorStandReplacement(entityId, packetWrapper.user());
+						} else if (typeId == 68) {
+							replacement = new GuardianReplacement(entityId, packetWrapper.user());
+						} else if (typeId == 67) {
+							replacement = new EndermiteReplacement(entityId, packetWrapper.user());
+						} else if (typeId == 101){
+							replacement = new RabbitReplacement(entityId, packetWrapper.user());
+						}
+						replacement.setLocation(x / 32.0, y / 32.0, z / 32.0);
+						replacement.setYawPitch(yaw * 360f / 256, pitch * 360f / 256);
+						replacement.setHeadYaw(headYaw * 360f / 256);
+						tracker.addEntityReplacement(replacement);
+					} else if (typeId == 255 || typeId == -1) {
 						packetWrapper.cancel();
 					}
 				});

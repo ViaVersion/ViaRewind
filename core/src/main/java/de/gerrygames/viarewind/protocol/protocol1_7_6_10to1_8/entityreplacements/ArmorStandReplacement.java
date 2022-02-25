@@ -33,7 +33,6 @@ public class ArmorStandReplacement implements EntityReplacement {
 	private float headYaw;
 	private boolean small = false;
 	private boolean marker = false;
-	private static int ENTITY_ID = Integer.MAX_VALUE - 16000;
 
 	public int getEntityId() {
 		return this.entityId;
@@ -259,7 +258,7 @@ public class ArmorStandReplacement implements EntityReplacement {
 	}
 
 	private void spawnHologram() {
-		int[] entityIds = new int[] {entityId, ENTITY_ID--};
+		int[] entityIds = new int[] {entityId, additionalEntityId()};
 
 		PacketWrapper spawnSkull = PacketWrapper.create(ClientboundPackets1_7.SPAWN_ENTITY, null, user);
 		spawnSkull.write(Type.VAR_INT, entityIds[0]);
@@ -289,6 +288,10 @@ public class ArmorStandReplacement implements EntityReplacement {
 		PacketUtil.sendPacket(spawnHorse, Protocol1_7_6_10TO1_8.class, true, true);
 
 		this.entityIds = entityIds;
+	}
+
+	private int additionalEntityId() {
+		return Integer.MAX_VALUE - 16000 - entityId;
 	}
 
 	public AABB getBoundingBox() {
