@@ -288,7 +288,7 @@ public class PlayerPackets {
 							}
 
 							PacketWrapper packet = PacketWrapper.create(0x38, null, packetWrapper.user());
-							packet.write(Type.STRING, gameProfile.name);
+							packet.write(Type.STRING, gameProfile.getDisplayName());
 							packet.write(Type.BOOLEAN, true);
 							packet.write(Type.SHORT, (short) ping);
 							PacketUtil.sendPacket(packet, Protocol1_7_6_10TO1_8.class);
@@ -327,30 +327,48 @@ public class PlayerPackets {
 
 							GameProfileStorage.GameProfile gameProfile = gameProfileStorage.get(uuid);
 							if (gameProfile == null) continue;
-
+							
+							PacketWrapper packet = PacketWrapper.create(0x38, null, packetWrapper.user());
+							packet.write(Type.STRING, gameProfile.getDisplayName());
+							packet.write(Type.BOOLEAN, false);
+							packet.write(Type.SHORT, (short) gameProfile.ping);
+							PacketUtil.sendPacket(packet, Protocol1_7_6_10TO1_8.class);
+							
 							gameProfile.ping = ping;
 
-							PacketWrapper packet = PacketWrapper.create(0x38, null, packetWrapper.user());
-							packet.write(Type.STRING, gameProfile.name);
+							packet = PacketWrapper.create(0x38, null, packetWrapper.user());
+							packet.write(Type.STRING, gameProfile.getDisplayName());
 							packet.write(Type.BOOLEAN, true);
 							packet.write(Type.SHORT, (short) ping);
 							PacketUtil.sendPacket(packet, Protocol1_7_6_10TO1_8.class);
 						} else if (action == 3) {
-							String displayName = packetWrapper.read(Type.BOOLEAN) ? ChatUtil.jsonToLegacy(packetWrapper.read(Type.COMPONENT)) : null;
+							boolean update = packetWrapper.read(Type.BOOLEAN);
+							String displayName = update ? ChatUtil.jsonToLegacy(packetWrapper.read(Type.COMPONENT)) : null;
 
 							GameProfileStorage.GameProfile gameProfile = gameProfileStorage.get(uuid);
 							if (gameProfile == null || gameProfile.displayName == null && displayName == null) continue;
+							
+							PacketWrapper packet = PacketWrapper.create(0x38, null, packetWrapper.user());
+							packet.write(Type.STRING, gameProfile.getDisplayName());
+							packet.write(Type.BOOLEAN, false);
+							packet.write(Type.SHORT, (short) gameProfile.ping);
+							PacketUtil.sendPacket(packet, Protocol1_7_6_10TO1_8.class);
 
 							if (gameProfile.displayName == null && displayName != null || gameProfile.displayName != null && displayName == null || !gameProfile.displayName.equals(displayName)) {
 								gameProfile.setDisplayName(displayName);
 							}
+							
+							packet = PacketWrapper.create(0x38, null, packetWrapper.user());
+							packet.write(Type.STRING, gameProfile.getDisplayName());
+							packet.write(Type.BOOLEAN, true);
+							packet.write(Type.SHORT, (short) gameProfile.ping);
+							PacketUtil.sendPacket(packet, Protocol1_7_6_10TO1_8.class);
 						} else if (action == 4) {
 							GameProfileStorage.GameProfile gameProfile = gameProfileStorage.remove(uuid);
 							if (gameProfile == null) continue;
 
 							PacketWrapper packet = PacketWrapper.create(0x38, null, packetWrapper.user());
-							//packet.write(Type.STRING, gameProfile.getDisplayName());
-							packet.write(Type.STRING, gameProfile.name);
+							packet.write(Type.STRING, gameProfile.getDisplayName());
 							packet.write(Type.BOOLEAN, false);
 							packet.write(Type.SHORT, (short) gameProfile.ping);
 							PacketUtil.sendPacket(packet, Protocol1_7_6_10TO1_8.class);
