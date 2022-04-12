@@ -1,0 +1,38 @@
+{
+  "loader": {
+    "name": "java_plain",
+    "version": "1.0"
+  },
+  "license": "GNU GPLv3",
+  "global": {
+    "version": "${project.version}",
+    "links": {
+      "homepage": "https://viaversion.com/rewind",
+      "source": "https://github.com/ViaVersion/ViaRewind",
+      "issues": "https://github.com/ViaVersion/ViaRewind"
+    },
+    "contributors": [
+      {
+        "name": "Gerrygames",
+        "description": "Author"
+      }
+    ],
+    "dependencies": [
+      {
+        "id": "spongeapi",
+        "version": "8.0.0"
+      },
+      {
+        "id": "viaversion",
+        "version": "[4.2.0,)"
+      }
+    ]
+  },
+  "plugins": [
+    {
+      "id": "viarewind",
+      "name": "ViaRewind",
+      "entrypoint": "de.gerrygames.viarewind.SpongePlugin"
+    }
+  ]
+}
