@@ -4,10 +4,12 @@ import com.viaversion.viaversion.api.minecraft.Environment;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.type.PartialType;
+import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import io.netty.buffer.ByteBuf;
 
-import java.util.zip.Deflater;
+import java.io.ByteArrayOutputStream;
+import java.util.zip.DeflaterOutputStream;
 
 public class Chunk1_7_10Type extends PartialType<Chunk, ClientWorld> {
 
@@ -29,71 +31,56 @@ public class Chunk1_7_10Type extends PartialType<Chunk, ClientWorld> {
         output.writeShort(0);
 
         ByteBuf dataToCompress = output.alloc().buffer();
-
-        // Half byte per block data
-        ByteBuf blockData = output.alloc().buffer();
-
-        for (int i = 0; i < chunk.getSections().length; i++) {
-            if ((chunk.getBitmask() & 1 << i) == 0) continue;
-            ChunkSection section = chunk.getSections()[i];
-            for (int y = 0; y < 16; y++) {
-                for (int z = 0; z < 16; z++) {
-                    int previousData = 0;
-                    for (int x = 0; x < 16; x++) {
-                        int block = section.getFlatBlock(x, y, z);
-                        dataToCompress.writeByte(block >> 4);
-
-                        int data = block & 0xF;
-                        if (x % 2 == 0) {
-                            previousData = data;
-                        } else {
-                            blockData.writeByte((data << 4) | previousData);
-                        }
-                    }
-                }
-            }
-        }
-        dataToCompress.writeBytes(blockData);
-        blockData.release();
-
-        for (int i = 0; i < chunk.getSections().length; i++) {
-            if ((chunk.getBitmask() & 1 << i) == 0) continue;
-            chunk.getSections()[i].getLight().writeBlockLight(dataToCompress);
-        }
-
-        boolean skyLight = clientWorld != null && clientWorld.getEnvironment() == Environment.NORMAL;
-        if (skyLight) {
+        try {
             for (int i = 0; i < chunk.getSections().length; i++) {
                 if ((chunk.getBitmask() & 1 << i) == 0) continue;
-                chunk.getSections()[i].getLight().writeSkyLight(dataToCompress);
+                ChunkSection section = chunk.getSections()[i];
+                for (int j = 0; j < 4096; j++) {
+                    int block = section.getFlatBlock(j);
+                    dataToCompress.writeByte(block >> 4);
+                }
             }
-        }
 
-        if (chunk.isFullChunk() && chunk.isBiomeData()) {
-            for (int biome : chunk.getBiomeData()) {
-                dataToCompress.writeByte((byte) biome);
+            for (int i = 0; i < chunk.getSections().length; i++) {
+                if ((chunk.getBitmask() & 1 << i) == 0) continue;
+                ChunkSection section = chunk.getSections()[i];
+                for (int j = 0; j < 4096; j += 2) {
+                    int data0 = section.getFlatBlock(j) & 0xF;
+                    int data1 = section.getFlatBlock(j + 1) & 0xF;
+
+                    dataToCompress.writeByte((data1 << 4) | data0);
+                }
             }
-        }
 
-        dataToCompress.readerIndex(0);
-        byte[] data = new byte[dataToCompress.readableBytes()];
-        dataToCompress.readBytes(data);
-        dataToCompress.release();
+            for (int i = 0; i < chunk.getSections().length; i++) {
+                if ((chunk.getBitmask() & 1 << i) == 0) continue;
+                chunk.getSections()[i].getLight().writeBlockLight(dataToCompress);
+            }
 
-        Deflater deflater = new Deflater(4); // todo let user choose compression
-        byte[] compressedData;
-        int compressedSize;
-        try {
-            deflater.setInput(data, 0, data.length);
-            deflater.finish();
-            compressedData = new byte[data.length];
-            compressedSize = deflater.deflate(compressedData);
+            boolean skyLight = clientWorld != null && clientWorld.getEnvironment() == Environment.NORMAL;
+            if (skyLight) {
+                for (int i = 0; i < chunk.getSections().length; i++) {
+                    if ((chunk.getBitmask() & 1 << i) == 0) continue;
+                    chunk.getSections()[i].getLight().writeSkyLight(dataToCompress);
+                }
+            }
+
+            if (chunk.isFullChunk() && chunk.isBiomeData()) {
+                for (int biome : chunk.getBiomeData()) {
+                    dataToCompress.writeByte(biome);
+                }
+            }
+
+            ByteArrayOutputStream compressedStream = new ByteArrayOutputStream();
+            // todo config for compression level
+            try (DeflaterOutputStream compressorStream = new DeflaterOutputStream(compressedStream)) {
+                compressorStream.write(Type.REMAINING_BYTES.read(dataToCompress));
+            }
+
+            output.writeInt(compressedStream.size());
+            output.writeBytes(compressedStream.toByteArray());
         } finally {
-            deflater.end();
+            dataToCompress.release();
         }
-
-        output.writeInt(compressedSize);
-
-        output.writeBytes(compressedData, 0, compressedSize);
     }
 }

@@ -19,7 +19,6 @@ import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage.WorldBorde
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.Chunk1_7_10Type;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.Particle;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
-import de.gerrygames.viarewind.replacement.Replacement;
 import de.gerrygames.viarewind.types.VarLongType;
 import de.gerrygames.viarewind.utils.ChatUtil;
 import de.gerrygames.viarewind.utils.PacketUtil;
@@ -80,18 +79,10 @@ public class WorldPackets {
 				handler(packetWrapper -> {
 					int data = packetWrapper.read(Type.VAR_INT);
 
-					int blockId = data >> 4;
-					int meta = data & 0xF;
+					data = ReplacementRegistry1_7_6_10to1_8.replace(data);
 
-					Replacement replace = ReplacementRegistry1_7_6_10to1_8.getReplacement(blockId, meta);
-
-					if (replace != null) {
-						blockId = replace.getId();
-						meta = replace.replaceData(meta);
-					}
-
-					packetWrapper.write(Type.VAR_INT, blockId);
-					packetWrapper.write(Type.UNSIGNED_BYTE, (short) meta);
+					packetWrapper.write(Type.VAR_INT, data >> 4);
+					packetWrapper.write(Type.UNSIGNED_BYTE, (short) (data & 0xF));
 				});  //Block Data
 			}
 		});
