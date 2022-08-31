@@ -39,8 +39,8 @@ public class WorldBorder extends StoredObject implements Tickable {
 		WEST(-1, 0),
 		;
 
-		private int modX;
-		private int modZ;
+		private final int modX;
+		private final int modZ;
 
 		Side(int modX, int modZ) {
 			this.modX = modX;

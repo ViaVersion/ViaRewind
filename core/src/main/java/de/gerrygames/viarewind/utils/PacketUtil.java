@@ -22,7 +22,6 @@ public class PacketUtil {
                 packet.scheduleSendToServer(packetProtocol, skipCurrentPipeline);
             }
 		} catch (CancelException ignored) {
-			;
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -45,7 +44,6 @@ public class PacketUtil {
             }
 			return true;
 		} catch (CancelException ignored) {
-			;
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}

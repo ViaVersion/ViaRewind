@@ -79,15 +79,14 @@ public class PlayerPosition extends StoredObject {
 		if (o == this) return true;
 		if (!(o instanceof PlayerPosition)) return false;
 		final PlayerPosition other = (PlayerPosition) o;
-		if (!other.canEqual((Object) this)) return false;
+		if (!other.canEqual(this)) return false;
 		if (Double.compare(this.getPosX(), other.getPosX()) != 0) return false;
 		if (Double.compare(this.getPosY(), other.getPosY()) != 0) return false;
 		if (Double.compare(this.getPosZ(), other.getPosZ()) != 0) return false;
 		if (Float.compare(this.getYaw(), other.getYaw()) != 0) return false;
 		if (Float.compare(this.getPitch(), other.getPitch()) != 0) return false;
 		if (this.isOnGround() != other.isOnGround()) return false;
-		if (this.getConfirmId() != other.getConfirmId()) return false;
-		return true;
+		return this.getConfirmId() == other.getConfirmId();
 	}
 
 	protected boolean canEqual(final Object other) {

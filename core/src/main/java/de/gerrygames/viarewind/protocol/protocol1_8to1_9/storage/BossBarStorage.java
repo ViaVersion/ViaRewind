@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public class BossBarStorage extends StoredObject {
-	private Map<UUID, WitherBossBar> bossBars = new HashMap<>();
+	private final Map<UUID, WitherBossBar> bossBars = new HashMap<>();
 
 	public BossBarStorage(UserConnection user) {
 		super(user);

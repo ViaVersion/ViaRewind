@@ -81,15 +81,14 @@ public class PlayerAbilities extends StoredObject {
 		if (!(o instanceof PlayerAbilities))
 			return false;
 		final PlayerAbilities other = (PlayerAbilities) o;
-		if (!other.canEqual((Object) this)) return false;
+		if (!other.canEqual(this)) return false;
 		if (this.isSprinting() != other.isSprinting()) return false;
 		if (this.isAllowFly() != other.isAllowFly()) return false;
 		if (this.isFlying() != other.isFlying()) return false;
 		if (this.isInvincible() != other.isInvincible()) return false;
 		if (this.isCreative() != other.isCreative()) return false;
 		if (Float.compare(this.getFlySpeed(), other.getFlySpeed()) != 0) return false;
-		if (Float.compare(this.getWalkSpeed(), other.getWalkSpeed()) != 0) return false;
-		return true;
+		return Float.compare(this.getWalkSpeed(), other.getWalkSpeed()) == 0;
 	}
 
 	protected boolean canEqual(final Object other) {

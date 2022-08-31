@@ -21,7 +21,7 @@ public class NBTType extends Type<CompoundTag> {
 		ByteBufInputStream byteBufInputStream = new ByteBufInputStream(buffer);
 		DataInputStream dataInputStream = new DataInputStream(byteBufInputStream);
 		try {
-			return (CompoundTag) NBTIO.readTag((DataInput) dataInputStream);
+			return NBTIO.readTag((DataInput) dataInputStream);
 		} catch (Throwable throwable) {throwable.printStackTrace();}
 		finally {
 			try {

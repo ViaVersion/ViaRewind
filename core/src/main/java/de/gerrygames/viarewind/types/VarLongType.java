@@ -19,7 +19,7 @@ public class VarLongType extends Type<Long> {
 		do
 		{
 			b0 = byteBuf.readByte();
-			i |= (b0 & 0x7F) << j++ * 7;
+			i |= (long) (b0 & 0x7F) << j++ * 7;
 			if (j > 10) {
 				throw new RuntimeException("VarLong too big");
 			}

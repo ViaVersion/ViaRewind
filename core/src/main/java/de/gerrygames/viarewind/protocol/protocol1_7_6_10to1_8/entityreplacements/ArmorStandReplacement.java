@@ -20,15 +20,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ArmorStandReplacement implements EntityReplacement {
-	private int entityId;
-	private List<Metadata> datawatcher = new ArrayList<>();
+	private final int entityId;
+	private final List<Metadata> datawatcher = new ArrayList<>();
 	private int[] entityIds = null;
 	private double locX, locY, locZ;
 	private State currentState = null;
 	private boolean invisible = false;
 	private boolean nameTagVisible = false;
 	private String name = null;
-	private UserConnection user;
+	private final UserConnection user;
 	private float yaw, pitch;
 	private float headYaw;
 	private boolean small = false;
