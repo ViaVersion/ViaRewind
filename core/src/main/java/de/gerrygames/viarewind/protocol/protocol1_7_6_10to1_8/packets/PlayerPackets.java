@@ -213,15 +213,17 @@ public class PlayerPackets {
 					int gamemode = packetWrapper.get(Type.FLOAT, 0).intValue();
 					EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
 					if (gamemode == 3 || tracker.getGamemode() == 3) {
-						UUID uuid = packetWrapper.user().getProtocolInfo().getUuid();
+						UUID myId = packetWrapper.user().getProtocolInfo().getUuid();
 						Item[] equipment;
 						if (gamemode == 3) {
-							GameProfileStorage.GameProfile profile = packetWrapper.user().get(GameProfileStorage.class).get(uuid);
-							equipment = new Item[5];
-							equipment[4] = profile.getSkull();
+							GameProfileStorage.GameProfile profile = packetWrapper.user().get(GameProfileStorage.class).get(myId);
+							equipment = new Item[4];
+							equipment[3] = profile.getSkull();
 						} else {
-							equipment = tracker.getPlayerEquipment(uuid);
-							if (equipment == null) equipment = new Item[5];
+							equipment = new Item[4];
+							for (int i = 0; i < equipment.length; i++) {
+								equipment[i] = tracker.getPlayerEquipment(myId, i);
+							}
 						}
 
 						for (int i = 1; i < 5; i++) {
@@ -301,18 +303,20 @@ public class PlayerPackets {
 							if (gamemode == 3 || gameProfile.gamemode == 3) {
 								EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
 								int entityId = tracker.getPlayerEntityId(uuid);
+								boolean isOwnPlayer = entityId == tracker.getPlayerId();
 								if (entityId != -1) {
-									Item[] equipment;
+									// Weirdly, PlayerEntity has only 4 slots instead of 5
+									Item[] equipment = new Item[isOwnPlayer ? 4 : 5];
 									if (gamemode == 3) {
-										equipment = new Item[5];
-										equipment[4] = gameProfile.getSkull();
+										equipment[isOwnPlayer ? 3 : 4] = gameProfile.getSkull();
 									} else {
-										equipment = tracker.getPlayerEquipment(uuid);
-										if (equipment == null) equipment = new Item[5];
+										for (int j = 0; j < equipment.length; j++) {
+											equipment[j] = tracker.getPlayerEquipment(uuid, j);
+										}
 									}
 
-									for (short slot = 0; slot < 5; slot++) {
-										PacketWrapper equipmentPacket = PacketWrapper.create(0x04, null, packetWrapper.user());
+									for (short slot = 0; slot < equipment.length; slot++) {
+										PacketWrapper equipmentPacket = PacketWrapper.create(ClientboundPackets1_7.ENTITY_EQUIPMENT, packetWrapper.user());
 										equipmentPacket.write(Type.INT, entityId);
 										equipmentPacket.write(Type.SHORT, slot);
 										equipmentPacket.write(Types1_7_6_10.COMPRESSED_NBT_ITEM, equipment[slot]);

@@ -1,10 +1,6 @@
 package de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.packets;
 
 import com.viaversion.viaversion.api.minecraft.item.Item;
-import com.viaversion.viaversion.api.protocol.Protocol;
-import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.protocol.packet.State;
-import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.libs.gson.JsonElement;
@@ -93,12 +89,8 @@ public class InventoryPackets {
 					if (slot < 5 || slot > 8) return;
 					Item item = packetWrapper.get(Types1_7_6_10.COMPRESSED_NBT_ITEM, 0);
 					EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-					UUID uuid = packetWrapper.user().getProtocolInfo().getUuid();
-					Item[] equipment = tracker.getPlayerEquipment(uuid);
-					if (equipment == null) {
-						tracker.setPlayerEquipment(uuid, equipment = new Item[5]);
-					}
-					equipment[9 - slot] = item;
+					UUID myId = packetWrapper.user().getProtocolInfo().getUuid();
+					tracker.setPlayerEquipment(myId, item, 8 - slot);
 					if (tracker.getGamemode() == 3) packetWrapper.cancel();
 				});
 			}
@@ -126,17 +118,13 @@ public class InventoryPackets {
 					if (windowId != 0) return;
 					Item[] items = packetWrapper.get(Types1_7_6_10.COMPRESSED_NBT_ITEM_ARRAY, 0);
 					EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-					UUID uuid = packetWrapper.user().getProtocolInfo().getUuid();
-					Item[] equipment = tracker.getPlayerEquipment(uuid);
-					if (equipment == null) {
-						tracker.setPlayerEquipment(uuid, equipment = new Item[5]);
-					}
+					UUID myId = packetWrapper.user().getProtocolInfo().getUuid();
 					for (int i = 5; i < 9; i++) {
-						equipment[9 - i] = items[i];
+						tracker.setPlayerEquipment(myId, items[i], 8 - i);
 						if (tracker.getGamemode() == 3) items[i] = null;
 					}
 					if (tracker.getGamemode() == 3) {
-						GameProfileStorage.GameProfile profile = packetWrapper.user().get(GameProfileStorage.class).get(uuid);
+						GameProfileStorage.GameProfile profile = packetWrapper.user().get(GameProfileStorage.class).get(myId);
 						if (profile != null) items[5] = profile.getSkull();
 					}
 				});
