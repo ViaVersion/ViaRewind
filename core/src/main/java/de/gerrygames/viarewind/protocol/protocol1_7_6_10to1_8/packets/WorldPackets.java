@@ -19,7 +19,6 @@ import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage.WorldBorde
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.Chunk1_7_10Type;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.Particle;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
-import de.gerrygames.viarewind.types.VarLongType;
 import de.gerrygames.viarewind.utils.ChatUtil;
 import de.gerrygames.viarewind.utils.PacketUtil;
 
@@ -299,14 +298,14 @@ public class WorldPackets {
 					if (action == 0) {
 						worldBorder.setSize(packetWrapper.read(Type.DOUBLE));
 					} else if (action == 1) {
-						worldBorder.lerpSize(packetWrapper.read(Type.DOUBLE), packetWrapper.read(Type.DOUBLE), packetWrapper.read(VarLongType.VAR_LONG));
+						worldBorder.lerpSize(packetWrapper.read(Type.DOUBLE), packetWrapper.read(Type.DOUBLE), packetWrapper.read(Type.VAR_LONG));
 					} else if (action == 2) {
 						worldBorder.setCenter(packetWrapper.read(Type.DOUBLE), packetWrapper.read(Type.DOUBLE));
 					} else if (action == 3) {
 						worldBorder.init(
 								packetWrapper.read(Type.DOUBLE), packetWrapper.read(Type.DOUBLE),
 								packetWrapper.read(Type.DOUBLE), packetWrapper.read(Type.DOUBLE),
-								packetWrapper.read(VarLongType.VAR_LONG),
+								packetWrapper.read(Type.VAR_LONG),
 								packetWrapper.read(Type.VAR_INT),
 								packetWrapper.read(Type.VAR_INT), packetWrapper.read(Type.VAR_INT)
 						);
