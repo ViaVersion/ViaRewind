@@ -13,7 +13,7 @@ import de.gerrygames.viarewind.utils.ChatUtil;
 import java.util.*;
 
 public class GameProfileStorage extends StoredObject {
-	private Map<UUID, GameProfile> properties = new HashMap<>();
+	private final Map<UUID, GameProfile> properties = new HashMap<>();
 
 	public GameProfileStorage(UserConnection user) {
 		super(user);

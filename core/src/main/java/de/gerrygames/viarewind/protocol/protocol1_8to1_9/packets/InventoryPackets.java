@@ -118,7 +118,6 @@ public class InventoryPackets {
 						} else if (slot == 4) {
 							packetWrapper.cancel();
 							Windows.updateBrewingStand(packetWrapper.user(), packetWrapper.get(Type.ITEM, 0), windowId);
-							return;
 						} else {
 							packetWrapper.user().get(Windows.class).getBrewingItems(windowId)[slot] = packetWrapper.get(Type.ITEM, 0);
 						}

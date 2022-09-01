@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MetadataListType extends MetaListTypeTemplate {
-	private MetadataType metadataType = new MetadataType();
+	private final MetadataType metadataType = new MetadataType();
 
 	@Override
 	public List<Metadata> read(ByteBuf buffer) throws Exception {

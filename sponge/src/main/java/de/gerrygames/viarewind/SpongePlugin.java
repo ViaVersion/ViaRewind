@@ -4,47 +4,44 @@ import com.google.inject.Inject;
 import com.viaversion.viaversion.sponge.util.LoggerWrapper;
 import de.gerrygames.viarewind.api.ViaRewindConfigImpl;
 import de.gerrygames.viarewind.api.ViaRewindPlatform;
-import de.gerrygames.viarewind.sponge.VersionInfo;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
-import org.spongepowered.api.event.game.state.GameInitializationEvent;
-import org.spongepowered.api.plugin.Dependency;
-import org.spongepowered.api.plugin.Plugin;
+import org.spongepowered.api.event.lifecycle.ConstructPluginEvent;
+import org.spongepowered.api.event.lifecycle.RefreshGameEvent;
+import org.spongepowered.plugin.builtin.jvm.Plugin;
 
 import java.nio.file.Path;
 import java.util.logging.Logger;
 
-@Plugin(id = "viarewind",
-		name = "ViaRewind",
-		version = VersionInfo.VERSION,
-		authors = {"Gerrygames"},
-		dependencies = {
-			@Dependency(id = "viaversion"),
-			@Dependency(id = "viabackwards", optional = true)
-		},
-		url = "https://viaversion.com/rewind"
-)
+@Plugin("viarewind")
 public class SpongePlugin implements ViaRewindPlatform {
-	private Logger logger;
-	@Inject
-	private org.slf4j.Logger loggerSlf4j;
+    private Logger logger;
+    @SuppressWarnings("SpongeInjection")
+    @Inject
+    private org.apache.logging.log4j.Logger loggerSlf4j;
 
-	@Inject
-	@ConfigDir(sharedRoot = false)
-	private Path configDir;
+    @Inject
+    @ConfigDir(sharedRoot = false)
+    private Path configDir;
+    private ViaRewindConfigImpl conf;
 
-	@Listener(order = Order.LATE)
-	public void onGameStart(GameInitializationEvent e) {
-		// Setup Logger
-		this.logger = new LoggerWrapper(loggerSlf4j);
-		// Init!
-		ViaRewindConfigImpl conf = new ViaRewindConfigImpl(configDir.resolve("config.yml").toFile());
-		conf.reloadConfig();
-		this.init(conf);
-	}
+    @Listener(order = Order.LATE)
+    public void loadPlugin(ConstructPluginEvent e) {
+        // Setup Logger
+        this.logger = new LoggerWrapper(loggerSlf4j);
+        // Init!
+        conf = new ViaRewindConfigImpl(configDir.resolve("config.yml").toFile());
+        conf.reloadConfig();
+        this.init(conf);
+    }
 
-	public Logger getLogger() {
-		return this.logger;
-	}
+    @Listener
+    public void reload(RefreshGameEvent e) {
+        conf.reloadConfig();
+    }
+
+    public Logger getLogger() {
+        return this.logger;
+    }
 }

@@ -12,12 +12,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ShulkerBulletReplacement implements EntityReplacement {
-	private int entityId;
-	private List<Metadata> datawatcher = new ArrayList<>();
+	private final int entityId;
+	private final List<Metadata> datawatcher = new ArrayList<>();
 	private double locX, locY, locZ;
 	private float yaw, pitch;
 	private float headYaw;
-	private UserConnection user;
+	private final UserConnection user;
 
 	public ShulkerBulletReplacement(int entityId, UserConnection user) {
 		this.entityId = entityId;

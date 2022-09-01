@@ -84,10 +84,12 @@ public class ScoreboardPackets {
 		protocol.registerClientbound(ClientboundPackets1_8.UPDATE_SCORE, new PacketRemapper() {
 			@Override
 			public void registerMap() {
+				map(Type.STRING); // Name
+				map(Type.VAR_INT, Type.BYTE); // Mode
 				handler(packetWrapper -> {
 					Scoreboard scoreboard = packetWrapper.user().get(Scoreboard.class);
-					String name = packetWrapper.passthrough(Type.STRING);
-					byte mode = packetWrapper.passthrough(Type.BYTE);
+					String name = packetWrapper.get(Type.STRING, 0);
+					byte mode = packetWrapper.get(Type.BYTE, 0);
 
 					if (mode == 1) {
 						name = scoreboard.removeTeamForScore(name);

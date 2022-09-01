@@ -103,12 +103,11 @@ public class Windows extends StoredObject {
 			if (!(o instanceof Furnace))
 				return false;
 			final Furnace other = (Furnace) o;
-			if (!other.canEqual((Object) this)) return false;
+			if (!other.canEqual(this)) return false;
 			if (this.getFuelLeft() != other.getFuelLeft()) return false;
 			if (this.getMaxFuel() != other.getMaxFuel()) return false;
 			if (this.getProgress() != other.getProgress()) return false;
-			if (this.getMaxProgress() != other.getMaxProgress()) return false;
-			return true;
+			return this.getMaxProgress() == other.getMaxProgress();
 		}
 
 		protected boolean canEqual(final Object other) {

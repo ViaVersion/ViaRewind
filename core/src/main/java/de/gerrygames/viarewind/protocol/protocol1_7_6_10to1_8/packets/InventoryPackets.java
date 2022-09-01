@@ -68,7 +68,7 @@ public class InventoryPackets {
 				handler(packetWrapper -> {
 					short windowId = packetWrapper.read(Type.UNSIGNED_BYTE);  //Window Id
 					short windowType = packetWrapper.user().get(Windows.class).get(windowId);
-					packetWrapper.write(Type.UNSIGNED_BYTE, (short) windowId);
+					packetWrapper.write(Type.UNSIGNED_BYTE, windowId);
 					short slot = packetWrapper.read(Type.SHORT);
 					if (windowType == 4) {
 						if (slot == 1) {
@@ -190,7 +190,6 @@ public class InventoryPackets {
 					} else if (windowType == 4) {  //Enchanting Table
 						if (property > 2) {
 							packetWrapper.cancel();
-							return;
 						}
 					} else if (windowType == 8) {
 						windows.levelCost = value;
