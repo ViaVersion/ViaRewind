@@ -66,6 +66,7 @@ public class PlayerPackets {
 					tracker.setPlayerId(packetWrapper.get(Type.INT, 0));
 					tracker.getClientEntityTypes().put(tracker.getPlayerId(), Entity1_10Types.EntityType.ENTITY_HUMAN);
 					tracker.setDimension(packetWrapper.get(Type.BYTE, 0));
+					tracker.addPlayer(tracker.getPlayerId(), packetWrapper.user().getProtocolInfo().getUuid());
 				});
 				handler(packetWrapper -> {
 					ClientWorld world = packetWrapper.user().get(ClientWorld.class);
@@ -214,22 +215,20 @@ public class PlayerPackets {
 					EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
 					if (gamemode == 3 || tracker.getGamemode() == 3) {
 						UUID myId = packetWrapper.user().getProtocolInfo().getUuid();
-						Item[] equipment;
+						Item[] equipment = new Item[4];
 						if (gamemode == 3) {
 							GameProfileStorage.GameProfile profile = packetWrapper.user().get(GameProfileStorage.class).get(myId);
-							equipment = new Item[4];
 							equipment[3] = profile.getSkull();
 						} else {
-							equipment = new Item[4];
 							for (int i = 0; i < equipment.length; i++) {
 								equipment[i] = tracker.getPlayerEquipment(myId, i);
 							}
 						}
 
-						for (int i = 1; i < 5; i++) {
-							PacketWrapper setSlot = PacketWrapper.create(0x2F, null, packetWrapper.user());
+						for (int i = 0; i < equipment.length; i++) {
+							PacketWrapper setSlot = PacketWrapper.create(ClientboundPackets1_7.SET_SLOT, packetWrapper.user());
 							setSlot.write(Type.BYTE, (byte) 0);
-							setSlot.write(Type.SHORT, (short) (9 - i));
+							setSlot.write(Type.SHORT, (short) (8 - i));
 							setSlot.write(Types1_7_6_10.COMPRESSED_NBT_ITEM, equipment[i]);
 							PacketUtil.sendPacket(setSlot, Protocol1_7_6_10TO1_8.class);
 						}

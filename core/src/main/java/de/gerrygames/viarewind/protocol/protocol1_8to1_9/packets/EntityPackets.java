@@ -310,6 +310,7 @@ public class EntityPackets {
 			public void registerMap() {
 				map(Type.VAR_INT);
 				handler(packetWrapper -> {
+					// todo check if this is correct for the own player
 					int slot = packetWrapper.read(Type.VAR_INT);
 					if (slot == 1) {
 						packetWrapper.cancel();

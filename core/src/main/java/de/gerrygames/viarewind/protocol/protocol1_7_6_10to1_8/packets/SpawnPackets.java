@@ -56,6 +56,7 @@ public class SpawnPackets {
 						}
 					}
 
+					EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
 					if (gameProfile != null && gameProfile.gamemode == 3) {
 						int entityId = packetWrapper.get(Type.VAR_INT, 0);
 						for (short i = 0; i < 5; i++) {
@@ -67,7 +68,6 @@ public class SpawnPackets {
 						}
 					}
 
-					EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
 					tracker.addPlayer(packetWrapper.get(Type.VAR_INT, 0), uuid);
 				});
 				map(Type.INT);

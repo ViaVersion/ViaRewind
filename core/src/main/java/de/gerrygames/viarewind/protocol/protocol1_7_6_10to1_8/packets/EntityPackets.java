@@ -39,7 +39,10 @@ public class EntityPackets {
 					packetWrapper.set(Types1_7_6_10.COMPRESSED_NBT_ITEM, 0, item);
 				});
 				handler(packetWrapper -> {
-					if (packetWrapper.get(Type.SHORT, 0) > 4) packetWrapper.cancel();
+					EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
+					int id = packetWrapper.get(Type.INT, 0);
+					int limit = tracker.getPlayerId() == id ? 3 : 4;
+					if (packetWrapper.get(Type.SHORT, 0) > limit) packetWrapper.cancel();
 				});
 				handler(packetWrapper -> {
 					short slot = packetWrapper.get(Type.SHORT, 0);

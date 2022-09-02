@@ -64,7 +64,7 @@ public class EntityTracker extends StoredObject implements ClientEntityIdChangeL
 
 	public Item getPlayerEquipment(UUID uuid, int slot) {
 		Item[] items = playerEquipment.get(uuid);
-		if (slot < 0 || slot >= items.length) return null;
+		if (items == null || slot < 0 || slot >= items.length) return null;
 		return items[slot];
 	}
 
