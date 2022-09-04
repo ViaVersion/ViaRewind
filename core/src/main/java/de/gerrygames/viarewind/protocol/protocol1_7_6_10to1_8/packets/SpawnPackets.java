@@ -8,6 +8,7 @@ import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_8;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
+import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.ClientboundPackets1_7;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10TO1_8;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.entityreplacements.ArmorStandReplacement;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.entityreplacements.EndermiteReplacement;
@@ -55,26 +56,18 @@ public class SpawnPackets {
 						}
 					}
 
+					EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
 					if (gameProfile != null && gameProfile.gamemode == 3) {
 						int entityId = packetWrapper.get(Type.VAR_INT, 0);
-
-						PacketWrapper equipmentPacket = PacketWrapper.create(0x04, null, packetWrapper.user());
-						equipmentPacket.write(Type.INT, entityId);
-						equipmentPacket.write(Type.SHORT, (short) 4);
-						equipmentPacket.write(Types1_7_6_10.COMPRESSED_NBT_ITEM, gameProfile.getSkull());
-
-						PacketUtil.sendPacket(equipmentPacket, Protocol1_7_6_10TO1_8.class);
-
-						for (short i = 0; i < 4; i++) {
-							equipmentPacket = PacketWrapper.create(0x04, null, packetWrapper.user());
+						for (short i = 0; i < 5; i++) {
+							PacketWrapper equipmentPacket = PacketWrapper.create(ClientboundPackets1_7.ENTITY_EQUIPMENT, packetWrapper.user());
 							equipmentPacket.write(Type.INT, entityId);
 							equipmentPacket.write(Type.SHORT, i);
-							equipmentPacket.write(Types1_7_6_10.COMPRESSED_NBT_ITEM, null);
+							equipmentPacket.write(Types1_7_6_10.COMPRESSED_NBT_ITEM, i == 4 ? gameProfile.getSkull() :null);
 							PacketUtil.sendPacket(equipmentPacket, Protocol1_7_6_10TO1_8.class);
 						}
 					}
 
-					EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
 					tracker.addPlayer(packetWrapper.get(Type.VAR_INT, 0), uuid);
 				});
 				map(Type.INT);

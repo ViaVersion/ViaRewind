@@ -39,16 +39,21 @@ public class EntityPackets {
 					packetWrapper.set(Types1_7_6_10.COMPRESSED_NBT_ITEM, 0, item);
 				});
 				handler(packetWrapper -> {
-					if (packetWrapper.get(Type.SHORT, 0) > 4) packetWrapper.cancel();
+					EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
+					int id = packetWrapper.get(Type.INT, 0);
+					int limit = tracker.getPlayerId() == id ? 3 : 4;
+					if (packetWrapper.get(Type.SHORT, 0) > limit) packetWrapper.cancel();
 				});
 				handler(packetWrapper -> {
+					short slot = packetWrapper.get(Type.SHORT, 0);
 					if (packetWrapper.isCancelled()) return;
 					EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
 					UUID uuid = tracker.getPlayerUUID(packetWrapper.get(Type.INT, 0));
 					if (uuid == null) return;
-					Item[] equipment = tracker.getPlayerEquipment(uuid);
-					if (equipment == null) tracker.setPlayerEquipment(uuid, equipment = new Item[5]);
-					equipment[packetWrapper.get(Type.SHORT, 0)] = packetWrapper.get(Types1_7_6_10.COMPRESSED_NBT_ITEM, 0);
+
+					Item item = packetWrapper.get(Types1_7_6_10.COMPRESSED_NBT_ITEM, 0);
+					tracker.setPlayerEquipment(uuid, item, slot);
+
 					GameProfileStorage storage = packetWrapper.user().get(GameProfileStorage.class);
 					GameProfileStorage.GameProfile profile = storage.get(uuid);
 					if (profile != null && profile.gamemode == 3) packetWrapper.cancel();
