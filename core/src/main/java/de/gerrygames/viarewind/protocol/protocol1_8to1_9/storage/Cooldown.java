@@ -5,6 +5,7 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.libs.gson.JsonPrimitive;
+import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ClientboundPackets1_9;
 import com.viaversion.viaversion.util.Pair;
 import de.gerrygames.viarewind.ViaRewind;
@@ -84,7 +85,7 @@ public class Cooldown extends StoredObject implements Tickable {
 
 	private void hideBossBar() {
 		if (bossUUID == null) return;
-		PacketWrapper wrapper = PacketWrapper.create(0x0C, null, getUser());
+		PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_9.BOSSBAR, null, getUser());
 		wrapper.write(Type.UUID, bossUUID);
 		wrapper.write(Type.VAR_INT, 1);
 		PacketUtil.sendPacket(wrapper, Protocol1_8TO1_9.class, false, true);
@@ -111,23 +112,23 @@ public class Cooldown extends StoredObject implements Tickable {
 	}
 
 	private void hideTitle() {
-		PacketWrapper hide = PacketWrapper.create(0x45, null, getUser());
+		PacketWrapper hide = PacketWrapper.create(ClientboundPackets1_8.TITLE, null, getUser());
 		hide.write(Type.VAR_INT, 3);
 		PacketUtil.sendPacket(hide, Protocol1_8TO1_9.class);
 	}
 
 	private void sendTitle(String title, String subTitle, int fadeIn, int stay, int fadeOut) {
-		PacketWrapper timePacket = PacketWrapper.create(0x45, null, getUser());
+		PacketWrapper timePacket = PacketWrapper.create(ClientboundPackets1_8.TITLE, null, getUser());
 		timePacket.write(Type.VAR_INT, 2);
 		timePacket.write(Type.INT, fadeIn);
 		timePacket.write(Type.INT, stay);
 		timePacket.write(Type.INT, fadeOut);
-		PacketWrapper titlePacket = PacketWrapper.create(0x45, null, getUser());
+		PacketWrapper titlePacket = PacketWrapper.create(ClientboundPackets1_8.TITLE, getUser());
 		titlePacket.write(Type.VAR_INT, 0);
-		titlePacket.write(Type.STRING, title);
-		PacketWrapper subtitlePacket = PacketWrapper.create(0x45, null, getUser());
+		titlePacket.write(Type.COMPONENT, new JsonPrimitive(title));
+		PacketWrapper subtitlePacket = PacketWrapper.create(ClientboundPackets1_8.TITLE, getUser());
 		subtitlePacket.write(Type.VAR_INT, 1);
-		subtitlePacket.write(Type.STRING, subTitle);
+		subtitlePacket.write(Type.COMPONENT, new JsonPrimitive(subTitle));
 
 		PacketUtil.sendPacket(titlePacket, Protocol1_8TO1_9.class);
 		PacketUtil.sendPacket(subtitlePacket, Protocol1_8TO1_9.class);
@@ -135,8 +136,8 @@ public class Cooldown extends StoredObject implements Tickable {
 	}
 
 	private void sendActionBar(String bar) {
-		PacketWrapper actionBarPacket = PacketWrapper.create(0x02, null, getUser());
-		actionBarPacket.write(Type.STRING, bar);
+		PacketWrapper actionBarPacket = PacketWrapper.create(ClientboundPackets1_8.CHAT_MESSAGE, getUser());
+		actionBarPacket.write(Type.COMPONENT, new JsonPrimitive(bar));
 		actionBarPacket.write(Type.BYTE, (byte) 2);
 
 		PacketUtil.sendPacket(actionBarPacket, Protocol1_8TO1_9.class);

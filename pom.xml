@@ -40,7 +40,14 @@
         <dependency>
             <groupId>com.viaversion</groupId>
             <artifactId>viaversion</artifactId>
-            <version>4.2.1</version>
+            <version>4.4.2</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <!--suppress MavenPackageUpdate -->
+            <version>17.0</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

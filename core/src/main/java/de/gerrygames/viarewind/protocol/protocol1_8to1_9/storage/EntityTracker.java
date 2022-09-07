@@ -9,6 +9,7 @@ import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_8;
+import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.Protocol1_8TO1_9;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.metadata.MetadataRewriter;
 import de.gerrygames.viarewind.replacement.EntityReplacement;
@@ -49,7 +50,7 @@ public class EntityTracker extends StoredObject implements ClientEntityIdChangeL
 
 	public void removeEntity(int entityId) {
 		vehicleMap.remove(entityId);
-		vehicleMap.forEach((vehicle, passengers) -> passengers.remove((Integer)entityId));
+		vehicleMap.forEach((vehicle, passengers) -> passengers.remove((Integer) entityId));
 		vehicleMap.entrySet().removeIf(entry -> entry.getValue().isEmpty());
 		clientEntityTypes.remove(entityId);
 		entityOffsets.remove(entityId);
@@ -151,7 +152,7 @@ public class EntityTracker extends StoredObject implements ClientEntityIdChangeL
 		if (entityReplacements.containsKey(entityId)) {
 			entityReplacements.get(entityId).updateMetadata(this.metadataBuffer.remove(entityId));
 		} else {
-			PacketWrapper wrapper = PacketWrapper.create(0x1C, null, this.getUser());
+			PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_8.ENTITY_METADATA, this.getUser());
 			wrapper.write(Type.VAR_INT, entityId);
 			wrapper.write(Types1_8.METADATA_LIST, this.metadataBuffer.get(entityId));
 			MetadataRewriter.transform(this.getClientEntityTypes().get(entityId), this.metadataBuffer.get(entityId));
