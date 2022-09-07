@@ -11,7 +11,6 @@ import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10TO
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.metadata.MetadataRewriter;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.MetaType1_7_6_10;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
-import de.gerrygames.viarewind.replacement.EntityReplacement;
 import de.gerrygames.viarewind.utils.PacketUtil;
 import de.gerrygames.viarewind.utils.math.AABB;
 import de.gerrygames.viarewind.utils.math.Vector3d;
@@ -19,7 +18,7 @@ import de.gerrygames.viarewind.utils.math.Vector3d;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ArmorStandReplacement implements EntityReplacement {
+public class ArmorStandReplacement extends EntityReplacement1_7to1_8 {
 	private final int entityId;
 	private final List<Metadata> datawatcher = new ArrayList<>();
 	private int[] entityIds = null;
@@ -28,7 +27,6 @@ public class ArmorStandReplacement implements EntityReplacement {
 	private boolean invisible = false;
 	private boolean nameTagVisible = false;
 	private String name = null;
-	private final UserConnection user;
 	private float yaw, pitch;
 	private float headYaw;
 	private boolean small = false;
@@ -43,8 +41,8 @@ public class ArmorStandReplacement implements EntityReplacement {
 	}
 
 	public ArmorStandReplacement(int entityId, UserConnection user) {
+		super(user);
 		this.entityId = entityId;
-		this.user = user;
 	}
 
 	public void setLocation(double x, double y, double z) {
@@ -134,20 +132,7 @@ public class ArmorStandReplacement implements EntityReplacement {
 	}
 
 	private void updateZombieLocation() {
-		PacketWrapper teleport = PacketWrapper.create(ClientboundPackets1_7.ENTITY_TELEPORT, null, user);
-		teleport.write(Type.INT, entityId);
-		teleport.write(Type.INT, (int) (locX * 32.0));
-		teleport.write(Type.INT, (int) (locY * 32.0));
-		teleport.write(Type.INT, (int) (locZ * 32.0));
-		teleport.write(Type.BYTE, (byte) ((yaw / 360f) * 256));
-		teleport.write(Type.BYTE, (byte) ((pitch / 360f) * 256));
-
-		PacketWrapper head = PacketWrapper.create(ClientboundPackets1_7.ENTITY_HEAD_LOOK, null, user);
-		head.write(Type.INT, entityId);
-		head.write(Type.BYTE, (byte) ((headYaw / 360f) * 256));
-
-		PacketUtil.sendPacket(teleport, Protocol1_7_6_10TO1_8.class, true, true);
-		PacketUtil.sendPacket(head, Protocol1_7_6_10TO1_8.class, true, true);
+		sendTeleportWithHead(entityId, locX, locY, locZ, yaw, pitch, headYaw);
 	}
 
 	private void updateHologramLocation() {
@@ -155,31 +140,16 @@ public class ArmorStandReplacement implements EntityReplacement {
 		detach.write(Type.INT, entityIds[1]);
 		detach.write(Type.INT, -1);
 		detach.write(Type.BOOLEAN, false);
+		PacketUtil.sendPacket(detach, Protocol1_7_6_10TO1_8.class, true, true);
 
-		PacketWrapper teleportSkull = PacketWrapper.create(ClientboundPackets1_7.ENTITY_TELEPORT, null, user);
-		teleportSkull.write(Type.INT, entityIds[0]);
-		teleportSkull.write(Type.INT, (int) (locX * 32.0));
-		teleportSkull.write(Type.INT, (int) ((locY + (marker ? 54.85 : small ? 56 : 57)) * 32.0));  //Don't ask me where this offset is coming from
-		teleportSkull.write(Type.INT, (int) (locZ * 32.0));
-		teleportSkull.write(Type.BYTE, (byte) 0);
-		teleportSkull.write(Type.BYTE, (byte) 0);
-
-		PacketWrapper teleportHorse = PacketWrapper.create(ClientboundPackets1_7.ENTITY_TELEPORT, null, user);
-		teleportHorse.write(Type.INT, entityIds[1]);
-		teleportHorse.write(Type.INT, (int) (locX * 32.0));
-		teleportHorse.write(Type.INT, (int) ((locY + 56.75) * 32.0));
-		teleportHorse.write(Type.INT, (int) (locZ * 32.0));
-		teleportHorse.write(Type.BYTE, (byte) 0);
-		teleportHorse.write(Type.BYTE, (byte) 0);
+		// Don't ask me where this offset is coming from
+		sendTeleport(entityIds[0], locX, (locY + (marker ? 54.85 : small ? 56 : 57)), locZ, 0, 0); // Skull
+		sendTeleport(entityIds[1], locX, locY + 56.75, locZ, 0, 0); // Horse
 
 		PacketWrapper attach = PacketWrapper.create(ClientboundPackets1_7.ATTACH_ENTITY, null, user);
 		attach.write(Type.INT, entityIds[1]);
 		attach.write(Type.INT, entityIds[0]);
 		attach.write(Type.BOOLEAN, false);
-
-		PacketUtil.sendPacket(detach, Protocol1_7_6_10TO1_8.class, true, true);
-		PacketUtil.sendPacket(teleportSkull, Protocol1_7_6_10TO1_8.class, true, true);
-		PacketUtil.sendPacket(teleportHorse, Protocol1_7_6_10TO1_8.class, true, true);
 		PacketUtil.sendPacket(attach, Protocol1_7_6_10TO1_8.class, true, true);
 	}
 
@@ -238,21 +208,7 @@ public class ArmorStandReplacement implements EntityReplacement {
 	}
 
 	private void spawnZombie() {
-		PacketWrapper spawn = PacketWrapper.create(ClientboundPackets1_7.SPAWN_MOB, null, user);
-		spawn.write(Type.VAR_INT, entityId);
-		spawn.write(Type.UNSIGNED_BYTE, (short) 54);
-		spawn.write(Type.INT, (int) (locX * 32.0));
-		spawn.write(Type.INT, (int) (locY * 32.0));
-		spawn.write(Type.INT, (int) (locZ * 32.0));
-		spawn.write(Type.BYTE, (byte) 0);
-		spawn.write(Type.BYTE, (byte) 0);
-		spawn.write(Type.BYTE, (byte) 0);
-		spawn.write(Type.SHORT, (short) 0);
-		spawn.write(Type.SHORT, (short) 0);
-		spawn.write(Type.SHORT, (short) 0);
-		spawn.write(Types1_7_6_10.METADATA_LIST, new ArrayList<>());
-
-		PacketUtil.sendPacket(spawn, Protocol1_7_6_10TO1_8.class, true, true);
+		sendSpawn(entityId, 54, locX, locY, locZ);
 
 		entityIds = new int[] {entityId};
 	}
@@ -260,32 +216,8 @@ public class ArmorStandReplacement implements EntityReplacement {
 	private void spawnHologram() {
 		int[] entityIds = new int[] {entityId, additionalEntityId()};
 
-		PacketWrapper spawnSkull = PacketWrapper.create(ClientboundPackets1_7.SPAWN_ENTITY, null, user);
-		spawnSkull.write(Type.VAR_INT, entityIds[0]);
-		spawnSkull.write(Type.BYTE, (byte) 66);
-		spawnSkull.write(Type.INT, (int) (locX * 32.0));
-		spawnSkull.write(Type.INT, (int) (locY * 32.0));
-		spawnSkull.write(Type.INT, (int) (locZ * 32.0));
-		spawnSkull.write(Type.BYTE, (byte) 0);
-		spawnSkull.write(Type.BYTE, (byte) 0);
-		spawnSkull.write(Type.INT, 0);
-
-		PacketWrapper spawnHorse = PacketWrapper.create(ClientboundPackets1_7.SPAWN_MOB, null, user);
-		spawnHorse.write(Type.VAR_INT, entityIds[1]);
-		spawnHorse.write(Type.UNSIGNED_BYTE, (short) 100);
-		spawnHorse.write(Type.INT, (int) (locX * 32.0));
-		spawnHorse.write(Type.INT, (int) (locY * 32.0));
-		spawnHorse.write(Type.INT, (int) (locZ * 32.0));
-		spawnHorse.write(Type.BYTE, (byte) 0);
-		spawnHorse.write(Type.BYTE, (byte) 0);
-		spawnHorse.write(Type.BYTE, (byte) 0);
-		spawnHorse.write(Type.SHORT, (short) 0);
-		spawnHorse.write(Type.SHORT, (short) 0);
-		spawnHorse.write(Type.SHORT, (short) 0);
-		spawnHorse.write(Types1_7_6_10.METADATA_LIST, new ArrayList<>());
-
-		PacketUtil.sendPacket(spawnSkull, Protocol1_7_6_10TO1_8.class, true, true);
-		PacketUtil.sendPacket(spawnHorse, Protocol1_7_6_10TO1_8.class, true, true);
+		sendSpawn(entityIds[0], 66, locX, locY, locZ); // Skull
+		sendSpawn(entityIds[1], 100, locX, locY, locZ); // Horse
 
 		this.entityIds = entityIds;
 	}

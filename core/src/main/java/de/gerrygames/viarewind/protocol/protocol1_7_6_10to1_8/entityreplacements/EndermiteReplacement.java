@@ -9,23 +9,21 @@ import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.ClientboundPackets
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10TO1_8;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.metadata.MetadataRewriter;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
-import de.gerrygames.viarewind.replacement.EntityReplacement;
 import de.gerrygames.viarewind.utils.PacketUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class EndermiteReplacement implements EntityReplacement {
+public class EndermiteReplacement extends EntityReplacement1_7to1_8 {
 	private final int entityId;
 	private final List<Metadata> datawatcher = new ArrayList<>();
 	private double locX, locY, locZ;
 	private float yaw, pitch;
 	private float headYaw;
-	private final UserConnection user;
 
 	public EndermiteReplacement(int entityId, UserConnection user) {
+		super(user);
 		this.entityId = entityId;
-		this.user = user;
 		spawn();
 	}
 
@@ -67,20 +65,7 @@ public class EndermiteReplacement implements EntityReplacement {
 	}
 
 	public void updateLocation() {
-		PacketWrapper teleport = PacketWrapper.create(ClientboundPackets1_7.ENTITY_TELEPORT, user);
-		teleport.write(Type.INT, entityId);
-		teleport.write(Type.INT, (int) (locX * 32.0));
-		teleport.write(Type.INT, (int) (locY * 32.0));
-		teleport.write(Type.INT, (int) (locZ * 32.0));
-		teleport.write(Type.BYTE, (byte) ((yaw / 360f) * 256));
-		teleport.write(Type.BYTE, (byte) ((pitch / 360f) * 256));
-
-		PacketWrapper head = PacketWrapper.create(ClientboundPackets1_7.ENTITY_HEAD_LOOK, user);
-		head.write(Type.INT, entityId);
-		head.write(Type.BYTE, (byte) ((headYaw / 360f) * 256));
-
-		PacketUtil.sendPacket(teleport, Protocol1_7_6_10TO1_8.class, true, true);
-		PacketUtil.sendPacket(head, Protocol1_7_6_10TO1_8.class, true, true);
+		sendTeleportWithHead(entityId, locX, locY, locZ, yaw, pitch, headYaw);
 	}
 
 	public void updateMetadata() {
@@ -101,21 +86,7 @@ public class EndermiteReplacement implements EntityReplacement {
 
 	@Override
 	public void spawn() {
-		PacketWrapper spawn = PacketWrapper.create(ClientboundPackets1_7.SPAWN_MOB, user);
-		spawn.write(Type.VAR_INT, entityId);
-		spawn.write(Type.UNSIGNED_BYTE, (short) 60);
-		spawn.write(Type.INT, 0);
-		spawn.write(Type.INT, 0);
-		spawn.write(Type.INT, 0);
-		spawn.write(Type.BYTE, (byte) 0);
-		spawn.write(Type.BYTE, (byte) 0);
-		spawn.write(Type.BYTE, (byte) 0);
-		spawn.write(Type.SHORT, (short) 0);
-		spawn.write(Type.SHORT, (short) 0);
-		spawn.write(Type.SHORT, (short) 0);
-		spawn.write(Types1_7_6_10.METADATA_LIST, new ArrayList<>());
-
-		PacketUtil.sendPacket(spawn, Protocol1_7_6_10TO1_8.class, true, true);
+		sendSpawn(entityId, 60, locX, locY, locZ);
 	}
 
 	@Override

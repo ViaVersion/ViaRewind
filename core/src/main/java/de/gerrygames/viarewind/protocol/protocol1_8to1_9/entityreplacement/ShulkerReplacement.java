@@ -7,23 +7,23 @@ import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_9;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_8;
+import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
+import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.ClientboundPackets1_7;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.Protocol1_8TO1_9;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.metadata.MetadataRewriter;
-import de.gerrygames.viarewind.replacement.EntityReplacement;
 import de.gerrygames.viarewind.utils.PacketUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ShulkerReplacement implements EntityReplacement {
+public class ShulkerReplacement extends EntityReplacement1_8to1_9 {
 	private final int entityId;
 	private final List<Metadata> datawatcher = new ArrayList<>();
 	private double locX, locY, locZ;
-	private final UserConnection user;
 
 	public ShulkerReplacement(int entityId, UserConnection user) {
+		super(user);
 		this.entityId = entityId;
-		this.user = user;
 		spawn();
 	}
 
@@ -41,38 +41,31 @@ public class ShulkerReplacement implements EntityReplacement {
 		updateLocation();
 	}
 
-	public void setYawPitch(float yaw, float pitch) { }
+	public void setYawPitch(float yaw, float pitch) {
+	}
 
-	public void setHeadYaw(float yaw) { }
+	public void setHeadYaw(float yaw) {
+	}
 
 	public void updateMetadata(List<Metadata> metadataList) {
 		for (Metadata metadata : metadataList) {
-			datawatcher.removeIf(m -> m.id()==metadata.id());
+			datawatcher.removeIf(m -> m.id() == metadata.id());
 			datawatcher.add(metadata);
 		}
 		updateMetadata();
 	}
 
 	public void updateLocation() {
-		PacketWrapper teleport = PacketWrapper.create(0x18, null, user);
-		teleport.write(Type.VAR_INT, entityId);
-		teleport.write(Type.INT, (int) (locX * 32.0));
-		teleport.write(Type.INT, (int) (locY * 32.0));
-		teleport.write(Type.INT, (int) (locZ * 32.0));
-		teleport.write(Type.BYTE, (byte) 0);
-		teleport.write(Type.BYTE, (byte) 0);
-		teleport.write(Type.BOOLEAN, true);
-
-		PacketUtil.sendPacket(teleport, Protocol1_8TO1_9.class, true, true);
+		sendTeleport(entityId, locX, locY, locZ, 0, 0);
 	}
 
 	public void updateMetadata() {
-		PacketWrapper metadataPacket = PacketWrapper.create(0x1C, null, user);
+		PacketWrapper metadataPacket = PacketWrapper.create(ClientboundPackets1_8.ENTITY_METADATA, null, user);
 		metadataPacket.write(Type.VAR_INT, entityId);
 
 		List<Metadata> metadataList = new ArrayList<>();
 		for (Metadata metadata : datawatcher) {
-			if (metadata.id()==11 || metadata.id()==12 || metadata.id()==13) continue;
+			if (metadata.id() == 11 || metadata.id() == 12 || metadata.id() == 13) continue;
 			metadataList.add(new Metadata(metadata.id(), metadata.metaType(), metadata.getValue()));
 		}
 		metadataList.add(new Metadata(11, MetaType1_9.VarInt, 2));
@@ -86,29 +79,14 @@ public class ShulkerReplacement implements EntityReplacement {
 
 	@Override
 	public void spawn() {
-		PacketWrapper spawn = PacketWrapper.create(0x0F, null, user);
-		spawn.write(Type.VAR_INT, entityId);
-		spawn.write(Type.UNSIGNED_BYTE, (short) 62);
-		spawn.write(Type.INT, 0);
-		spawn.write(Type.INT, 0);
-		spawn.write(Type.INT, 0);
-		spawn.write(Type.BYTE, (byte) 0);
-		spawn.write(Type.BYTE, (byte) 0);
-		spawn.write(Type.BYTE, (byte) 0);
-		spawn.write(Type.SHORT, (short) 0);
-		spawn.write(Type.SHORT, (short) 0);
-		spawn.write(Type.SHORT, (short) 0);
-		List<Metadata> list = new ArrayList<>();
-		list.add(new Metadata(0, MetaType1_9.Byte, (byte) 0)); // Old clients don't like empty metadata
-		spawn.write(Types1_8.METADATA_LIST, list);
-
-		PacketUtil.sendPacket(spawn, Protocol1_8TO1_9.class, true, true);
+		sendSpawn(entityId, 62);
+		// Old clients don't like empty metadata
 	}
 
 	@Override
 	public void despawn() {
-		PacketWrapper despawn = PacketWrapper.create(0x13, null, user);
-		despawn.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[] {entityId});
+		PacketWrapper despawn = PacketWrapper.create(ClientboundPackets1_7.DESTROY_ENTITIES, null, user);
+		despawn.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[]{entityId});
 
 		PacketUtil.sendPacket(despawn, Protocol1_8TO1_9.class, true, true);
 	}

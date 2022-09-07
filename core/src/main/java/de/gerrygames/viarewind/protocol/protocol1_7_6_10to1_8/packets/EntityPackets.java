@@ -105,15 +105,16 @@ public class EntityPackets {
 					for (int entityId : entityIds) tracker.removeEntity(entityId);
 
 					List<List<Integer>> parts = Lists.partition(Ints.asList(entityIds), Byte.MAX_VALUE);
-					while (parts.size() > 1) {
+
+					for (int i = 0; i < parts.size() - 1; i++) {
 						PacketWrapper destroy = PacketWrapper.create(ClientboundPackets1_7.DESTROY_ENTITIES,
 								packetWrapper.user());
-						destroy.write(Types1_7_6_10.INT_ARRAY, parts.remove(0).stream()
+						destroy.write(Types1_7_6_10.INT_ARRAY, parts.get(i).stream()
 								.mapToInt(Integer::intValue).toArray());
 						PacketUtil.sendPacket(destroy, Protocol1_7_6_10TO1_8.class);
 					}
 
-					packetWrapper.write(Types1_7_6_10.INT_ARRAY, parts.remove(0).stream()
+					packetWrapper.write(Types1_7_6_10.INT_ARRAY, parts.get(parts.size() - 1).stream()
 							.mapToInt(Integer::intValue).toArray());
 				});  //Entity Id Array
 			}
