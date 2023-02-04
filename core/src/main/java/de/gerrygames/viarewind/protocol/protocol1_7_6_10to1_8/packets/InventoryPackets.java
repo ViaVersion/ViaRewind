@@ -230,7 +230,7 @@ public class InventoryPackets {
 		protocol.registerServerbound(ServerboundPackets1_7.WINDOW_CONFIRMATION, new PacketRemapper() {
 			@Override
 			public void registerMap() {
-				map(Type.BYTE);
+				map(Type.UNSIGNED_BYTE);
 				map(Type.SHORT);
 				map(Type.BOOLEAN);
 				handler(packetWrapper -> {
