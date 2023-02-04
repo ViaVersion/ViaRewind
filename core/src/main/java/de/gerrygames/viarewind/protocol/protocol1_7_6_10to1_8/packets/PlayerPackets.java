@@ -351,8 +351,8 @@ public class PlayerPackets {
 							packet.write(Type.SHORT, (short) ping);
 							PacketUtil.sendPacket(packet, Protocol1_7_6_10TO1_8.class);
 						} else if (action == 3) {
-							boolean update = packetWrapper.read(Type.BOOLEAN);
-							String displayName = update ? ChatUtil.jsonToLegacy(packetWrapper.read(Type.COMPONENT)) : null;
+							JsonElement displayNameComponent = packetWrapper.read(Type.OPTIONAL_COMPONENT);
+							String displayName = displayNameComponent != null ? ChatUtil.jsonToLegacy(displayNameComponent) : null;
 
 							GameProfileStorage.GameProfile gameProfile = gameProfileStorage.get(uuid);
 							if (gameProfile == null || gameProfile.displayName == null && displayName == null) continue;
