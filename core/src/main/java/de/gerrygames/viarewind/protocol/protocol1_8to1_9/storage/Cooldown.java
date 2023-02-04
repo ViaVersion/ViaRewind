@@ -185,20 +185,20 @@ public class Cooldown extends StoredObject implements Tickable {
 	public void setAttackSpeed(double base, ArrayList<Pair<Byte, Double>> modifiers) {
 		attackSpeed = base;
 		for (int j = 0; j < modifiers.size(); j++) {
-			if (modifiers.get(j).getKey() == 0) {
-				attackSpeed += modifiers.get(j).getValue();
+			if (modifiers.get(j).key() == 0) {
+				attackSpeed += modifiers.get(j).value();
 				modifiers.remove(j--);
 			}
 		}
 		for (int j = 0; j < modifiers.size(); j++) {
-			if (modifiers.get(j).getKey() == 1) {
-				attackSpeed += base * modifiers.get(j).getValue();
+			if (modifiers.get(j).key() == 1) {
+				attackSpeed += base * modifiers.get(j).value();
 				modifiers.remove(j--);
 			}
 		}
 		for (int j = 0; j < modifiers.size(); j++) {
-			if (modifiers.get(j).getKey() == 2) {
-				attackSpeed *= (1.0 + modifiers.get(j).getValue());
+			if (modifiers.get(j).key() == 2) {
+				attackSpeed *= (1.0 + modifiers.get(j).value());
 				modifiers.remove(j--);
 			}
 		}

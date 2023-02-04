@@ -155,7 +155,7 @@ public class Scoreboard extends StoredObject {
 		this.colorIndependentSidebar = colorIndependentSidebar;
 	}
 
-	private class ScoreTeam {
+	private static class ScoreTeam {
 		private final String prefix;
 		private final String suffix;
 		private final String name;

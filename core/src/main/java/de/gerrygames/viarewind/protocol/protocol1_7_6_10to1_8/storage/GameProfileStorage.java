@@ -74,10 +74,10 @@ public class GameProfileStorage extends StoredObject {
 
 
 	public static class GameProfile {
-		public String name;
+		public final String name;
+		public final UUID uuid;
 		public String displayName;
 		public int ping;
-		public UUID uuid;
 		public List<Property> properties = new ArrayList<>();
 		public int gamemode = 0;
 
@@ -123,9 +123,9 @@ public class GameProfileStorage extends StoredObject {
 	}
 
 	public static class Property {
-		public String name;
-		public String value;
-		public String signature;
+		public final String name;
+		public final String value;
+		public final String signature;
 
 		public Property(String name, String value, String signature) {
 			this.name = name;

@@ -252,9 +252,9 @@ public class SpawnPackets {
 				map(Type.STRING);  //Title
 				handler(packetWrapper -> {
 					Position position = packetWrapper.read(Type.POSITION);
-					packetWrapper.write(Type.INT, position.getX());
-					packetWrapper.write(Type.INT, position.getY());
-					packetWrapper.write(Type.INT, position.getZ());
+					packetWrapper.write(Type.INT, position.x());
+					packetWrapper.write(Type.INT, position.y());
+					packetWrapper.write(Type.INT, position.z());
 				});
 				map(Type.UNSIGNED_BYTE, Type.INT);  //Rotation
 				handler(packetWrapper -> {

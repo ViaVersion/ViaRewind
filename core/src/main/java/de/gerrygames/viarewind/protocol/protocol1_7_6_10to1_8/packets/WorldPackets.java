@@ -4,6 +4,8 @@ import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
+import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
+import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
@@ -37,10 +39,11 @@ public class WorldPackets {
 					packetWrapper.write(new Chunk1_7_10Type(world), chunk);
 					for (ChunkSection section : chunk.getSections()) {
 						if (section == null) continue;
-						for (int i = 0; i < section.getPaletteSize(); i++) {
-							int block = section.getPaletteEntry(i);
+						DataPalette palette = section.palette(PaletteType.BLOCKS);
+						for (int i = 0; i < palette.size(); i++) {
+							int block = palette.idByIndex(i);
 							int replacedBlock = ReplacementRegistry1_7_6_10to1_8.replace(block);
-							section.setPaletteEntry(i, replacedBlock);
+							palette.setIdByIndex(i, replacedBlock);
 						}
 					}
 				});
@@ -71,9 +74,9 @@ public class WorldPackets {
 			public void registerMap() {
 				handler(packetWrapper -> {
 					Position position = packetWrapper.read(Type.POSITION);
-					packetWrapper.write(Type.INT, position.getX());
-					packetWrapper.write(Type.UNSIGNED_BYTE, (short) position.getY());
-					packetWrapper.write(Type.INT, position.getZ());
+					packetWrapper.write(Type.INT, position.x());
+					packetWrapper.write(Type.UNSIGNED_BYTE, (short) position.y());
+					packetWrapper.write(Type.INT, position.z());
 				});
 				handler(packetWrapper -> {
 					int data = packetWrapper.read(Type.VAR_INT);
@@ -91,9 +94,9 @@ public class WorldPackets {
 			public void registerMap() {
 				handler(packetWrapper -> {
 					Position position = packetWrapper.read(Type.POSITION);
-					packetWrapper.write(Type.INT, position.getX());
-					packetWrapper.write(Type.SHORT, (short) position.getY());
-					packetWrapper.write(Type.INT, position.getZ());
+					packetWrapper.write(Type.INT, position.x());
+					packetWrapper.write(Type.SHORT, (short) position.y());
+					packetWrapper.write(Type.INT, position.z());
 				});
 				map(Type.UNSIGNED_BYTE);
 				map(Type.UNSIGNED_BYTE);
@@ -107,9 +110,9 @@ public class WorldPackets {
 				map(Type.VAR_INT);  //Entity Id
 				handler(packetWrapper -> {
 					Position position = packetWrapper.read(Type.POSITION);
-					packetWrapper.write(Type.INT, position.getX());
-					packetWrapper.write(Type.INT, position.getY());
-					packetWrapper.write(Type.INT, position.getZ());
+					packetWrapper.write(Type.INT, position.x());
+					packetWrapper.write(Type.INT, position.y());
+					packetWrapper.write(Type.INT, position.z());
 				});
 				map(Type.BYTE);  //Progress
 			}
@@ -129,9 +132,9 @@ public class WorldPackets {
 				map(Type.INT);
 				handler(packetWrapper -> {
 					Position position = packetWrapper.read(Type.POSITION);
-					packetWrapper.write(Type.INT, position.getX());
-					packetWrapper.write(Type.BYTE, (byte) position.getY());
-					packetWrapper.write(Type.INT, position.getZ());
+					packetWrapper.write(Type.INT, position.x());
+					packetWrapper.write(Type.BYTE, (byte) position.y());
+					packetWrapper.write(Type.INT, position.z());
 				});
 				map(Type.INT);
 				map(Type.BOOLEAN);
@@ -185,9 +188,9 @@ public class WorldPackets {
 			public void registerMap() {
 				handler(packetWrapper -> {
 					Position position = packetWrapper.read(Type.POSITION);
-					packetWrapper.write(Type.INT, position.getX());
-					packetWrapper.write(Type.SHORT, (short) position.getY());
-					packetWrapper.write(Type.INT, position.getZ());
+					packetWrapper.write(Type.INT, position.x());
+					packetWrapper.write(Type.SHORT, (short) position.y());
+					packetWrapper.write(Type.INT, position.z());
 				});
 				handler(packetWrapper -> {
 					for (int i = 0; i < 4; i++) {
@@ -277,9 +280,9 @@ public class WorldPackets {
 			public void registerMap() {
 				handler(packetWrapper -> {
 					Position position = packetWrapper.read(Type.POSITION);
-					packetWrapper.write(Type.INT, position.getX());
-					packetWrapper.write(Type.SHORT, (short) position.getY());
-					packetWrapper.write(Type.INT, position.getZ());
+					packetWrapper.write(Type.INT, position.x());
+					packetWrapper.write(Type.SHORT, (short) position.y());
+					packetWrapper.write(Type.INT, position.z());
 				});
 				map(Type.UNSIGNED_BYTE);  //Action
 				map(Type.NBT, Types1_7_6_10.COMPRESSED_NBT);

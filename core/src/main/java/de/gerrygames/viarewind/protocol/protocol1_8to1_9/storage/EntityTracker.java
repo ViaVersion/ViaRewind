@@ -64,7 +64,7 @@ public class EntityTracker extends StoredObject implements ClientEntityIdChangeL
 	}
 
 	public Vector getEntityOffset(int entityId) {
-		return entityOffsets.computeIfAbsent(entityId, key -> new Vector(0, 0, 0));
+		return entityOffsets.get(entityId);
 	}
 
 	public void addToEntityOffset(int entityId, short relX, short relY, short relZ) {
@@ -72,25 +72,13 @@ public class EntityTracker extends StoredObject implements ClientEntityIdChangeL
 			if (offset == null) {
 				return new Vector(relX, relY, relZ);
 			} else {
-				offset.setBlockX(offset.getBlockX() + relX);
-				offset.setBlockY(offset.getBlockY() + relY);
-				offset.setBlockZ(offset.getBlockZ() + relZ);
-				return offset;
+				return new Vector(offset.blockX() + relX, offset.blockY() + relY, offset.blockZ() + relZ);
 			}
 		});
 	}
 
 	public void setEntityOffset(int entityId, short relX, short relY, short relZ) {
-		entityOffsets.compute(entityId, (key, offset) -> {
-			if (offset == null) {
-				return new Vector(relX, relY, relZ);
-			} else {
-				offset.setBlockX(relX);
-				offset.setBlockY(relY);
-				offset.setBlockZ(relZ);
-				return offset;
-			}
-		});
+		entityOffsets.compute(entityId, (key, offset) -> new Vector(relX, relY, relZ));
 	}
 
 	public void setEntityOffset(int entityId, Vector offset) {

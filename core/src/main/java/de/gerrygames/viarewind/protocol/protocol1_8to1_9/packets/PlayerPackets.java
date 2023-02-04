@@ -249,7 +249,7 @@ public class PlayerPackets {
 						packetWrapper.cancel();
 						PacketWrapper swapItems = PacketWrapper.create(0x13, null, packetWrapper.user());
 						swapItems.write(Type.VAR_INT, 6);
-						swapItems.write(Type.POSITION, new Position(0, (short) 0, 0));
+						swapItems.write(Type.POSITION, new Position(0, 0, 0));
 						swapItems.write(Type.BYTE, (byte) 255);
 
 						PacketUtil.sendToServer(swapItems, Protocol1_8TO1_9.class, true, true);

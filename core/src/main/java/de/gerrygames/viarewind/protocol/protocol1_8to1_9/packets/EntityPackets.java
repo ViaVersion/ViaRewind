@@ -74,18 +74,18 @@ public class EntityPackets {
 
 					Vector[] moves = RelativeMoveUtil.calculateRelativeMoves(packetWrapper.user(), entityId, relX, relY, relZ);
 
-					packetWrapper.write(Type.BYTE, (byte) moves[0].getBlockX());
-					packetWrapper.write(Type.BYTE, (byte) moves[0].getBlockY());
-					packetWrapper.write(Type.BYTE, (byte) moves[0].getBlockZ());
+					packetWrapper.write(Type.BYTE, (byte) moves[0].blockX());
+					packetWrapper.write(Type.BYTE, (byte) moves[0].blockY());
+					packetWrapper.write(Type.BYTE, (byte) moves[0].blockZ());
 
 					boolean onGround = packetWrapper.passthrough(Type.BOOLEAN);
 
 					if (moves.length > 1) {
 						PacketWrapper secondPacket = PacketWrapper.create(0x15, null, packetWrapper.user());
 						secondPacket.write(Type.VAR_INT, packetWrapper.get(Type.VAR_INT, 0));
-						secondPacket.write(Type.BYTE, (byte) moves[1].getBlockX());
-						secondPacket.write(Type.BYTE, (byte) moves[1].getBlockY());
-						secondPacket.write(Type.BYTE, (byte) moves[1].getBlockZ());
+						secondPacket.write(Type.BYTE, (byte) moves[1].blockX());
+						secondPacket.write(Type.BYTE, (byte) moves[1].blockY());
+						secondPacket.write(Type.BYTE, (byte) moves[1].blockZ());
 						secondPacket.write(Type.BOOLEAN, onGround);
 
 						PacketUtil.sendPacket(secondPacket, Protocol1_8TO1_9.class);
@@ -116,9 +116,9 @@ public class EntityPackets {
 
 					Vector[] moves = RelativeMoveUtil.calculateRelativeMoves(packetWrapper.user(), entityId, relX, relY, relZ);
 
-					packetWrapper.write(Type.BYTE, (byte) moves[0].getBlockX());
-					packetWrapper.write(Type.BYTE, (byte) moves[0].getBlockY());
-					packetWrapper.write(Type.BYTE, (byte) moves[0].getBlockZ());
+					packetWrapper.write(Type.BYTE, (byte) moves[0].blockX());
+					packetWrapper.write(Type.BYTE, (byte) moves[0].blockY());
+					packetWrapper.write(Type.BYTE, (byte) moves[0].blockZ());
 
 					byte yaw = packetWrapper.passthrough(Type.BYTE);
 					byte pitch = packetWrapper.passthrough(Type.BYTE);
@@ -133,9 +133,9 @@ public class EntityPackets {
 					if (moves.length > 1) {
 						PacketWrapper secondPacket = PacketWrapper.create(0x17, null, packetWrapper.user());
 						secondPacket.write(Type.VAR_INT, packetWrapper.get(Type.VAR_INT, 0));
-						secondPacket.write(Type.BYTE, (byte) moves[1].getBlockX());
-						secondPacket.write(Type.BYTE, (byte) moves[1].getBlockY());
-						secondPacket.write(Type.BYTE, (byte) moves[1].getBlockZ());
+						secondPacket.write(Type.BYTE, (byte) moves[1].blockX());
+						secondPacket.write(Type.BYTE, (byte) moves[1].blockY());
+						secondPacket.write(Type.BYTE, (byte) moves[1].blockZ());
 						secondPacket.write(Type.BYTE, yaw);
 						secondPacket.write(Type.BYTE, pitch);
 						secondPacket.write(Type.BOOLEAN, onGround);

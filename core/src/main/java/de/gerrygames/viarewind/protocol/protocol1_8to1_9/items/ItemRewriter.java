@@ -205,7 +205,7 @@ public class ItemRewriter {
 			for (int i = 0; i<attributes.size(); i++) {
 				CompoundTag attribute = attributes.get(i);
 				String name = (String) attribute.get("AttributeName").getValue();
-				if (!Protocol1_8TO1_9.VALID_ATTRIBUTES.contains(attribute)) {
+				if (!Protocol1_8TO1_9.VALID_ATTRIBUTES.contains(name)) {
 					attributes.remove(attribute);
 					i--;
 				}

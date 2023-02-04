@@ -7,6 +7,7 @@ import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.libs.gson.JsonElement;
 import com.viaversion.viaversion.libs.gson.JsonParser;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.CompoundTag;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.ListTag;
@@ -95,9 +96,9 @@ public class PlayerPackets {
 			public void registerMap() {
 				handler(packetWrapper -> {
 					Position position = packetWrapper.read(Type.POSITION);
-					packetWrapper.write(Type.INT, position.getX());
-					packetWrapper.write(Type.INT, position.getY());
-					packetWrapper.write(Type.INT, position.getZ());
+					packetWrapper.write(Type.INT, position.x());
+					packetWrapper.write(Type.INT, position.y());
+					packetWrapper.write(Type.INT, position.z());
 				});
 			}
 		});
@@ -253,9 +254,9 @@ public class PlayerPackets {
 			public void registerMap() {
 				handler(packetWrapper -> {
 					Position position = packetWrapper.read(Type.POSITION);
-					packetWrapper.write(Type.INT, position.getX());
-					packetWrapper.write(Type.INT, position.getY());
-					packetWrapper.write(Type.INT, position.getZ());
+					packetWrapper.write(Type.INT, position.x());
+					packetWrapper.write(Type.INT, position.y());
+					packetWrapper.write(Type.INT, position.z());
 				});
 			}
 		});
@@ -278,14 +279,19 @@ public class PlayerPackets {
 
 							int propertyCount = packetWrapper.read(Type.VAR_INT);
 							while (propertyCount-- > 0) {
-								gameProfile.properties.add(new GameProfileStorage.Property(packetWrapper.read(Type.STRING), packetWrapper.read(Type.STRING), packetWrapper.read(Type.BOOLEAN) ? packetWrapper.read(Type.STRING) : null));
+								String propertyName = packetWrapper.read(Type.STRING);
+								String propertyValue = packetWrapper.read(Type.STRING);
+								String propertySignature = packetWrapper.read(Type.OPTIONAL_STRING);
+								gameProfile.properties.add(new GameProfileStorage.Property(propertyName, propertyValue, propertySignature));
 							}
+
 							int gamemode = packetWrapper.read(Type.VAR_INT);
 							int ping = packetWrapper.read(Type.VAR_INT);
 							gameProfile.ping = ping;
 							gameProfile.gamemode = gamemode;
-							if (packetWrapper.read(Type.BOOLEAN)) {
-								gameProfile.setDisplayName(ChatUtil.jsonToLegacy(packetWrapper.read(Type.COMPONENT)));
+							JsonElement displayName = packetWrapper.read(Type.OPTIONAL_COMPONENT);
+							if (displayName != null) {
+								gameProfile.setDisplayName(ChatUtil.jsonToLegacy(displayName));
 							}
 
 							PacketWrapper packet = PacketWrapper.create(0x38, null, packetWrapper.user());
@@ -680,7 +686,7 @@ public class PlayerPackets {
 				map(Type.VAR_INT);  //Status
 				handler(packetWrapper -> {
 					int x = packetWrapper.read(Type.INT);
-					short y = packetWrapper.read(Type.UNSIGNED_BYTE);
+					int y = packetWrapper.read(Type.UNSIGNED_BYTE);
 					int z = packetWrapper.read(Type.INT);
 					packetWrapper.write(Type.POSITION, new Position(x, y, z));
 				});
@@ -692,7 +698,7 @@ public class PlayerPackets {
 			public void registerMap() {
 				handler(packetWrapper -> {
 					int x = packetWrapper.read(Type.INT);
-					short y = packetWrapper.read(Type.UNSIGNED_BYTE);
+					int y = packetWrapper.read(Type.UNSIGNED_BYTE);
 					int z = packetWrapper.read(Type.INT);
 					packetWrapper.write(Type.POSITION, new Position(x, y, z));
 
@@ -798,7 +804,7 @@ public class PlayerPackets {
 			public void registerMap() {
 				handler(packetWrapper -> {
 					int x = packetWrapper.read(Type.INT);
-					short y = packetWrapper.read(Type.SHORT);
+					int y = packetWrapper.read(Type.SHORT);
 					int z = packetWrapper.read(Type.INT);
 					packetWrapper.write(Type.POSITION, new Position(x, y, z));
 					for (int i = 0; i < 4; i++) {

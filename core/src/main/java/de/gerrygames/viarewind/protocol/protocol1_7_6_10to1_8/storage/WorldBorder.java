@@ -17,7 +17,7 @@ public class WorldBorder extends StoredObject implements Tickable {
 	private int warningTime, warningBlocks;
 	private boolean init = false;
 
-	private final int VIEW_DISTANCE = 16;
+	private static final int VIEW_DISTANCE = 16;
 
 	public WorldBorder(UserConnection user) {
 		super(user);

@@ -3,6 +3,8 @@ package de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types;
 import com.viaversion.viaversion.api.minecraft.Environment;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
+import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
+import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.type.PartialType;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
@@ -35,8 +37,9 @@ public class Chunk1_7_10Type extends PartialType<Chunk, ClientWorld> {
             for (int i = 0; i < chunk.getSections().length; i++) {
                 if ((chunk.getBitmask() & 1 << i) == 0) continue;
                 ChunkSection section = chunk.getSections()[i];
-                for (int j = 0; j < 4096; j++) {
-                    int block = section.getFlatBlock(j);
+				DataPalette palette = section.palette(PaletteType.BLOCKS);
+				for (int j = 0; j < 4096; j++) {
+					int block = palette.idAt(j);
                     dataToCompress.writeByte(block >> 4);
                 }
             }
@@ -44,9 +47,10 @@ public class Chunk1_7_10Type extends PartialType<Chunk, ClientWorld> {
             for (int i = 0; i < chunk.getSections().length; i++) {
                 if ((chunk.getBitmask() & 1 << i) == 0) continue;
                 ChunkSection section = chunk.getSections()[i];
-                for (int j = 0; j < 4096; j += 2) {
-                    int data0 = section.getFlatBlock(j) & 0xF;
-                    int data1 = section.getFlatBlock(j + 1) & 0xF;
+				DataPalette palette = section.palette(PaletteType.BLOCKS);
+				for (int j = 0; j < 4096; j += 2) {
+					int data0 = palette.idAt(j) & 0xF;
+                    int data1 = palette.idAt(j + 1) & 0xF;
 
                     dataToCompress.writeByte((data1 << 4) | data0);
                 }

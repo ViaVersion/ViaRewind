@@ -8,6 +8,8 @@ import com.viaversion.viaversion.api.minecraft.chunks.BaseChunk;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSectionImpl;
+import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
+import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
@@ -175,10 +177,11 @@ public class WorldPackets {
 
 					for (ChunkSection section : chunk.getSections()) {
 						if (section == null) continue;
-						for (int i = 0; i < section.getPaletteSize(); i++) {
-							int block = section.getPaletteEntry(i);
+						DataPalette palette = section.palette(PaletteType.BLOCKS);
+						for (int i = 0; i < palette.size(); i++) {
+							int block = palette.idByIndex(i);
 							int replacedBlock = ReplacementRegistry1_8to1_9.replace(block);
-							section.setPaletteEntry(i, replacedBlock);
+							palette.setIdByIndex(i, replacedBlock);
 						}
 					}
 
@@ -187,7 +190,7 @@ public class WorldPackets {
 						ChunkSection[] sections = new ChunkSection[16];
 						ChunkSection section = new ChunkSectionImpl(true);
 						sections[0] = section;
-						section.addPaletteEntry(0);
+						section.palette(PaletteType.BLOCKS).addId(0);
 						if (skylight) section.getLight().setSkyLight(new byte[2048]);
 						chunk = new BaseChunk(chunk.getX(), chunk.getZ(), true, false, 1, sections, chunk.getBiomeData(), chunk.getBlockEntities());
 					}
@@ -198,7 +201,7 @@ public class WorldPackets {
 					chunk.getBlockEntities().forEach(nbt -> {
 						if (!nbt.contains("x") || !nbt.contains("y") || !nbt.contains("z") || !nbt.contains("id"))
 							return;
-						Position position = new Position((int) nbt.get("x").getValue(), (short) (int) nbt.get("y").getValue(), (int) nbt.get("z").getValue());
+						Position position = new Position((int) nbt.get("x").getValue(), (int) nbt.get("y").getValue(), (int) nbt.get("z").getValue());
 						String id = (String) nbt.get("id").getValue();
 
 						short action;

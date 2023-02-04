@@ -70,9 +70,9 @@ public class EntityPackets {
 				map(Type.VAR_INT, Type.INT);  //Entity Id
 				handler(packetWrapper -> {
 					Position position = packetWrapper.read(Type.POSITION);
-					packetWrapper.write(Type.INT, position.getX());
-					packetWrapper.write(Type.UNSIGNED_BYTE, (short) position.getY());
-					packetWrapper.write(Type.INT, position.getZ());
+					packetWrapper.write(Type.INT, position.x());
+					packetWrapper.write(Type.UNSIGNED_BYTE, (short) position.y());
+					packetWrapper.write(Type.INT, position.z());
 				});
 			}
 		});
