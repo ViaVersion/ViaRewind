@@ -214,9 +214,19 @@ public class ArmorStandReplacement extends EntityReplacement1_7to1_8 {
 	}
 
 	private void spawnHologram() {
-		int[] entityIds = new int[] {entityId, additionalEntityId()};
+		int[] entityIds = {entityId, additionalEntityId()};
 
-		sendSpawn(entityIds[0], 66, locX, locY, locZ); // Skull
+		PacketWrapper spawnSkull = PacketWrapper.create(ClientboundPackets1_7.SPAWN_ENTITY, null, user);
+		spawnSkull.write(Type.VAR_INT, entityIds[0]);
+		spawnSkull.write(Type.BYTE, (byte) 66);
+		spawnSkull.write(Type.INT, (int) (locX * 32.0));
+		spawnSkull.write(Type.INT, (int) (locY * 32.0));
+		spawnSkull.write(Type.INT, (int) (locZ * 32.0));
+		spawnSkull.write(Type.BYTE, (byte) 0);
+		spawnSkull.write(Type.BYTE, (byte) 0);
+		spawnSkull.write(Type.INT, 0);
+		PacketUtil.sendPacket(spawnSkull, Protocol1_7_6_10TO1_8.class, true, true);
+
 		sendSpawn(entityIds[1], 100, locX, locY, locZ); // Horse
 
 		this.entityIds = entityIds;
