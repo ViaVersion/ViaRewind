@@ -7,7 +7,7 @@ import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_8;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
@@ -30,9 +30,9 @@ public class EntityPackets {
 
 		/*  OUTGOING  */
 
-		protocol.registerClientbound(ClientboundPackets1_8.ENTITY_EQUIPMENT, new PacketRemapper() {
+		protocol.registerClientbound(ClientboundPackets1_8.ENTITY_EQUIPMENT, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				map(Type.VAR_INT, Type.INT);  //Entity Id
 				map(Type.SHORT);  //Slot
 				map(Type.ITEM, Types1_7_6_10.COMPRESSED_NBT_ITEM);  //Item
@@ -64,9 +64,9 @@ public class EntityPackets {
 			}
 		});
 
-		protocol.registerClientbound(ClientboundPackets1_8.USE_BED, new PacketRemapper() {
+		protocol.registerClientbound(ClientboundPackets1_8.USE_BED, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				map(Type.VAR_INT, Type.INT);  //Entity Id
 				handler(packetWrapper -> {
 					Position position = packetWrapper.read(Type.POSITION);
@@ -77,17 +77,17 @@ public class EntityPackets {
 			}
 		});
 
-		protocol.registerClientbound(ClientboundPackets1_8.COLLECT_ITEM, new PacketRemapper() {
+		protocol.registerClientbound(ClientboundPackets1_8.COLLECT_ITEM, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				map(Type.VAR_INT, Type.INT);  //Collected Entity ID
 				map(Type.VAR_INT, Type.INT);  //Collector Entity ID
 			}
 		});
 
-		protocol.registerClientbound(ClientboundPackets1_8.ENTITY_VELOCITY, new PacketRemapper() {
+		protocol.registerClientbound(ClientboundPackets1_8.ENTITY_VELOCITY, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				map(Type.VAR_INT, Type.INT);  //Entity Id
 				map(Type.SHORT);  //velX
 				map(Type.SHORT);  //velY
@@ -95,9 +95,9 @@ public class EntityPackets {
 			}
 		});
 
-		protocol.registerClientbound(ClientboundPackets1_8.DESTROY_ENTITIES, new PacketRemapper() {
+		protocol.registerClientbound(ClientboundPackets1_8.DESTROY_ENTITIES, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				handler(packetWrapper -> {
 					int[] entityIds = packetWrapper.read(Type.VAR_INT_ARRAY_PRIMITIVE);
 
@@ -120,16 +120,16 @@ public class EntityPackets {
 			}
 		});
 
-		protocol.registerClientbound(ClientboundPackets1_8.ENTITY_MOVEMENT, new PacketRemapper() {
+		protocol.registerClientbound(ClientboundPackets1_8.ENTITY_MOVEMENT, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				map(Type.VAR_INT, Type.INT);  //Entity Id
 			}
 		});
 
-		protocol.registerClientbound(ClientboundPackets1_8.ENTITY_POSITION, new PacketRemapper() {
+		protocol.registerClientbound(ClientboundPackets1_8.ENTITY_POSITION, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				map(Type.VAR_INT, Type.INT);  //Entity Id
 				map(Type.BYTE);  //x
 				map(Type.BYTE);  //y
@@ -150,9 +150,9 @@ public class EntityPackets {
 			}
 		});
 
-		protocol.registerClientbound(ClientboundPackets1_8.ENTITY_ROTATION, new PacketRemapper() {
+		protocol.registerClientbound(ClientboundPackets1_8.ENTITY_ROTATION, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				map(Type.VAR_INT, Type.INT);  //Entity Id
 				map(Type.BYTE);  //yaw
 				map(Type.BYTE);  //pitch
@@ -171,9 +171,9 @@ public class EntityPackets {
 			}
 		});
 
-		protocol.registerClientbound(ClientboundPackets1_8.ENTITY_POSITION_AND_ROTATION, new PacketRemapper() {
+		protocol.registerClientbound(ClientboundPackets1_8.ENTITY_POSITION_AND_ROTATION, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				map(Type.VAR_INT, Type.INT);  //Entity Id
 				map(Type.BYTE);  //x
 				map(Type.BYTE);  //y
@@ -199,9 +199,9 @@ public class EntityPackets {
 			}
 		});
 
-		protocol.registerClientbound(ClientboundPackets1_8.ENTITY_TELEPORT, new PacketRemapper() {
+		protocol.registerClientbound(ClientboundPackets1_8.ENTITY_TELEPORT, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				map(Type.VAR_INT, Type.INT);  //Entity Id
 				map(Type.INT);  //x
 				map(Type.INT);  //y
@@ -237,9 +237,9 @@ public class EntityPackets {
 			}
 		});
 
-		protocol.registerClientbound(ClientboundPackets1_8.ENTITY_HEAD_LOOK, new PacketRemapper() {
+		protocol.registerClientbound(ClientboundPackets1_8.ENTITY_HEAD_LOOK, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				map(Type.VAR_INT, Type.INT);  //Entity Id
 				map(Type.BYTE);  //Head yaw
 				handler(packetWrapper -> {
@@ -255,9 +255,9 @@ public class EntityPackets {
 			}
 		});
 
-		protocol.registerClientbound(ClientboundPackets1_8.ATTACH_ENTITY, new PacketRemapper() {
+		protocol.registerClientbound(ClientboundPackets1_8.ATTACH_ENTITY, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				map(Type.INT);
 				map(Type.INT);
 				map(Type.BOOLEAN);
@@ -272,9 +272,9 @@ public class EntityPackets {
 			}
 		});
 
-		protocol.registerClientbound(ClientboundPackets1_8.ENTITY_METADATA, new PacketRemapper() {
+		protocol.registerClientbound(ClientboundPackets1_8.ENTITY_METADATA, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				map(Type.VAR_INT, Type.INT);  //Entity Id
 				map(Types1_8.METADATA_LIST, Types1_7_6_10.METADATA_LIST);  //Metadata
 				handler(wrapper -> {
@@ -298,9 +298,9 @@ public class EntityPackets {
 			}
 		});
 
-		protocol.registerClientbound(ClientboundPackets1_8.ENTITY_EFFECT, new PacketRemapper() {
+		protocol.registerClientbound(ClientboundPackets1_8.ENTITY_EFFECT, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				map(Type.VAR_INT, Type.INT);  //Entity Id
 				map(Type.BYTE);  //Effect Id
 				map(Type.BYTE);  //Amplifier
@@ -309,17 +309,17 @@ public class EntityPackets {
 			}
 		});
 
-		protocol.registerClientbound(ClientboundPackets1_8.REMOVE_ENTITY_EFFECT, new PacketRemapper() {
+		protocol.registerClientbound(ClientboundPackets1_8.REMOVE_ENTITY_EFFECT, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				map(Type.VAR_INT, Type.INT);  //Entity Id
 				map(Type.BYTE);  //Effect Id
 			}
 		});
 
-		protocol.registerClientbound(ClientboundPackets1_8.ENTITY_PROPERTIES, new PacketRemapper() {
+		protocol.registerClientbound(ClientboundPackets1_8.ENTITY_PROPERTIES, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				map(Type.VAR_INT, Type.INT);  //Entity Id
 				handler(packetWrapper -> {
 					int entityId = packetWrapper.get(Type.INT, 0);

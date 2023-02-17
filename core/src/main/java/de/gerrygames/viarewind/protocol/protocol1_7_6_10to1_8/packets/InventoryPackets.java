@@ -1,7 +1,7 @@
 package de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.packets;
 
 import com.viaversion.viaversion.api.minecraft.item.Item;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.libs.gson.JsonElement;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
@@ -22,9 +22,9 @@ public class InventoryPackets {
 
 		/*  OUTGOING  */
 
-		protocol.registerClientbound(ClientboundPackets1_8.OPEN_WINDOW, new PacketRemapper() {
+		protocol.registerClientbound(ClientboundPackets1_8.OPEN_WINDOW, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				handler(packetWrapper -> {
 					short windowId = packetWrapper.passthrough(Type.UNSIGNED_BYTE);
 					String windowType = packetWrapper.read(Type.STRING);
@@ -47,9 +47,9 @@ public class InventoryPackets {
 			}
 		});
 
-		protocol.registerClientbound(ClientboundPackets1_8.CLOSE_WINDOW, new PacketRemapper() {
+		protocol.registerClientbound(ClientboundPackets1_8.CLOSE_WINDOW, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				map(Type.UNSIGNED_BYTE);
 				handler(packetWrapper -> {
 					short windowsId = packetWrapper.get(Type.UNSIGNED_BYTE, 0);
@@ -58,9 +58,9 @@ public class InventoryPackets {
 			}
 		});
 
-		protocol.registerClientbound(ClientboundPackets1_8.SET_SLOT, new PacketRemapper() {
+		protocol.registerClientbound(ClientboundPackets1_8.SET_SLOT, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				handler(packetWrapper -> {
 					short windowId = packetWrapper.read(Type.UNSIGNED_BYTE);  //Window Id
 					short windowType = packetWrapper.user().get(Windows.class).get(windowId);
@@ -96,9 +96,9 @@ public class InventoryPackets {
 			}
 		});
 
-		protocol.registerClientbound(ClientboundPackets1_8.WINDOW_ITEMS, new PacketRemapper() {
+		protocol.registerClientbound(ClientboundPackets1_8.WINDOW_ITEMS, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				handler(packetWrapper -> {
 					short windowId = packetWrapper.read(Type.UNSIGNED_BYTE);  //Window Id
 					short windowType = packetWrapper.user().get(Windows.class).get(windowId);
@@ -131,9 +131,9 @@ public class InventoryPackets {
 			}
 		});
 
-		protocol.registerClientbound(ClientboundPackets1_8.WINDOW_PROPERTY, new PacketRemapper() {
+		protocol.registerClientbound(ClientboundPackets1_8.WINDOW_PROPERTY, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				map(Type.UNSIGNED_BYTE);
 				map(Type.SHORT);
 				map(Type.SHORT);
@@ -189,9 +189,9 @@ public class InventoryPackets {
 
 		/*  INCOMING  */
 
-		protocol.registerServerbound(ServerboundPackets1_7.CLOSE_WINDOW, new PacketRemapper() {
+		protocol.registerServerbound(ServerboundPackets1_7.CLOSE_WINDOW, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				map(Type.UNSIGNED_BYTE);
 				handler(packetWrapper -> {
 					short windowsId = packetWrapper.get(Type.UNSIGNED_BYTE, 0);
@@ -200,9 +200,9 @@ public class InventoryPackets {
 			}
 		});
 
-		protocol.registerServerbound(ServerboundPackets1_7.CLICK_WINDOW, new PacketRemapper() {
+		protocol.registerServerbound(ServerboundPackets1_7.CLICK_WINDOW, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				handler(packetWrapper -> {
 					short windowId = packetWrapper.read(Type.BYTE);  //Window Id
 					packetWrapper.write(Type.UNSIGNED_BYTE, windowId);
@@ -227,9 +227,9 @@ public class InventoryPackets {
 			}
 		});
 
-		protocol.registerServerbound(ServerboundPackets1_7.WINDOW_CONFIRMATION, new PacketRemapper() {
+		protocol.registerServerbound(ServerboundPackets1_7.WINDOW_CONFIRMATION, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				map(Type.UNSIGNED_BYTE);
 				map(Type.SHORT);
 				map(Type.BOOLEAN);
@@ -241,9 +241,9 @@ public class InventoryPackets {
 		});
 
 		//Creative Inventory Action
-		protocol.registerServerbound(ServerboundPackets1_7.CREATIVE_INVENTORY_ACTION, new PacketRemapper() {
+		protocol.registerServerbound(ServerboundPackets1_7.CREATIVE_INVENTORY_ACTION, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				map(Type.SHORT);  //Slot
 				map(Types1_7_6_10.COMPRESSED_NBT_ITEM, Type.ITEM);  //Item
 				handler(packetWrapper -> {

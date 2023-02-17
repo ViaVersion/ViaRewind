@@ -3,7 +3,7 @@ package de.gerrygames.viarewind.protocol.protocol1_7_6to1_7_2;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.protocol.remapper.ValueTransformer;
 import com.viaversion.viaversion.api.type.Type;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.ClientboundPackets1_7;
@@ -29,17 +29,17 @@ public class Protocol1_7_6to1_7_2 extends AbstractProtocol<ClientboundPackets1_7
 	@Override
 	protected void registerPackets() {
 		//Login Success
-		this.registerClientbound(State.LOGIN, 0x02, 0x02, new PacketRemapper() {
+		this.registerClientbound(State.LOGIN, 0x02, 0x02, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				map(Type.STRING, INSERT_DASHES);
 			}
 		});
 
 		//Spawn Player
-		this.registerClientbound(ClientboundPackets1_7.SPAWN_PLAYER, new PacketRemapper() {
+		this.registerClientbound(ClientboundPackets1_7.SPAWN_PLAYER, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				map(Type.VAR_INT);
 				map(Type.STRING, INSERT_DASHES);
 				map(Type.STRING);

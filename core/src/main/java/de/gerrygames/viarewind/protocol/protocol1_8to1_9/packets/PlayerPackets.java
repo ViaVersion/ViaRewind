@@ -7,7 +7,7 @@ import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_8;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_8;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.CompoundTag;
@@ -39,9 +39,9 @@ public class PlayerPackets {
 		//Statistics
 
 		//Boss Bar
-		protocol.registerClientbound(ClientboundPackets1_9.BOSSBAR, null, new PacketRemapper() {
+		protocol.registerClientbound(ClientboundPackets1_9.BOSSBAR, null, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				handler(packetWrapper -> {
 					packetWrapper.cancel();
 
@@ -72,9 +72,9 @@ public class PlayerPackets {
 		protocol.cancelClientbound(ClientboundPackets1_9.COOLDOWN);
 
 		//Custom Payload
-		protocol.registerClientbound(ClientboundPackets1_9.PLUGIN_MESSAGE, new PacketRemapper() {
+		protocol.registerClientbound(ClientboundPackets1_9.PLUGIN_MESSAGE, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				map(Type.STRING);
 				handler(packetWrapper -> {
 					String channel = packetWrapper.get(Type.STRING, 0);
@@ -110,9 +110,9 @@ public class PlayerPackets {
 
 		//Disconnect
 		//Change Game State
-		protocol.registerClientbound(ClientboundPackets1_9.GAME_EVENT, new PacketRemapper() {
+		protocol.registerClientbound(ClientboundPackets1_9.GAME_EVENT, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				map(Type.UNSIGNED_BYTE);
 				map(Type.FLOAT);
 				handler(packetWrapper -> {
@@ -124,9 +124,9 @@ public class PlayerPackets {
 		});
 
 		//Join Game
-		protocol.registerClientbound(ClientboundPackets1_9.JOIN_GAME, new PacketRemapper() {
+		protocol.registerClientbound(ClientboundPackets1_9.JOIN_GAME, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				map(Type.INT);
 				map(Type.UNSIGNED_BYTE);
 				map(Type.BYTE);
@@ -152,9 +152,9 @@ public class PlayerPackets {
 		//Player List Item
 
 		//Player Position And Look
-		protocol.registerClientbound(ClientboundPackets1_9.PLAYER_POSITION, new PacketRemapper() {
+		protocol.registerClientbound(ClientboundPackets1_9.PLAYER_POSITION, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				map(Type.DOUBLE);
 				map(Type.DOUBLE);
 				map(Type.DOUBLE);
@@ -209,9 +209,9 @@ public class PlayerPackets {
 		//Resource Pack Send
 
 		//Respawn
-		protocol.registerClientbound(ClientboundPackets1_9.RESPAWN, new PacketRemapper() {
+		protocol.registerClientbound(ClientboundPackets1_9.RESPAWN, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				map(Type.INT);
 				map(Type.UNSIGNED_BYTE);
 				map(Type.UNSIGNED_BYTE);
@@ -239,9 +239,9 @@ public class PlayerPackets {
 		/*  INCMOING  */
 
 		//Chat Message
-		protocol.registerServerbound(ServerboundPackets1_8.CHAT_MESSAGE, new PacketRemapper() {
+		protocol.registerServerbound(ServerboundPackets1_8.CHAT_MESSAGE, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				map(Type.STRING);
 				handler(packetWrapper -> {
 					String msg = packetWrapper.get(Type.STRING, 0);
@@ -261,9 +261,9 @@ public class PlayerPackets {
 		//Confirm Transaction
 
 		//Use Entity
-		protocol.registerServerbound(ServerboundPackets1_8.INTERACT_ENTITY, new PacketRemapper() {
+		protocol.registerServerbound(ServerboundPackets1_8.INTERACT_ENTITY, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				map(Type.VAR_INT);
 				map(Type.VAR_INT);
 				handler(packetWrapper -> {
@@ -281,9 +281,9 @@ public class PlayerPackets {
 		});
 
 		//Player
-		protocol.registerServerbound(ServerboundPackets1_8.PLAYER_MOVEMENT, new PacketRemapper() {
+		protocol.registerServerbound(ServerboundPackets1_8.PLAYER_MOVEMENT, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				map(Type.BOOLEAN);
 				handler(packetWrapper -> {
 					EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
@@ -294,9 +294,9 @@ public class PlayerPackets {
 		});
 
 		//Player Position
-		protocol.registerServerbound(ServerboundPackets1_8.PLAYER_POSITION, new PacketRemapper() {
+		protocol.registerServerbound(ServerboundPackets1_8.PLAYER_POSITION, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				map(Type.DOUBLE);
 				map(Type.DOUBLE);
 				map(Type.DOUBLE);
@@ -312,9 +312,9 @@ public class PlayerPackets {
 		});
 
 		//Player Look
-		protocol.registerServerbound(ServerboundPackets1_8.PLAYER_ROTATION, new PacketRemapper() {
+		protocol.registerServerbound(ServerboundPackets1_8.PLAYER_ROTATION, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				map(Type.FLOAT);
 				map(Type.FLOAT);
 				map(Type.BOOLEAN);
@@ -330,9 +330,9 @@ public class PlayerPackets {
 		});
 
 		//Player Position And Look
-		protocol.registerServerbound(ServerboundPackets1_8.PLAYER_POSITION_AND_ROTATION, new PacketRemapper() {
+		protocol.registerServerbound(ServerboundPackets1_8.PLAYER_POSITION_AND_ROTATION, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				map(Type.DOUBLE);
 				map(Type.DOUBLE);
 				map(Type.DOUBLE);
@@ -368,9 +368,9 @@ public class PlayerPackets {
 		});
 
 		//Player Digging
-		protocol.registerServerbound(ServerboundPackets1_8.PLAYER_DIGGING, new PacketRemapper() {
+		protocol.registerServerbound(ServerboundPackets1_8.PLAYER_DIGGING, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				map(Type.VAR_INT);
 				map(Type.POSITION);
 				handler(packetWrapper -> {
@@ -393,9 +393,9 @@ public class PlayerPackets {
 		});
 
 		//Player Block Placement
-		protocol.registerServerbound(ServerboundPackets1_8.PLAYER_BLOCK_PLACEMENT, new PacketRemapper() {
+		protocol.registerServerbound(ServerboundPackets1_8.PLAYER_BLOCK_PLACEMENT, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				map(Type.POSITION);
 				map(Type.BYTE, Type.VAR_INT);
 				map(Type.ITEM, Type.NOTHING);
@@ -421,17 +421,17 @@ public class PlayerPackets {
 		});
 
 		//Held Item Change
-		protocol.registerServerbound(ServerboundPackets1_8.HELD_ITEM_CHANGE, new PacketRemapper() {
+		protocol.registerServerbound(ServerboundPackets1_8.HELD_ITEM_CHANGE, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				handler(packetWrapper -> packetWrapper.user().get(Cooldown.class).hit());
 			}
 		});
 
 		//Animation
-		protocol.registerServerbound(ServerboundPackets1_8.ANIMATION, new PacketRemapper() {
+		protocol.registerServerbound(ServerboundPackets1_8.ANIMATION, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				handler(packetWrapper -> {
 					packetWrapper.cancel();
 					final PacketWrapper delayedPacket = PacketWrapper.create(0x1A, null, packetWrapper.user());
@@ -455,9 +455,9 @@ public class PlayerPackets {
 		});
 
 		//Entity Action
-		protocol.registerServerbound(ServerboundPackets1_8.ENTITY_ACTION, new PacketRemapper() {
+		protocol.registerServerbound(ServerboundPackets1_8.ENTITY_ACTION, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				map(Type.VAR_INT);
 				map(Type.VAR_INT);
 				map(Type.VAR_INT);
@@ -480,9 +480,9 @@ public class PlayerPackets {
 		});
 
 		//Steer Vehicle
-		protocol.registerServerbound(ServerboundPackets1_8.STEER_VEHICLE, new PacketRemapper() {
+		protocol.registerServerbound(ServerboundPackets1_8.STEER_VEHICLE, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				map(Type.FLOAT);
 				map(Type.FLOAT);
 				map(Type.UNSIGNED_BYTE);
@@ -503,9 +503,9 @@ public class PlayerPackets {
 		});
 
 		//Update Sign
-		protocol.registerServerbound(ServerboundPackets1_8.UPDATE_SIGN, new PacketRemapper() {
+		protocol.registerServerbound(ServerboundPackets1_8.UPDATE_SIGN, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				map(Type.POSITION);
 				handler(packetWrapper -> {
 					for (int i = 0; i < 4; i++) {
@@ -518,9 +518,9 @@ public class PlayerPackets {
 		//Player Abilities
 
 		//Tab Complete
-		protocol.registerServerbound(ServerboundPackets1_8.TAB_COMPLETE, new PacketRemapper() {
+		protocol.registerServerbound(ServerboundPackets1_8.TAB_COMPLETE, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				map(Type.STRING);
 				handler(packetWrapper -> packetWrapper.write(Type.BOOLEAN, false));
 				map(Type.OPTIONAL_POSITION);
@@ -528,9 +528,9 @@ public class PlayerPackets {
 		});
 
 		//Client Settings
-		protocol.registerServerbound(ServerboundPackets1_8.CLIENT_SETTINGS, new PacketRemapper() {
+		protocol.registerServerbound(ServerboundPackets1_8.CLIENT_SETTINGS, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				map(Type.STRING);
 				map(Type.BYTE);
 				map(Type.BYTE, Type.VAR_INT);
@@ -556,9 +556,9 @@ public class PlayerPackets {
 		//Client Status
 
 		//Custom Payload
-		protocol.registerServerbound(ServerboundPackets1_8.PLUGIN_MESSAGE, new PacketRemapper() {
+		protocol.registerServerbound(ServerboundPackets1_8.PLUGIN_MESSAGE, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				map(Type.STRING);
 				handler(packetWrapper -> {
 					String channel = packetWrapper.get(Type.STRING, 0);

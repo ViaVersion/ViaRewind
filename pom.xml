@@ -40,9 +40,10 @@
         <dependency>
             <groupId>com.viaversion</groupId>
             <artifactId>viaversion</artifactId>
-            <version>4.4.2</version>
+            <version>4.6.0-1.19.4-rc2-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
+        <!--suppress VulnerableLibrariesLocal -->
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>

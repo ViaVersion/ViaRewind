@@ -7,7 +7,7 @@ import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.Direction;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.protocol1_8.ServerboundPackets1_8;
@@ -33,26 +33,26 @@ public class Protocol1_7_6_10TO1_8 extends AbstractProtocol<ClientboundPackets1_
 		SpawnPackets.register(this);
 		WorldPackets.register(this);
 
-		this.registerClientbound(ClientboundPackets1_8.KEEP_ALIVE, new PacketRemapper() {
+		this.registerClientbound(ClientboundPackets1_8.KEEP_ALIVE, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				map(Type.VAR_INT, Type.INT);
 			}
 		});
 
 		this.cancelClientbound(ClientboundPackets1_8.SET_COMPRESSION); // unused
 
-		this.registerServerbound(ServerboundPackets1_7.KEEP_ALIVE, new PacketRemapper() {
+		this.registerServerbound(ServerboundPackets1_7.KEEP_ALIVE, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				map(Type.INT, Type.VAR_INT);
 			}
 		});
 
 		//Encryption Request
-		this.registerClientbound(State.LOGIN, 0x01, 0x01, new PacketRemapper() {
+		this.registerClientbound(State.LOGIN, 0x01, 0x01, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				map(Type.STRING);  //Server ID
 				map(Type.BYTE_ARRAY_PRIMITIVE, Type.SHORT_BYTE_ARRAY); // Public key
 				map(Type.BYTE_ARRAY_PRIMITIVE, Type.SHORT_BYTE_ARRAY); // Verification token
@@ -60,9 +60,9 @@ public class Protocol1_7_6_10TO1_8 extends AbstractProtocol<ClientboundPackets1_
 		});
 
 		//Set Compression
-		this.registerClientbound(State.LOGIN, 0x03, 0x03, new PacketRemapper() {
+		this.registerClientbound(State.LOGIN, 0x03, 0x03, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				handler(packetWrapper -> {
 					Via.getManager().getProviders().get(CompressionHandlerProvider.class)
 							.handleSetCompression(packetWrapper.user(), packetWrapper.read(Type.VAR_INT));
@@ -72,9 +72,9 @@ public class Protocol1_7_6_10TO1_8 extends AbstractProtocol<ClientboundPackets1_
 		});
 
 		//Encryption Response
-		this.registerServerbound(State.LOGIN, 0x01, 0x01, new PacketRemapper() {
+		this.registerServerbound(State.LOGIN, 0x01, 0x01, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				map(Type.SHORT_BYTE_ARRAY, Type.BYTE_ARRAY_PRIMITIVE); // Shared secret
 				map(Type.SHORT_BYTE_ARRAY, Type.BYTE_ARRAY_PRIMITIVE); // Verification token
 			}

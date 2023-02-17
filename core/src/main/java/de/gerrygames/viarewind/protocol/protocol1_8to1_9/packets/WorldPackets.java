@@ -12,7 +12,7 @@ import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
 import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.CompoundTag;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.StringTag;
@@ -41,27 +41,30 @@ public class WorldPackets {
 		//Block Break Animation
 
 		//Update Block Entity
-		protocol.registerClientbound(ClientboundPackets1_9.BLOCK_ENTITY_DATA, new PacketRemapper() {
+		protocol.registerClientbound(ClientboundPackets1_9.BLOCK_ENTITY_DATA, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				map(Type.POSITION);
 				map(Type.UNSIGNED_BYTE);
 				map(Type.NBT);
 				handler(packetWrapper -> {
 					CompoundTag tag = packetWrapper.get(Type.NBT, 0);
 					if (tag != null && tag.contains("SpawnData")) {
-						String entity = (String) ((CompoundTag) tag.get("SpawnData")).get("id").getValue();
-						tag.remove("SpawnData");
-						tag.put("entityId", new StringTag(entity));
+						CompoundTag spawnData = tag.get("SpawnData");
+						if (spawnData.contains("id")) {
+							String entity = (String) spawnData.get("id").getValue();
+							tag.remove("SpawnData");
+							tag.put("entityId", new StringTag(entity));
+						}
 					}
 				});
 			}
 		});
 
 		//Block Action
-		protocol.registerClientbound(ClientboundPackets1_9.BLOCK_ACTION, new PacketRemapper() {
+		protocol.registerClientbound(ClientboundPackets1_9.BLOCK_ACTION, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				map(Type.POSITION);
 				map(Type.UNSIGNED_BYTE);
 				map(Type.UNSIGNED_BYTE);
@@ -76,9 +79,9 @@ public class WorldPackets {
 		});
 
 		//Block Change
-		protocol.registerClientbound(ClientboundPackets1_9.BLOCK_CHANGE, new PacketRemapper() {
+		protocol.registerClientbound(ClientboundPackets1_9.BLOCK_CHANGE, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				map(Type.POSITION);
 				map(Type.VAR_INT);
 				handler(packetWrapper -> {
@@ -92,9 +95,9 @@ public class WorldPackets {
 		//Server Difficulty
 
 		//Multi Block Change
-		protocol.registerClientbound(ClientboundPackets1_9.MULTI_BLOCK_CHANGE, new PacketRemapper() {
+		protocol.registerClientbound(ClientboundPackets1_9.MULTI_BLOCK_CHANGE, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				map(Type.INT);
 				map(Type.INT);
 				map(Type.BLOCK_CHANGE_RECORD_ARRAY);
@@ -108,9 +111,9 @@ public class WorldPackets {
 		});
 
 		//Named Sound Effect
-		protocol.registerClientbound(ClientboundPackets1_9.NAMED_SOUND, new PacketRemapper() {
+		protocol.registerClientbound(ClientboundPackets1_9.NAMED_SOUND, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				map(Type.STRING);
 				handler(packetWrapper -> {
 					String name = packetWrapper.get(Type.STRING, 0);
@@ -131,9 +134,9 @@ public class WorldPackets {
 		});
 
 		//Explosion
-		protocol.registerClientbound(ClientboundPackets1_9.EXPLOSION, new PacketRemapper() {
+		protocol.registerClientbound(ClientboundPackets1_9.EXPLOSION, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				map(Type.FLOAT);
 				map(Type.FLOAT);
 				map(Type.FLOAT);
@@ -154,9 +157,9 @@ public class WorldPackets {
 		});
 
 		//Unload Chunk
-		protocol.registerClientbound(ClientboundPackets1_9.UNLOAD_CHUNK, ClientboundPackets1_8.CHUNK_DATA, new PacketRemapper() {
+		protocol.registerClientbound(ClientboundPackets1_9.UNLOAD_CHUNK, ClientboundPackets1_8.CHUNK_DATA, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				handler(packetWrapper -> {
 					int chunkX = packetWrapper.read(Type.INT);
 					int chunkZ = packetWrapper.read(Type.INT);
@@ -167,9 +170,9 @@ public class WorldPackets {
 		});
 
 		//Chunk Data
-		protocol.registerClientbound(ClientboundPackets1_9.CHUNK_DATA, new PacketRemapper() {
+		protocol.registerClientbound(ClientboundPackets1_9.CHUNK_DATA, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				handler(packetWrapper -> {
 					ClientWorld world = packetWrapper.user().get(ClientWorld.class);
 
@@ -240,9 +243,9 @@ public class WorldPackets {
 		});
 
 		//Effect
-		protocol.registerClientbound(ClientboundPackets1_9.EFFECT, new PacketRemapper() {
+		protocol.registerClientbound(ClientboundPackets1_9.EFFECT, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				map(Type.INT);
 				map(Type.POSITION);
 				map(Type.INT);
@@ -264,9 +267,9 @@ public class WorldPackets {
 		});
 
 		//Particle
-		protocol.registerClientbound(ClientboundPackets1_9.SPAWN_PARTICLE, new PacketRemapper() {
+		protocol.registerClientbound(ClientboundPackets1_9.SPAWN_PARTICLE, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				map(Type.INT);
 				handler(packetWrapper -> {
 					int type = packetWrapper.get(Type.INT, 0);
@@ -288,9 +291,9 @@ public class WorldPackets {
 		});
 
 		//Map
-		protocol.registerClientbound(ClientboundPackets1_9.MAP_DATA, new PacketRemapper() {
+		protocol.registerClientbound(ClientboundPackets1_9.MAP_DATA, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				map(Type.VAR_INT);
 				map(Type.BYTE);
 				map(Type.BOOLEAN, Type.NOTHING);
@@ -303,9 +306,9 @@ public class WorldPackets {
 		//Update Sign
 
 		//Sound Effects
-		protocol.registerClientbound(ClientboundPackets1_9.SOUND, ClientboundPackets1_8.NAMED_SOUND, new PacketRemapper() {
+		protocol.registerClientbound(ClientboundPackets1_9.SOUND, ClientboundPackets1_8.NAMED_SOUND, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				handler(packetWrapper -> {
 					int soundId = packetWrapper.read(Type.VAR_INT);
 					String sound = SoundRemapper.oldNameFromId(soundId);
