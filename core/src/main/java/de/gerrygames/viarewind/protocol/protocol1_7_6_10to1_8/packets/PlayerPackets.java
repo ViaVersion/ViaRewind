@@ -619,12 +619,6 @@ public class PlayerPackets {
 
 					PlayerPosition playerPosition = packetWrapper.user().get(PlayerPosition.class);
 
-					if (playerPosition.isPositionPacketReceived()) {
-						playerPosition.setPositionPacketReceived(false);
-						feetY -= 0.01;
-						packetWrapper.set(Type.DOUBLE, 1, feetY);
-					}
-
 					playerPosition.setOnGround(packetWrapper.get(Type.BOOLEAN, 0));
 					playerPosition.setPos(x, feetY, z);
 				});
@@ -665,12 +659,6 @@ public class PlayerPackets {
 					float pitch = packetWrapper.get(Type.FLOAT, 1);
 
 					PlayerPosition playerPosition = packetWrapper.user().get(PlayerPosition.class);
-
-					if (playerPosition.isPositionPacketReceived()) {
-						playerPosition.setPositionPacketReceived(false);
-						feetY = playerPosition.getReceivedPosY();
-						packetWrapper.set(Type.DOUBLE, 1, feetY);
-					}
 
 					playerPosition.setOnGround(packetWrapper.get(Type.BOOLEAN, 0));
 					playerPosition.setPos(x, feetY, z);
