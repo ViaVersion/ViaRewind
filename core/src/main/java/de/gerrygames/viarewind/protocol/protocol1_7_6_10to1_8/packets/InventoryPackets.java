@@ -240,22 +240,6 @@ public class InventoryPackets {
 			}
 		});
 
-		/*
-		Completely useless, transaction packet have been always 1:1, until 1.17 removed them
-		This code will break anticheat support.
-		*/
-		/*protocol.registerServerbound(ServerboundPackets1_7.WINDOW_CONFIRMATION, new PacketRemapper() {
-			@Override
-			public void registerMap() {
-				map(Type.BYTE);
-				map(Type.SHORT);
-				map(Type.BOOLEAN);
-				handler(packetWrapper -> {
-					int action = packetWrapper.get(Type.SHORT, 0);
-					if (action == -89) packetWrapper.cancel();
-				});
-			}
-		});*/
 
 		//Creative Inventory Action
 		protocol.registerServerbound(ServerboundPackets1_7.CREATIVE_INVENTORY_ACTION, new PacketRemapper() {
