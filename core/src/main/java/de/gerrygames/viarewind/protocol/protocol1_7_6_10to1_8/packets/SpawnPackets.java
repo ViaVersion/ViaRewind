@@ -3,23 +3,23 @@ package de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.packets;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
-import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.protocol.packet.State;
-import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_8;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
+import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.ClientboundPackets1_7;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10TO1_8;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.entityreplacements.ArmorStandReplacement;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.entityreplacements.EndermiteReplacement;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.entityreplacements.GuardianReplacement;
+import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.entityreplacements.RabbitReplacement;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.items.ReplacementRegistry1_7_6_10to1_8;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.metadata.MetadataRewriter;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage.EntityTracker;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage.GameProfileStorage;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
+import de.gerrygames.viarewind.replacement.EntityReplacement;
 import de.gerrygames.viarewind.replacement.Replacement;
 import de.gerrygames.viarewind.utils.PacketUtil;
 
@@ -32,9 +32,9 @@ public class SpawnPackets {
 
 		/*  OUTGOING  */
 
-		protocol.registerClientbound(ClientboundPackets1_8.SPAWN_PLAYER, new PacketRemapper() {
+		protocol.registerClientbound(ClientboundPackets1_8.SPAWN_PLAYER, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				map(Type.VAR_INT);
 				handler(packetWrapper -> {
 					UUID uuid = packetWrapper.read(Type.UUID);
@@ -56,26 +56,18 @@ public class SpawnPackets {
 						}
 					}
 
+					EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
 					if (gameProfile != null && gameProfile.gamemode == 3) {
 						int entityId = packetWrapper.get(Type.VAR_INT, 0);
-
-						PacketWrapper equipmentPacket = PacketWrapper.create(0x04, null, packetWrapper.user());
-						equipmentPacket.write(Type.INT, entityId);
-						equipmentPacket.write(Type.SHORT, (short) 4);
-						equipmentPacket.write(Types1_7_6_10.COMPRESSED_NBT_ITEM, gameProfile.getSkull());
-
-						PacketUtil.sendPacket(equipmentPacket, Protocol1_7_6_10TO1_8.class);
-
-						for (short i = 0; i < 4; i++) {
-							equipmentPacket = PacketWrapper.create(0x04, null, packetWrapper.user());
+						for (short i = 0; i < 5; i++) {
+							PacketWrapper equipmentPacket = PacketWrapper.create(ClientboundPackets1_7.ENTITY_EQUIPMENT, packetWrapper.user());
 							equipmentPacket.write(Type.INT, entityId);
 							equipmentPacket.write(Type.SHORT, i);
-							equipmentPacket.write(Types1_7_6_10.COMPRESSED_NBT_ITEM, null);
+							equipmentPacket.write(Types1_7_6_10.COMPRESSED_NBT_ITEM, i == 4 ? gameProfile.getSkull() :null);
 							PacketUtil.sendPacket(equipmentPacket, Protocol1_7_6_10TO1_8.class);
 						}
 					}
 
-					EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
 					tracker.addPlayer(packetWrapper.get(Type.VAR_INT, 0), uuid);
 				});
 				map(Type.INT);
@@ -98,9 +90,9 @@ public class SpawnPackets {
 			}
 		});
 
-		protocol.registerClientbound(ClientboundPackets1_8.SPAWN_ENTITY, new PacketRemapper() {
+		protocol.registerClientbound(ClientboundPackets1_8.SPAWN_ENTITY, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				map(Type.VAR_INT);
 				map(Type.BYTE);
 				map(Type.INT);
@@ -184,9 +176,9 @@ public class SpawnPackets {
 			}
 		});
 
-		protocol.registerClientbound(ClientboundPackets1_8.SPAWN_MOB, new PacketRemapper() {
+		protocol.registerClientbound(ClientboundPackets1_8.SPAWN_MOB, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				map(Type.VAR_INT);
 				map(Type.UNSIGNED_BYTE);
 				map(Type.INT);
@@ -209,34 +201,25 @@ public class SpawnPackets {
 					byte yaw = packetWrapper.get(Type.BYTE, 0);
 					byte headYaw = packetWrapper.get(Type.BYTE, 2);
 
-					if (typeId == 30) {
+					if (typeId == 30 || typeId == 68 || typeId == 67 || typeId == 101) {
 						packetWrapper.cancel();
 
 						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-						ArmorStandReplacement armorStand = new ArmorStandReplacement(entityId, packetWrapper.user());
-						armorStand.setLocation(x / 32.0, y / 32.0, z / 32.0);
-						armorStand.setYawPitch(yaw * 360f / 256, pitch * 360f / 256);
-						armorStand.setHeadYaw(headYaw * 360f / 256);
-						tracker.addEntityReplacement(armorStand);
-					} else if (typeId == 68) {
-						packetWrapper.cancel();
-
-						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-						GuardianReplacement guardian = new GuardianReplacement(entityId, packetWrapper.user());
-						guardian.setLocation(x / 32.0, y / 32.0, z / 32.0);
-						guardian.setYawPitch(yaw * 360f / 256, pitch * 360f / 256);
-						guardian.setHeadYaw(headYaw * 360f / 256);
-						tracker.addEntityReplacement(guardian);
-					} else if (typeId == 67) {
-						packetWrapper.cancel();
-
-						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-						EndermiteReplacement endermite = new EndermiteReplacement(entityId, packetWrapper.user());
-						endermite.setLocation(x / 32.0, y / 32.0, z / 32.0);
-						endermite.setYawPitch(yaw * 360f / 256, pitch * 360f / 256);
-						endermite.setHeadYaw(headYaw * 360f / 256);
-						tracker.addEntityReplacement(endermite);
-					} else if (typeId == 101 || typeId == 255 || typeId == -1) {
+						EntityReplacement replacement = null;
+						if (typeId == 30) {
+							replacement = new ArmorStandReplacement(entityId, packetWrapper.user());
+						} else if (typeId == 68) {
+							replacement = new GuardianReplacement(entityId, packetWrapper.user());
+						} else if (typeId == 67) {
+							replacement = new EndermiteReplacement(entityId, packetWrapper.user());
+						} else if (typeId == 101){
+							replacement = new RabbitReplacement(entityId, packetWrapper.user());
+						}
+						replacement.setLocation(x / 32.0, y / 32.0, z / 32.0);
+						replacement.setYawPitch(yaw * 360f / 256, pitch * 360f / 256);
+						replacement.setHeadYaw(headYaw * 360f / 256);
+						tracker.addEntityReplacement(replacement);
+					} else if (typeId == 255 || typeId == -1) {
 						packetWrapper.cancel();
 					}
 				});
@@ -262,16 +245,16 @@ public class SpawnPackets {
 			}
 		});
 
-		protocol.registerClientbound(ClientboundPackets1_8.SPAWN_PAINTING, new PacketRemapper() {
+		protocol.registerClientbound(ClientboundPackets1_8.SPAWN_PAINTING, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				map(Type.VAR_INT);  //Entity Id
 				map(Type.STRING);  //Title
 				handler(packetWrapper -> {
 					Position position = packetWrapper.read(Type.POSITION);
-					packetWrapper.write(Type.INT, position.getX());
-					packetWrapper.write(Type.INT, position.getY());
-					packetWrapper.write(Type.INT, position.getZ());
+					packetWrapper.write(Type.INT, position.x());
+					packetWrapper.write(Type.INT, position.y());
+					packetWrapper.write(Type.INT, position.z());
 				});
 				map(Type.UNSIGNED_BYTE, Type.INT);  //Rotation
 				handler(packetWrapper -> {
@@ -283,9 +266,9 @@ public class SpawnPackets {
 			}
 		});
 
-		protocol.registerClientbound(ClientboundPackets1_8.SPAWN_EXPERIENCE_ORB, new PacketRemapper() {
+		protocol.registerClientbound(ClientboundPackets1_8.SPAWN_EXPERIENCE_ORB, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				map(Type.VAR_INT);
 				map(Type.INT);
 				map(Type.INT);
@@ -300,9 +283,9 @@ public class SpawnPackets {
 			}
 		});
 
-		protocol.registerClientbound(ClientboundPackets1_8.SPAWN_GLOBAL_ENTITY, new PacketRemapper() {
+		protocol.registerClientbound(ClientboundPackets1_8.SPAWN_GLOBAL_ENTITY, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				map(Type.VAR_INT);
 				map(Type.BYTE);
 				map(Type.INT);

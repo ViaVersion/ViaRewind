@@ -1,7 +1,7 @@
 package de.gerrygames.viarewind.protocol.protocol1_8to1_9.packets;
 
 import com.viaversion.viaversion.api.protocol.Protocol;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.protocol1_8.ServerboundPackets1_8;
@@ -18,9 +18,9 @@ public class ScoreboardPackets {
 		//Scoreboard Objective
 
 		//Scoreboard Team
-		protocol.registerClientbound(ClientboundPackets1_9.TEAMS, new PacketRemapper() {
+		protocol.registerClientbound(ClientboundPackets1_9.TEAMS, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				map(Type.STRING);
 				map(Type.BYTE);
 				handler(packetWrapper -> {

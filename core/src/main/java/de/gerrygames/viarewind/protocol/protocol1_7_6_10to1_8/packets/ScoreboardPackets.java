@@ -4,7 +4,7 @@ import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
 import com.viaversion.viaversion.util.ChatColorUtil;
@@ -23,9 +23,9 @@ public class ScoreboardPackets {
 		/*  OUTGOING  */
 
 		//Scoreboard Objective
-		protocol.registerClientbound(ClientboundPackets1_8.SCOREBOARD_OBJECTIVE, new PacketRemapper() {
+		protocol.registerClientbound(ClientboundPackets1_8.SCOREBOARD_OBJECTIVE, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				handler(packetWrapper -> {
 					String name = packetWrapper.passthrough(Type.STRING);
 					if (name.length() > 16) {
@@ -81,13 +81,15 @@ public class ScoreboardPackets {
 		});
 
 		//Update Score
-		protocol.registerClientbound(ClientboundPackets1_8.UPDATE_SCORE, new PacketRemapper() {
+		protocol.registerClientbound(ClientboundPackets1_8.UPDATE_SCORE, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
+				map(Type.STRING); // Name
+				map(Type.VAR_INT, Type.BYTE); // Mode
 				handler(packetWrapper -> {
 					Scoreboard scoreboard = packetWrapper.user().get(Scoreboard.class);
-					String name = packetWrapper.passthrough(Type.STRING);
-					byte mode = packetWrapper.passthrough(Type.BYTE);
+					String name = packetWrapper.get(Type.STRING, 0);
+					byte mode = packetWrapper.get(Type.BYTE, 0);
 
 					if (mode == 1) {
 						name = scoreboard.removeTeamForScore(name);
@@ -117,9 +119,9 @@ public class ScoreboardPackets {
 			}
 		});
 
-		protocol.registerClientbound(ClientboundPackets1_8.DISPLAY_SCOREBOARD, new PacketRemapper() {
+		protocol.registerClientbound(ClientboundPackets1_8.DISPLAY_SCOREBOARD, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				map(Type.BYTE); // Position
 				map(Type.STRING); // Score name
 				handler(packetWrapper -> {
@@ -154,9 +156,9 @@ public class ScoreboardPackets {
 			}
 		});
 
-		protocol.registerClientbound(ClientboundPackets1_8.TEAMS, new PacketRemapper() {
+		protocol.registerClientbound(ClientboundPackets1_8.TEAMS, new PacketHandlers() {
 			@Override
-			public void registerMap() {
+			public void register() {
 				map(Type.STRING);
 				handler(packetWrapper -> {
 					String team = packetWrapper.get(Type.STRING, 0);

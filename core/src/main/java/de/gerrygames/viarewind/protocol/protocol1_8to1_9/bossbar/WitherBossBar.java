@@ -23,7 +23,7 @@ public class WitherBossBar implements BossBar {
 	private float health;
 	private boolean visible = false;
 
-	private UserConnection connection;
+	private final UserConnection connection;
 
 	private final int entityId = highestId++;
 	private double locX, locY, locZ;

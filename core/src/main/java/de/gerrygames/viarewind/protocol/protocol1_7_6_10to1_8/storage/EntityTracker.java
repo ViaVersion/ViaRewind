@@ -43,7 +43,9 @@ public class EntityTracker extends StoredObject implements ClientEntityIdChangeL
 			entityReplacements.remove(entityId).despawn();
 		}
 		if (playersByEntityId.containsKey(entityId)) {
-			playersByUniqueId.remove(playersByEntityId.remove(entityId));
+			UUID playerId = playersByEntityId.remove(entityId);
+			playersByUniqueId.remove(playerId);
+			playerEquipment.remove(playerId);
 		}
 	}
 
@@ -60,12 +62,17 @@ public class EntityTracker extends StoredObject implements ClientEntityIdChangeL
 		return playersByUniqueId.getOrDefault(uuid, -1);
 	}
 
-	public Item[] getPlayerEquipment(UUID uuid) {
-		return playerEquipment.get(uuid);
+	public Item getPlayerEquipment(UUID uuid, int slot) {
+		Item[] items = playerEquipment.get(uuid);
+		if (items == null || slot < 0 || slot >= items.length) return null;
+		return items[slot];
 	}
 
-	public void setPlayerEquipment(UUID uuid, Item[] equipment) {
-		playerEquipment.put(uuid, equipment);
+	public void setPlayerEquipment(UUID uuid, Item equipment, int slot) {
+		// Please note that when referring to the client player, it has an Item[4] array
+		Item[] items = playerEquipment.computeIfAbsent(uuid, it -> new Item[5]);
+		if (slot < 0 || slot >= items.length) return;
+		items[slot] = equipment;
 	}
 
 	public Map<Integer, Entity1_10Types.EntityType> getClientEntityTypes() {

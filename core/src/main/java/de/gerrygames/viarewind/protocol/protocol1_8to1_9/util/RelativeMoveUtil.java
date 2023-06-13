@@ -9,39 +9,44 @@ public class RelativeMoveUtil {
 	public static Vector[] calculateRelativeMoves(UserConnection user, int entityId, int relX, int relY, int relZ) {
 		EntityTracker tracker = user.get(EntityTracker.class);
 
+		int x;
+		int y;
+		int z;
 		Vector offset = tracker.getEntityOffset(entityId);
-		relX += offset.getBlockX();
-		relY += offset.getBlockY();
-		relZ += offset.getBlockZ();
+		if (offset != null) {
+			relX += offset.blockX();
+			relY += offset.blockY();
+			relZ += offset.blockZ();
+		}
 
 		if (relX > Short.MAX_VALUE) {
-			offset.setBlockX(relX - Short.MAX_VALUE);
+			x = relX - Short.MAX_VALUE;
 			relX = Short.MAX_VALUE;
 		} else if (relX < Short.MIN_VALUE) {
-			offset.setBlockX(relX - Short.MIN_VALUE);
+			x = relX - Short.MIN_VALUE;
 			relX = Short.MIN_VALUE;
 		} else {
-			offset.setBlockX(0);
+			x = 0;
 		}
 
 		if (relY > Short.MAX_VALUE) {
-			offset.setBlockY(relY - Short.MAX_VALUE);
+			y = relY - Short.MAX_VALUE;
 			relY = Short.MAX_VALUE;
 		} else if (relY < Short.MIN_VALUE) {
-			offset.setBlockY(relY - Short.MIN_VALUE);
+			y = relY - Short.MIN_VALUE;
 			relY = Short.MIN_VALUE;
 		} else {
-			offset.setBlockY(0);
+			y = 0;
 		}
 
 		if (relZ > Short.MAX_VALUE) {
-			offset.setBlockZ(relZ - Short.MAX_VALUE);
+			z = relZ - Short.MAX_VALUE;
 			relZ = Short.MAX_VALUE;
 		} else if (relZ < Short.MIN_VALUE) {
-			offset.setBlockZ(relZ - Short.MIN_VALUE);
+			z = relZ - Short.MIN_VALUE;
 			relZ = Short.MIN_VALUE;
 		} else {
-			offset.setBlockZ(0);
+			z = 0;
 		}
 
 		int sentRelX, sentRelY, sentRelZ;
@@ -68,11 +73,11 @@ public class RelativeMoveUtil {
 			moves = new Vector[] {new Vector(sentRelX, sentRelY, sentRelZ)};
 		}
 
-		offset.setBlockX(offset.getBlockX() + relX - sentRelX * 128);
-		offset.setBlockY(offset.getBlockY() + relY - sentRelY * 128);
-		offset.setBlockZ(offset.getBlockZ() + relZ - sentRelZ * 128);
+		x = x + relX - sentRelX * 128;
+		y = y + relY - sentRelY * 128;
+		z = z + relZ - sentRelZ * 128;
 
-		tracker.setEntityOffset(entityId, offset);
+		tracker.setEntityOffset(entityId, new Vector(x, y, z));
 
 		return moves;
 	}

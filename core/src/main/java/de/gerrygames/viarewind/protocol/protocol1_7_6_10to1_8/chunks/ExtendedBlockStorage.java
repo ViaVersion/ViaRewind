@@ -3,7 +3,7 @@ package de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.chunks;
 import com.viaversion.viaversion.api.minecraft.chunks.NibbleArray;
 
 public class ExtendedBlockStorage {
-	private int yBase;
+	private final int yBase;
 	private byte[] blockLSBArray;
 	private NibbleArray blockMSBArray;
 	private NibbleArray blockMetadataArray;

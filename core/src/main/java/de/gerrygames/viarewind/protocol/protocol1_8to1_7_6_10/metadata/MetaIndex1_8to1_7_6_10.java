@@ -97,11 +97,11 @@ public enum MetaIndex1_8to1_7_6_10 {
 			metadataRewrites.put(new Pair<>(index.getClazz(), index.getIndex()), index);
 	}
 
-	private Entity1_10Types.EntityType clazz;
-	private int newIndex;
-	private MetaType1_8 newType;
-	private MetaType1_7_6_10 oldType;
-	private int index;
+	private final Entity1_10Types.EntityType clazz;
+	private final int newIndex;
+	private final MetaType1_8 newType;
+	private final MetaType1_7_6_10 oldType;
+	private final int index;
 
 	MetaIndex1_8to1_7_6_10(Entity1_10Types.EntityType type, int index, MetaType1_7_6_10 oldType, MetaType1_8 newType) {
 		this.clazz = type;

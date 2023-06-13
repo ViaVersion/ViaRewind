@@ -4,21 +4,22 @@ import com.viaversion.viaversion.api.connection.StoredObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
+import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.ClientboundPackets1_7;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10TO1_8;
 import de.gerrygames.viarewind.utils.PacketUtil;
 
 import java.util.*;
 
 public class Scoreboard extends StoredObject {
-	private HashMap<String, List<String>> teams = new HashMap<>();
-	private HashSet<String> objectives = new HashSet<>();
-	private HashMap<String, ScoreTeam> scoreTeams = new HashMap<>();
-	private HashMap<String, Byte> teamColors = new HashMap<>();
-	private HashSet<String> scoreTeamNames = new HashSet<>();
+	private final HashMap<String, List<String>> teams = new HashMap<>();
+	private final HashSet<String> objectives = new HashSet<>();
+	private final HashMap<String, ScoreTeam> scoreTeams = new HashMap<>();
+	private final HashMap<String, Byte> teamColors = new HashMap<>();
+	private final HashSet<String> scoreTeamNames = new HashSet<>();
 	private String colorIndependentSidebar;
-	private HashMap<Byte, String> colorDependentSidebar = new HashMap<>();
+	private final HashMap<Byte, String> colorDependentSidebar = new HashMap<>();
 
-    public Scoreboard(UserConnection user) {
+	public Scoreboard(UserConnection user) {
 		super(user);
 	}
 
@@ -50,7 +51,7 @@ public class Scoreboard extends StoredObject {
 
 	public void removePlayerFromTeam(String player, String team) {
 		List<String> teamPlayers = teams.get(team);
-		if (teamPlayers!=null) teamPlayers.remove(player);
+		if (teamPlayers != null) teamPlayers.remove(player);
 	}
 
 	public boolean isPlayerInTeam(String player, String team) {
@@ -94,28 +95,28 @@ public class Scoreboard extends StoredObject {
 	}
 
 	public String sendTeamForScore(String score) {
-		if (score.length()<=16) return score;
+		if (score.length() <= 16) return score;
 		if (scoreTeams.containsKey(score)) return scoreTeams.get(score).name;
 		int l = 16;
-		int i = Math.min(16, score.length()-16);
-		String name = score.substring(i, i+l);
+		int i = Math.min(16, score.length() - 16);
+		String name = score.substring(i, i + l);
 		while (scoreTeamNames.contains(name) || teams.containsKey(name)) {
 			i--;
-			while (score.length()-l-i>16) {
+			while (score.length() - l - i > 16) {
 				l--;
-				if (l<1) return score;
-				i = Math.min(16, score.length()-l);
+				if (l < 1) return score;
+				i = Math.min(16, score.length() - l);
 			}
-			name = score.substring(i, i+l);
+			name = score.substring(i, i + l);
 		}
 		String prefix = score.substring(0, i);
-		String suffix = i+l>=score.length() ? "" : score.substring(i+l, score.length());
+		String suffix = i + l >= score.length() ? "" : score.substring(i + l);
 
 		ScoreTeam scoreTeam = new ScoreTeam(name, prefix, suffix);
 		scoreTeams.put(score, scoreTeam);
 		scoreTeamNames.add(name);
 
-		PacketWrapper teamPacket = PacketWrapper.create(0x3E, null, getUser());
+		PacketWrapper teamPacket = PacketWrapper.create(ClientboundPackets1_7.TEAMS, getUser());
 		teamPacket.write(Type.STRING, name);
 		teamPacket.write(Type.BYTE, (byte) 0);
 		teamPacket.write(Type.STRING, "ViaRewind");
@@ -131,10 +132,10 @@ public class Scoreboard extends StoredObject {
 
 	public String removeTeamForScore(String score) {
 		ScoreTeam scoreTeam = scoreTeams.remove(score);
-		if (scoreTeam==null) return score;
+		if (scoreTeam == null) return score;
 		scoreTeamNames.remove(scoreTeam.name);
 
-		PacketWrapper teamPacket = PacketWrapper.create(0x3E, null, getUser());
+		PacketWrapper teamPacket = PacketWrapper.create(ClientboundPackets1_7.TEAMS, getUser());
 		teamPacket.write(Type.STRING, scoreTeam.name);
 		teamPacket.write(Type.BYTE, (byte) 1);
 		PacketUtil.sendPacket(teamPacket, Protocol1_7_6_10TO1_8.class, true, true);
@@ -154,10 +155,10 @@ public class Scoreboard extends StoredObject {
 		this.colorIndependentSidebar = colorIndependentSidebar;
 	}
 
-	private class ScoreTeam {
-		private String prefix;
-		private String suffix;
-		private String name;
+	private static class ScoreTeam {
+		private final String prefix;
+		private final String suffix;
+		private final String name;
 
 		public ScoreTeam(String name, String prefix, String suffix) {
 			this.prefix = prefix;

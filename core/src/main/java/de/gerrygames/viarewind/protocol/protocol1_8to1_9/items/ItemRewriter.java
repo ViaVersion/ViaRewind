@@ -19,7 +19,7 @@ public class ItemRewriter {
 	private static Map<Integer, String> ENTTIY_ID_TO_NAME;
 	private static Map<String, Integer> POTION_NAME_TO_ID;
 	private static Map<Integer, String> POTION_ID_TO_NAME;
-	private static Map<String, String> POTION_NAME_INDEX = new HashMap<>();
+	private static final Map<String, String> POTION_NAME_INDEX = new HashMap<>();
 
 	static {
 		for (Field field : de.gerrygames.viarewind.protocol.protocol1_8to1_9.items.ItemRewriter.class.getDeclaredFields()) {
@@ -205,7 +205,7 @@ public class ItemRewriter {
 			for (int i = 0; i<attributes.size(); i++) {
 				CompoundTag attribute = attributes.get(i);
 				String name = (String) attribute.get("AttributeName").getValue();
-				if (!Protocol1_8TO1_9.VALID_ATTRIBUTES.contains(attribute)) {
+				if (!Protocol1_8TO1_9.VALID_ATTRIBUTES.contains(name)) {
 					attributes.remove(attribute);
 					i--;
 				}

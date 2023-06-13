@@ -7,13 +7,14 @@
     <parent>
         <groupId>com.viaversion</groupId>
         <artifactId>viarewind-parent</artifactId>
-        <version>2.0.2-SNAPSHOT</version>
+        <version>2.0.4-SNAPSHOT</version>
     </parent>
 
     <artifactId>viarewind-core</artifactId>
 
     <dependencies>
         <!-- Netty (Network Library) -->
+        <!--suppress VulnerableLibrariesLocal -->
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-all</artifactId>
