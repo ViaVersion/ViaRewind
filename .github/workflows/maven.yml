@@ -18,7 +18,8 @@ jobs:
     - name: Build with Maven
       run: mvn install
     - name: Upload Artifacts
-    - uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v3
       with:
         name: artifact
         path: all/target
+        
