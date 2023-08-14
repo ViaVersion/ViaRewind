@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.gerrygames.viarewind.api;
+package de.gerrygames.viarewind;
 
 import com.viaversion.viaversion.util.Config;
 
@@ -26,8 +26,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-public class ViaRewindConfigImpl extends Config implements ViaRewindConfig {
-    public ViaRewindConfigImpl(File configFile) {
+public class ViaRewindConfig extends Config implements de.gerrygames.viarewind.api.ViaRewindConfig {
+    public ViaRewindConfig(File configFile) {
         super(configFile);
         reloadConfig();
     }

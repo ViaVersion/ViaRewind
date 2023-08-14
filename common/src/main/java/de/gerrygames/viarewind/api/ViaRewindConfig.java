@@ -18,19 +18,53 @@
 
 package de.gerrygames.viarewind.api;
 
+/**
+ * This class is used to get the platform specific config
+ */
 public interface ViaRewindConfig {
 
 	enum CooldownIndicator {
 		TITLE, ACTION_BAR, BOSS_BAR, DISABLED
 	}
 
+	/**
+	 * Specifies how 1.8.x clients should see the cooldown indicator
+	 * You can choose between TITLE, ACTION_BAR, BOSS_BAR and DISABLED
+	 * ONLY DISABLE IF YOU HAVE 1.9 COOLDOWN DISABLED ON YOUR SERVER
+	 * 1.8 PLAYERS MAY ASK WHY PVP IS NOT WORKING OTHERWISE
+	 *
+	 * @return the cooldown indicator
+	 */
 	CooldownIndicator getCooldownIndicator();
 
+	/**
+	 * Replaces Adventure mode with Survival mode for 1.7.x clients
+	 * Enable this option if your server is using the 'CanDestroy'
+	 * or 'CanPlaceOn' flags on items
+	 *
+	 * @return true if enabled
+	 */
 	boolean isReplaceAdventureMode();
 
+	/**
+	 * Whether 1.9 particles should be replaced by similar ones in
+	 * 1.8 and lower
+	 *
+	 * @return true if enabled
+	 */
 	boolean isReplaceParticles();
 
+	/**
+	 * Max amount of pages for written books before a client gets kicked
+	 *
+	 * @return the max amount of pages
+	 */
 	int getMaxBookPages();
 
+	/**
+	 * Max amount of characters in the json (!) string of a book page before a client gets kicked
+	 *
+	 * @return the max amount of characters
+	 */
 	int getMaxBookPageSize();
 }

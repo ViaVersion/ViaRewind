@@ -22,6 +22,7 @@ import de.gerrygames.viarewind.api.ViaRewindConfig;
 import de.gerrygames.viarewind.api.ViaRewindPlatform;
 
 public class ViaRewind {
+
 	private static ViaRewindPlatform platform;
 	private static ViaRewindConfig config;
 
