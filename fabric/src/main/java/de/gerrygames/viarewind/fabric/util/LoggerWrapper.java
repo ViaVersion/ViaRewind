@@ -1,6 +1,5 @@
 package de.gerrygames.viarewind.fabric.util;
 
-
 import java.text.MessageFormat;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;

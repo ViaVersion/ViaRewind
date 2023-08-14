@@ -9,9 +9,9 @@ import com.velocitypowered.api.plugin.Dependency;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.viaversion.viaversion.velocity.util.LoggerWrapper;
+import de.gerrygames.viarewind.api.VersionInfo;
 import de.gerrygames.viarewind.api.ViaRewindConfigImpl;
 import de.gerrygames.viarewind.api.ViaRewindPlatform;
-import de.gerrygames.viarewind.velocity.VersionInfo;
 
 import java.nio.file.Path;
 import java.util.logging.Logger;

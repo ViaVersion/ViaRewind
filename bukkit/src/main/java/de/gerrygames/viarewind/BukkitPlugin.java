@@ -7,6 +7,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.io.File;
 
 public class BukkitPlugin extends JavaPlugin implements ViaRewindPlatform {
+
 	@Override
 	public void onEnable() {
 		ViaRewindConfigImpl conf = new ViaRewindConfigImpl(new File(getDataFolder(), "config.yml"));
