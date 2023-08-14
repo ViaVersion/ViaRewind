@@ -227,19 +227,6 @@ public class InventoryPackets {
 			}
 		});
 
-		protocol.registerServerbound(ServerboundPackets1_7.WINDOW_CONFIRMATION, new PacketHandlers() {
-			@Override
-			public void register() {
-				map(Type.UNSIGNED_BYTE);
-				map(Type.SHORT);
-				map(Type.BOOLEAN);
-				handler(packetWrapper -> {
-					int action = packetWrapper.get(Type.SHORT, 0);
-					if (action == -89) packetWrapper.cancel();
-				});
-			}
-		});
-
 		//Creative Inventory Action
 		protocol.registerServerbound(ServerboundPackets1_7.CREATIVE_INVENTORY_ACTION, new PacketHandlers() {
 			@Override

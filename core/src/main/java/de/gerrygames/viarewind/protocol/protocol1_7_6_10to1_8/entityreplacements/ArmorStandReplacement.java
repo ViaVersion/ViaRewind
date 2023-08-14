@@ -50,7 +50,7 @@ public class ArmorStandReplacement extends EntityReplacement1_7to1_8 {
 			this.locX = x;
 			this.locY = y;
 			this.locZ = z;
-			updateLocation();
+			updateLocation(false);
 		}
 	}
 
@@ -59,7 +59,7 @@ public class ArmorStandReplacement extends EntityReplacement1_7to1_8 {
 		this.locX += x;
 		this.locY += y;
 		this.locZ += z;
-		updateLocation();
+		updateLocation(false);
 	}
 
 	public void setYawPitch(float yaw, float pitch) {
@@ -67,14 +67,14 @@ public class ArmorStandReplacement extends EntityReplacement1_7to1_8 {
 			this.yaw = yaw;
 			this.headYaw = yaw;
 			this.pitch = pitch;
-			updateLocation();
+			updateLocation(false);
 		}
 	}
 
 	public void setHeadYaw(float yaw) {
 		if (this.headYaw != yaw) {
 			this.headYaw = yaw;
-			updateLocation();
+			updateLocation(false);
 		}
 	}
 
@@ -106,7 +106,7 @@ public class ArmorStandReplacement extends EntityReplacement1_7to1_8 {
 		marker = (armorStandFlags & 0x10) != 0;
 
 		State prevState = currentState;
-		if (invisible && name != null) {
+		if (invisible && marker) {
 			currentState = State.HOLOGRAM;
 		} else {
 			currentState = State.ZOMBIE;
@@ -117,17 +117,17 @@ public class ArmorStandReplacement extends EntityReplacement1_7to1_8 {
 			spawn();
 		} else {
 			updateMetadata();
-			updateLocation();
+			updateLocation(false);
 		}
 	}
 
-	public void updateLocation() {
+	public void updateLocation(boolean remount) {
 		if (entityIds == null) return;
 
 		if (currentState == State.ZOMBIE) {
 			updateZombieLocation();
 		} else if (currentState == State.HOLOGRAM) {
-			updateHologramLocation();
+			updateHologramLocation(remount);
 		}
 	}
 
@@ -135,22 +135,27 @@ public class ArmorStandReplacement extends EntityReplacement1_7to1_8 {
 		sendTeleportWithHead(entityId, locX, locY, locZ, yaw, pitch, headYaw);
 	}
 
-	private void updateHologramLocation() {
-		PacketWrapper detach = PacketWrapper.create(ClientboundPackets1_7.ATTACH_ENTITY, null, user);
-		detach.write(Type.INT, entityIds[1]);
-		detach.write(Type.INT, -1);
-		detach.write(Type.BOOLEAN, false);
-		PacketUtil.sendPacket(detach, Protocol1_7_6_10TO1_8.class, true, true);
+	private void updateHologramLocation(boolean remount) {
+		if(remount) {
+			PacketWrapper detach = PacketWrapper.create(ClientboundPackets1_7.ATTACH_ENTITY, null, user);
+			detach.write(Type.INT, entityIds[1]);
+			detach.write(Type.INT, -1);
+			detach.write(Type.BOOLEAN, false);
+			PacketUtil.sendPacket(detach, Protocol1_7_6_10TO1_8.class, true, true);
+		}
 
 		// Don't ask me where this offset is coming from
 		sendTeleport(entityIds[0], locX, (locY + (marker ? 54.85 : small ? 56 : 57)), locZ, 0, 0); // Skull
-		sendTeleport(entityIds[1], locX, locY + 56.75, locZ, 0, 0); // Horse
 
-		PacketWrapper attach = PacketWrapper.create(ClientboundPackets1_7.ATTACH_ENTITY, null, user);
-		attach.write(Type.INT, entityIds[1]);
-		attach.write(Type.INT, entityIds[0]);
-		attach.write(Type.BOOLEAN, false);
-		PacketUtil.sendPacket(attach, Protocol1_7_6_10TO1_8.class, true, true);
+		if(remount) {
+			sendTeleport(entityIds[1], locX, locY + 56.75, locZ, 0, 0); // Horse
+
+			PacketWrapper attach = PacketWrapper.create(ClientboundPackets1_7.ATTACH_ENTITY, null, user);
+			attach.write(Type.INT, entityIds[1]);
+			attach.write(Type.INT, entityIds[0]);
+			attach.write(Type.BOOLEAN, false);
+			PacketUtil.sendPacket(attach, Protocol1_7_6_10TO1_8.class, true, true);
+		}
 	}
 
 	public void updateMetadata() {
@@ -204,7 +209,7 @@ public class ArmorStandReplacement extends EntityReplacement1_7to1_8 {
 		}
 
 		updateMetadata();
-		updateLocation();
+		updateLocation(true);
 	}
 
 	private void spawnZombie() {

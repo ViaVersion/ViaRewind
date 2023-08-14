@@ -2,6 +2,7 @@ name: ViaRewind
 version: ${project.version}
 main: de.gerrygames.viarewind.BukkitPlugin
 api-version: 1.13
+folia-supported: true
 
 authors: [Gerrygames]
 website: https://viaversion.com/rewind

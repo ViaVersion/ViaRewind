@@ -9,6 +9,7 @@
     "issues": "https://github.com/ViaVersion/ViaRewind/issues",
     "sources": "https://github.com/ViaVersion/ViaRewind"
   },
+  "icon": "assets/viarewind/textures/squarelogo.png",
   "environment": "*",
   "authors": [
     "Gerrygames"
