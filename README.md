@@ -1,6 +1,5 @@
 # ViaRewind
-[![Latest Release](https://img.shields.io/github/v/release/ViaVersion/ViaRewind)](https://github.com/ViaVersion/ViaRewind/releases)
-[![Build Status](https://github.com/ViaVersion/ViaRewind/actions/workflows/gradle.yml/badge.svg?branch=master)](https://github.com/ViaVersion/ViaRewind/actions)
+[![Build Status](https://github.com/ViaVersion/ViaRewind/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/ViaVersion/ViaRewind/actions)
 [![Discord](https://img.shields.io/badge/chat-on%20discord-blue.svg)](https://viaversion.com/discord)
 
 **Allow 1.8.x and 1.7.x on your newer server**

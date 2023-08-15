@@ -7,7 +7,7 @@ dependencies {
 
 blossom {
     replaceToken("\$VERSION", project.version, "src/main/java/de/gerrygames/viarewind/api/ViaRewindPlatform.java")
-    replaceToken("\$IMPL_VERSION", "git-${project.name}-${project.version}:${latestCommitHash()}", "src/main/java/de/gerrygames/viarewind/api/ViaRewindPlatform.java")
+    replaceToken("\$IMPL_VERSION", "git-ViaRewind-${project.version}:${latestCommitHash()}", "src/main/java/de/gerrygames/viarewind/api/ViaRewindPlatform.java")
 }
 
 String latestCommitHash() {

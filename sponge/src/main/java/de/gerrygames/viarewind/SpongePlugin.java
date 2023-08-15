@@ -20,6 +20,7 @@ package de.gerrygames.viarewind;
 
 import com.google.inject.Inject;
 import com.viaversion.viaversion.sponge.util.LoggerWrapper;
+import de.gerrygames.viarewind.api.ViaRewindConfigImpl;
 import de.gerrygames.viarewind.api.ViaRewindPlatform;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.event.Listener;
@@ -41,14 +42,14 @@ public class SpongePlugin implements ViaRewindPlatform {
     @Inject
     @ConfigDir(sharedRoot = false)
     private Path configDir;
-    private ViaRewindConfig conf;
+    private ViaRewindConfigImpl conf;
 
     @Listener(order = Order.LATE)
     public void loadPlugin(ConstructPluginEvent e) {
         // Setup Logger
         this.logger = new LoggerWrapper(loggerSlf4j);
         // Init!
-        conf = new ViaRewindConfig(configDir.resolve("config.yml").toFile());
+        conf = new ViaRewindConfigImpl(configDir.resolve("config.yml").toFile());
         conf.reloadConfig();
         this.init(conf);
     }

@@ -18,6 +18,7 @@
 
 package de.gerrygames.viarewind;
 
+import de.gerrygames.viarewind.api.ViaRewindConfigImpl;
 import de.gerrygames.viarewind.api.ViaRewindPlatform;
 import de.gerrygames.viarewind.fabric.util.LoggerWrapper;
 import net.fabricmc.loader.api.FabricLoader;
@@ -30,7 +31,7 @@ public class ViaFabricAddon implements ViaRewindPlatform, Runnable {
 
     @Override
     public void run() {
-        ViaRewindConfig conf = new ViaRewindConfig(FabricLoader.getInstance().getConfigDirectory().toPath().resolve("ViaRewind").resolve("config.yml").toFile());
+        ViaRewindConfigImpl conf = new ViaRewindConfigImpl(FabricLoader.getInstance().getConfigDirectory().toPath().resolve("ViaRewind").resolve("config.yml").toFile());
         conf.reloadConfig();
         this.init(conf);
     }
