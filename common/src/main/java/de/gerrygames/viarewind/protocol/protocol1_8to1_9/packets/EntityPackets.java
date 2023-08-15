@@ -18,7 +18,7 @@
 
 package de.gerrygames.viarewind.protocol.protocol1_8to1_9.packets;
 
-import de.gerrygames.viarewind.protocol.protocol1_8to1_9.Protocol1_8TO1_9;
+import de.gerrygames.viarewind.protocol.protocol1_8to1_9.Protocol1_8To1_9;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.metadata.MetadataRewriter;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage.Cooldown;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage.EntityTracker;
@@ -104,7 +104,7 @@ public class EntityPackets {
 						secondPacket.write(Type.BYTE, (byte) moves[1].blockZ());
 						secondPacket.write(Type.BOOLEAN, onGround);
 
-						PacketUtil.sendPacket(secondPacket, Protocol1_8TO1_9.class);
+						PacketUtil.sendPacket(secondPacket, Protocol1_8To1_9.class);
 					}
 				});
 			}
@@ -156,7 +156,7 @@ public class EntityPackets {
 						secondPacket.write(Type.BYTE, pitch);
 						secondPacket.write(Type.BOOLEAN, onGround);
 
-						PacketUtil.sendPacket(secondPacket, Protocol1_8TO1_9.class);
+						PacketUtil.sendPacket(secondPacket, Protocol1_8To1_9.class);
 					}
 				});
 			}
@@ -205,11 +205,11 @@ public class EntityPackets {
 					if (vehicle == -1) packetWrapper.cancel();
 					packetWrapper.write(Type.VAR_INT, vehicle);
 				});
-				map(Type.DOUBLE, Protocol1_8TO1_9.TO_OLD_INT);
-				map(Type.DOUBLE, Protocol1_8TO1_9.TO_OLD_INT);
-				map(Type.DOUBLE, Protocol1_8TO1_9.TO_OLD_INT);
-				map(Type.FLOAT, Protocol1_8TO1_9.DEGREES_TO_ANGLE);
-				map(Type.FLOAT, Protocol1_8TO1_9.DEGREES_TO_ANGLE);
+				map(Type.DOUBLE, Protocol1_8To1_9.TO_OLD_INT);
+				map(Type.DOUBLE, Protocol1_8To1_9.TO_OLD_INT);
+				map(Type.DOUBLE, Protocol1_8To1_9.TO_OLD_INT);
+				map(Type.FLOAT, Protocol1_8To1_9.DEGREES_TO_ANGLE);
+				map(Type.FLOAT, Protocol1_8To1_9.DEGREES_TO_ANGLE);
 				handler(packetWrapper -> {
 					if (packetWrapper.isCancelled()) return;
 					PlayerPosition position = packetWrapper.user().get(PlayerPosition.class);
@@ -359,7 +359,7 @@ public class EntityPackets {
 							detach.write(Type.INT, passenger);
 							detach.write(Type.INT, -1);
 							detach.write(Type.BOOLEAN, false);
-							PacketUtil.sendPacket(detach, Protocol1_8TO1_9.class);
+							PacketUtil.sendPacket(detach, Protocol1_8To1_9.class);
 						}
 					}
 					for (int i = 0; i < count; i++) {
@@ -369,7 +369,7 @@ public class EntityPackets {
 						attach.write(Type.INT, p);
 						attach.write(Type.INT, v);
 						attach.write(Type.BOOLEAN, false);
-						PacketUtil.sendPacket(attach, Protocol1_8TO1_9.class);
+						PacketUtil.sendPacket(attach, Protocol1_8To1_9.class);
 					}
 				});
 			}
@@ -382,9 +382,9 @@ public class EntityPackets {
 			@Override
 			public void register() {
 				map(Type.VAR_INT);
-				map(Type.DOUBLE, Protocol1_8TO1_9.TO_OLD_INT);
-				map(Type.DOUBLE, Protocol1_8TO1_9.TO_OLD_INT);
-				map(Type.DOUBLE, Protocol1_8TO1_9.TO_OLD_INT);
+				map(Type.DOUBLE, Protocol1_8To1_9.TO_OLD_INT);
+				map(Type.DOUBLE, Protocol1_8To1_9.TO_OLD_INT);
+				map(Type.DOUBLE, Protocol1_8To1_9.TO_OLD_INT);
 				map(Type.BYTE);
 				map(Type.BYTE);
 				map(Type.BOOLEAN);
@@ -434,7 +434,7 @@ public class EntityPackets {
 					int removed = 0;
 					for (int i = 0; i < size; i++) {
 						String key = packetWrapper.read(Type.STRING);
-						boolean skip = !Protocol1_8TO1_9.VALID_ATTRIBUTES.contains(key);
+						boolean skip = !Protocol1_8To1_9.VALID_ATTRIBUTES.contains(key);
 						double value = packetWrapper.read(Type.DOUBLE);
 						int modifiersize = packetWrapper.read(Type.VAR_INT);
 						if (!skip) {

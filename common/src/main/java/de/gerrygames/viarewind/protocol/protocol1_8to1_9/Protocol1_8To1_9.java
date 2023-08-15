@@ -35,9 +35,7 @@ import de.gerrygames.viarewind.utils.Ticker;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class Protocol1_8TO1_9 extends AbstractProtocol<ClientboundPackets1_9, ClientboundPackets1_8,
-		ServerboundPackets1_9, ServerboundPackets1_8> {
-	public static final Timer TIMER = new Timer("ViaRewind-1_8TO1_9", true);
+public class Protocol1_8To1_9 extends AbstractProtocol<ClientboundPackets1_9, ClientboundPackets1_8, ServerboundPackets1_9, ServerboundPackets1_8> {
 
 	public Queue<PacketWrapper> animationsToSend = new ConcurrentLinkedQueue<>();
 
@@ -64,7 +62,7 @@ public class Protocol1_8TO1_9 extends AbstractProtocol<ClientboundPackets1_9, Cl
 		VALID_ATTRIBUTES.add("zombie.spawnReinforcements");
 	}
 
-	public Protocol1_8TO1_9() {
+	public Protocol1_8To1_9() {
 		super(ClientboundPackets1_9.class, ClientboundPackets1_8.class, ServerboundPackets1_9.class, ServerboundPackets1_8.class);
 	}
 

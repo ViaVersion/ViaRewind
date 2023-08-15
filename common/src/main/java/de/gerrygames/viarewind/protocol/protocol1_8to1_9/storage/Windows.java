@@ -18,7 +18,7 @@
 
 package de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage;
 
-import de.gerrygames.viarewind.protocol.protocol1_8to1_9.Protocol1_8TO1_9;
+import de.gerrygames.viarewind.protocol.protocol1_8to1_9.Protocol1_8To1_9;
 import com.viaversion.viaversion.api.connection.StoredObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
@@ -76,7 +76,7 @@ public class Windows extends StoredObject {
 				.append(Component.translatable("item.blazePowder.name", NamedTextColor.DARK_RED));
 		openWindow.write(Type.COMPONENT, GsonComponentSerializer.colorDownsamplingGson().serializeToTree(title));
 		openWindow.write(Type.UNSIGNED_BYTE, (short) 420);
-		PacketUtil.sendPacket(openWindow, Protocol1_8TO1_9.class);
+		PacketUtil.sendPacket(openWindow, Protocol1_8To1_9.class);
 
 		Item[] items = user.get(Windows.class).getBrewingItems(windowId);
 		for (int i = 0; i < items.length; i++) {
@@ -84,7 +84,7 @@ public class Windows extends StoredObject {
 			setSlot.write(Type.UNSIGNED_BYTE, windowId);
 			setSlot.write(Type.SHORT, (short) i);
 			setSlot.write(Type.ITEM, items[i]);
-			PacketUtil.sendPacket(setSlot, Protocol1_8TO1_9.class);
+			PacketUtil.sendPacket(setSlot, Protocol1_8To1_9.class);
 		}
 	}
 }

@@ -18,7 +18,7 @@
 
 package de.gerrygames.viarewind.protocol.protocol1_8to1_9.entityreplacement;
 
-import de.gerrygames.viarewind.protocol.protocol1_8to1_9.Protocol1_8TO1_9;
+import de.gerrygames.viarewind.protocol.protocol1_8to1_9.Protocol1_8To1_9;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
@@ -88,7 +88,7 @@ public class ShulkerBulletReplacement extends EntityReplacement1_8to1_9 {
 		PacketWrapper despawn = PacketWrapper.create(ClientboundPackets1_8.DESTROY_ENTITIES, null, user);
 		despawn.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[]{entityId});
 
-		PacketUtil.sendPacket(despawn, Protocol1_8TO1_9.class, true, true);
+		PacketUtil.sendPacket(despawn, Protocol1_8To1_9.class, true, true);
 	}
 
 	public int getEntityId() {

@@ -19,7 +19,7 @@
 package de.gerrygames.viarewind.protocol.protocol1_8to1_9.packets;
 
 import de.gerrygames.viarewind.ViaRewind;
-import de.gerrygames.viarewind.protocol.protocol1_8to1_9.Protocol1_8TO1_9;
+import de.gerrygames.viarewind.protocol.protocol1_8to1_9.Protocol1_8To1_9;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.entityreplacement.ShulkerBulletReplacement;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.entityreplacement.ShulkerReplacement;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.metadata.MetadataRewriter;
@@ -56,9 +56,9 @@ public class SpawnPackets {
 				map(Type.VAR_INT);
 				map(Type.UUID, Type.NOTHING);
 				map(Type.BYTE);
-				map(Type.DOUBLE, Protocol1_8TO1_9.TO_OLD_INT);
-				map(Type.DOUBLE, Protocol1_8TO1_9.TO_OLD_INT);
-				map(Type.DOUBLE, Protocol1_8TO1_9.TO_OLD_INT);
+				map(Type.DOUBLE, Protocol1_8To1_9.TO_OLD_INT);
+				map(Type.DOUBLE, Protocol1_8To1_9.TO_OLD_INT);
+				map(Type.DOUBLE, Protocol1_8To1_9.TO_OLD_INT);
 				map(Type.BYTE);
 				map(Type.BYTE);
 				map(Type.INT);
@@ -127,7 +127,7 @@ public class SpawnPackets {
 						velocityPacket.write(Type.SHORT, vX);
 						velocityPacket.write(Type.SHORT, vY);
 						velocityPacket.write(Type.SHORT, vZ);
-						PacketUtil.sendPacket(velocityPacket, Protocol1_8TO1_9.class);
+						PacketUtil.sendPacket(velocityPacket, Protocol1_8To1_9.class);
 					}
 
 					tracker.getClientEntityTypes().put(entityId, type);
@@ -141,9 +141,9 @@ public class SpawnPackets {
 			@Override
 			public void register() {
 				map(Type.VAR_INT);
-				map(Type.DOUBLE, Protocol1_8TO1_9.TO_OLD_INT);
-				map(Type.DOUBLE, Protocol1_8TO1_9.TO_OLD_INT);
-				map(Type.DOUBLE, Protocol1_8TO1_9.TO_OLD_INT);
+				map(Type.DOUBLE, Protocol1_8To1_9.TO_OLD_INT);
+				map(Type.DOUBLE, Protocol1_8To1_9.TO_OLD_INT);
+				map(Type.DOUBLE, Protocol1_8To1_9.TO_OLD_INT);
 				map(Type.SHORT);
 				handler(packetWrapper -> {
 					int entityId = packetWrapper.get(Type.VAR_INT, 0);
@@ -160,9 +160,9 @@ public class SpawnPackets {
 			public void register() {
 				map(Type.VAR_INT);
 				map(Type.BYTE);
-				map(Type.DOUBLE, Protocol1_8TO1_9.TO_OLD_INT);
-				map(Type.DOUBLE, Protocol1_8TO1_9.TO_OLD_INT);
-				map(Type.DOUBLE, Protocol1_8TO1_9.TO_OLD_INT);
+				map(Type.DOUBLE, Protocol1_8To1_9.TO_OLD_INT);
+				map(Type.DOUBLE, Protocol1_8To1_9.TO_OLD_INT);
+				map(Type.DOUBLE, Protocol1_8To1_9.TO_OLD_INT);
 				handler(packetWrapper -> {
 					int entityId = packetWrapper.get(Type.VAR_INT, 0);
 					EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
@@ -179,9 +179,9 @@ public class SpawnPackets {
 				map(Type.VAR_INT);
 				map(Type.UUID, Type.NOTHING);
 				map(Type.UNSIGNED_BYTE);
-				map(Type.DOUBLE, Protocol1_8TO1_9.TO_OLD_INT);
-				map(Type.DOUBLE, Protocol1_8TO1_9.TO_OLD_INT);
-				map(Type.DOUBLE, Protocol1_8TO1_9.TO_OLD_INT);
+				map(Type.DOUBLE, Protocol1_8To1_9.TO_OLD_INT);
+				map(Type.DOUBLE, Protocol1_8To1_9.TO_OLD_INT);
+				map(Type.DOUBLE, Protocol1_8To1_9.TO_OLD_INT);
 				map(Type.BYTE);
 				map(Type.BYTE);
 				map(Type.BYTE);
@@ -258,9 +258,9 @@ public class SpawnPackets {
 			public void register() {
 				map(Type.VAR_INT);
 				map(Type.UUID);
-				map(Type.DOUBLE, Protocol1_8TO1_9.TO_OLD_INT);
-				map(Type.DOUBLE, Protocol1_8TO1_9.TO_OLD_INT);
-				map(Type.DOUBLE, Protocol1_8TO1_9.TO_OLD_INT);
+				map(Type.DOUBLE, Protocol1_8To1_9.TO_OLD_INT);
+				map(Type.DOUBLE, Protocol1_8To1_9.TO_OLD_INT);
+				map(Type.DOUBLE, Protocol1_8To1_9.TO_OLD_INT);
 				map(Type.BYTE);
 				map(Type.BYTE);
 				handler(packetWrapper -> packetWrapper.write(Type.SHORT, (short) 0));

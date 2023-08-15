@@ -19,7 +19,7 @@
 package de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage;
 
 import de.gerrygames.viarewind.api.ViaRewindConfig;
-import de.gerrygames.viarewind.protocol.protocol1_8to1_9.Protocol1_8TO1_9;
+import de.gerrygames.viarewind.protocol.protocol1_8to1_9.Protocol1_8To1_9;
 import com.viaversion.viaversion.api.connection.StoredObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
@@ -106,7 +106,7 @@ public class Cooldown extends StoredObject implements Tickable {
 		PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_9.BOSSBAR, null, getUser());
 		wrapper.write(Type.UUID, bossUUID);
 		wrapper.write(Type.VAR_INT, 1);
-		PacketUtil.sendPacket(wrapper, Protocol1_8TO1_9.class, false, true);
+		PacketUtil.sendPacket(wrapper, Protocol1_8To1_9.class, false, true);
 		bossUUID = null;
 	}
 
@@ -126,13 +126,13 @@ public class Cooldown extends StoredObject implements Tickable {
 			wrapper.write(Type.VAR_INT, 2);
 			wrapper.write(Type.FLOAT, cooldown);
 		}
-		PacketUtil.sendPacket(wrapper, Protocol1_8TO1_9.class, false, true);
+		PacketUtil.sendPacket(wrapper, Protocol1_8To1_9.class, false, true);
 	}
 
 	private void hideTitle() {
 		PacketWrapper hide = PacketWrapper.create(ClientboundPackets1_8.TITLE, null, getUser());
 		hide.write(Type.VAR_INT, 3);
-		PacketUtil.sendPacket(hide, Protocol1_8TO1_9.class);
+		PacketUtil.sendPacket(hide, Protocol1_8To1_9.class);
 	}
 
 	private void sendTitle(String title, String subTitle, int fadeIn, int stay, int fadeOut) {
@@ -148,9 +148,9 @@ public class Cooldown extends StoredObject implements Tickable {
 		subtitlePacket.write(Type.VAR_INT, 1);
 		subtitlePacket.write(Type.COMPONENT, new JsonPrimitive(subTitle));
 
-		PacketUtil.sendPacket(titlePacket, Protocol1_8TO1_9.class);
-		PacketUtil.sendPacket(subtitlePacket, Protocol1_8TO1_9.class);
-		PacketUtil.sendPacket(timePacket, Protocol1_8TO1_9.class);
+		PacketUtil.sendPacket(titlePacket, Protocol1_8To1_9.class);
+		PacketUtil.sendPacket(subtitlePacket, Protocol1_8To1_9.class);
+		PacketUtil.sendPacket(timePacket, Protocol1_8To1_9.class);
 	}
 
 	private void sendActionBar(String bar) {
@@ -158,7 +158,7 @@ public class Cooldown extends StoredObject implements Tickable {
 		actionBarPacket.write(Type.COMPONENT, new JsonPrimitive(bar));
 		actionBarPacket.write(Type.BYTE, (byte) 2);
 
-		PacketUtil.sendPacket(actionBarPacket, Protocol1_8TO1_9.class);
+		PacketUtil.sendPacket(actionBarPacket, Protocol1_8To1_9.class);
 	}
 
 	public boolean hasCooldown() {

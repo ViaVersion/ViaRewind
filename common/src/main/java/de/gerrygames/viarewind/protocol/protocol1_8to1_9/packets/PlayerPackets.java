@@ -19,7 +19,7 @@
 package de.gerrygames.viarewind.protocol.protocol1_8to1_9.packets;
 
 import de.gerrygames.viarewind.ViaRewind;
-import de.gerrygames.viarewind.protocol.protocol1_8to1_9.Protocol1_8TO1_9;
+import de.gerrygames.viarewind.protocol.protocol1_8to1_9.Protocol1_8To1_9;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage.*;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
@@ -40,7 +40,6 @@ import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.Client
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ClientboundPackets1_9;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ServerboundPackets1_9;
 import de.gerrygames.viarewind.protocol.protocol1_8to1_9.items.ItemRewriter;
-import de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage.*;
 import de.gerrygames.viarewind.utils.ChatUtil;
 import de.gerrygames.viarewind.utils.PacketUtil;
 
@@ -270,7 +269,7 @@ public class PlayerPackets {
 						swapItems.write(Type.POSITION, new Position(0, 0, 0));
 						swapItems.write(Type.BYTE, (byte) 255);
 
-						PacketUtil.sendToServer(swapItems, Protocol1_8TO1_9.class, true, true);
+						PacketUtil.sendToServer(swapItems, Protocol1_8To1_9.class, true, true);
 					}
 				});
 			}
@@ -306,8 +305,8 @@ public class PlayerPackets {
 				handler(packetWrapper -> {
 					//Sending any queued animations.
 					PacketWrapper animation = null;
-					while((animation = ((Protocol1_8TO1_9)protocol).animationsToSend.poll()) != null) {
-						PacketUtil.sendToServer(animation, Protocol1_8TO1_9.class, true, true);
+					while((animation = ((Protocol1_8To1_9)protocol).animationsToSend.poll()) != null) {
+						PacketUtil.sendToServer(animation, Protocol1_8To1_9.class, true, true);
 					}
 
 					EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
@@ -328,8 +327,8 @@ public class PlayerPackets {
 				handler(packetWrapper -> {
 					//Sending any queued animations.
 					PacketWrapper animation = null;
-					while((animation = ((Protocol1_8TO1_9)protocol).animationsToSend.poll()) != null) {
-						PacketUtil.sendToServer(animation, Protocol1_8TO1_9.class,
+					while((animation = ((Protocol1_8To1_9)protocol).animationsToSend.poll()) != null) {
+						PacketUtil.sendToServer(animation, Protocol1_8To1_9.class,
 								true, true);
 					}
 
@@ -353,8 +352,8 @@ public class PlayerPackets {
 				handler(packetWrapper -> {
 					//Sending any queued animations.
 					PacketWrapper animation = null;
-					while((animation = ((Protocol1_8TO1_9)protocol).animationsToSend.poll()) != null) {
-						PacketUtil.sendToServer(animation, Protocol1_8TO1_9.class, true, true);
+					while((animation = ((Protocol1_8To1_9)protocol).animationsToSend.poll()) != null) {
+						PacketUtil.sendToServer(animation, Protocol1_8To1_9.class, true, true);
 					}
 
 					PlayerPosition pos = packetWrapper.user().get(PlayerPosition.class);
@@ -380,8 +379,8 @@ public class PlayerPackets {
 				handler(packetWrapper -> {
 					//Sending any queued animations.
 					PacketWrapper animation = null;
-					while((animation = ((Protocol1_8TO1_9)protocol).animationsToSend.poll()) != null) {
-						PacketUtil.sendToServer(animation, Protocol1_8TO1_9.class, true, true);
+					while((animation = ((Protocol1_8To1_9)protocol).animationsToSend.poll()) != null) {
+						PacketUtil.sendToServer(animation, Protocol1_8To1_9.class, true, true);
 					}
 
 					double x = packetWrapper.get(Type.DOUBLE, 0);
@@ -398,7 +397,7 @@ public class PlayerPackets {
 							PacketWrapper confirmTeleport = packetWrapper.create(0x00);
 							confirmTeleport.write(Type.VAR_INT, pos.getConfirmId());
 							PacketUtil.sendToServer(confirmTeleport,
-									Protocol1_8TO1_9.class, true, true);
+									Protocol1_8To1_9.class, true, true);
 
 							pos.setConfirmId(-1);
 						}
@@ -455,7 +454,7 @@ public class PlayerPackets {
 						PacketWrapper useItem = PacketWrapper.create(0x1D, null, packetWrapper.user());
 						useItem.write(Type.VAR_INT, 0);
 
-						PacketUtil.sendToServer(useItem, Protocol1_8TO1_9.class, true, true);
+						PacketUtil.sendToServer(useItem, Protocol1_8To1_9.class, true, true);
 					}
 				});
 				handler(packetWrapper -> {
@@ -493,7 +492,7 @@ public class PlayerPackets {
 							null, packetWrapper.user());
 					delayedPacket.write(Type.VAR_INT, 0);  //Main Hand
 
-					((Protocol1_8TO1_9)protocol).animationsToSend.add(delayedPacket);
+					((Protocol1_8To1_9)protocol).animationsToSend.add(delayedPacket);
 				});
 				handler(packetWrapper -> {
 					packetWrapper.user().get(BlockPlaceDestroyTracker.class).updateMining();
@@ -520,7 +519,7 @@ public class PlayerPackets {
 							elytra.write(Type.VAR_INT, packetWrapper.get(Type.VAR_INT, 0));
 							elytra.write(Type.VAR_INT, 8);
 							elytra.write(Type.VAR_INT, 0);
-							PacketUtil.sendToServer(elytra, Protocol1_8TO1_9.class, true, false);
+							PacketUtil.sendToServer(elytra, Protocol1_8To1_9.class, true, false);
 						}
 					}
 				});
@@ -544,7 +543,7 @@ public class PlayerPackets {
 						float forward = packetWrapper.get(Type.FLOAT, 1);
 						steerBoat.write(Type.BOOLEAN, forward != 0.0f || left < 0.0f);
 						steerBoat.write(Type.BOOLEAN, forward != 0.0f || left > 0.0f);
-						PacketUtil.sendToServer(steerBoat, Protocol1_8TO1_9.class);
+						PacketUtil.sendToServer(steerBoat, Protocol1_8To1_9.class);
 					}
 				});
 			}
@@ -596,7 +595,7 @@ public class PlayerPackets {
 
 					updateSkin.write(Types1_8.METADATA_LIST, metadata);
 
-					PacketUtil.sendPacket(updateSkin, Protocol1_8TO1_9.class);
+					PacketUtil.sendPacket(updateSkin, Protocol1_8To1_9.class);
 				});
 			}
 		});

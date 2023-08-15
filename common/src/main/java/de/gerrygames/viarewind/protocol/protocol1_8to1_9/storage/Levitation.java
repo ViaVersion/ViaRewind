@@ -18,7 +18,7 @@
 
 package de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage;
 
-import de.gerrygames.viarewind.protocol.protocol1_8to1_9.Protocol1_8TO1_9;
+import de.gerrygames.viarewind.protocol.protocol1_8to1_9.Protocol1_8To1_9;
 import com.viaversion.viaversion.api.connection.StoredObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
@@ -46,7 +46,7 @@ public class Levitation extends StoredObject implements Tickable {
 		packet.write(Type.SHORT, (short)0);
 		packet.write(Type.SHORT, (short)vY);
 		packet.write(Type.SHORT, (short)0);
-		PacketUtil.sendPacket(packet, Protocol1_8TO1_9.class);
+		PacketUtil.sendPacket(packet, Protocol1_8To1_9.class);
 	}
 
 	public void setActive(boolean active) {

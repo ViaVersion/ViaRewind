@@ -18,7 +18,7 @@
 
 package de.gerrygames.viarewind.protocol.protocol1_8to1_9.bossbar;
 
-import de.gerrygames.viarewind.protocol.protocol1_8to1_9.Protocol1_8TO1_9;
+import de.gerrygames.viarewind.protocol.protocol1_8to1_9.Protocol1_8To1_9;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.legacy.bossbar.BossBar;
 import com.viaversion.viaversion.api.legacy.bossbar.BossColor;
@@ -200,7 +200,7 @@ public class WitherBossBar implements BossBar {
 
 		packetWrapper.write(Types1_8.METADATA_LIST, metadata);
 
-		PacketUtil.sendPacket(packetWrapper, Protocol1_8TO1_9.class, true, false);
+		PacketUtil.sendPacket(packetWrapper, Protocol1_8To1_9.class, true, false);
 	}
 
 	private void updateLocation() {
@@ -213,7 +213,7 @@ public class WitherBossBar implements BossBar {
 		packetWrapper.write(Type.BYTE, (byte)0);
 		packetWrapper.write(Type.BOOLEAN, false);
 
-		PacketUtil.sendPacket(packetWrapper, Protocol1_8TO1_9.class, true, false);
+		PacketUtil.sendPacket(packetWrapper, Protocol1_8To1_9.class, true, false);
 	}
 
 	private void updateMetadata() {
@@ -226,14 +226,14 @@ public class WitherBossBar implements BossBar {
 
 		packetWrapper.write(Types1_8.METADATA_LIST, metadata);
 
-		PacketUtil.sendPacket(packetWrapper, Protocol1_8TO1_9.class, true, false);
+		PacketUtil.sendPacket(packetWrapper, Protocol1_8To1_9.class, true, false);
 	}
 
 	private void despawnWither() {
 		PacketWrapper packetWrapper = PacketWrapper.create(0x13, null, this.connection);
 		packetWrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[] {entityId});
 
-		PacketUtil.sendPacket(packetWrapper, Protocol1_8TO1_9.class, true, false);
+		PacketUtil.sendPacket(packetWrapper, Protocol1_8To1_9.class, true, false);
 	}
 
 	public void setPlayerLocation(double posX, double posY, double posZ, float yaw, float pitch) {

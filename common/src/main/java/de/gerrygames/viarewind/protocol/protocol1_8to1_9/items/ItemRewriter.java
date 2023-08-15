@@ -18,7 +18,7 @@
 
 package de.gerrygames.viarewind.protocol.protocol1_8to1_9.items;
 
-import de.gerrygames.viarewind.protocol.protocol1_8to1_9.Protocol1_8TO1_9;
+import de.gerrygames.viarewind.protocol.protocol1_8to1_9.Protocol1_8To1_9;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.*;
 import de.gerrygames.viarewind.utils.Enchantments;
@@ -223,7 +223,7 @@ public class ItemRewriter {
 			for (int i = 0; i<attributes.size(); i++) {
 				CompoundTag attribute = attributes.get(i);
 				String name = (String) attribute.get("AttributeName").getValue();
-				if (!Protocol1_8TO1_9.VALID_ATTRIBUTES.contains(name)) {
+				if (!Protocol1_8To1_9.VALID_ATTRIBUTES.contains(name)) {
 					attributes.remove(attribute);
 					i--;
 				}

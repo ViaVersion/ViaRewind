@@ -18,7 +18,7 @@
 
 package de.gerrygames.viarewind.protocol.protocol1_8to1_9.entityreplacement;
 
-import de.gerrygames.viarewind.protocol.protocol1_8to1_9.Protocol1_8TO1_9;
+import de.gerrygames.viarewind.protocol.protocol1_8to1_9.Protocol1_8To1_9;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
@@ -53,14 +53,14 @@ public abstract class EntityReplacement1_8to1_9 implements EntityReplacement {
 		teleport.write(Type.BYTE, (byte) ((pitch / 360f) * 256));
 		teleport.write(Type.BOOLEAN, true);
 
-		PacketUtil.sendPacket(teleport, Protocol1_8TO1_9.class, true, true);
+		PacketUtil.sendPacket(teleport, Protocol1_8To1_9.class, true, true);
 	}
 
 	protected void sendHeadYaw(int entityId, float headYaw) {
 		PacketWrapper head = PacketWrapper.create(ClientboundPackets1_8.ENTITY_HEAD_LOOK, null, user);
 		head.write(Type.VAR_INT, entityId);
 		head.write(Type.BYTE, (byte) ((headYaw / 360f) * 256));
-		PacketUtil.sendPacket(head, Protocol1_8TO1_9.class, true, true);
+		PacketUtil.sendPacket(head, Protocol1_8To1_9.class, true, true);
 	}
 
 	protected void sendSpawn(int entityId, int type) {
@@ -79,7 +79,7 @@ public abstract class EntityReplacement1_8to1_9 implements EntityReplacement {
 		List<Metadata> list = new ArrayList<>();
 		spawn.write(Types1_8.METADATA_LIST, list);
 
-		PacketUtil.sendPacket(spawn, Protocol1_8TO1_9.class, true, true);
+		PacketUtil.sendPacket(spawn, Protocol1_8To1_9.class, true, true);
 	}
 
 	protected void sendSpawnEntity(int entityId, int type) {
@@ -93,6 +93,6 @@ public abstract class EntityReplacement1_8to1_9 implements EntityReplacement {
 		spawn.write(Type.BYTE, (byte) 0);
 		spawn.write(Type.INT, 0);
 
-		PacketUtil.sendPacket(spawn, Protocol1_8TO1_9.class, true, true);
+		PacketUtil.sendPacket(spawn, Protocol1_8To1_9.class, true, true);
 	}
 }

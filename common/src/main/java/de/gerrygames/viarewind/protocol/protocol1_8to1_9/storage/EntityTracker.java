@@ -18,7 +18,7 @@
 
 package de.gerrygames.viarewind.protocol.protocol1_8to1_9.storage;
 
-import de.gerrygames.viarewind.protocol.protocol1_8to1_9.Protocol1_8TO1_9;
+import de.gerrygames.viarewind.protocol.protocol1_8to1_9.Protocol1_8To1_9;
 import com.viaversion.viaversion.api.connection.StoredObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.entity.ClientEntityIdChangeListener;
@@ -164,7 +164,7 @@ public class EntityTracker extends StoredObject implements ClientEntityIdChangeL
 			MetadataRewriter.transform(this.getClientEntityTypes().get(entityId), this.metadataBuffer.get(entityId));
 			if (!this.metadataBuffer.get(entityId).isEmpty()) {
 				try {
-					wrapper.send(Protocol1_8TO1_9.class);
+					wrapper.send(Protocol1_8To1_9.class);
 				} catch (Exception ex) {
 					ex.printStackTrace();
 				}

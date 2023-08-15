@@ -19,7 +19,7 @@
 package de.gerrygames.viarewind.protocol.protocol1_8to1_9.packets;
 
 import de.gerrygames.viarewind.ViaRewind;
-import de.gerrygames.viarewind.protocol.protocol1_8to1_9.Protocol1_8TO1_9;
+import de.gerrygames.viarewind.protocol.protocol1_8to1_9.Protocol1_8To1_9;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
 import com.viaversion.viaversion.api.minecraft.Environment;
@@ -254,7 +254,7 @@ public class WorldPackets {
 						updateTileEntity.write(Type.UNSIGNED_BYTE, action);
 						updateTileEntity.write(Type.NBT, nbt);
 
-						PacketUtil.sendPacket(updateTileEntity, Protocol1_8TO1_9.class, false, false);
+						PacketUtil.sendPacket(updateTileEntity, Protocol1_8To1_9.class, false, false);
 					});
 				});
 			}

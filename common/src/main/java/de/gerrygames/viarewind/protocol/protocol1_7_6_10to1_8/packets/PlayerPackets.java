@@ -41,11 +41,9 @@ import com.viaversion.viaversion.libs.opennbt.tag.builtin.ListTag;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.StringTag;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
-import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.storage.*;
 import de.gerrygames.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
 import de.gerrygames.viarewind.utils.ChatUtil;
 import de.gerrygames.viarewind.utils.PacketUtil;
-import de.gerrygames.viarewind.utils.Utils;
 import de.gerrygames.viarewind.utils.math.AABB;
 import de.gerrygames.viarewind.utils.math.Ray3d;
 import de.gerrygames.viarewind.utils.math.RayTracing;
@@ -509,7 +507,7 @@ public class PlayerPackets {
 					TitleRenderProvider titleRenderProvider = Via.getManager().getProviders().get(TitleRenderProvider.class);
 					if (titleRenderProvider == null) return;
 					int action = packetWrapper.read(Type.VAR_INT);
-					UUID uuid = Utils.getUUID(packetWrapper.user());
+					UUID uuid = packetWrapper.user().getProtocolInfo().getUuid();
 					switch (action) {
 						case 0:
 							titleRenderProvider.setTitle(uuid, packetWrapper.read(Type.STRING));
