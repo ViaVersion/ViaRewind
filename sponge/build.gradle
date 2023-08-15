@@ -1,5 +1,5 @@
 dependencies {
-    api project(":viarewind-common")
+    api project(":viarewind-core")
 
     compileOnly "org.spongepowered:spongeapi:8.0.0"
 }

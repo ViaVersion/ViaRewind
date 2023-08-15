@@ -1,13 +1,13 @@
-include "viarewind-universal"
-include "viarewind-common"
+include "viarewind-all"
+include "viarewind-core"
 include "viarewind-bukkit"
 include "viarewind-bungee"
 include "viarewind-fabric"
 include "viarewind-sponge"
 include "viarewind-velocity"
 
-project(":viarewind-universal").projectDir = file("universal")
-project(":viarewind-common").projectDir = file("common")
+project(":viarewind-all").projectDir = file("all")
+project(":viarewind-core").projectDir = file("core")
 project(":viarewind-bukkit").projectDir = file("bukkit")
 project(":viarewind-bungee").projectDir = file("bungee")
 project(":viarewind-fabric").projectDir = file("fabric")
