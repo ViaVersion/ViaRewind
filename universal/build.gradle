@@ -12,6 +12,7 @@ dependencies {
 
 shadowJar {
     archiveClassifier.set("")
+    archiveBaseName.set("ViaRewind")
     configurations {
         api
     }
