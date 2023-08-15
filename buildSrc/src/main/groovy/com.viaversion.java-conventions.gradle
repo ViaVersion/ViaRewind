@@ -47,6 +47,17 @@ version = project.maven_version
 java.sourceCompatibility = JavaVersion.VERSION_1_8
 
 publishing {
+    repositories {
+        maven {
+            name = "Via"
+            url = "https://repo.viaversion.com/"
+
+            credentials(PasswordCredentials)
+            authentication {
+                basic(BasicAuthentication)
+            }
+        }
+    }
     publications {
         main(MavenPublication) {
             artifactId = project.maven_name

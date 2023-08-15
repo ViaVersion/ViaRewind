@@ -21,6 +21,17 @@ shadowJar {
 }
 
 publishing {
+    repositories {
+        maven {
+            name = "Via"
+            url = "https://repo.viaversion.com/"
+
+            credentials(PasswordCredentials)
+            authentication {
+                basic(BasicAuthentication)
+            }
+        }
+    }
     publications {
         shadow(MavenPublication) { publication ->
             artifactId = project.maven_name
