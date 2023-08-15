@@ -26,8 +26,3 @@ jobs:
             ${{ runner.os }}-gradle-
       - name: Build with Gradle
         run: ./gradlew build
-      - name: Upload Artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: Artifacts
-          path: build/libs/

@@ -1,5 +1,9 @@
+import io.papermc.hangarpublishplugin.model.Platforms
+
 plugins {
     id "com.github.johnrengelman.shadow" version "8.1.1"
+    id "io.papermc.hangar-publish-plugin" version "0.0.5"
+    id "com.modrinth.minotaur" version "2.+"
     id "java-library"
     id "maven-publish"
 }
@@ -44,3 +48,111 @@ publishing {
 }
 
 build.dependsOn shadowJar
+
+// -----------------------------------------------------
+// Publishing
+
+def latestCommitHash() {
+    def byteOut = new ByteArrayOutputStream()
+    exec {
+        commandLine 'git', 'rev-parse', '--short', 'HEAD'
+        standardOutput = byteOut
+    }
+    return byteOut.toString('UTF-8').trim()
+}
+
+def latestCommitMessage() {
+    def byteOut = new ByteArrayOutputStream()
+    exec {
+        commandLine 'git', 'log', '-1', '--pretty=%B'
+        standardOutput = byteOut
+    }
+    return byteOut.toString('UTF-8').trim()
+}
+
+def branchName() {
+    def byteOut = new ByteArrayOutputStream()
+    exec {
+        commandLine 'git', 'branch'
+        standardOutput = byteOut
+    }
+    return byteOut.toString('UTF-8').trim()
+}
+
+def branch = branchName()
+def baseVersion = project.maven_version
+def isRelease = !baseVersion.contains('-')
+def suffixedVersion = isRelease ? baseVersion : baseVersion + "+" + System.getenv("GITHUB_RUN_NUMBER")
+def commitHash = latestCommitHash()
+def changelogContent = "[${commitHash}](https://github.com/ViaVersion/ViaRewind/commit/${commitHash}) ${latestCommitMessage()}"
+def isMainBranch = branch == "master"
+modrinth {
+    def mcVersions = project.mcVersions
+            .split(',')
+            .collect { it.trim() }
+
+    token.set(System.getenv("MODRINTH_TOKEN"))
+    projectId.set("viarewind")
+    versionType.set(isRelease ? "release" : isMainBranch ? "beta" : "alpha")
+    versionNumber.set(suffixedVersion)
+    versionName.set(suffixedVersion)
+    changelog.set(changelogContent)
+    uploadFile.set(shadowJar.archiveFile)
+    gameVersions.set(mcVersions)
+    loaders.add("fabric")
+    loaders.add("paper")
+    loaders.add("folia")
+    loaders.add("velocity")
+    loaders.add("bungeecord")
+    loaders.add("sponge")
+    autoAddDependsOn.set(false)
+    detectLoaders.set(false)
+    dependencies {
+        optional.project("viafabric")
+        optional.project("viafabricplus")
+        optional.project("viaversion")
+        optional.project("viabackwards")
+    }
+}
+
+hangarPublish {
+    publications.register("plugin") {
+        version.set(suffixedVersion)
+        namespace("ViaVersion", "ViaRewind")
+        channel.set(isRelease ? "Release" : isMainBranch ? "Snapshot" : "Alpha")
+        changelog.set(changelogContent)
+        apiKey.set(System.getenv("HANGAR_TOKEN"))
+        platforms {
+            register(Platforms.PAPER) {
+                jar.set(shadowJar.archiveFile)
+                platformVersions.set([property('mcVersionRange') as String])
+                dependencies.hangar("ViaVersion", "ViaVersion") {
+                    required.set(true)
+                }
+                dependencies.hangar("ViaVersion", "ViaBackwards") {
+                    required.set(false)
+                }
+            }
+            register(Platforms.VELOCITY) {
+                jar.set(shadowJar.archiveFile)
+                platformVersions.set([property("velocityVersion") as String])
+                dependencies.hangar("ViaVersion", "ViaVersion") {
+                    required.set(true)
+                }
+                dependencies.hangar("ViaVersion", "ViaBackwards") {
+                    required.set(false)
+                }
+            }
+            register(Platforms.WATERFALL) {
+                jar.set(shadowJar.archiveFile)
+                platformVersions.set([property("waterfallVersion") as String])
+                dependencies.hangar("ViaVersion", "ViaVersion") {
+                    required.set(true)
+                }
+                dependencies.hangar("ViaVersion", "ViaBackwards") {
+                    required.set(false)
+                }
+            }
+        }
+    }
+}
