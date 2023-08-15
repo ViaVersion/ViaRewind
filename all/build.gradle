@@ -14,7 +14,7 @@ dependencies {
 
 shadowJar {
     archiveClassifier.set("")
-    archiveBaseName.set("ViaRewind")
+    archiveBaseName.set("ViaRewind-" + project.maven_version)
     configurations {
         api
     }
