@@ -59,7 +59,7 @@ subprojects {
         publications {
             maven(MavenPublication) {
                 groupId = project.maven_group
-                artifactId = project.maven_name
+                artifactId = archivesBaseName
                 version = project.maven_version
 
                 from components.java
