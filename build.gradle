@@ -44,4 +44,26 @@ subprojects {
     compileJava {
         options.encoding = StandardCharsets.UTF_8
     }
+
+    publishing {
+        repositories {
+            maven {
+                name = "Via"
+                url = "https://repo.viaversion.com/"
+                credentials(PasswordCredentials)
+                authentication {
+                    basic(BasicAuthentication)
+                }
+            }
+        }
+        publications {
+            maven(MavenPublication) {
+                groupId = project.maven_group
+                artifactId = "ViaRewind"
+                version = project.maven_version
+
+                from components.java
+            }
+        }
+    }
 }
