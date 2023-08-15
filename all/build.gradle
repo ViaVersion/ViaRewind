@@ -1,5 +1,7 @@
 plugins {
     id "com.github.johnrengelman.shadow" version "8.1.1"
+    id "java-library"
+    id "maven-publish"
 }
 
 dependencies {
@@ -15,6 +17,18 @@ shadowJar {
     archiveBaseName.set("ViaRewind")
     configurations {
         api
+    }
+}
+
+publishing {
+    publications {
+        shadow(MavenPublication) { publication ->
+            artifactId = project.maven_name
+            groupId = project.maven_group
+            version = project.maven_version
+
+            from project.shadow.component(publication)
+        }
     }
 }
 

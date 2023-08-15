@@ -1,0 +1,67 @@
+plugins {
+    id "java-library"
+    id "maven-publish"
+}
+
+repositories {
+    mavenLocal()
+    maven {
+        url = uri('https://repo.viaversion.com')
+    }
+
+    maven {
+        url = uri('https://repo.maven.apache.org/maven2/')
+    }
+
+    maven {
+        url = uri('https://hub.spigotmc.org/nexus/content/repositories/snapshots/')
+    }
+
+    maven {
+        url = uri('https://oss.sonatype.org/content/repositories/snapshots')
+    }
+
+    maven {
+        url = uri('https://maven.fabricmc.net/')
+    }
+
+    maven {
+        url = uri('https://repo.spongepowered.org/repository/maven-public/')
+    }
+
+    maven {
+        url = uri('https://nexus.velocitypowered.com/repository/maven-public/')
+    }
+}
+
+dependencies {
+    compileOnly "com.viaversion:viaversion:${project.viaversion_version}"
+    compileOnly "io.netty:netty-all:${project.netty_version}"
+    compileOnly "com.google.guava:guava:${project.guava_version}"
+}
+
+archivesBaseName = project.maven_name
+group = project.maven_group
+version = project.maven_version
+
+java.sourceCompatibility = JavaVersion.VERSION_1_8
+
+publishing {
+    publications {
+        main(MavenPublication) {
+            artifactId = project.maven_name
+            groupId = project.maven_group
+            version = project.maven_version
+
+            from(components.java)
+        }
+    }
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+tasks.withType(Javadoc) {
+    options.encoding = 'UTF-8'
+}
