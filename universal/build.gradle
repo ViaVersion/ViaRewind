@@ -1,0 +1,20 @@
+plugins {
+    id "com.github.johnrengelman.shadow" version "8.1.1"
+}
+
+dependencies {
+    api project(":viarewind-common")
+    api project(":viarewind-bukkit")
+    api project(":viarewind-bungee")
+    api project(":viarewind-fabric")
+    api project(":viarewind-sponge")
+}
+
+shadowJar {
+    archiveClassifier.set("")
+    configurations {
+        api
+    }
+}
+
+build.dependsOn shadowJar

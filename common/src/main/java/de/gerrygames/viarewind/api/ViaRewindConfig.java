@@ -1,0 +1,70 @@
+/*
+ * This file is part of ViaRewind - https://github.com/ViaVersion/ViaRewind
+ * Copyright (C) 2016-2023 ViaVersion and contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package de.gerrygames.viarewind.api;
+
+/**
+ * This class is used to get the platform specific config
+ */
+public interface ViaRewindConfig {
+
+	enum CooldownIndicator {
+		TITLE, ACTION_BAR, BOSS_BAR, DISABLED
+	}
+
+	/**
+	 * Specifies how 1.8.x clients should see the cooldown indicator
+	 * You can choose between TITLE, ACTION_BAR, BOSS_BAR and DISABLED
+	 * ONLY DISABLE IF YOU HAVE 1.9 COOLDOWN DISABLED ON YOUR SERVER
+	 * 1.8 PLAYERS MAY ASK WHY PVP IS NOT WORKING OTHERWISE
+	 *
+	 * @return the cooldown indicator
+	 */
+	CooldownIndicator getCooldownIndicator();
+
+	/**
+	 * Replaces Adventure mode with Survival mode for 1.7.x clients
+	 * Enable this option if your server is using the 'CanDestroy'
+	 * or 'CanPlaceOn' flags on items
+	 *
+	 * @return true if enabled
+	 */
+	boolean isReplaceAdventureMode();
+
+	/**
+	 * Whether 1.9 particles should be replaced by similar ones in
+	 * 1.8 and lower
+	 *
+	 * @return true if enabled
+	 */
+	boolean isReplaceParticles();
+
+	/**
+	 * Max amount of pages for written books before a client gets kicked
+	 *
+	 * @return the max amount of pages
+	 */
+	int getMaxBookPages();
+
+	/**
+	 * Max amount of characters in the json (!) string of a book page before a client gets kicked
+	 *
+	 * @return the max amount of characters
+	 */
+	int getMaxBookPageSize();
+}

@@ -4,7 +4,7 @@ main: de.gerrygames.viarewind.BukkitPlugin
 api-version: 1.13
 folia-supported: true
 
-authors: [Gerrygames]
+authors: [Gerrygames, FlorianMichael/EnZaXD, creeper123321123]
 website: https://viaversion.com/rewind
 
 load: STARTUP

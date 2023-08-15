@@ -12,7 +12,9 @@
   "icon": "assets/viarewind/textures/squarelogo.png",
   "environment": "*",
   "authors": [
-    "Gerrygames"
+    "Gerrygames",
+    "FlorianMichael/EnZaXD",
+    "creeper123123321"
   ],
   "entrypoints": {
     "viafabric:via_api_initialized": [

@@ -1,0 +1,5 @@
+dependencies {
+    api project(":viarewind-common")
+
+    compileOnly "com.velocitypowered:velocity-api:3.0.1"
+}

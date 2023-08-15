@@ -15,6 +15,14 @@
       {
         "name": "Gerrygames",
         "description": "Author"
+      },
+      {
+        "name": "FlorianMichael/EnZaXD",
+        "description": "Author"
+      },
+      {
+        "name": "creeper123123321",
+        "description": "Maintainer"
       }
     ],
     "dependencies": [
