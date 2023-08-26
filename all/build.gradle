@@ -2,7 +2,7 @@ import io.papermc.hangarpublishplugin.model.Platforms
 
 plugins {
     id "com.github.johnrengelman.shadow" version "8.1.1"
-    id "io.papermc.hangar-publish-plugin" version "0.0.5"
+    id "io.papermc.hangar-publish-plugin" version "0.1.0"
     id "com.modrinth.minotaur" version "2.+"
     id "java-library"
     id "maven-publish"
@@ -118,7 +118,7 @@ modrinth {
 hangarPublish {
     publications.register("plugin") {
         version.set(suffixedVersion)
-        namespace("ViaVersion", "ViaRewind")
+        id.set("ViaRewind")
         channel.set(isRelease ? "Release" : isMainBranch ? "Snapshot" : "Alpha")
         changelog.set(changelogContent)
         apiKey.set(System.getenv("HANGAR_TOKEN"))
@@ -126,30 +126,30 @@ hangarPublish {
             register(Platforms.PAPER) {
                 jar.set(shadowJar.archiveFile)
                 platformVersions.set([property('mcVersionRange') as String])
-                dependencies.hangar("ViaVersion", "ViaVersion") {
+                dependencies.hangar("ViaVersion") {
                     required.set(true)
                 }
-                dependencies.hangar("ViaVersion", "ViaBackwards") {
+                dependencies.hangar("ViaBackwards") {
                     required.set(false)
                 }
             }
             register(Platforms.VELOCITY) {
                 jar.set(shadowJar.archiveFile)
                 platformVersions.set([property("velocityVersion") as String])
-                dependencies.hangar("ViaVersion", "ViaVersion") {
+                dependencies.hangar("ViaVersion") {
                     required.set(true)
                 }
-                dependencies.hangar("ViaVersion", "ViaBackwards") {
+                dependencies.hangar("ViaBackwards") {
                     required.set(false)
                 }
             }
             register(Platforms.WATERFALL) {
                 jar.set(shadowJar.archiveFile)
                 platformVersions.set([property("waterfallVersion") as String])
-                dependencies.hangar("ViaVersion", "ViaVersion") {
+                dependencies.hangar("ViaVersion") {
                     required.set(true)
                 }
-                dependencies.hangar("ViaVersion", "ViaBackwards") {
+                dependencies.hangar("ViaBackwards") {
                     required.set(false)
                 }
             }
