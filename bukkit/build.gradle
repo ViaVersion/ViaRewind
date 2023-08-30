@@ -5,5 +5,5 @@ plugins {
 dependencies {
     api project(":viarewind-core")
 
-    compileOnly "org.spigotmc:spigot-api:1.12.2-R0.1-SNAPSHOT"
+    compileOnly(annotationProcessor("org.spigotmc:spigot-api:1.12.2-R0.1-SNAPSHOT"))
 }
