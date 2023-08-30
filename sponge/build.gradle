@@ -5,5 +5,5 @@ plugins {
 dependencies {
     api project(":viarewind-core")
 
-    compileOnly "org.spongepowered:spongeapi:8.0.0"
+    compileOnly(annotationProcessor("org.spongepowered:spongeapi:8.0.0"))
 }
