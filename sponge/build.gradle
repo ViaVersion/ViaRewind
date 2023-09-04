@@ -3,7 +3,7 @@ plugins {
 }
 
 dependencies {
-    api project(":viarewind-core")
+    api project(":viarewind-common")
 
     compileOnly(annotationProcessor("org.spongepowered:spongeapi:8.0.0"))
 }

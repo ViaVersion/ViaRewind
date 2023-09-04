@@ -9,7 +9,7 @@ plugins {
 }
 
 dependencies {
-    api project(":viarewind-core")
+    api project(":viarewind-common")
     api project(":viarewind-bukkit")
     api project(":viarewind-bungee")
     api project(":viarewind-fabric")
