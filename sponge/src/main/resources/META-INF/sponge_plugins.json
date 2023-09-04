@@ -40,7 +40,7 @@
     {
       "id": "viarewind",
       "name": "ViaRewind",
-      "entrypoint": "de.gerrygames.viarewind.SpongePlugin"
+      "entrypoint": "com.viaversion.viarewind.SpongePlugin"
     }
   ]
 }

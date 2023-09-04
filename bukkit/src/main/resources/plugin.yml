@@ -1,6 +1,6 @@
 name: ViaRewind
 version: ${project.version}
-main: de.gerrygames.viarewind.BukkitPlugin
+main: com.viaversion.viarewind.BukkitPlugin
 api-version: 1.13
 folia-supported: true
 

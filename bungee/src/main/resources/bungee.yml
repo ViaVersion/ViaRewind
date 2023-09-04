@@ -1,5 +1,5 @@
 name: ViaRewind
-main: de.gerrygames.viarewind.BungeePlugin
+main: com.viaversion.viarewind.BungeePlugin
 authors: [Gerrygames, FlorianMichael/EnZaXD, creeper123321123]
 version: ${project.version}
 depends: [ViaVersion]
