@@ -20,7 +20,7 @@ package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage;
 
 import com.viaversion.viarewind.utils.PacketUtil;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.ClientboundPackets1_7;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10TO1_8;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
 import com.viaversion.viaversion.api.connection.StoredObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
@@ -143,7 +143,7 @@ public class Scoreboard extends StoredObject {
 		teamPacket.write(Type.BYTE, (byte) 0);
 		teamPacket.write(Type.SHORT, (short) 1);
 		teamPacket.write(Type.STRING, name);
-		PacketUtil.sendPacket(teamPacket, Protocol1_7_6_10TO1_8.class, true, true);
+		PacketUtil.sendPacket(teamPacket, Protocol1_7_6_10To1_8.class, true, true);
 
 		return name;
 	}
@@ -156,7 +156,7 @@ public class Scoreboard extends StoredObject {
 		PacketWrapper teamPacket = PacketWrapper.create(ClientboundPackets1_7.TEAMS, getUser());
 		teamPacket.write(Type.STRING, scoreTeam.name);
 		teamPacket.write(Type.BYTE, (byte) 1);
-		PacketUtil.sendPacket(teamPacket, Protocol1_7_6_10TO1_8.class, true, true);
+		PacketUtil.sendPacket(teamPacket, Protocol1_7_6_10To1_8.class, true, true);
 
 		return scoreTeam.name;
 	}

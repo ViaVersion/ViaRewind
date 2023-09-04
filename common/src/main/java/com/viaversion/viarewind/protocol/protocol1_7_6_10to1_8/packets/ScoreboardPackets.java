@@ -20,7 +20,7 @@ package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.packets;
 
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.Scoreboard;
 import com.viaversion.viarewind.utils.PacketUtil;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10TO1_8;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
@@ -33,7 +33,7 @@ import java.util.Optional;
 
 public class ScoreboardPackets {
 
-	public static void register(Protocol1_7_6_10TO1_8 protocol) {
+	public static void register(Protocol1_7_6_10To1_8 protocol) {
 
 		/*  OUTGOING  */
 
@@ -69,7 +69,7 @@ public class ScoreboardPackets {
 									PacketWrapper sidebarPacket = PacketWrapper.create(0x3D, null, packetWrapper.user());
 									sidebarPacket.write(Type.BYTE, (byte) 1);
 									sidebarPacket.write(Type.STRING, scoreboard.getColorIndependentSidebar());
-									PacketUtil.sendPacket(sidebarPacket, Protocol1_7_6_10TO1_8.class);
+									PacketUtil.sendPacket(sidebarPacket, Protocol1_7_6_10To1_8.class);
 								}
 							}
 						}
@@ -194,7 +194,7 @@ public class ScoreboardPackets {
 						PacketWrapper remove = PacketWrapper.create(0x3E, null, packetWrapper.user());
 						remove.write(Type.STRING, team);
 						remove.write(Type.BYTE, (byte) 1);
-						PacketUtil.sendPacket(remove, Protocol1_7_6_10TO1_8.class, true, true);
+						PacketUtil.sendPacket(remove, Protocol1_7_6_10To1_8.class, true, true);
 					}
 
 					if (mode == 0) {
@@ -216,7 +216,7 @@ public class ScoreboardPackets {
 							PacketWrapper sidebarPacket = packetWrapper.create(0x3D);
 							sidebarPacket.write(Type.BYTE, (byte) 1);
 							sidebarPacket.write(Type.STRING, sidebar == null ? "" : sidebar);
-							PacketUtil.sendPacket(sidebarPacket, Protocol1_7_6_10TO1_8.class);
+							PacketUtil.sendPacket(sidebarPacket, Protocol1_7_6_10To1_8.class);
 						}
 						scoreboard.setTeamColor(team, color);
 					}
@@ -236,7 +236,7 @@ public class ScoreboardPackets {
 									PacketWrapper sidebarPacket = packetWrapper.create(0x3D);
 									sidebarPacket.write(Type.BYTE, (byte) 1);
 									sidebarPacket.write(Type.STRING, scoreboard.getColorIndependentSidebar() == null ? "" : scoreboard.getColorIndependentSidebar());
-									PacketUtil.sendPacket(sidebarPacket, Protocol1_7_6_10TO1_8.class);
+									PacketUtil.sendPacket(sidebarPacket, Protocol1_7_6_10To1_8.class);
 								}
 							} else {
 								scoreboard.addPlayerToTeam(entry, team);
@@ -244,7 +244,7 @@ public class ScoreboardPackets {
 									PacketWrapper displayObjective = packetWrapper.create(0x3D);
 									displayObjective.write(Type.BYTE, (byte) 1);
 									displayObjective.write(Type.STRING, scoreboard.getColorDependentSidebar().get(color));
-									PacketUtil.sendPacket(displayObjective, Protocol1_7_6_10TO1_8.class);
+									PacketUtil.sendPacket(displayObjective, Protocol1_7_6_10To1_8.class);
 								}
 							}
 							entryList.add(entry);

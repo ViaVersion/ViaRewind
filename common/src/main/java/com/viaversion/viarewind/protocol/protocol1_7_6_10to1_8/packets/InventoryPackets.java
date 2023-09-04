@@ -22,7 +22,7 @@ import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.EntityTra
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.GameProfileStorage;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.Windows;
 import com.viaversion.viarewind.utils.ChatUtil;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10TO1_8;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.ServerboundPackets1_7;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.items.ItemRewriter;
 import com.viaversion.viaversion.api.minecraft.item.Item;
@@ -36,7 +36,7 @@ import java.util.UUID;
 
 public class InventoryPackets {
 
-	public static void register(Protocol1_7_6_10TO1_8 protocol) {
+	public static void register(Protocol1_7_6_10To1_8 protocol) {
 
 		/*  OUTGOING  */
 

@@ -23,7 +23,7 @@ import com.viaversion.viarewind.utils.PacketUtil;
 import com.viaversion.viarewind.utils.math.AABB;
 import com.viaversion.viarewind.utils.math.Vector3d;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.ClientboundPackets1_7;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10TO1_8;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
@@ -159,7 +159,7 @@ public class ArmorStandReplacement extends EntityReplacement1_7to1_8 {
 			detach.write(Type.INT, entityIds[1]);
 			detach.write(Type.INT, -1);
 			detach.write(Type.BOOLEAN, false);
-			PacketUtil.sendPacket(detach, Protocol1_7_6_10TO1_8.class, true, true);
+			PacketUtil.sendPacket(detach, Protocol1_7_6_10To1_8.class, true, true);
 		}
 
 		// Don't ask me where this offset is coming from
@@ -172,7 +172,7 @@ public class ArmorStandReplacement extends EntityReplacement1_7to1_8 {
 			attach.write(Type.INT, entityIds[1]);
 			attach.write(Type.INT, entityIds[0]);
 			attach.write(Type.BOOLEAN, false);
-			PacketUtil.sendPacket(attach, Protocol1_7_6_10TO1_8.class, true, true);
+			PacketUtil.sendPacket(attach, Protocol1_7_6_10To1_8.class, true, true);
 		}
 	}
 
@@ -189,7 +189,7 @@ public class ArmorStandReplacement extends EntityReplacement1_7to1_8 {
 			return;
 		}
 
-		PacketUtil.sendPacket(metadataPacket, Protocol1_7_6_10TO1_8.class, true, true);
+		PacketUtil.sendPacket(metadataPacket, Protocol1_7_6_10To1_8.class, true, true);
 	}
 
 	private void writeZombieMeta(PacketWrapper metadataPacket) {
@@ -248,7 +248,7 @@ public class ArmorStandReplacement extends EntityReplacement1_7to1_8 {
 		spawnSkull.write(Type.BYTE, (byte) 0);
 		spawnSkull.write(Type.BYTE, (byte) 0);
 		spawnSkull.write(Type.INT, 0);
-		PacketUtil.sendPacket(spawnSkull, Protocol1_7_6_10TO1_8.class, true, true);
+		PacketUtil.sendPacket(spawnSkull, Protocol1_7_6_10To1_8.class, true, true);
 
 		sendSpawn(entityIds[1], 100, locX, locY, locZ); // Horse
 
@@ -275,6 +275,6 @@ public class ArmorStandReplacement extends EntityReplacement1_7to1_8 {
 			despawn.write(Type.INT, id);
 		}
 		entityIds = null;
-		PacketUtil.sendPacket(despawn, Protocol1_7_6_10TO1_8.class, true, true);
+		PacketUtil.sendPacket(despawn, Protocol1_7_6_10To1_8.class, true, true);
 	}
 }

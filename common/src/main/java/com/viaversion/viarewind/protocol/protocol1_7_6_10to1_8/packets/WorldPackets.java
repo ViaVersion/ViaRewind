@@ -22,7 +22,7 @@ import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.chunks.ChunkPacke
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.WorldBorder;
 import com.viaversion.viarewind.utils.ChatUtil;
 import com.viaversion.viarewind.utils.PacketUtil;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10TO1_8;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.items.ReplacementRegistry1_7_6_10to1_8;
 import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
 import com.viaversion.viaversion.api.minecraft.Position;
@@ -44,7 +44,7 @@ import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_
 
 public class WorldPackets {
 
-	public static void register(Protocol1_7_6_10TO1_8 protocol) {
+	public static void register(Protocol1_7_6_10To1_8 protocol) {
 
 		/*  OUTGOING  */
 
@@ -264,7 +264,7 @@ public class WorldPackets {
 							columnUpdate.write(Type.SHORT, (short) columnData.length);
 							columnUpdate.write(new CustomByteType(columnData.length), columnData);
 
-							PacketUtil.sendPacket(columnUpdate, Protocol1_7_6_10TO1_8.class, true, true);
+							PacketUtil.sendPacket(columnUpdate, Protocol1_7_6_10To1_8.class, true, true);
 						}
 					}
 
@@ -281,14 +281,14 @@ public class WorldPackets {
 						iconUpdate.write(Type.SHORT, (short) iconData.length);
 						CustomByteType customByteType = new CustomByteType(iconData.length);
 						iconUpdate.write(customByteType, iconData);
-						PacketUtil.sendPacket(iconUpdate, Protocol1_7_6_10TO1_8.class, true, true);
+						PacketUtil.sendPacket(iconUpdate, Protocol1_7_6_10To1_8.class, true, true);
 					}
 
 					PacketWrapper scaleUpdate = PacketWrapper.create(0x34, null, packetWrapper.user());
 					scaleUpdate.write(Type.VAR_INT, id);
 					scaleUpdate.write(Type.SHORT, (short) 2);
 					scaleUpdate.write(new CustomByteType(2), new byte[]{2, scale});
-					PacketUtil.sendPacket(scaleUpdate, Protocol1_7_6_10TO1_8.class, true, true);
+					PacketUtil.sendPacket(scaleUpdate, Protocol1_7_6_10To1_8.class, true, true);
 				});
 			}
 		});

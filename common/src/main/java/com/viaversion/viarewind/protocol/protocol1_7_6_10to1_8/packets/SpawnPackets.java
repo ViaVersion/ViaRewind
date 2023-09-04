@@ -29,7 +29,7 @@ import com.viaversion.viarewind.replacement.EntityReplacement;
 import com.viaversion.viarewind.replacement.Replacement;
 import com.viaversion.viarewind.utils.PacketUtil;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.ClientboundPackets1_7;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10TO1_8;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.items.ReplacementRegistry1_7_6_10to1_8;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
@@ -46,7 +46,7 @@ import java.util.UUID;
 
 public class SpawnPackets {
 
-	public static void register(Protocol1_7_6_10TO1_8 protocol) {
+	public static void register(Protocol1_7_6_10To1_8 protocol) {
 
 		/*  OUTGOING  */
 
@@ -82,7 +82,7 @@ public class SpawnPackets {
 							equipmentPacket.write(Type.INT, entityId);
 							equipmentPacket.write(Type.SHORT, i);
 							equipmentPacket.write(Types1_7_6_10.COMPRESSED_NBT_ITEM, i == 4 ? gameProfile.getSkull() :null);
-							PacketUtil.sendPacket(equipmentPacket, Protocol1_7_6_10TO1_8.class);
+							PacketUtil.sendPacket(equipmentPacket, Protocol1_7_6_10To1_8.class);
 						}
 					}
 

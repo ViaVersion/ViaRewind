@@ -20,7 +20,7 @@ package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.metadata;
 
 import com.viaversion.viarewind.ViaRewind;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.items.ItemRewriter;
-import com.viaversion.viarewind.protocol.protocol1_8to1_7_6_10.metadata.MetaIndex1_8to1_7_6_10;
+import com.viaversion.viarewind.protocol.protocol1_8to1_7_6_10.metadata.MetaIndex1_8To1_7_6_10;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
@@ -34,7 +34,7 @@ public class MetadataRewriter {
 
 	public static void transform(Entity1_10Types.EntityType type, List<Metadata> list) {
 		for (Metadata entry : new ArrayList<>(list)) {
-			MetaIndex1_8to1_7_6_10 metaIndex = MetaIndex1_7_6_10to1_8.searchIndex(type, entry.id());
+			MetaIndex1_8To1_7_6_10 metaIndex = MetaIndex1_7_6_10to1_8.searchIndex(type, entry.id());
 			try {
 				if (metaIndex == null) throw new Exception("Could not find valid metadata");
 				if (metaIndex.getOldType() == MetaType1_7_6_10.NonExistent) {
@@ -52,7 +52,7 @@ public class MetadataRewriter {
 					case Int:
 						if (metaIndex.getNewType() == MetaType1_8.Byte) {
 							entry.setValue(((Byte) value).intValue());
-							if (metaIndex == MetaIndex1_8to1_7_6_10.ENTITY_AGEABLE_AGE) {
+							if (metaIndex == MetaIndex1_8To1_7_6_10.ENTITY_AGEABLE_AGE) {
 								if ((Integer) entry.getValue() < 0) {
 									entry.setValue(-25000);
 								}
@@ -70,12 +70,12 @@ public class MetadataRewriter {
 							entry.setValue(((Integer) value).byteValue());
 						}
 						if (metaIndex.getNewType() == MetaType1_8.Byte) {
-							if (metaIndex == MetaIndex1_8to1_7_6_10.ITEM_FRAME_ROTATION) {
+							if (metaIndex == MetaIndex1_8To1_7_6_10.ITEM_FRAME_ROTATION) {
 								value = ((Integer) ((Byte) value / 2)).byteValue();
 							}
 							entry.setValue(value);
 						}
-						if (metaIndex == MetaIndex1_8to1_7_6_10.HUMAN_SKIN_FLAGS) {
+						if (metaIndex == MetaIndex1_8To1_7_6_10.HUMAN_SKIN_FLAGS) {
 							byte flags = (byte) value;
 							boolean cape = (flags & 0x01) != 0;
 							flags = (byte) (cape ? 0x00 : 0x02);

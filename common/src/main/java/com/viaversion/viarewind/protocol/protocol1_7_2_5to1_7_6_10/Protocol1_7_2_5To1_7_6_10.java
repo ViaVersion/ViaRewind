@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.viaversion.viarewind.protocol.protocol1_7_0_5to1_7_6_10;
+package com.viaversion.viarewind.protocol.protocol1_7_2_5to1_7_6_10;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
@@ -33,7 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Protocol1_7_0_5to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_7, ClientboundPackets1_7, ServerboundPackets1_7, ServerboundPackets1_7> {
+public class Protocol1_7_2_5To1_7_6_10 extends AbstractProtocol<ClientboundPackets1_7, ClientboundPackets1_7, ServerboundPackets1_7, ServerboundPackets1_7> {
 	public static final ValueTransformer<String, String> REMOVE_DASHES = new ValueTransformer<String, String>(Type.STRING) {
 		@Override
 		public String transform(PacketWrapper packetWrapper, String s) {
@@ -41,7 +41,7 @@ public class Protocol1_7_0_5to1_7_6_10 extends AbstractProtocol<ClientboundPacke
 		}
 	};
 
-	public Protocol1_7_0_5to1_7_6_10() {
+	public Protocol1_7_2_5To1_7_6_10() {
 		super(ClientboundPackets1_7.class, ClientboundPackets1_7.class, ServerboundPackets1_7.class, ServerboundPackets1_7.class);
 	}
 

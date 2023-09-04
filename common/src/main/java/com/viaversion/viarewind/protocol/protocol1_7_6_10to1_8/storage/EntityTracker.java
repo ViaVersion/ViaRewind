@@ -21,7 +21,7 @@ package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.metadata.MetadataRewriter;
 import com.viaversion.viarewind.replacement.EntityReplacement;
 import com.viaversion.viarewind.utils.PacketUtil;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10TO1_8;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
 import com.viaversion.viaversion.api.connection.StoredObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.entity.ClientEntityIdChangeListener;
@@ -128,7 +128,7 @@ public class EntityTracker extends StoredObject implements ClientEntityIdChangeL
 			wrapper.write(Types1_8.METADATA_LIST, this.metadataBuffer.get(entityId));
 			MetadataRewriter.transform(type, this.metadataBuffer.get(entityId));
 			if (!this.metadataBuffer.get(entityId).isEmpty()) {
-				PacketUtil.sendPacket(wrapper, Protocol1_7_6_10TO1_8.class);
+				PacketUtil.sendPacket(wrapper, Protocol1_7_6_10To1_8.class);
 			}
 
 			this.metadataBuffer.remove(entityId);
@@ -159,7 +159,7 @@ public class EntityTracker extends StoredObject implements ClientEntityIdChangeL
 				unsneakPacket.write(Type.VAR_INT, 1);  //Stop sneaking
 				unsneakPacket.write(Type.VAR_INT, 0);  //Action Parameter
 
-				PacketUtil.sendToServer(sneakPacket, Protocol1_7_6_10TO1_8.class, true, true);
+				PacketUtil.sendToServer(sneakPacket, Protocol1_7_6_10To1_8.class, true, true);
 
 				setSpectating(playerId);
 			} catch (Exception ex) {ex.printStackTrace();}
@@ -191,7 +191,7 @@ public class EntityTracker extends StoredObject implements ClientEntityIdChangeL
 			unsneakPacket.write(Type.VAR_INT, 1);  //Stop sneaking
 			unsneakPacket.write(Type.VAR_INT, 0);  //Action Parameter
 
-			PacketUtil.sendToServer(sneakPacket, Protocol1_7_6_10TO1_8.class, true, true);
+			PacketUtil.sendToServer(sneakPacket, Protocol1_7_6_10To1_8.class, true, true);
 
 			setSpectating(this.playerId);
 			return false;  //Entity has Passenger
@@ -202,7 +202,7 @@ public class EntityTracker extends StoredObject implements ClientEntityIdChangeL
 			unmount.write(Type.INT, this.playerId);
 			unmount.write(Type.INT, -1);
 			unmount.write(Type.BOOLEAN, false);
-			PacketUtil.sendPacket(unmount, Protocol1_7_6_10TO1_8.class);
+			PacketUtil.sendPacket(unmount, Protocol1_7_6_10To1_8.class);
 		}
 		this.spectating = spectating;
 		if (spectating!=this.playerId) {
@@ -210,7 +210,7 @@ public class EntityTracker extends StoredObject implements ClientEntityIdChangeL
 			mount.write(Type.INT, this.playerId);
 			mount.write(Type.INT, this.spectating);
 			mount.write(Type.BOOLEAN, false);
-			PacketUtil.sendPacket(mount, Protocol1_7_6_10TO1_8.class);
+			PacketUtil.sendPacket(mount, Protocol1_7_6_10To1_8.class);
 		}
 		return true;
 	}

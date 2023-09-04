@@ -20,7 +20,7 @@ package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage;
 
 import com.viaversion.viarewind.utils.PacketUtil;
 import com.viaversion.viarewind.utils.Tickable;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10TO1_8;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
 import com.viaversion.viaversion.api.connection.StoredObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
@@ -115,7 +115,7 @@ public class WorldBorder extends StoredObject implements Tickable {
 			particles.write(Type.FLOAT, 0f);
 			particles.write(Type.INT, a);
 
-			PacketUtil.sendPacket(particles, Protocol1_7_6_10TO1_8.class, true, true);
+			PacketUtil.sendPacket(particles, Protocol1_7_6_10To1_8.class, true, true);
 		}
 	}
 

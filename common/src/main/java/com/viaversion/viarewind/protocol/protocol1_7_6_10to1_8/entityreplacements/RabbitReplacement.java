@@ -26,7 +26,7 @@ import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.ClientboundPackets1_7;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10TO1_8;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
 
 import java.util.ArrayList;
@@ -99,7 +99,7 @@ public class RabbitReplacement extends EntityReplacement1_7to1_8 {
 
 		metadataPacket.write(Types1_7_6_10.METADATA_LIST, metadataList);
 
-		PacketUtil.sendPacket(metadataPacket, Protocol1_7_6_10TO1_8.class, true, true);
+		PacketUtil.sendPacket(metadataPacket, Protocol1_7_6_10To1_8.class, true, true);
 	}
 
 	@Override
@@ -112,7 +112,7 @@ public class RabbitReplacement extends EntityReplacement1_7to1_8 {
 		PacketWrapper despawn = PacketWrapper.create(ClientboundPackets1_7.DESTROY_ENTITIES, null, user);
 		despawn.write(Types1_7_6_10.INT_ARRAY, new int[]{entityId});
 
-		PacketUtil.sendPacket(despawn, Protocol1_7_6_10TO1_8.class, true, true);
+		PacketUtil.sendPacket(despawn, Protocol1_7_6_10To1_8.class, true, true);
 	}
 
 	public int getEntityId() {

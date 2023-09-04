@@ -21,7 +21,7 @@ package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.entityreplacemen
 import com.viaversion.viarewind.replacement.EntityReplacement;
 import com.viaversion.viarewind.utils.PacketUtil;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.ClientboundPackets1_7;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10TO1_8;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
@@ -50,14 +50,14 @@ public abstract class EntityReplacement1_7to1_8 implements EntityReplacement {
 		teleport.write(Type.BYTE, (byte) ((yaw / 360f) * 256));
 		teleport.write(Type.BYTE, (byte) ((pitch / 360f) * 256));
 
-		PacketUtil.sendPacket(teleport, Protocol1_7_6_10TO1_8.class, true, true);
+		PacketUtil.sendPacket(teleport, Protocol1_7_6_10To1_8.class, true, true);
 	}
 
 	protected void sendHeadYaw(int entityId, float headYaw) {
 		PacketWrapper head = PacketWrapper.create(ClientboundPackets1_7.ENTITY_HEAD_LOOK, null, user);
 		head.write(Type.INT, entityId);
 		head.write(Type.BYTE, (byte) ((headYaw / 360f) * 256));
-		PacketUtil.sendPacket(head, Protocol1_7_6_10TO1_8.class, true, true);
+		PacketUtil.sendPacket(head, Protocol1_7_6_10To1_8.class, true, true);
 	}
 
 	protected void sendSpawn(int entityId, int type, double locX, double locY, double locZ) {
@@ -75,6 +75,6 @@ public abstract class EntityReplacement1_7to1_8 implements EntityReplacement {
 		spawn.write(Type.SHORT, (short) 0);
 		spawn.write(Types1_7_6_10.METADATA_LIST, new ArrayList<>());
 
-		PacketUtil.sendPacket(spawn, Protocol1_7_6_10TO1_8.class, true, true);
+		PacketUtil.sendPacket(spawn, Protocol1_7_6_10To1_8.class, true, true);
 	}
 }

@@ -30,10 +30,9 @@ import com.viaversion.viarewind.utils.math.RayTracing;
 import com.viaversion.viarewind.utils.math.Vector3d;
 import com.viaversion.viarewind.ViaRewind;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.ClientboundPackets1_7;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10TO1_8;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.ServerboundPackets1_7;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.items.ItemRewriter;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.*;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
@@ -59,7 +58,7 @@ import java.util.UUID;
 
 public class PlayerPackets {
 
-	public static void register(Protocol1_7_6_10TO1_8 protocol) {
+	public static void register(Protocol1_7_6_10To1_8 protocol) {
 
 		/*  OUTGOING  */
 
@@ -249,7 +248,7 @@ public class PlayerPackets {
 							setSlot.write(Type.BYTE, (byte) 0);
 							setSlot.write(Type.SHORT, (short) (8 - i));
 							setSlot.write(Types1_7_6_10.COMPRESSED_NBT_ITEM, equipment[i]);
-							PacketUtil.sendPacket(setSlot, Protocol1_7_6_10TO1_8.class);
+							PacketUtil.sendPacket(setSlot, Protocol1_7_6_10To1_8.class);
 						}
 					}
 				});
@@ -316,7 +315,7 @@ public class PlayerPackets {
 							packet.write(Type.STRING, gameProfile.getDisplayName());
 							packet.write(Type.BOOLEAN, true);
 							packet.write(Type.SHORT, (short) ping);
-							PacketUtil.sendPacket(packet, Protocol1_7_6_10TO1_8.class);
+							PacketUtil.sendPacket(packet, Protocol1_7_6_10To1_8.class);
 						} else if (action == 1) {
 							int gamemode = packetWrapper.read(Type.VAR_INT);
 
@@ -343,7 +342,7 @@ public class PlayerPackets {
 										equipmentPacket.write(Type.INT, entityId);
 										equipmentPacket.write(Type.SHORT, slot);
 										equipmentPacket.write(Types1_7_6_10.COMPRESSED_NBT_ITEM, equipment[slot]);
-										PacketUtil.sendPacket(equipmentPacket, Protocol1_7_6_10TO1_8.class);
+										PacketUtil.sendPacket(equipmentPacket, Protocol1_7_6_10To1_8.class);
 									}
 								}
 							}
@@ -359,7 +358,7 @@ public class PlayerPackets {
 							packet.write(Type.STRING, gameProfile.getDisplayName());
 							packet.write(Type.BOOLEAN, false);
 							packet.write(Type.SHORT, (short) gameProfile.ping);
-							PacketUtil.sendPacket(packet, Protocol1_7_6_10TO1_8.class);
+							PacketUtil.sendPacket(packet, Protocol1_7_6_10To1_8.class);
 							
 							gameProfile.ping = ping;
 
@@ -367,7 +366,7 @@ public class PlayerPackets {
 							packet.write(Type.STRING, gameProfile.getDisplayName());
 							packet.write(Type.BOOLEAN, true);
 							packet.write(Type.SHORT, (short) ping);
-							PacketUtil.sendPacket(packet, Protocol1_7_6_10TO1_8.class);
+							PacketUtil.sendPacket(packet, Protocol1_7_6_10To1_8.class);
 						} else if (action == 3) {
 							JsonElement displayNameComponent = packetWrapper.read(Type.OPTIONAL_COMPONENT);
 							String displayName = displayNameComponent != null ? ChatUtil.jsonToLegacy(displayNameComponent) : null;
@@ -379,7 +378,7 @@ public class PlayerPackets {
 							packet.write(Type.STRING, gameProfile.getDisplayName());
 							packet.write(Type.BOOLEAN, false);
 							packet.write(Type.SHORT, (short) gameProfile.ping);
-							PacketUtil.sendPacket(packet, Protocol1_7_6_10TO1_8.class);
+							PacketUtil.sendPacket(packet, Protocol1_7_6_10To1_8.class);
 
 							if (gameProfile.displayName == null && displayName != null || gameProfile.displayName != null && displayName == null || !gameProfile.displayName.equals(displayName)) {
 								gameProfile.setDisplayName(displayName);
@@ -389,7 +388,7 @@ public class PlayerPackets {
 							packet.write(Type.STRING, gameProfile.getDisplayName());
 							packet.write(Type.BOOLEAN, true);
 							packet.write(Type.SHORT, (short) gameProfile.ping);
-							PacketUtil.sendPacket(packet, Protocol1_7_6_10TO1_8.class);
+							PacketUtil.sendPacket(packet, Protocol1_7_6_10To1_8.class);
 						} else if (action == 4) {
 							GameProfileStorage.GameProfile gameProfile = gameProfileStorage.remove(uuid);
 							if (gameProfile == null) continue;
@@ -398,7 +397,7 @@ public class PlayerPackets {
 							packet.write(Type.STRING, gameProfile.getDisplayName());
 							packet.write(Type.BOOLEAN, false);
 							packet.write(Type.SHORT, (short) gameProfile.ping);
-							PacketUtil.sendPacket(packet, Protocol1_7_6_10TO1_8.class);
+							PacketUtil.sendPacket(packet, Protocol1_7_6_10To1_8.class);
 						}
 					}
 				});
@@ -474,7 +473,7 @@ public class PlayerPackets {
 					newWrapper.passthrough(Type.STRING);
 					if (newPacketBuf.readableBytes() <= Short.MAX_VALUE) {
 						newWrapper.write(Type.SHORT, (short) newPacketBuf.readableBytes());
-						newWrapper.send(Protocol1_7_6_10TO1_8.class);
+						newWrapper.send(Protocol1_7_6_10To1_8.class);
 					}
 				});
 			}
@@ -572,7 +571,7 @@ public class PlayerPackets {
 							PacketWrapper teleportPacket = PacketWrapper.create(0x18, null, packetWrapper.user());
 							teleportPacket.write(Type.UUID, profile.uuid);
 
-							PacketUtil.sendToServer(teleportPacket, Protocol1_7_6_10TO1_8.class, true, true);
+							PacketUtil.sendToServer(teleportPacket, Protocol1_7_6_10To1_8.class, true, true);
 						}
 					}
 				});
@@ -746,7 +745,7 @@ public class PlayerPackets {
 					entityAction.write(Type.VAR_INT, entityId);
 					entityAction.write(Type.VAR_INT, animation);
 					entityAction.write(Type.VAR_INT, 0);
-					PacketUtil.sendPacket(entityAction, Protocol1_7_6_10TO1_8.class, true, true);
+					PacketUtil.sendPacket(entityAction, Protocol1_7_6_10To1_8.class, true, true);
 				});
 			}
 		});
@@ -766,7 +765,7 @@ public class PlayerPackets {
 						abilitiesPacket.write(Type.BYTE, abilities.getFlags());
 						abilitiesPacket.write(Type.FLOAT, abilities.isSprinting() ? abilities.getFlySpeed() * 2.0f : abilities.getFlySpeed());
 						abilitiesPacket.write(Type.FLOAT, abilities.getWalkSpeed());
-						PacketUtil.sendPacket(abilitiesPacket, Protocol1_7_6_10TO1_8.class);
+						PacketUtil.sendPacket(abilitiesPacket, Protocol1_7_6_10To1_8.class);
 					}
 				});
 			}
@@ -798,7 +797,7 @@ public class PlayerPackets {
 							unsneakPacket.write(Type.VAR_INT, 1);  //Stop sneaking
 							unsneakPacket.write(Type.VAR_INT, 0);  //Action Parameter
 
-							PacketUtil.sendToServer(sneakPacket, Protocol1_7_6_10TO1_8.class);
+							PacketUtil.sendToServer(sneakPacket, Protocol1_7_6_10To1_8.class);
 						}
 					}
 				});
@@ -860,7 +859,7 @@ public class PlayerPackets {
 								tabComplete.write(Type.STRING, profile.name);
 							}
 
-							PacketUtil.sendPacket(tabComplete, Protocol1_7_6_10TO1_8.class);
+							PacketUtil.sendPacket(tabComplete, Protocol1_7_6_10To1_8.class);
 						}
 					}
 				});
@@ -909,7 +908,7 @@ public class PlayerPackets {
 							updateCost.write(Type.SHORT, (short) 0);
 							updateCost.write(Type.SHORT, windows.levelCost);
 
-							PacketUtil.sendPacket(updateCost, Protocol1_7_6_10TO1_8.class, true, true);
+							PacketUtil.sendPacket(updateCost, Protocol1_7_6_10To1_8.class, true, true);
 							break;
 						}
 						case "MC|BEdit":
