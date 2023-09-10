@@ -18,7 +18,6 @@
 
 package com.viaversion.viarewind;
 
-import com.viaversion.viarewind.api.ViaRewindConfigImpl;
 import com.viaversion.viarewind.api.ViaRewindPlatform;
 import com.viaversion.viarewind.fabric.util.LoggerWrapper;
 import net.fabricmc.loader.api.FabricLoader;
@@ -31,7 +30,7 @@ public class ViaFabricAddon implements ViaRewindPlatform, Runnable {
 
     @Override
     public void run() {
-        ViaRewindConfigImpl conf = new ViaRewindConfigImpl(FabricLoader.getInstance().getConfigDirectory().toPath().resolve("ViaRewind").resolve("config.yml").toFile());
+        ViaRewindConfig conf = new ViaRewindConfig(FabricLoader.getInstance().getConfigDirectory().toPath().resolve("ViaRewind").resolve("config.yml").toFile());
         conf.reloadConfig();
         this.init(conf);
     }

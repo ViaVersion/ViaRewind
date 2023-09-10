@@ -18,7 +18,6 @@
 
 package com.viaversion.viarewind;
 
-import com.viaversion.viarewind.api.ViaRewindConfigImpl;
 import com.viaversion.viarewind.api.ViaRewindPlatform;
 import net.md_5.bungee.api.plugin.Plugin;
 
@@ -28,7 +27,7 @@ public class BungeePlugin extends Plugin implements ViaRewindPlatform {
 
     @Override
     public void onEnable() {
-        ViaRewindConfigImpl conf = new ViaRewindConfigImpl(new File(getDataFolder(), "config.yml"));
+        ViaRewindConfig conf = new ViaRewindConfig(new File(getDataFolder(), "config.yml"));
         conf.reloadConfig();
         this.init(conf);
     }
