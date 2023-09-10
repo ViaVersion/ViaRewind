@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "viarewind",
   "name": "ViaRewind",
-  "version": "${project.version}",
+  "version": "${version}",
   "license": "GPL-3.0",
   "contact": {
     "homepage": "https://viaversion.com/rewind",

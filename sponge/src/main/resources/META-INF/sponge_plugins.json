@@ -5,7 +5,7 @@
   },
   "license": "GNU GPLv3",
   "global": {
-    "version": "${project.version}",
+    "version": "${version}",
     "links": {
       "homepage": "https://viaversion.com/rewind",
       "source": "https://github.com/ViaVersion/ViaRewind",

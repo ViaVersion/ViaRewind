@@ -3,15 +3,19 @@ plugins {
 }
 
 plugins {
-    id "net.kyori.blossom" version "1.3.1"
+    id "net.raphimc.class-token-replacer" version "1.0.0"
 }
 
 dependencies {
 }
 
-blossom {
-    replaceToken("\$VERSION", project.version, "src/main/java/com/viaversion/viarewind/api/ViaRewindPlatform.java")
-    replaceToken("\$IMPL_VERSION", "git-ViaRewind-${project.version}:${latestCommitHash()}", "src/main/java/com/viaversion/viarewind/api/ViaRewindPlatform.java")
+sourceSets {
+    main {
+        classTokenReplacer {
+            property("\${version}", rootProject.maven_version)
+            property("\${impl_version}", "git-${project.name}-${rootProject.maven_version}:${project.latestCommitHash()}")
+        }
+    }
 }
 
 String latestCommitHash() {

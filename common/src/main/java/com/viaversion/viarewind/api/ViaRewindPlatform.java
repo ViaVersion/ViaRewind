@@ -33,8 +33,8 @@ import java.util.logging.Logger;
  */
 public interface ViaRewindPlatform {
 
-	String VERSION = "$VERSION";
-	String IMPL_VERSION = "$IMPL_VERSION";
+	String VERSION = "${version}";
+	String IMPL_VERSION = "${impl_version}";
 
 	/**
 	 * Initialize ViaRewind
