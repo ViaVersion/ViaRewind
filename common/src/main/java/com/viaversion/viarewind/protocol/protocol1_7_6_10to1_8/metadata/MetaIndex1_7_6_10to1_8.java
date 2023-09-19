@@ -35,7 +35,7 @@ public class MetaIndex1_7_6_10to1_8 {
 	}
 
 	private static Optional<MetaIndex1_8To1_7_6_10> getIndex(Entity1_10Types.EntityType type, int index) {
-		Pair pair = new Pair<>(type, index);
+		Pair<Entity1_10Types.EntityType, Integer> pair = new Pair<>(type, index);
 		if (metadataRewrites.containsKey(pair)) {
 			return Optional.of(metadataRewrites.get(pair));
 		}

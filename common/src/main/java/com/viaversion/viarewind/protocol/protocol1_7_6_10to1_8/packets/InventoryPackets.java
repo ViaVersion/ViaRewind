@@ -18,19 +18,19 @@
 
 package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.packets;
 
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.EntityTracker;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.GameProfileStorage;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.Windows;
-import com.viaversion.viarewind.utils.ChatUtil;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.ServerboundPackets1_7;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.items.ItemRewriter;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.EntityTracker;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.GameProfileStorage;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.Windows;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
+import com.viaversion.viarewind.utils.ChatUtil;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.libs.gson.JsonElement;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
 
 import java.util.UUID;
 
@@ -46,9 +46,9 @@ public class InventoryPackets {
 				handler(packetWrapper -> {
 					short windowId = packetWrapper.passthrough(Type.UNSIGNED_BYTE);
 					String windowType = packetWrapper.read(Type.STRING);
-					short windowtypeId = (short) Windows.getInventoryType(windowType);
-					packetWrapper.user().get(Windows.class).types.put(windowId, windowtypeId);
-					packetWrapper.write(Type.UNSIGNED_BYTE, windowtypeId);
+					short windowTypeId = (short) Windows.getInventoryType(windowType);
+					packetWrapper.user().get(Windows.class).types.put(windowId, windowTypeId);
+					packetWrapper.write(Type.UNSIGNED_BYTE, windowTypeId);
 
 					JsonElement titleComponent = packetWrapper.read(Type.COMPONENT);  //Title
 					String title = ChatUtil.jsonToLegacy(titleComponent);
@@ -60,7 +60,7 @@ public class InventoryPackets {
 
 					packetWrapper.passthrough(Type.UNSIGNED_BYTE);
 					packetWrapper.write(Type.BOOLEAN, true);
-					if (windowtypeId == 11) packetWrapper.passthrough(Type.INT);  //Entity Id
+					if (windowTypeId == 11) packetWrapper.passthrough(Type.INT);  //Entity Id
 				});
 			}
 		});

@@ -67,6 +67,7 @@ public class VelocityPlugin implements ViaRewindPlatform {
 		conf.reloadConfig();
 	}
 
+	@Override
 	public Logger getLogger() {
 		return this.logger;
 	}

@@ -42,6 +42,7 @@ public class ShulkerBulletReplacement extends EntityReplacement1_8to1_9 {
 		spawn();
 	}
 
+	@Override
 	public void setLocation(double x, double y, double z) {
 		if (x != this.locX || y != this.locY || z != this.locZ) {
 			this.locX = x;
@@ -51,6 +52,7 @@ public class ShulkerBulletReplacement extends EntityReplacement1_8to1_9 {
 		}
 	}
 
+	@Override
 	public void relMove(double x, double y, double z) {
 		if (x == 0.0 && y == 0.0 && z == 0.0) return;
 		this.locX += x;
@@ -59,6 +61,7 @@ public class ShulkerBulletReplacement extends EntityReplacement1_8to1_9 {
 		updateLocation();
 	}
 
+	@Override
 	public void setYawPitch(float yaw, float pitch) {
 		if (this.yaw != yaw && this.pitch != pitch) {
 			this.yaw = yaw;
@@ -67,10 +70,12 @@ public class ShulkerBulletReplacement extends EntityReplacement1_8to1_9 {
 		}
 	}
 
+	@Override
 	public void setHeadYaw(float yaw) {
 		this.headYaw = yaw;
 	}
 
+	@Override
 	public void updateMetadata(List<Metadata> metadataList) {
 	}
 
@@ -91,6 +96,7 @@ public class ShulkerBulletReplacement extends EntityReplacement1_8to1_9 {
 		PacketUtil.sendPacket(despawn, Protocol1_8To1_9.class, true, true);
 	}
 
+	@Override
 	public int getEntityId() {
 		return this.entityId;
 	}

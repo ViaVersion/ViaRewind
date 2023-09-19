@@ -20,14 +20,15 @@ package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.packets;
 
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Ints;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.metadata.MetadataRewriter;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.EntityTracker;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.GameProfileStorage;
-import com.viaversion.viarewind.replacement.EntityReplacement;
-import com.viaversion.viarewind.utils.PacketUtil;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.ClientboundPackets1_7;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.items.ItemRewriter;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.metadata.MetadataRewriter;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.EntityTracker;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.GameProfileStorage;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
+import com.viaversion.viarewind.replacement.EntityReplacement;
+import com.viaversion.viarewind.utils.PacketUtil;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
 import com.viaversion.viaversion.api.minecraft.item.Item;
@@ -37,7 +38,6 @@ import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_8;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
 
 import java.util.List;
 import java.util.UUID;
@@ -350,9 +350,9 @@ public class EntityPackets {
 					for (int i = 0; i < amount; i++) {
 						packetWrapper.passthrough(Type.STRING);
 						packetWrapper.passthrough(Type.DOUBLE);
-						int modifierlength = packetWrapper.read(Type.VAR_INT);
-						packetWrapper.write(Type.SHORT, (short) modifierlength);
-						for (int j = 0; j < modifierlength; j++) {
+						int modifierLength = packetWrapper.read(Type.VAR_INT);
+						packetWrapper.write(Type.SHORT, (short) modifierLength);
+						for (int j = 0; j < modifierLength; j++) {
 							packetWrapper.passthrough(Type.UUID);
 							packetWrapper.passthrough(Type.DOUBLE);
 							packetWrapper.passthrough(Type.BYTE);

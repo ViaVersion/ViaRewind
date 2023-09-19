@@ -20,12 +20,12 @@ package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.metadata;
 
 import com.viaversion.viarewind.ViaRewind;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.items.ItemRewriter;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.MetaType1_7_6_10;
 import com.viaversion.viarewind.protocol.protocol1_8to1_7_6_10.metadata.MetaIndex1_8To1_7_6_10;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_8;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.MetaType1_7_6_10;
 
 import java.util.ArrayList;
 import java.util.List;

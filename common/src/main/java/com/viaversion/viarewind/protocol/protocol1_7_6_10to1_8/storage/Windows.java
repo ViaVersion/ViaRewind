@@ -34,7 +34,7 @@ public class Windows extends StoredObject {
 	}
 
 	public short get(short windowId) {
-		return types.getOrDefault(windowId, (short)-1);
+		return types.getOrDefault(windowId, (short) -1);
 	}
 
 	public void remove(short windowId) {
@@ -43,7 +43,7 @@ public class Windows extends StoredObject {
 	}
 
 	public static int getInventoryType(String name) {
-		switch(name) {
+		switch (name) {
 			case "minecraft:container":
 				return 0;
 			case "minecraft:chest":

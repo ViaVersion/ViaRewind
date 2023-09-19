@@ -18,16 +18,16 @@
 
 package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.entityreplacements;
 
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.ClientboundPackets1_7;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.metadata.MetadataRewriter;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
 import com.viaversion.viarewind.utils.PacketUtil;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.ClientboundPackets1_7;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +45,7 @@ public class EndermiteReplacement extends EntityReplacement1_7to1_8 {
 		spawn();
 	}
 
+	@Override
 	public void setLocation(double x, double y, double z) {
 		this.locX = x;
 		this.locY = y;
@@ -52,6 +53,7 @@ public class EndermiteReplacement extends EntityReplacement1_7to1_8 {
 		updateLocation();
 	}
 
+	@Override
 	public void relMove(double x, double y, double z) {
 		this.locX += x;
 		this.locY += y;
@@ -59,6 +61,7 @@ public class EndermiteReplacement extends EntityReplacement1_7to1_8 {
 		updateLocation();
 	}
 
+	@Override
 	public void setYawPitch(float yaw, float pitch) {
 		if (this.yaw != yaw || this.pitch != pitch) {
 			this.yaw = yaw;
@@ -67,6 +70,7 @@ public class EndermiteReplacement extends EntityReplacement1_7to1_8 {
 		}
 	}
 
+	@Override
 	public void setHeadYaw(float yaw) {
 		if (this.headYaw != yaw) {
 			this.headYaw = yaw;
@@ -74,6 +78,7 @@ public class EndermiteReplacement extends EntityReplacement1_7to1_8 {
 		}
 	}
 
+	@Override
 	public void updateMetadata(List<Metadata> metadataList) {
 		for (Metadata metadata : metadataList) {
 			datawatcher.removeIf(m -> m.id() == metadata.id());
@@ -115,6 +120,7 @@ public class EndermiteReplacement extends EntityReplacement1_7to1_8 {
 		PacketUtil.sendPacket(despawn, Protocol1_7_6_10To1_8.class, true, true);
 	}
 
+	@Override
 	public int getEntityId() {
 		return this.entityId;
 	}

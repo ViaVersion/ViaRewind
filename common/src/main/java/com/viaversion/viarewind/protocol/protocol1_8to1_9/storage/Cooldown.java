@@ -18,6 +18,7 @@
 
 package com.viaversion.viarewind.protocol.protocol1_8to1_9.storage;
 
+import com.viaversion.viarewind.ViaRewind;
 import com.viaversion.viarewind.api.ViaRewindConfig;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.Protocol1_8To1_9;
 import com.viaversion.viarewind.utils.PacketUtil;
@@ -30,7 +31,6 @@ import com.viaversion.viaversion.libs.gson.JsonPrimitive;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ClientboundPackets1_9;
 import com.viaversion.viaversion.util.Pair;
-import com.viaversion.viarewind.ViaRewind;
 
 import java.util.ArrayList;
 import java.util.UUID;

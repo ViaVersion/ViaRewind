@@ -43,7 +43,7 @@ public class BossBarStorage extends StoredObject {
 
 	public void remove(UUID uuid) {
 		WitherBossBar bossBar = bossBars.remove(uuid);
-		if (bossBar==null) return;
+		if (bossBar == null) return;
 		bossBar.hide();
 	}
 
@@ -61,13 +61,13 @@ public class BossBarStorage extends StoredObject {
 
 	public void updateHealth(UUID uuid, float health) {
 		WitherBossBar bossBar = bossBars.get(uuid);
-		if (bossBar==null) return;
+		if (bossBar == null) return;
 		bossBar.setHealth(health);
 	}
 
 	public void updateTitle(UUID uuid, String title) {
 		WitherBossBar bossBar = bossBars.get(uuid);
-		if (bossBar==null) return;
+		if (bossBar == null) return;
 		bossBar.setTitle(title);
 	}
 }

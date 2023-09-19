@@ -35,16 +35,21 @@ public class NBTType extends Type<CompoundTag> {
 	@Override
 	public CompoundTag read(ByteBuf buffer) {
 		short length = buffer.readShort();
-		if (length < 0) {return null;}
+		if (length < 0) {
+			return null;
+		}
 		ByteBufInputStream byteBufInputStream = new ByteBufInputStream(buffer);
 		DataInputStream dataInputStream = new DataInputStream(byteBufInputStream);
 		try {
 			return NBTIO.readTag((DataInput) dataInputStream);
-		} catch (Throwable throwable) {throwable.printStackTrace();}
-		finally {
+		} catch (Throwable throwable) {
+			throwable.printStackTrace();
+		} finally {
 			try {
 				dataInputStream.close();
-			} catch (IOException e) {e.printStackTrace();}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 		return null;
 	}
@@ -55,8 +60,8 @@ public class NBTType extends Type<CompoundTag> {
 			buffer.writeShort(-1);
 		} else {
 			ByteBuf buf = buffer.alloc().buffer();
-			ByteBufOutputStream bytebufStream = new ByteBufOutputStream(buf);
-			DataOutputStream dataOutputStream = new DataOutputStream(bytebufStream);
+			ByteBufOutputStream byteBufStream = new ByteBufOutputStream(buf);
+			DataOutputStream dataOutputStream = new DataOutputStream(byteBufStream);
 			NBTIO.writeTag((DataOutput) dataOutputStream, nbt);
 			dataOutputStream.close();
 			buffer.writeShort(buf.readableBytes());

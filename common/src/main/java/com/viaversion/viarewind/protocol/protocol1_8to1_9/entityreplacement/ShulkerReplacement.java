@@ -18,7 +18,9 @@
 
 package com.viaversion.viarewind.protocol.protocol1_8to1_9.entityreplacement;
 
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.ClientboundPackets1_7;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.Protocol1_8To1_9;
+import com.viaversion.viarewind.protocol.protocol1_8to1_9.metadata.MetadataRewriter;
 import com.viaversion.viarewind.utils.PacketUtil;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
@@ -28,8 +30,6 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_8;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.ClientboundPackets1_7;
-import com.viaversion.viarewind.protocol.protocol1_8to1_9.metadata.MetadataRewriter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +45,7 @@ public class ShulkerReplacement extends EntityReplacement1_8to1_9 {
 		spawn();
 	}
 
+	@Override
 	public void setLocation(double x, double y, double z) {
 		this.locX = x;
 		this.locY = y;
@@ -52,6 +53,7 @@ public class ShulkerReplacement extends EntityReplacement1_8to1_9 {
 		updateLocation();
 	}
 
+	@Override
 	public void relMove(double x, double y, double z) {
 		this.locX += x;
 		this.locY += y;
@@ -59,12 +61,15 @@ public class ShulkerReplacement extends EntityReplacement1_8to1_9 {
 		updateLocation();
 	}
 
+	@Override
 	public void setYawPitch(float yaw, float pitch) {
 	}
 
+	@Override
 	public void setHeadYaw(float yaw) {
 	}
 
+	@Override
 	public void updateMetadata(List<Metadata> metadataList) {
 		for (Metadata metadata : metadataList) {
 			datawatcher.removeIf(m -> m.id() == metadata.id());
@@ -109,6 +114,7 @@ public class ShulkerReplacement extends EntityReplacement1_8to1_9 {
 		PacketUtil.sendPacket(despawn, Protocol1_8To1_9.class, true, true);
 	}
 
+	@Override
 	public int getEntityId() {
 		return this.entityId;
 	}

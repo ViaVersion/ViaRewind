@@ -18,9 +18,9 @@
 
 package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage;
 
-import com.viaversion.viarewind.utils.PacketUtil;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.ClientboundPackets1_7;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
+import com.viaversion.viarewind.utils.PacketUtil;
 import com.viaversion.viaversion.api.connection.StoredObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;

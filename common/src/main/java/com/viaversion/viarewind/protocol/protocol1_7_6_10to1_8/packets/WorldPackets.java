@@ -18,12 +18,15 @@
 
 package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.packets;
 
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.chunks.ChunkPacketTransformer;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.items.ReplacementRegistry1_7_6_10to1_8;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.WorldBorder;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Chunk1_7_10Type;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Particle;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
 import com.viaversion.viarewind.utils.ChatUtil;
 import com.viaversion.viarewind.utils.PacketUtil;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.items.ReplacementRegistry1_7_6_10to1_8;
 import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
@@ -38,9 +41,6 @@ import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.types.Chunk1_8Type;
 import com.viaversion.viaversion.util.ChatColorUtil;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Chunk1_7_10Type;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Particle;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
 
 public class WorldPackets {
 

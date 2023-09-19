@@ -18,6 +18,7 @@
 
 package com.viaversion.viarewind.protocol.protocol1_8to1_9.packets;
 
+import com.viaversion.viarewind.protocol.protocol1_8to1_9.items.ItemRewriter;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.storage.Windows;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.Protocol;
@@ -28,7 +29,6 @@ import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.protocol1_8.ServerboundPackets1_8;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ClientboundPackets1_9;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ServerboundPackets1_9;
-import com.viaversion.viarewind.protocol.protocol1_8to1_9.items.ItemRewriter;
 
 public class InventoryPackets {
 
@@ -144,7 +144,7 @@ public class InventoryPackets {
 			}
 		});
 
-		/*  INCMOING  */
+		/*  INCOMING  */
 
 		//Close Window
 		protocol.registerServerbound(ServerboundPackets1_8.CLOSE_WINDOW, new PacketHandlers() {

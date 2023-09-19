@@ -34,11 +34,11 @@ public class PacketUtil {
 
 	public static void sendToServer(PacketWrapper packet, Class<? extends Protocol> packetProtocol, boolean skipCurrentPipeline, boolean currentThread) {
 		try {
-		    if (currentThread) {
-                packet.sendToServer(packetProtocol, skipCurrentPipeline);
-            } else {
-                packet.scheduleSendToServer(packetProtocol, skipCurrentPipeline);
-            }
+			if (currentThread) {
+				packet.sendToServer(packetProtocol, skipCurrentPipeline);
+			} else {
+				packet.scheduleSendToServer(packetProtocol, skipCurrentPipeline);
+			}
 		} catch (CancelException ignored) {
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -50,16 +50,16 @@ public class PacketUtil {
 	}
 
 	public static boolean sendPacket(PacketWrapper packet, Class<? extends Protocol> packetProtocol, boolean skipCurrentPipeline) {
-		return sendPacket(packet, packetProtocol, true, false);
+		return sendPacket(packet, packetProtocol, skipCurrentPipeline, false);
 	}
 
 	public static boolean sendPacket(PacketWrapper packet, Class<? extends Protocol> packetProtocol, boolean skipCurrentPipeline, boolean currentThread) {
 		try {
-            if (currentThread) {
-                packet.send(packetProtocol, skipCurrentPipeline);
-            } else {
-                packet.scheduleSend(packetProtocol, skipCurrentPipeline);
-            }
+			if (currentThread) {
+				packet.send(packetProtocol, skipCurrentPipeline);
+			} else {
+				packet.scheduleSend(packetProtocol, skipCurrentPipeline);
+			}
 			return true;
 		} catch (CancelException ignored) {
 		} catch (Exception ex) {

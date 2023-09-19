@@ -18,13 +18,13 @@
 
 package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.provider;
 
+import com.viaversion.viarewind.netty.EmptyChannelHandler;
+import com.viaversion.viarewind.netty.ForwardMessageToByteEncoder;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.CompressionSendStorage;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.platform.providers.Provider;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viarewind.netty.EmptyChannelHandler;
-import com.viaversion.viarewind.netty.ForwardMessageToByteEncoder;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.ChannelHandler;
@@ -139,6 +139,7 @@ public class CompressionHandlerProvider implements Provider {
 			this.deflater = new Deflater();
 		}
 
+		@Override
 		protected void encode(ChannelHandlerContext ctx, ByteBuf in, ByteBuf out) throws Exception {
 			int frameLength = in.readableBytes();
 			if (frameLength < this.threshold) {

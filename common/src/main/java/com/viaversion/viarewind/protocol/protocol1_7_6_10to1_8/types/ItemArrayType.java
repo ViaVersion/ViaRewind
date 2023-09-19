@@ -35,7 +35,7 @@ public class ItemArrayType extends Type<Item[]> {
 		int amount = Type.SHORT.readPrimitive(buffer);
 		Item[] items = new Item[amount];
 
-		for(int i = 0; i < amount; ++i) {
+		for (int i = 0; i < amount; ++i) {
 			items[i] = (compressed ? Types1_7_6_10.COMPRESSED_NBT_ITEM : Types1_7_6_10.ITEM).read(buffer);
 		}
 		return items;
@@ -43,7 +43,7 @@ public class ItemArrayType extends Type<Item[]> {
 
 	@Override
 	public void write(ByteBuf buffer, Item[] items) throws Exception {
-		Type.SHORT.writePrimitive(buffer, (short)items.length);
+		Type.SHORT.writePrimitive(buffer, (short) items.length);
 		for (Item item : items) {
 			(compressed ? Types1_7_6_10.COMPRESSED_NBT_ITEM : Types1_7_6_10.ITEM).write(buffer, item);
 		}

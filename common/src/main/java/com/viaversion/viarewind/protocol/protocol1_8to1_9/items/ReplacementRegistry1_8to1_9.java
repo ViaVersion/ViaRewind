@@ -20,8 +20,8 @@ package com.viaversion.viarewind.protocol.protocol1_8to1_9.items;
 
 import com.viaversion.viarewind.replacement.Replacement;
 import com.viaversion.viarewind.replacement.ReplacementRegistry;
-import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viarewind.storage.BlockState;
+import com.viaversion.viaversion.api.minecraft.item.Item;
 
 public class ReplacementRegistry1_8to1_9 {
 	private static final ReplacementRegistry registry = new ReplacementRegistry();

@@ -82,11 +82,11 @@ public enum MetaIndex1_8To1_7_6_10 {
 	GHAST_IS_POWERED(Entity1_10Types.EntityType.GHAST, 17, MetaType1_7_6_10.NonExistent, MetaType1_8.Byte),
 	SLIME_SIZE(Entity1_10Types.EntityType.SLIME, 16, MetaType1_7_6_10.Byte, MetaType1_8.Byte),
 	SKELETON_TYPE(Entity1_10Types.EntityType.SKELETON, 13, MetaType1_7_6_10.Byte, MetaType1_8.Byte),
-	WITCH_AGRESSIVE(Entity1_10Types.EntityType.WITCH, 21, MetaType1_7_6_10.Byte, MetaType1_8.Byte),
+	WITCH_AGGRESSIVE(Entity1_10Types.EntityType.WITCH, 21, MetaType1_7_6_10.Byte, MetaType1_8.Byte),
 	IRON_GOLEM_IS_PLAYER_CREATED(Entity1_10Types.EntityType.IRON_GOLEM, 16, MetaType1_7_6_10.Byte, MetaType1_8.Byte),
-	WITHER_WATCHED_TAGRET_1(Entity1_10Types.EntityType.WITHER, 17, MetaType1_7_6_10.Int, MetaType1_8.Int),
-	WITHER_WATCHED_TAGRET_2(Entity1_10Types.EntityType.WITHER, 18, MetaType1_7_6_10.Int, MetaType1_8.Int),
-	WITHER_WATCHED_TAGRET_3(Entity1_10Types.EntityType.WITHER, 19, MetaType1_7_6_10.Int, MetaType1_8.Int),
+	WITHER_WATCHED_TARGET_1(Entity1_10Types.EntityType.WITHER, 17, MetaType1_7_6_10.Int, MetaType1_8.Int),
+	WITHER_WATCHED_TARGET_2(Entity1_10Types.EntityType.WITHER, 18, MetaType1_7_6_10.Int, MetaType1_8.Int),
+	WITHER_WATCHED_TARGET_3(Entity1_10Types.EntityType.WITHER, 19, MetaType1_7_6_10.Int, MetaType1_8.Int),
 	WITHER_INVULNERABLE_TIME(Entity1_10Types.EntityType.WITHER, 20, MetaType1_7_6_10.Int, MetaType1_8.Int),
 	GUARDIAN_FLAGS(Entity1_10Types.EntityType.GUARDIAN, 16, MetaType1_7_6_10.NonExistent, MetaType1_8.Byte),
 	GUARDIAN_TARGET(Entity1_10Types.EntityType.GUARDIAN, 17, MetaType1_7_6_10.NonExistent, MetaType1_8.Int),
@@ -111,8 +111,9 @@ public enum MetaIndex1_8To1_7_6_10 {
 	private static final HashMap<Pair<Entity1_10Types.EntityType, Integer>, MetaIndex1_8To1_7_6_10> metadataRewrites = new HashMap<>();
 
 	static {
-		for (MetaIndex1_8To1_7_6_10 index : MetaIndex1_8To1_7_6_10.values())
+		for (MetaIndex1_8To1_7_6_10 index : MetaIndex1_8To1_7_6_10.values()) {
 			metadataRewrites.put(new Pair<>(index.getClazz(), index.getIndex()), index);
+		}
 	}
 
 	private final Entity1_10Types.EntityType clazz;
@@ -138,7 +139,7 @@ public enum MetaIndex1_8To1_7_6_10 {
 	}
 
 	private static Optional<MetaIndex1_8To1_7_6_10> getIndex(Entity1_10Types.EntityType type, int index) {
-		Pair pair = new Pair<>(type, index);
+		Pair<Entity1_10Types.EntityType, Integer> pair = new Pair<>(type, index);
 		if (metadataRewrites.containsKey(pair)) {
 			return Optional.of(metadataRewrites.get(pair));
 		}
@@ -180,5 +181,4 @@ public enum MetaIndex1_8To1_7_6_10 {
 
 		return null;
 	}
-
 }

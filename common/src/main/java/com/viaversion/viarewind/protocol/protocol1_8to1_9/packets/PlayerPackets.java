@@ -20,8 +20,10 @@ package com.viaversion.viarewind.protocol.protocol1_8to1_9.packets;
 
 import com.viaversion.viarewind.ViaRewind;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.Protocol1_8To1_9;
+import com.viaversion.viarewind.protocol.protocol1_8to1_9.items.ItemRewriter;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.storage.*;
-import com.viaversion.viarewind.protocol.protocol1_8to1_9.storage.*;
+import com.viaversion.viarewind.utils.ChatUtil;
+import com.viaversion.viarewind.utils.PacketUtil;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
 import com.viaversion.viaversion.api.minecraft.item.Item;
@@ -40,9 +42,6 @@ import com.viaversion.viaversion.protocols.protocol1_8.ServerboundPackets1_8;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ClientboundPackets1_9;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ServerboundPackets1_9;
-import com.viaversion.viarewind.protocol.protocol1_8to1_9.items.ItemRewriter;
-import com.viaversion.viarewind.utils.ChatUtil;
-import com.viaversion.viarewind.utils.PacketUtil;
 
 import java.util.ArrayList;
 import java.util.UUID;
@@ -50,7 +49,7 @@ import java.util.UUID;
 public class PlayerPackets {
 
 	public static void register(Protocol<ClientboundPackets1_9, ClientboundPackets1_8,
-			ServerboundPackets1_9, ServerboundPackets1_8> protocol) {
+		ServerboundPackets1_9, ServerboundPackets1_8> protocol) {
 		/*  OUTGOING  */
 
 		//Animation
@@ -254,7 +253,7 @@ public class PlayerPackets {
 		//Title
 		//Player List Header And Footer
 
-		/*  INCMOING  */
+		/*  INCOMING  */
 
 		//Chat Message
 		protocol.registerServerbound(ServerboundPackets1_8.CHAT_MESSAGE, new PacketHandlers() {
@@ -306,7 +305,7 @@ public class PlayerPackets {
 				handler(packetWrapper -> {
 					//Sending any queued animations.
 					PacketWrapper animation = null;
-					while((animation = ((Protocol1_8To1_9)protocol).animationsToSend.poll()) != null) {
+					while ((animation = ((Protocol1_8To1_9) protocol).animationsToSend.poll()) != null) {
 						PacketUtil.sendToServer(animation, Protocol1_8To1_9.class, true, true);
 					}
 
@@ -328,9 +327,8 @@ public class PlayerPackets {
 				handler(packetWrapper -> {
 					//Sending any queued animations.
 					PacketWrapper animation = null;
-					while((animation = ((Protocol1_8To1_9)protocol).animationsToSend.poll()) != null) {
-						PacketUtil.sendToServer(animation, Protocol1_8To1_9.class,
-								true, true);
+					while ((animation = ((Protocol1_8To1_9) protocol).animationsToSend.poll()) != null) {
+						PacketUtil.sendToServer(animation, Protocol1_8To1_9.class, true, true);
 					}
 
 					PlayerPosition pos = packetWrapper.user().get(PlayerPosition.class);
@@ -353,7 +351,7 @@ public class PlayerPackets {
 				handler(packetWrapper -> {
 					//Sending any queued animations.
 					PacketWrapper animation = null;
-					while((animation = ((Protocol1_8To1_9)protocol).animationsToSend.poll()) != null) {
+					while ((animation = ((Protocol1_8To1_9) protocol).animationsToSend.poll()) != null) {
 						PacketUtil.sendToServer(animation, Protocol1_8To1_9.class, true, true);
 					}
 
@@ -380,7 +378,7 @@ public class PlayerPackets {
 				handler(packetWrapper -> {
 					//Sending any queued animations.
 					PacketWrapper animation = null;
-					while((animation = ((Protocol1_8To1_9)protocol).animationsToSend.poll()) != null) {
+					while ((animation = ((Protocol1_8To1_9) protocol).animationsToSend.poll()) != null) {
 						PacketUtil.sendToServer(animation, Protocol1_8To1_9.class, true, true);
 					}
 
@@ -493,7 +491,7 @@ public class PlayerPackets {
 							null, packetWrapper.user());
 					delayedPacket.write(Type.VAR_INT, 0);  //Main Hand
 
-					((Protocol1_8To1_9)protocol).animationsToSend.add(delayedPacket);
+					((Protocol1_8To1_9) protocol).animationsToSend.add(delayedPacket);
 				});
 				handler(packetWrapper -> {
 					packetWrapper.user().get(BlockPlaceDestroyTracker.class).updateMining();

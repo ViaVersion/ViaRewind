@@ -24,19 +24,19 @@ import java.util.List;
 
 public interface EntityReplacement {
 
-    int getEntityId();
+	int getEntityId();
 
-    void setLocation(double x, double y, double z);
+	void setLocation(double x, double y, double z);
 
-    void relMove(double x, double y, double z);
+	void relMove(double x, double y, double z);
 
-    void setYawPitch(float yaw, float pitch);
+	void setYawPitch(float yaw, float pitch);
 
-    void setHeadYaw(float yaw);
+	void setHeadYaw(float yaw);
 
-    void spawn();
+	void spawn();
 
-    void despawn();
+	void despawn();
 
-    void updateMetadata(List<Metadata> metadataList);
+	void updateMetadata(List<Metadata> metadataList);
 }

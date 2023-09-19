@@ -58,6 +58,7 @@ public class SpongePlugin implements ViaRewindPlatform {
         conf.reloadConfig();
     }
 
+	@Override
     public Logger getLogger() {
         return this.logger;
     }

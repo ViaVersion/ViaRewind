@@ -35,7 +35,7 @@ public class SoundRemapper {
 
 	public static String oldNameFromId(int id) {
 		String sound1_9 = sounds1_9.get(id);
-		if (sound1_9==null) return null;
+		if (sound1_9 == null) return null;
 		return getOldName(sound1_9);
 	}
 
