@@ -1,0 +1,9 @@
+plugins {
+    id "com.viaversion.java-conventions"
+}
+
+dependencies {
+    api project(":viarewind-common")
+
+    compileOnly(annotationProcessor("org.spigotmc:spigot-api:1.12.2-R0.1-SNAPSHOT"))
+}

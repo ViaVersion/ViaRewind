@@ -5,7 +5,7 @@
   },
   "license": "GNU GPLv3",
   "global": {
-    "version": "${project.version}",
+    "version": "${version}",
     "links": {
       "homepage": "https://viaversion.com/rewind",
       "source": "https://github.com/ViaVersion/ViaRewind",
@@ -15,6 +15,14 @@
       {
         "name": "Gerrygames",
         "description": "Author"
+      },
+      {
+        "name": "FlorianMichael/EnZaXD",
+        "description": "Author"
+      },
+      {
+        "name": "creeper123123321",
+        "description": "Maintainer"
       }
     ],
     "dependencies": [
@@ -32,7 +40,7 @@
     {
       "id": "viarewind",
       "name": "ViaRewind",
-      "entrypoint": "de.gerrygames.viarewind.SpongePlugin"
+      "entrypoint": "com.viaversion.viarewind.SpongePlugin"
     }
   ]
 }

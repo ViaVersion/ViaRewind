@@ -1,0 +1,9 @@
+plugins {
+    id "com.viaversion.java-conventions"
+}
+
+dependencies {
+    api project(":viarewind-common")
+
+    compileOnly(annotationProcessor("com.velocitypowered:velocity-api:3.0.1"))
+}

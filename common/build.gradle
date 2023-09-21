@@ -1,0 +1,28 @@
+plugins {
+    id "com.viaversion.java-conventions"
+}
+
+plugins {
+    id "net.raphimc.class-token-replacer" version "1.0.0"
+}
+
+dependencies {
+}
+
+sourceSets {
+    main {
+        classTokenReplacer {
+            property("\${version}", rootProject.maven_version)
+            property("\${impl_version}", "git-${project.name}-${rootProject.maven_version}:${project.latestCommitHash()}")
+        }
+    }
+}
+
+String latestCommitHash() {
+    def stdout = new ByteArrayOutputStream()
+    exec {
+        commandLine 'git', 'rev-parse', '--short', 'HEAD'
+        standardOutput = stdout
+    }
+    return stdout.toString().trim()
+}

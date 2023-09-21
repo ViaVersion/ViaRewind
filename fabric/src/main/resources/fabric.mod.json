@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "viarewind",
   "name": "ViaRewind",
-  "version": "${project.version}",
+  "version": "${version}",
   "license": "GPL-3.0",
   "contact": {
     "homepage": "https://viaversion.com/rewind",
@@ -12,11 +12,13 @@
   "icon": "assets/viarewind/textures/squarelogo.png",
   "environment": "*",
   "authors": [
-    "Gerrygames"
+    "Gerrygames",
+    "FlorianMichael/EnZaXD",
+    "creeper123123321"
   ],
   "entrypoints": {
     "viafabric:via_api_initialized": [
-      "de.gerrygames.viarewind.ViaFabricAddon"
+      "com.viaversion.viarewind.ViaFabricAddon"
     ]
   },
   "depends": {

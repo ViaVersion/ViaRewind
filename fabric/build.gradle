@@ -1,0 +1,10 @@
+plugins {
+    id "com.viaversion.java-conventions"
+}
+
+dependencies {
+    api project(":viarewind-common")
+
+    compileOnly(annotationProcessor("net.fabricmc:fabric-loader:0.11.3"))
+    compileOnly(annotationProcessor("org.apache.logging.log4j:log4j-api:2.17.1"))
+}
