@@ -82,13 +82,13 @@ public class RelativeMoveUtil {
 			sentRelY = relY1 + relY2;
 			sentRelZ = relZ1 + relZ2;
 
-			moves = new Vector[] {new Vector(relX1, relY1, relZ1), new Vector(relX2, relY2, relZ2)};
+			moves = new Vector[]{new Vector(relX1, relY1, relZ1), new Vector(relX2, relY2, relZ2)};
 		} else {
 			sentRelX = Math.round(relX / 128f);
 			sentRelY = Math.round(relY / 128f);
 			sentRelZ = Math.round(relZ / 128f);
 
-			moves = new Vector[] {new Vector(sentRelX, sentRelY, sentRelZ)};
+			moves = new Vector[]{new Vector(sentRelX, sentRelY, sentRelZ)};
 		}
 
 		x = x + relX - sentRelX * 128;

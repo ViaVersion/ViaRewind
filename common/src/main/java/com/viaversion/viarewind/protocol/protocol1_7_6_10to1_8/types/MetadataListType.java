@@ -38,7 +38,7 @@ public class MetadataListType extends MetaListTypeTemplate {
 			if (m != null) {
 				list.add(m);
 			}
-		} while(m != null);
+		} while (m != null);
 
 		return list;
 	}
@@ -49,7 +49,7 @@ public class MetadataListType extends MetaListTypeTemplate {
 			Types1_7_6_10.METADATA.write(buffer, meta);
 		}
 		if (metadata.isEmpty()) {
-			Types1_7_6_10.METADATA.write(buffer, new Metadata(0, MetaType1_7_6_10.Byte, (byte)0));
+			Types1_7_6_10.METADATA.write(buffer, new Metadata(0, MetaType1_7_6_10.Byte, (byte) 0));
 		}
 		buffer.writeByte(127);
 	}

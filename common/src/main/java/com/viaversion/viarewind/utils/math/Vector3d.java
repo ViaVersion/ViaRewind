@@ -80,6 +80,7 @@ public class Vector3d {
 		return this;
 	}
 
+	@Override
 	public Vector3d clone() {
 		return new Vector3d(this.x, this.y, this.z);
 	}

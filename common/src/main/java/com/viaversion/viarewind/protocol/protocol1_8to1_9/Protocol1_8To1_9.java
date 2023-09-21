@@ -20,8 +20,7 @@ package com.viaversion.viarewind.protocol.protocol1_8to1_9;
 
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.packets.*;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.storage.*;
-import com.viaversion.viarewind.protocol.protocol1_8to1_9.packets.*;
-import com.viaversion.viarewind.protocol.protocol1_8to1_9.storage.*;
+import com.viaversion.viarewind.utils.Ticker;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
@@ -32,9 +31,10 @@ import com.viaversion.viaversion.protocols.protocol1_8.ServerboundPackets1_8;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ClientboundPackets1_9;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ServerboundPackets1_9;
-import com.viaversion.viarewind.utils.Ticker;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Queue;
+import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class Protocol1_8To1_9 extends AbstractProtocol<ClientboundPackets1_9, ClientboundPackets1_8, ServerboundPackets1_9, ServerboundPackets1_8> {
@@ -43,6 +43,7 @@ public class Protocol1_8To1_9 extends AbstractProtocol<ClientboundPackets1_9, Cl
 
 	public static final Set<String> VALID_ATTRIBUTES = new HashSet<>();
 	public static final ValueTransformer<Double, Integer> TO_OLD_INT = new ValueTransformer<Double, Integer>(Type.INT) {
+		@Override
 		public Integer transform(PacketWrapper wrapper, Double inputValue) {
 			return (int) (inputValue * 32.0D);
 		}

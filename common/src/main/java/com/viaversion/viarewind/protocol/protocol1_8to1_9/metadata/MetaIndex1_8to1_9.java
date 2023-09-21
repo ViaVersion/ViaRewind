@@ -35,7 +35,7 @@ public class MetaIndex1_8to1_9 {
 	}
 
 	private static Optional<MetaIndex> getIndex(Entity1_10Types.EntityType type, int index) {
-		Pair pair = new Pair<>(type, index);
+		Pair<Entity1_10Types.EntityType, Integer> pair = new Pair<>(type, index);
 		if (metadataRewrites.containsKey(pair)) {
 			return Optional.of(metadataRewrites.get(pair));
 		}
@@ -57,5 +57,4 @@ public class MetaIndex1_8to1_9 {
 
 		return null;
 	}
-
 }

@@ -18,6 +18,7 @@
 
 package com.viaversion.viarewind.protocol.protocol1_8to1_9.metadata;
 
+import com.viaversion.viarewind.ViaRewind;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.items.ItemRewriter;
 import com.viaversion.viaversion.api.minecraft.EulerAngle;
 import com.viaversion.viaversion.api.minecraft.Vector;
@@ -26,7 +27,6 @@ import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_8;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.metadata.MetaIndex;
-import com.viaversion.viarewind.ViaRewind;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +38,7 @@ public class MetadataRewriter {
 			MetaIndex metaIndex = MetaIndex1_8to1_9.searchIndex(type, entry.id());
 			try {
 				if (metaIndex != null) {
-					if (metaIndex.getOldType() == MetaType1_8.NonExistent || metaIndex.getNewType()==null) {
+					if (metaIndex.getOldType() == MetaType1_8.NonExistent || metaIndex.getNewType() == null) {
 						list.remove(entry);
 						continue;
 					}
@@ -55,7 +55,7 @@ public class MetadataRewriter {
 							}
 							break;
 						case OptUUID:
-							if (metaIndex.getOldType()!=MetaType1_8.String) {
+							if (metaIndex.getOldType() != MetaType1_8.String) {
 								list.remove(entry);
 								break;
 							}
@@ -85,8 +85,8 @@ public class MetadataRewriter {
 							entry.setValue(value);
 							break;
 						case Boolean:
-							if (metaIndex == MetaIndex.AGEABLE_AGE) entry.setValue((byte)((Boolean) value ? -1 : 0));
-							else entry.setValue((byte)((Boolean) value ? 1 : 0));
+							if (metaIndex == MetaIndex.AGEABLE_AGE) entry.setValue((byte) ((Boolean) value ? -1 : 0));
+							else entry.setValue((byte) ((Boolean) value ? 1 : 0));
 							break;
 						case Slot:
 							entry.setValue(ItemRewriter.toClient((Item) value));

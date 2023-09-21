@@ -18,15 +18,16 @@
 
 package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage;
 
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
 import com.viaversion.viarewind.utils.PacketUtil;
 import com.viaversion.viarewind.utils.Tickable;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
 import com.viaversion.viaversion.api.connection.StoredObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
 
 public class WorldBorder extends StoredObject implements Tickable {
+	private static final int VIEW_DISTANCE = 16;
 	private double x, z;
 	private double oldDiameter, newDiameter;
 	private long lerpTime;
@@ -34,8 +35,6 @@ public class WorldBorder extends StoredObject implements Tickable {
 	private int portalTeleportBoundary;
 	private int warningTime, warningBlocks;
 	private boolean init = false;
-
-	private static final int VIEW_DISTANCE = 16;
 
 	public WorldBorder(UserConnection user) {
 		super(user);
@@ -50,22 +49,6 @@ public class WorldBorder extends StoredObject implements Tickable {
 		sendPackets();
 	}
 
-	private enum Side {
-		NORTH(0, -1),
-		EAST(1, 0),
-		SOUTH(0, 1),
-		WEST(-1, 0),
-		;
-
-		private final int modX;
-		private final int modZ;
-
-		Side(int modX, int modZ) {
-			this.modX = modX;
-			this.modZ = modZ;
-		}
-	}
-
 	private void sendPackets() {
 		PlayerPosition position = getUser().get(PlayerPosition.class);
 
@@ -75,7 +58,7 @@ public class WorldBorder extends StoredObject implements Tickable {
 			double d;
 			double pos;
 			double center;
-			if (side.modX!=0) {
+			if (side.modX != 0) {
 				pos = position.getPosZ();
 				center = z;
 				d = Math.abs(x + radius * side.modX - position.getPosX());
@@ -93,25 +76,25 @@ public class WorldBorder extends StoredObject implements Tickable {
 			double minV = Math.ceil(position.getPosY() - r);
 			double maxV = Math.floor(position.getPosY() + r);
 
-			if (minH<center-radius) minH = Math.ceil(center-radius);
-			if (maxH>center+radius) maxH = Math.floor(center+radius);
-			if (minV<0.0) minV = 0.0;
+			if (minH < center - radius) minH = Math.ceil(center - radius);
+			if (maxH > center + radius) maxH = Math.floor(center + radius);
+			if (minV < 0.0) minV = 0.0;
 
-			double centerH = (minH+maxH) / 2.0;
-			double centerV = (minV+maxV) / 2.0;
+			double centerH = (minH + maxH) / 2.0;
+			double centerV = (minV + maxV) / 2.0;
 
-			int a = (int) Math.floor((maxH-minH) * (maxV-minV) * 0.5);
+			int a = (int) Math.floor((maxH - minH) * (maxV - minV) * 0.5);
 
 			double b = 2.5;
 
 			PacketWrapper particles = PacketWrapper.create(0x2A, null, getUser());
 			particles.write(Type.STRING, "fireworksSpark");
-			particles.write(Type.FLOAT, (float)(side.modX!=0 ? x + (radius * side.modX) : centerH));
-			particles.write(Type.FLOAT, (float)centerV);
-			particles.write(Type.FLOAT, (float)(side.modX==0 ? z + (radius * side.modZ) : centerH));
-			particles.write(Type.FLOAT, (float)(side.modX!=0 ? 0f : (maxH-minH) / b));
-			particles.write(Type.FLOAT, (float)((maxV-minV) / b));
-			particles.write(Type.FLOAT, (float)(side.modX==0 ? 0f : (maxH-minH) / b));
+			particles.write(Type.FLOAT, (float) (side.modX != 0 ? x + (radius * side.modX) : centerH));
+			particles.write(Type.FLOAT, (float) centerV);
+			particles.write(Type.FLOAT, (float) (side.modX == 0 ? z + (radius * side.modZ) : centerH));
+			particles.write(Type.FLOAT, (float) (side.modX != 0 ? 0f : (maxH - minH) / b));
+			particles.write(Type.FLOAT, (float) ((maxV - minV) / b));
+			particles.write(Type.FLOAT, (float) (side.modX == 0 ? 0f : (maxH - minH) / b));
 			particles.write(Type.FLOAT, 0f);
 			particles.write(Type.INT, a);
 
@@ -174,14 +157,14 @@ public class WorldBorder extends StoredObject implements Tickable {
 	}
 
 	public double getSize() {
-		if (lerpTime==0) return newDiameter;
+		if (lerpTime == 0) return newDiameter;
 
 		long time = System.currentTimeMillis() - lerpStartTime;
-		double percent = ((double)(time) / (double)(lerpTime));
-		if (percent>1.0d) percent = 1.0d;
-		else if (percent<0.0d) percent = 0.0d;
+		double percent = ((double) (time) / (double) (lerpTime));
+		if (percent > 1.0d) percent = 1.0d;
+		else if (percent < 0.0d) percent = 0.0d;
 
-		return oldDiameter + (newDiameter-oldDiameter) * percent;
+		return oldDiameter + (newDiameter - oldDiameter) * percent;
 	}
 
 	public int getPortalTeleportBoundary() {
@@ -206,5 +189,21 @@ public class WorldBorder extends StoredObject implements Tickable {
 
 	public void setWarningBlocks(int warningBlocks) {
 		this.warningBlocks = warningBlocks;
+	}
+
+	private enum Side {
+		NORTH(0, -1),
+		EAST(1, 0),
+		SOUTH(0, 1),
+		WEST(-1, 0),
+		;
+
+		private final int modX;
+		private final int modZ;
+
+		Side(int modX, int modZ) {
+			this.modX = modX;
+			this.modZ = modZ;
+		}
 	}
 }

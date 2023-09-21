@@ -25,6 +25,7 @@ import com.viaversion.viaversion.api.connection.StoredObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
 
 public class Levitation extends StoredObject implements Tickable {
 	private int amplifier;
@@ -40,12 +41,12 @@ public class Levitation extends StoredObject implements Tickable {
 			return;
 		}
 
-		int vY = (amplifier+1) * 360;
-		PacketWrapper packet = PacketWrapper.create(0x12, null, Levitation.this.getUser());
+		int vY = (amplifier + 1) * 360;
+		PacketWrapper packet = PacketWrapper.create(ClientboundPackets1_8.ENTITY_VELOCITY, null, Levitation.this.getUser());
 		packet.write(Type.VAR_INT, getUser().get(EntityTracker.class).getPlayerId());
-		packet.write(Type.SHORT, (short)0);
-		packet.write(Type.SHORT, (short)vY);
-		packet.write(Type.SHORT, (short)0);
+		packet.write(Type.SHORT, (short) 0);
+		packet.write(Type.SHORT, (short) vY);
+		packet.write(Type.SHORT, (short) 0);
 		PacketUtil.sendPacket(packet, Protocol1_8To1_9.class);
 	}
 

@@ -32,22 +32,24 @@ public enum MetaType1_7_6_10 implements MetaType {
 	NonExistent(-1, Type.NOTHING);
 
 	private final int typeID;
-	private final Type type;
+	private final Type<?> type;
+
+	MetaType1_7_6_10(int typeID, Type<?> type) {
+		this.typeID = typeID;
+		this.type = type;
+	}
 
 	public static MetaType1_7_6_10 byId(int id) {
 		return values()[id];
 	}
 
-	MetaType1_7_6_10(int typeID, Type type) {
-		this.typeID = typeID;
-		this.type = type;
-	}
-
+	@Override
 	public int typeId() {
 		return this.typeID;
 	}
 
-	public Type type() {
+	@Override
+	public Type<?> type() {
 		return this.type;
 	}
 }

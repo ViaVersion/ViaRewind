@@ -18,14 +18,16 @@
 
 package com.viaversion.viarewind.protocol.protocol1_8to1_9.packets;
 
-import com.viaversion.viarewind.replacement.EntityReplacement;
-import com.viaversion.viarewind.replacement.Replacement;
 import com.viaversion.viarewind.ViaRewind;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.Protocol1_8To1_9;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.entityreplacement.ShulkerBulletReplacement;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.entityreplacement.ShulkerReplacement;
+import com.viaversion.viarewind.protocol.protocol1_8to1_9.items.ReplacementRegistry1_8to1_9;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.metadata.MetadataRewriter;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.storage.EntityTracker;
+import com.viaversion.viarewind.replacement.EntityReplacement;
+import com.viaversion.viarewind.replacement.Replacement;
+import com.viaversion.viarewind.utils.PacketUtil;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.protocol.Protocol;
@@ -38,8 +40,6 @@ import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.protocol1_8.ServerboundPackets1_8;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ClientboundPackets1_9;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ServerboundPackets1_9;
-import com.viaversion.viarewind.protocol.protocol1_8to1_9.items.ReplacementRegistry1_8to1_9;
-import com.viaversion.viarewind.utils.PacketUtil;
 
 import java.util.List;
 

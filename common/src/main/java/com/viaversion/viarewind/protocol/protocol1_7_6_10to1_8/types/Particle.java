@@ -66,7 +66,7 @@ public enum Particle {
 
 	public final String name;
 	public final int extra;
-	private static final HashMap<String, Particle> particleMap = new HashMap();
+	private static final HashMap<String, Particle> particleMap = new HashMap<>();
 
 	Particle(String name) {
 		this(name, 0);
@@ -82,9 +82,9 @@ public enum Particle {
 	}
 
 	public static Particle find(int id) {
-		if (id<0) return null;
+		if (id < 0) return null;
 		Particle[] values = Particle.values();
-		return id>=values.length ? null : values[id];
+		return id >= values.length ? null : values[id];
 	}
 
 	static {
@@ -93,6 +93,5 @@ public enum Particle {
 		for (Particle particle : particles) {
 			particleMap.put(particle.name, particle);
 		}
-
 	}
 }

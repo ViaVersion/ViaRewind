@@ -39,7 +39,7 @@ public abstract class TitleRenderProvider implements Provider {
 		setFadeOut(uuid, fadeOut);
 
 		AtomicInteger time = getTime(uuid);
-		if (time.get()>0) time.set(getFadeIn(uuid) + getStay(uuid) + getFadeOut(uuid));
+		if (time.get() > 0) time.set(getFadeIn(uuid) + getStay(uuid) + getFadeOut(uuid));
 	}
 
 	public void reset(UUID uuid) {
@@ -83,17 +83,17 @@ public abstract class TitleRenderProvider implements Provider {
 	}
 
 	public void setFadeIn(UUID uuid, int fadeIn) {
-		if (fadeIn>=0) this.fadeIn.put(uuid, fadeIn);
+		if (fadeIn >= 0) this.fadeIn.put(uuid, fadeIn);
 		else this.fadeIn.remove(uuid);
 	}
 
 	public void setStay(UUID uuid, int stay) {
-		if (stay>=0) this.stay.put(uuid, stay);
+		if (stay >= 0) this.stay.put(uuid, stay);
 		else this.stay.remove(uuid);
 	}
 
 	public void setFadeOut(UUID uuid, int fadeOut) {
-		if (fadeOut>=0) this.fadeOut.put(uuid, fadeOut);
+		if (fadeOut >= 0) this.fadeOut.put(uuid, fadeOut);
 		else this.fadeOut.remove(uuid);
 	}
 }

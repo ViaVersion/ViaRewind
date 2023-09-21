@@ -18,12 +18,12 @@
 
 package com.viaversion.viarewind.protocol.protocol1_8to1_9.packets;
 
+import com.viaversion.viarewind.ViaRewind;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.Protocol1_8To1_9;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.items.ReplacementRegistry1_8to1_9;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.sound.Effect;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.sound.SoundRemapper;
 import com.viaversion.viarewind.utils.PacketUtil;
-import com.viaversion.viarewind.ViaRewind;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
 import com.viaversion.viaversion.api.minecraft.Environment;

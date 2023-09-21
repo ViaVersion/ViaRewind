@@ -55,7 +55,7 @@ public class Windows extends StoredObject {
 	}
 
 	public Item[] getBrewingItems(short windowId) {
-		return brewingItems.computeIfAbsent(windowId, key -> new Item[] {
+		return brewingItems.computeIfAbsent(windowId, key -> new Item[]{
 				new DataItem(),
 				new DataItem(),
 				new DataItem(),

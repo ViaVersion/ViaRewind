@@ -18,20 +18,20 @@
 
 package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.entityreplacements;
 
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.ClientboundPackets1_7;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.metadata.MetadataRewriter;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.MetaType1_7_6_10;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
 import com.viaversion.viarewind.utils.PacketUtil;
 import com.viaversion.viarewind.utils.math.AABB;
 import com.viaversion.viarewind.utils.math.Vector3d;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.ClientboundPackets1_7;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_8;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.MetaType1_7_6_10;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,19 +50,17 @@ public class ArmorStandReplacement extends EntityReplacement1_7to1_8 {
 	private boolean small = false;
 	private boolean marker = false;
 
-	public int getEntityId() {
-		return this.entityId;
-	}
-
-	private enum State {
-		HOLOGRAM, ZOMBIE
-	}
-
 	public ArmorStandReplacement(int entityId, UserConnection user) {
 		super(user);
 		this.entityId = entityId;
 	}
 
+	@Override
+	public int getEntityId() {
+		return this.entityId;
+	}
+
+	@Override
 	public void setLocation(double x, double y, double z) {
 		if (x != this.locX || y != this.locY || z != this.locZ) {
 			this.locX = x;
@@ -72,6 +70,7 @@ public class ArmorStandReplacement extends EntityReplacement1_7to1_8 {
 		}
 	}
 
+	@Override
 	public void relMove(double x, double y, double z) {
 		if (x == 0.0 && y == 0.0 && z == 0.0) return;
 		this.locX += x;
@@ -80,6 +79,7 @@ public class ArmorStandReplacement extends EntityReplacement1_7to1_8 {
 		updateLocation(false);
 	}
 
+	@Override
 	public void setYawPitch(float yaw, float pitch) {
 		if (this.yaw != yaw && this.pitch != pitch || this.headYaw != yaw) {
 			this.yaw = yaw;
@@ -89,6 +89,7 @@ public class ArmorStandReplacement extends EntityReplacement1_7to1_8 {
 		}
 	}
 
+	@Override
 	public void setHeadYaw(float yaw) {
 		if (this.headYaw != yaw) {
 			this.headYaw = yaw;
@@ -96,6 +97,7 @@ public class ArmorStandReplacement extends EntityReplacement1_7to1_8 {
 		}
 	}
 
+	@Override
 	public void updateMetadata(List<Metadata> metadataList) {
 		for (Metadata metadata : metadataList) {
 			datawatcher.removeIf(m -> m.id() == metadata.id());
@@ -112,7 +114,7 @@ public class ArmorStandReplacement extends EntityReplacement1_7to1_8 {
 				flags = ((Number) metadata.getValue()).byteValue();
 			} else if (metadata.id() == 2 && metadata.metaType() == MetaType1_8.String) {
 				name = metadata.getValue().toString();
-				if (name != null && name.equals("")) name = null;
+				if (name != null && name.isEmpty()) name = null;
 			} else if (metadata.id() == 10 && metadata.metaType() == MetaType1_8.Byte) {
 				armorStandFlags = ((Number) metadata.getValue()).byteValue();
 			} else if (metadata.id() == 3 && metadata.metaType() == MetaType1_8.Byte) {
@@ -154,7 +156,7 @@ public class ArmorStandReplacement extends EntityReplacement1_7to1_8 {
 	}
 
 	private void updateHologramLocation(boolean remount) {
-		if(remount) {
+		if (remount) {
 			PacketWrapper detach = PacketWrapper.create(ClientboundPackets1_7.ATTACH_ENTITY, null, user);
 			detach.write(Type.INT, entityIds[1]);
 			detach.write(Type.INT, -1);
@@ -165,7 +167,7 @@ public class ArmorStandReplacement extends EntityReplacement1_7to1_8 {
 		// Don't ask me where this offset is coming from
 		sendTeleport(entityIds[0], locX, (locY + (marker ? 54.85 : small ? 56 : 57)), locZ, 0, 0); // Skull
 
-		if(remount) {
+		if (remount) {
 			sendTeleport(entityIds[1], locX, locY + 56.75, locZ, 0, 0); // Horse
 
 			PacketWrapper attach = PacketWrapper.create(ClientboundPackets1_7.ATTACH_ENTITY, null, user);
@@ -217,6 +219,7 @@ public class ArmorStandReplacement extends EntityReplacement1_7to1_8 {
 		metadataPacket.write(Types1_7_6_10.METADATA_LIST, metadataList);
 	}
 
+	@Override
 	public void spawn() {
 		if (entityIds != null) despawn();
 
@@ -233,7 +236,7 @@ public class ArmorStandReplacement extends EntityReplacement1_7to1_8 {
 	private void spawnZombie() {
 		sendSpawn(entityId, 54, locX, locY, locZ);
 
-		entityIds = new int[] {entityId};
+		entityIds = new int[]{entityId};
 	}
 
 	private void spawnHologram() {
@@ -267,6 +270,7 @@ public class ArmorStandReplacement extends EntityReplacement1_7to1_8 {
 		return new AABB(min, max);
 	}
 
+	@Override
 	public void despawn() {
 		if (entityIds == null) return;
 		PacketWrapper despawn = PacketWrapper.create(ClientboundPackets1_7.DESTROY_ENTITIES, null, user);
@@ -276,5 +280,9 @@ public class ArmorStandReplacement extends EntityReplacement1_7to1_8 {
 		}
 		entityIds = null;
 		PacketUtil.sendPacket(despawn, Protocol1_7_6_10To1_8.class, true, true);
+	}
+
+	private enum State {
+		HOLOGRAM, ZOMBIE
 	}
 }

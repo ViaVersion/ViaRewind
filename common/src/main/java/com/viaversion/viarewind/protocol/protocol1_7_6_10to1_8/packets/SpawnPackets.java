@@ -18,19 +18,20 @@
 
 package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.packets;
 
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.ClientboundPackets1_7;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.entityreplacements.ArmorStandReplacement;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.entityreplacements.EndermiteReplacement;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.entityreplacements.GuardianReplacement;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.entityreplacements.RabbitReplacement;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.items.ReplacementRegistry1_7_6_10to1_8;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.metadata.MetadataRewriter;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.EntityTracker;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.GameProfileStorage;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
 import com.viaversion.viarewind.replacement.EntityReplacement;
 import com.viaversion.viarewind.replacement.Replacement;
 import com.viaversion.viarewind.utils.PacketUtil;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.ClientboundPackets1_7;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.items.ReplacementRegistry1_7_6_10to1_8;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
@@ -39,7 +40,6 @@ import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_8;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
 
 import java.util.List;
 import java.util.UUID;
@@ -81,7 +81,7 @@ public class SpawnPackets {
 							PacketWrapper equipmentPacket = PacketWrapper.create(ClientboundPackets1_7.ENTITY_EQUIPMENT, packetWrapper.user());
 							equipmentPacket.write(Type.INT, entityId);
 							equipmentPacket.write(Type.SHORT, i);
-							equipmentPacket.write(Types1_7_6_10.COMPRESSED_NBT_ITEM, i == 4 ? gameProfile.getSkull() :null);
+							equipmentPacket.write(Types1_7_6_10.COMPRESSED_NBT_ITEM, i == 4 ? gameProfile.getSkull() : null);
 							PacketUtil.sendPacket(equipmentPacket, Protocol1_7_6_10To1_8.class);
 						}
 					}
@@ -230,7 +230,7 @@ public class SpawnPackets {
 							replacement = new GuardianReplacement(entityId, packetWrapper.user());
 						} else if (typeId == 67) {
 							replacement = new EndermiteReplacement(entityId, packetWrapper.user());
-						} else if (typeId == 101){
+						} else if (typeId == 101) {
 							replacement = new RabbitReplacement(entityId, packetWrapper.user());
 						}
 						replacement.setLocation(x / 32.0, y / 32.0, z / 32.0);

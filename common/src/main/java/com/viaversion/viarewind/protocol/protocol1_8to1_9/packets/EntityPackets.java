@@ -19,12 +19,15 @@
 package com.viaversion.viarewind.protocol.protocol1_8to1_9.packets;
 
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.Protocol1_8To1_9;
+import com.viaversion.viarewind.protocol.protocol1_8to1_9.items.ItemRewriter;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.metadata.MetadataRewriter;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.storage.Cooldown;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.storage.EntityTracker;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.storage.Levitation;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.storage.PlayerPosition;
+import com.viaversion.viarewind.protocol.protocol1_8to1_9.util.RelativeMoveUtil;
 import com.viaversion.viarewind.replacement.EntityReplacement;
+import com.viaversion.viarewind.utils.PacketUtil;
 import com.viaversion.viaversion.api.minecraft.Vector;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
@@ -39,9 +42,6 @@ import com.viaversion.viaversion.protocols.protocol1_8.ServerboundPackets1_8;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ClientboundPackets1_9;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ServerboundPackets1_9;
 import com.viaversion.viaversion.util.Pair;
-import com.viaversion.viarewind.protocol.protocol1_8to1_9.items.ItemRewriter;
-import com.viaversion.viarewind.protocol.protocol1_8to1_9.util.RelativeMoveUtil;
-import com.viaversion.viarewind.utils.PacketUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -97,7 +97,7 @@ public class EntityPackets {
 					boolean onGround = packetWrapper.passthrough(Type.BOOLEAN);
 
 					if (moves.length > 1) {
-						PacketWrapper secondPacket = PacketWrapper.create(0x15, null, packetWrapper.user());
+						PacketWrapper secondPacket = PacketWrapper.create(ClientboundPackets1_8.ENTITY_POSITION, null, packetWrapper.user());
 						secondPacket.write(Type.VAR_INT, packetWrapper.get(Type.VAR_INT, 0));
 						secondPacket.write(Type.BYTE, (byte) moves[1].blockX());
 						secondPacket.write(Type.BYTE, (byte) moves[1].blockY());
@@ -147,7 +147,7 @@ public class EntityPackets {
 					}
 
 					if (moves.length > 1) {
-						PacketWrapper secondPacket = PacketWrapper.create(0x17, null, packetWrapper.user());
+						PacketWrapper secondPacket = PacketWrapper.create(ClientboundPackets1_8.ENTITY_POSITION_AND_ROTATION, null, packetWrapper.user());
 						secondPacket.write(Type.VAR_INT, packetWrapper.get(Type.VAR_INT, 0));
 						secondPacket.write(Type.BYTE, (byte) moves[1].blockX());
 						secondPacket.write(Type.BYTE, (byte) moves[1].blockY());
@@ -355,7 +355,7 @@ public class EntityPackets {
 					entityTracker.setPassengers(vehicle, passengers);
 					if (!oldPassengers.isEmpty()) {
 						for (Integer passenger : oldPassengers) {
-							PacketWrapper detach = PacketWrapper.create(0x1B, null, packetWrapper.user());
+							PacketWrapper detach = PacketWrapper.create(ClientboundPackets1_8.ATTACH_ENTITY, null, packetWrapper.user());
 							detach.write(Type.INT, passenger);
 							detach.write(Type.INT, -1);
 							detach.write(Type.BOOLEAN, false);
@@ -365,7 +365,7 @@ public class EntityPackets {
 					for (int i = 0; i < count; i++) {
 						int v = i == 0 ? vehicle : passengers.get(i - 1);
 						int p = passengers.get(i);
-						PacketWrapper attach = PacketWrapper.create(0x1B, null, packetWrapper.user());
+						PacketWrapper attach = PacketWrapper.create(ClientboundPackets1_8.ATTACH_ENTITY, null, packetWrapper.user());
 						attach.write(Type.INT, p);
 						attach.write(Type.INT, v);
 						attach.write(Type.BOOLEAN, false);
@@ -436,16 +436,16 @@ public class EntityPackets {
 						String key = packetWrapper.read(Type.STRING);
 						boolean skip = !Protocol1_8To1_9.VALID_ATTRIBUTES.contains(key);
 						double value = packetWrapper.read(Type.DOUBLE);
-						int modifiersize = packetWrapper.read(Type.VAR_INT);
+						int modifierSize = packetWrapper.read(Type.VAR_INT);
 						if (!skip) {
 							packetWrapper.write(Type.STRING, key);
 							packetWrapper.write(Type.DOUBLE, value);
-							packetWrapper.write(Type.VAR_INT, modifiersize);
+							packetWrapper.write(Type.VAR_INT, modifierSize);
 						} else {
 							removed++;
 						}
 						ArrayList<Pair<Byte, Double>> modifiers = new ArrayList<>();
-						for (int j = 0; j < modifiersize; j++) {
+						for (int j = 0; j < modifierSize; j++) {
 							UUID uuid = packetWrapper.read(Type.UUID);
 							double amount = packetWrapper.read(Type.DOUBLE);
 							byte operation = packetWrapper.read(Type.BYTE);

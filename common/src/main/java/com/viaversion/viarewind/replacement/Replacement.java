@@ -45,7 +45,7 @@ public class Replacement {
 		this.id = id;
 		this.data = data;
 		this.name = name;
-		if (name!=null) {
+		if (name != null) {
 			this.resetName = "§r" + name;
 			this.bracketName = " §r§7(" + name + "§r§7)";
 		}
@@ -65,9 +65,9 @@ public class Replacement {
 
 	public Item replace(Item item) {
 		item.setIdentifier(id);
-		if (data!=-1) item.setData((short)data);
-		if (name!=null) {
-			CompoundTag compoundTag = item.tag()==null ? new CompoundTag() : item.tag();
+		if (data != -1) item.setData((short) data);
+		if (name != null) {
+			CompoundTag compoundTag = item.tag() == null ? new CompoundTag() : item.tag();
 			if (!compoundTag.contains("display")) compoundTag.put("display", new CompoundTag());
 			CompoundTag display = compoundTag.get("display");
 			if (display.contains("Name")) {
