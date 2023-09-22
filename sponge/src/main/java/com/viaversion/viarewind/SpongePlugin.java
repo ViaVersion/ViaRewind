@@ -33,33 +33,35 @@ import java.util.logging.Logger;
 
 @Plugin("viarewind")
 public class SpongePlugin implements ViaRewindPlatform {
-    private Logger logger;
-    @SuppressWarnings("SpongeInjection")
-    @Inject
-    private org.apache.logging.log4j.Logger loggerSlf4j;
+	private Logger logger;
 
-    @Inject
-    @ConfigDir(sharedRoot = false)
-    private Path configDir;
-    private ViaRewindConfig conf;
+	@SuppressWarnings("SpongeInjection")
+	@Inject
+	private org.apache.logging.log4j.Logger loggerSlf4j;
 
-    @Listener(order = Order.LATE)
-    public void loadPlugin(ConstructPluginEvent e) {
-        // Setup Logger
-        this.logger = new LoggerWrapper(loggerSlf4j);
-        // Init!
-        conf = new ViaRewindConfig(configDir.resolve("config.yml").toFile());
-        conf.reloadConfig();
-        this.init(conf);
-    }
+	@Inject
+	@ConfigDir(sharedRoot = false)
+	private Path configDir;
 
-    @Listener
-    public void reload(RefreshGameEvent e) {
-        conf.reloadConfig();
-    }
+	private ViaRewindConfig conf;
+
+	@Listener(order = Order.LATE)
+	public void loadPlugin(ConstructPluginEvent e) {
+		// Setup Logger
+		this.logger = new LoggerWrapper(loggerSlf4j);
+		// Init!
+		conf = new ViaRewindConfig(configDir.resolve("config.yml").toFile());
+		conf.reloadConfig();
+		this.init(conf);
+	}
+
+	@Listener
+	public void reload(RefreshGameEvent e) {
+		conf.reloadConfig();
+	}
 
 	@Override
-    public Logger getLogger() {
-        return this.logger;
-    }
+	public Logger getLogger() {
+		return this.logger;
+	}
 }

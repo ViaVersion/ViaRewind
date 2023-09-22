@@ -17,6 +17,11 @@ dependencies {
     api project(":viarewind-velocity")
 }
 
+java {
+    withSourcesJar()
+    withJavadocJar()
+}
+
 shadowJar {
     archiveClassifier.set("")
     archiveBaseName.set("ViaRewind-" + project.maven_version)
