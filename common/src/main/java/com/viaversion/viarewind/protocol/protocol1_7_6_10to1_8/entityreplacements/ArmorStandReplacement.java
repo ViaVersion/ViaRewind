@@ -43,7 +43,6 @@ public class ArmorStandReplacement extends EntityReplacement1_7to1_8 {
 	private double locX, locY, locZ;
 	private State currentState = null;
 	private boolean invisible = false;
-	private boolean nameTagVisible = false;
 	private String name = null;
 	private float yaw, pitch;
 	private float headYaw;
@@ -117,8 +116,6 @@ public class ArmorStandReplacement extends EntityReplacement1_7to1_8 {
 				if (name != null && name.isEmpty()) name = null;
 			} else if (metadata.id() == 10 && metadata.metaType() == MetaType1_8.Byte) {
 				armorStandFlags = ((Number) metadata.getValue()).byteValue();
-			} else if (metadata.id() == 3 && metadata.metaType() == MetaType1_8.Byte) {
-				nameTagVisible = ((Number) metadata.getValue()).byteValue() != 0;
 			}
 		}
 		invisible = (flags & 0x20) != 0;
@@ -126,7 +123,7 @@ public class ArmorStandReplacement extends EntityReplacement1_7to1_8 {
 		marker = (armorStandFlags & 0x10) != 0;
 
 		State prevState = currentState;
-		if (invisible && marker) {
+		if (invisible && (name != null || marker)) {
 			currentState = State.HOLOGRAM;
 		} else {
 			currentState = State.ZOMBIE;
