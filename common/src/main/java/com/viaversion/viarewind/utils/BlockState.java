@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.viaversion.viarewind.storage;
+package com.viaversion.viarewind.utils;
 
 public class BlockState {
 

@@ -20,7 +20,7 @@ package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.items;
 
 import com.viaversion.viarewind.replacement.Replacement;
 import com.viaversion.viarewind.replacement.ReplacementRegistry;
-import com.viaversion.viarewind.storage.BlockState;
+import com.viaversion.viarewind.utils.BlockState;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 
 public class ReplacementRegistry1_7_6_10to1_8 {
