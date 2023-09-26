@@ -74,7 +74,7 @@ def latestCommitMessage() {
 def branchName() {
     def byteOut = new ByteArrayOutputStream()
     exec {
-        commandLine 'git', 'symbolic-ref', '--short', 'HEAD'
+        commandLine 'git', 'rev-parse', '--abbrev-ref', 'HEAD'
         standardOutput = byteOut
     }
     return byteOut.toString('UTF-8').trim()
