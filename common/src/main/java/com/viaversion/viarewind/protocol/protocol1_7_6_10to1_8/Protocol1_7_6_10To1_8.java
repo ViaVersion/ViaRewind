@@ -93,7 +93,7 @@ public class Protocol1_7_6_10To1_8 extends AbstractProtocol<ClientboundPackets1_
 		this.registerServerbound(ServerboundPackets1_7_2_5.KEEP_ALIVE, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Type.INT, Type.VAR_INT);
+				map(Type.INT, Type.VAR_INT); // id
 			}
 		});
 	}

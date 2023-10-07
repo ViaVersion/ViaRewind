@@ -45,9 +45,6 @@ import java.util.UUID;
 public class EntityPackets {
 
 	public static void register(Protocol1_7_6_10To1_8 protocol) {
-
-		/*  OUTGOING  */
-
 		protocol.registerClientbound(ClientboundPackets1_8.ENTITY_EQUIPMENT, new PacketHandlers() {
 			@Override
 			public void register() {
