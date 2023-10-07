@@ -5,9 +5,9 @@
 **ViaVersion addon to allow 1.8.x and 1.7.x clients on newer server versions.** <br>
 Runs on 1.9-latest servers or 1.8 clients and lower.
 
-**On Fabric, use either [ViaFabric](https://modrinth.com/mod/viafabric) or [ViaFabricPlus](https://modrinth.com/mod/viafabricplus). To override the included version**
+**You can override the included version in [ViaFabric](https://modrinth.com/mod/viafabric) or [ViaProxy](https://github.com/ViaVersion/ViaProxy):**
 - in **ViaFabric**, put ViaRewind into the `mods` folder
-- in **ViaFabricPlus**, put ViaRewind into the `ViaFabricPlus/jars` folder
+- in **ViaProxy**, put ViaRewind into the `jars` folder
 
 **Depending on the platform and version, this also requires [ViaVersion](https://modrinth.com/mod/viaversion) and [ViaBackwards](https://modrinth.com/mod/viabackwards).**
 
