@@ -21,18 +21,13 @@ package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage;
 import com.viaversion.viaversion.api.connection.StoredObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 
+/**
+ * @see com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.provider.CompressionHandlerProvider
+ */
 public class CompressionSendStorage extends StoredObject {
-	private boolean removeCompression = false;
+	public boolean removeCompression = false;
 
 	public CompressionSendStorage(UserConnection user) {
 		super(user);
-	}
-
-	public boolean isRemoveCompression() {
-		return removeCompression;
-	}
-
-	public void setRemoveCompression(boolean removeCompression) {
-		this.removeCompression = removeCompression;
 	}
 }

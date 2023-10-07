@@ -22,6 +22,7 @@ import com.viaversion.viarewind.protocol.protocol1_7_2_5to1_7_6_10.ClientboundPa
 import com.viaversion.viarewind.protocol.protocol1_7_2_5to1_7_6_10.ServerboundPackets1_7_2_5;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.packets.*;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.provider.CompressionHandlerProvider;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.provider.compression.TrackingCompressionHandlerProvider;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.*;
 import com.viaversion.viarewind.utils.Ticker;
 import com.viaversion.viaversion.api.Via;
@@ -33,12 +34,13 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
+import com.viaversion.viaversion.protocols.base.ServerboundLoginPackets;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.protocol1_8.ServerboundPackets1_8;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
-public class Protocol1_7_6_10To1_8 extends AbstractProtocol<ClientboundPackets1_8, ClientboundPackets1_7_2_5,
-		ServerboundPackets1_8, ServerboundPackets1_7_2_5> {
+public class Protocol1_7_6_10To1_8 extends AbstractProtocol<ClientboundPackets1_8, ClientboundPackets1_7_2_5, ServerboundPackets1_8, ServerboundPackets1_7_2_5> {
 
 	public Protocol1_7_6_10To1_8() {
 		super(ClientboundPackets1_8.class, ClientboundPackets1_7_2_5.class, ServerboundPackets1_8.class, ServerboundPackets1_7_2_5.class);
@@ -53,14 +55,40 @@ public class Protocol1_7_6_10To1_8 extends AbstractProtocol<ClientboundPackets1_
 		SpawnPackets.register(this);
 		WorldPackets.register(this);
 
+		this.registerClientbound(State.LOGIN, ClientboundLoginPackets.HELLO.getId(), ClientboundLoginPackets.HELLO.getId(), new PacketHandlers() {
+			@Override
+			public void register() {
+				map(Type.STRING); // server hash
+				map(Type.BYTE_ARRAY_PRIMITIVE, Type.SHORT_BYTE_ARRAY); // public key
+				map(Type.BYTE_ARRAY_PRIMITIVE, Type.SHORT_BYTE_ARRAY); // verification token
+			}
+		});
+		this.registerClientbound(State.LOGIN, ClientboundLoginPackets.LOGIN_COMPRESSION.getId(), ClientboundLoginPackets.LOGIN_COMPRESSION.getId(), new PacketHandlers() {
+			@Override
+			public void register() {
+				handler(wrapper -> {
+					final int threshold = wrapper.read(Type.VAR_INT);
+
+					Via.getManager().getProviders().get(CompressionHandlerProvider.class).onHandleLoginCompressionPacket(wrapper.user(), threshold);
+					wrapper.cancel();
+				});
+			}
+		});
+		this.cancelClientbound(ClientboundPackets1_8.SET_COMPRESSION); // unused
 		this.registerClientbound(ClientboundPackets1_8.KEEP_ALIVE, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Type.VAR_INT, Type.INT);
+				map(Type.VAR_INT, Type.INT); // id
 			}
 		});
 
-		this.cancelClientbound(ClientboundPackets1_8.SET_COMPRESSION); // unused
+		this.registerServerbound(State.LOGIN, ServerboundLoginPackets.ENCRYPTION_KEY.getId(), ServerboundLoginPackets.ENCRYPTION_KEY.getId(), new PacketHandlers() {
+			@Override
+			public void register() {
+				map(Type.SHORT_BYTE_ARRAY, Type.BYTE_ARRAY_PRIMITIVE); // shared secret
+				map(Type.SHORT_BYTE_ARRAY, Type.BYTE_ARRAY_PRIMITIVE); // verification token
+			}
+		});
 
 		this.registerServerbound(ServerboundPackets1_7_2_5.KEEP_ALIVE, new PacketHandlers() {
 			@Override
@@ -68,43 +96,11 @@ public class Protocol1_7_6_10To1_8 extends AbstractProtocol<ClientboundPackets1_
 				map(Type.INT, Type.VAR_INT);
 			}
 		});
-
-		//Encryption Request
-		this.registerClientbound(State.LOGIN, 0x01, 0x01, new PacketHandlers() {
-			@Override
-			public void register() {
-				map(Type.STRING);  //Server ID
-				map(Type.BYTE_ARRAY_PRIMITIVE, Type.SHORT_BYTE_ARRAY); // Public key
-				map(Type.BYTE_ARRAY_PRIMITIVE, Type.SHORT_BYTE_ARRAY); // Verification token
-			}
-		});
-
-		//Set Compression
-		this.registerClientbound(State.LOGIN, 0x03, 0x03, new PacketHandlers() {
-			@Override
-			public void register() {
-				handler(packetWrapper -> {
-					Via.getManager().getProviders().get(CompressionHandlerProvider.class)
-							.handleSetCompression(packetWrapper.user(), packetWrapper.read(Type.VAR_INT));
-					packetWrapper.cancel();
-				});
-			}
-		});
-
-		//Encryption Response
-		this.registerServerbound(State.LOGIN, 0x01, 0x01, new PacketHandlers() {
-			@Override
-			public void register() {
-				map(Type.SHORT_BYTE_ARRAY, Type.BYTE_ARRAY_PRIMITIVE); // Shared secret
-				map(Type.SHORT_BYTE_ARRAY, Type.BYTE_ARRAY_PRIMITIVE); // Verification token
-			}
-		});
 	}
 
 	@Override
 	public void transform(Direction direction, State state, PacketWrapper packetWrapper) throws Exception {
-		Via.getManager().getProviders().get(CompressionHandlerProvider.class)
-				.handleTransform(packetWrapper.user());
+		Via.getManager().getProviders().get(CompressionHandlerProvider.class).onTransformPacket(packetWrapper.user());
 
 		super.transform(direction, state, packetWrapper);
 	}
@@ -126,6 +122,6 @@ public class Protocol1_7_6_10To1_8 extends AbstractProtocol<ClientboundPackets1_
 
 	@Override
 	public void register(ViaProviders providers) {
-		providers.register(CompressionHandlerProvider.class, new CompressionHandlerProvider());
+		providers.register(CompressionHandlerProvider.class, new TrackingCompressionHandlerProvider());
 	}
 }
