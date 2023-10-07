@@ -19,9 +19,9 @@
 package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.packets;
 
 import com.viaversion.viarewind.ViaRewind;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.ClientboundPackets1_7;
+import com.viaversion.viarewind.protocol.protocol1_7_2_5to1_7_6_10.ClientboundPackets1_7_2_5;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.ServerboundPackets1_7;
+import com.viaversion.viarewind.protocol.protocol1_7_2_5to1_7_6_10.ServerboundPackets1_7_2_5;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.entityreplacements.ArmorStandReplacement;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.items.ItemRewriter;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.provider.TitleRenderProvider;
@@ -244,7 +244,7 @@ public class PlayerPackets {
 						}
 
 						for (int i = 0; i < equipment.length; i++) {
-							PacketWrapper setSlot = PacketWrapper.create(ClientboundPackets1_7.SET_SLOT, packetWrapper.user());
+							PacketWrapper setSlot = PacketWrapper.create(ClientboundPackets1_7_2_5.SET_SLOT, packetWrapper.user());
 							setSlot.write(Type.BYTE, (byte) 0);
 							setSlot.write(Type.SHORT, (short) (8 - i));
 							setSlot.write(Types1_7_6_10.COMPRESSED_NBT_ITEM, equipment[i]);
@@ -311,7 +311,7 @@ public class PlayerPackets {
 								gameProfile.setDisplayName(ChatUtil.jsonToLegacy(displayName));
 							}
 
-							PacketWrapper packet = PacketWrapper.create(ClientboundPackets1_7.PLAYER_INFO, null, packetWrapper.user());
+							PacketWrapper packet = PacketWrapper.create(ClientboundPackets1_7_2_5.PLAYER_INFO, null, packetWrapper.user());
 							packet.write(Type.STRING, gameProfile.getDisplayName());
 							packet.write(Type.BOOLEAN, true);
 							packet.write(Type.SHORT, (short) ping);
@@ -338,7 +338,7 @@ public class PlayerPackets {
 									}
 
 									for (short slot = 0; slot < equipment.length; slot++) {
-										PacketWrapper equipmentPacket = PacketWrapper.create(ClientboundPackets1_7.ENTITY_EQUIPMENT, packetWrapper.user());
+										PacketWrapper equipmentPacket = PacketWrapper.create(ClientboundPackets1_7_2_5.ENTITY_EQUIPMENT, packetWrapper.user());
 										equipmentPacket.write(Type.INT, entityId);
 										equipmentPacket.write(Type.SHORT, slot);
 										equipmentPacket.write(Types1_7_6_10.COMPRESSED_NBT_ITEM, equipment[slot]);
@@ -354,7 +354,7 @@ public class PlayerPackets {
 							GameProfileStorage.GameProfile gameProfile = gameProfileStorage.get(uuid);
 							if (gameProfile == null) continue;
 
-							PacketWrapper packet = PacketWrapper.create(ClientboundPackets1_7.PLAYER_INFO, null, packetWrapper.user());
+							PacketWrapper packet = PacketWrapper.create(ClientboundPackets1_7_2_5.PLAYER_INFO, null, packetWrapper.user());
 							packet.write(Type.STRING, gameProfile.getDisplayName());
 							packet.write(Type.BOOLEAN, false);
 							packet.write(Type.SHORT, (short) gameProfile.ping);
@@ -362,7 +362,7 @@ public class PlayerPackets {
 
 							gameProfile.ping = ping;
 
-							packet = PacketWrapper.create(ClientboundPackets1_7.PLAYER_INFO, null, packetWrapper.user());
+							packet = PacketWrapper.create(ClientboundPackets1_7_2_5.PLAYER_INFO, null, packetWrapper.user());
 							packet.write(Type.STRING, gameProfile.getDisplayName());
 							packet.write(Type.BOOLEAN, true);
 							packet.write(Type.SHORT, (short) ping);
@@ -374,7 +374,7 @@ public class PlayerPackets {
 							GameProfileStorage.GameProfile gameProfile = gameProfileStorage.get(uuid);
 							if (gameProfile == null || gameProfile.displayName == null && displayName == null) continue;
 
-							PacketWrapper packet = PacketWrapper.create(ClientboundPackets1_7.PLAYER_INFO, null, packetWrapper.user());
+							PacketWrapper packet = PacketWrapper.create(ClientboundPackets1_7_2_5.PLAYER_INFO, null, packetWrapper.user());
 							packet.write(Type.STRING, gameProfile.getDisplayName());
 							packet.write(Type.BOOLEAN, false);
 							packet.write(Type.SHORT, (short) gameProfile.ping);
@@ -384,7 +384,7 @@ public class PlayerPackets {
 								gameProfile.setDisplayName(displayName);
 							}
 
-							packet = PacketWrapper.create(ClientboundPackets1_7.PLAYER_INFO, null, packetWrapper.user());
+							packet = PacketWrapper.create(ClientboundPackets1_7_2_5.PLAYER_INFO, null, packetWrapper.user());
 							packet.write(Type.STRING, gameProfile.getDisplayName());
 							packet.write(Type.BOOLEAN, true);
 							packet.write(Type.SHORT, (short) gameProfile.ping);
@@ -393,7 +393,7 @@ public class PlayerPackets {
 							GameProfileStorage.GameProfile gameProfile = gameProfileStorage.remove(uuid);
 							if (gameProfile == null) continue;
 
-							PacketWrapper packet = PacketWrapper.create(ClientboundPackets1_7.PLAYER_INFO, null, packetWrapper.user());
+							PacketWrapper packet = PacketWrapper.create(ClientboundPackets1_7_2_5.PLAYER_INFO, null, packetWrapper.user());
 							packet.write(Type.STRING, gameProfile.getDisplayName());
 							packet.write(Type.BOOLEAN, false);
 							packet.write(Type.SHORT, (short) gameProfile.ping);
@@ -469,7 +469,7 @@ public class PlayerPackets {
 					packetWrapper.setPacketType(null);
 					ByteBuf newPacketBuf = Unpooled.buffer();
 					packetWrapper.writeToBuffer(newPacketBuf);
-					PacketWrapper newWrapper = PacketWrapper.create(ClientboundPackets1_7.PLUGIN_MESSAGE, newPacketBuf, packetWrapper.user());
+					PacketWrapper newWrapper = PacketWrapper.create(ClientboundPackets1_7_2_5.PLUGIN_MESSAGE, newPacketBuf, packetWrapper.user());
 					newWrapper.passthrough(Type.STRING);
 					if (newPacketBuf.readableBytes() <= Short.MAX_VALUE) {
 						newWrapper.write(Type.SHORT, (short) newPacketBuf.readableBytes());
@@ -533,7 +533,7 @@ public class PlayerPackets {
 		protocol.cancelClientbound(ClientboundPackets1_8.TAB_LIST);
 
 		//Resource Pack Send
-		protocol.registerClientbound(ClientboundPackets1_8.RESOURCE_PACK, ClientboundPackets1_7.PLUGIN_MESSAGE, new PacketHandlers() {
+		protocol.registerClientbound(ClientboundPackets1_8.RESOURCE_PACK, ClientboundPackets1_7_2_5.PLUGIN_MESSAGE, new PacketHandlers() {
 			@Override
 			public void register() {
 				create(Type.STRING, "MC|RPack");
@@ -554,7 +554,7 @@ public class PlayerPackets {
 
 		/*  INCOMING  */
 
-		protocol.registerServerbound(ServerboundPackets1_7.CHAT_MESSAGE, new PacketHandlers() {
+		protocol.registerServerbound(ServerboundPackets1_7_2_5.CHAT_MESSAGE, new PacketHandlers() {
 			@Override
 			public void register() {
 				map(Type.STRING);
@@ -578,7 +578,7 @@ public class PlayerPackets {
 			}
 		});
 
-		protocol.registerServerbound(ServerboundPackets1_7.INTERACT_ENTITY, new PacketHandlers() {
+		protocol.registerServerbound(ServerboundPackets1_7_2_5.INTERACT_ENTITY, new PacketHandlers() {
 			@Override
 			public void register() {
 				map(Type.INT, Type.VAR_INT);
@@ -610,7 +610,7 @@ public class PlayerPackets {
 			}
 		});
 
-		protocol.registerServerbound(ServerboundPackets1_7.PLAYER_MOVEMENT, new PacketHandlers() {
+		protocol.registerServerbound(ServerboundPackets1_7_2_5.PLAYER_MOVEMENT, new PacketHandlers() {
 			@Override
 			public void register() {
 				map(Type.BOOLEAN);
@@ -621,7 +621,7 @@ public class PlayerPackets {
 			}
 		});
 
-		protocol.registerServerbound(ServerboundPackets1_7.PLAYER_POSITION, new PacketHandlers() {
+		protocol.registerServerbound(ServerboundPackets1_7_2_5.PLAYER_POSITION, new PacketHandlers() {
 			@Override
 			public void register() {
 				map(Type.DOUBLE);  //X
@@ -642,7 +642,7 @@ public class PlayerPackets {
 			}
 		});
 
-		protocol.registerServerbound(ServerboundPackets1_7.PLAYER_ROTATION, new PacketHandlers() {
+		protocol.registerServerbound(ServerboundPackets1_7_2_5.PLAYER_ROTATION, new PacketHandlers() {
 			@Override
 			public void register() {
 				map(Type.FLOAT);
@@ -657,7 +657,7 @@ public class PlayerPackets {
 			}
 		});
 
-		protocol.registerServerbound(ServerboundPackets1_7.PLAYER_POSITION_AND_ROTATION, new PacketHandlers() {
+		protocol.registerServerbound(ServerboundPackets1_7_2_5.PLAYER_POSITION_AND_ROTATION, new PacketHandlers() {
 			@Override
 			public void register() {
 				map(Type.DOUBLE);  //X
@@ -685,7 +685,7 @@ public class PlayerPackets {
 			}
 		});
 
-		protocol.registerServerbound(ServerboundPackets1_7.PLAYER_DIGGING, new PacketHandlers() {
+		protocol.registerServerbound(ServerboundPackets1_7_2_5.PLAYER_DIGGING, new PacketHandlers() {
 			@Override
 			public void register() {
 				map(Type.VAR_INT);  //Status
@@ -698,7 +698,7 @@ public class PlayerPackets {
 			}
 		});
 
-		protocol.registerServerbound(ServerboundPackets1_7.PLAYER_BLOCK_PLACEMENT, new PacketHandlers() {
+		protocol.registerServerbound(ServerboundPackets1_7_2_5.PLAYER_BLOCK_PLACEMENT, new PacketHandlers() {
 			@Override
 			public void register() {
 				handler(packetWrapper -> {
@@ -719,7 +719,7 @@ public class PlayerPackets {
 			}
 		});
 
-		protocol.registerServerbound(ServerboundPackets1_7.ANIMATION, new PacketHandlers() {
+		protocol.registerServerbound(ServerboundPackets1_7_2_5.ANIMATION, new PacketHandlers() {
 			@Override
 			public void register() {
 				handler(packetWrapper -> {
@@ -750,7 +750,7 @@ public class PlayerPackets {
 			}
 		});
 
-		protocol.registerServerbound(ServerboundPackets1_7.ENTITY_ACTION, new PacketHandlers() {
+		protocol.registerServerbound(ServerboundPackets1_7_2_5.ENTITY_ACTION, new PacketHandlers() {
 			@Override
 			public void register() {
 				map(Type.INT, Type.VAR_INT);  //Entity Id
@@ -771,7 +771,7 @@ public class PlayerPackets {
 			}
 		});
 
-		protocol.registerServerbound(ServerboundPackets1_7.STEER_VEHICLE, new PacketHandlers() {
+		protocol.registerServerbound(ServerboundPackets1_7_2_5.STEER_VEHICLE, new PacketHandlers() {
 			@Override
 			public void register() {
 				map(Type.FLOAT);  //Sideways
@@ -804,7 +804,7 @@ public class PlayerPackets {
 			}
 		});
 
-		protocol.registerServerbound(ServerboundPackets1_7.UPDATE_SIGN, new PacketHandlers() {
+		protocol.registerServerbound(ServerboundPackets1_7_2_5.UPDATE_SIGN, new PacketHandlers() {
 			@Override
 			public void register() {
 				handler(packetWrapper -> {
@@ -821,7 +821,7 @@ public class PlayerPackets {
 			}
 		});
 
-		protocol.registerServerbound(ServerboundPackets1_7.PLAYER_ABILITIES, new PacketHandlers() {
+		protocol.registerServerbound(ServerboundPackets1_7_2_5.PLAYER_ABILITIES, new PacketHandlers() {
 			@Override
 			public void register() {
 				map(Type.BYTE);
@@ -838,7 +838,7 @@ public class PlayerPackets {
 			}
 		});
 
-		protocol.registerServerbound(ServerboundPackets1_7.TAB_COMPLETE, new PacketHandlers() {
+		protocol.registerServerbound(ServerboundPackets1_7_2_5.TAB_COMPLETE, new PacketHandlers() {
 			@Override
 			public void register() {
 				map(Type.STRING);
@@ -867,7 +867,7 @@ public class PlayerPackets {
 		});
 
 		//Client Settings
-		protocol.registerServerbound(ServerboundPackets1_7.CLIENT_SETTINGS, new PacketHandlers() {
+		protocol.registerServerbound(ServerboundPackets1_7_2_5.CLIENT_SETTINGS, new PacketHandlers() {
 			@Override
 			public void register() {
 				map(Type.STRING);
@@ -882,7 +882,7 @@ public class PlayerPackets {
 			}
 		});
 
-		protocol.registerServerbound(ServerboundPackets1_7.PLUGIN_MESSAGE, new PacketHandlers() {
+		protocol.registerServerbound(ServerboundPackets1_7_2_5.PLUGIN_MESSAGE, new PacketHandlers() {
 			@Override
 			public void register() {
 				map(Type.STRING);

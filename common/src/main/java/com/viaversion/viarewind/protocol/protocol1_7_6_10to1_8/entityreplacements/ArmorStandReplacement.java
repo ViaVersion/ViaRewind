@@ -18,7 +18,7 @@
 
 package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.entityreplacements;
 
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.ClientboundPackets1_7;
+import com.viaversion.viarewind.protocol.protocol1_7_2_5to1_7_6_10.ClientboundPackets1_7_2_5;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.metadata.MetadataRewriter;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.MetaType1_7_6_10;
@@ -154,7 +154,7 @@ public class ArmorStandReplacement extends EntityReplacement1_7to1_8 {
 
 	private void updateHologramLocation(boolean remount) {
 		if (remount) {
-			PacketWrapper detach = PacketWrapper.create(ClientboundPackets1_7.ATTACH_ENTITY, null, user);
+			PacketWrapper detach = PacketWrapper.create(ClientboundPackets1_7_2_5.ATTACH_ENTITY, null, user);
 			detach.write(Type.INT, entityIds[1]);
 			detach.write(Type.INT, -1);
 			detach.write(Type.BOOLEAN, false);
@@ -167,7 +167,7 @@ public class ArmorStandReplacement extends EntityReplacement1_7to1_8 {
 		if (remount) {
 			sendTeleport(entityIds[1], locX, locY + 56.75, locZ, 0, 0); // Horse
 
-			PacketWrapper attach = PacketWrapper.create(ClientboundPackets1_7.ATTACH_ENTITY, null, user);
+			PacketWrapper attach = PacketWrapper.create(ClientboundPackets1_7_2_5.ATTACH_ENTITY, null, user);
 			attach.write(Type.INT, entityIds[1]);
 			attach.write(Type.INT, entityIds[0]);
 			attach.write(Type.BOOLEAN, false);
@@ -178,7 +178,7 @@ public class ArmorStandReplacement extends EntityReplacement1_7to1_8 {
 	public void updateMetadata() {
 		if (entityIds == null) return;
 
-		PacketWrapper metadataPacket = PacketWrapper.create(ClientboundPackets1_7.ENTITY_METADATA, null, user);
+		PacketWrapper metadataPacket = PacketWrapper.create(ClientboundPackets1_7_2_5.ENTITY_METADATA, null, user);
 
 		if (currentState == State.ZOMBIE) {
 			writeZombieMeta(metadataPacket);
@@ -239,7 +239,7 @@ public class ArmorStandReplacement extends EntityReplacement1_7to1_8 {
 	private void spawnHologram() {
 		int[] entityIds = {entityId, additionalEntityId()};
 
-		PacketWrapper spawnSkull = PacketWrapper.create(ClientboundPackets1_7.SPAWN_ENTITY, null, user);
+		PacketWrapper spawnSkull = PacketWrapper.create(ClientboundPackets1_7_2_5.SPAWN_ENTITY, null, user);
 		spawnSkull.write(Type.VAR_INT, entityIds[0]);
 		spawnSkull.write(Type.BYTE, (byte) 66);
 		spawnSkull.write(Type.INT, (int) (locX * 32.0));
@@ -270,7 +270,7 @@ public class ArmorStandReplacement extends EntityReplacement1_7to1_8 {
 	@Override
 	public void despawn() {
 		if (entityIds == null) return;
-		PacketWrapper despawn = PacketWrapper.create(ClientboundPackets1_7.DESTROY_ENTITIES, null, user);
+		PacketWrapper despawn = PacketWrapper.create(ClientboundPackets1_7_2_5.DESTROY_ENTITIES, null, user);
 		despawn.write(Type.BYTE, (byte) entityIds.length);
 		for (int id : entityIds) {
 			despawn.write(Type.INT, id);

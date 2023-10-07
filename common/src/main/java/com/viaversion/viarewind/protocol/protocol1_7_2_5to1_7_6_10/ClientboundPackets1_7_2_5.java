@@ -16,11 +16,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8;
+package com.viaversion.viarewind.protocol.protocol1_7_2_5to1_7_6_10;
 
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 
-public enum ClientboundPackets1_7 implements ClientboundPacketType {
+public enum ClientboundPackets1_7_2_5 implements ClientboundPacketType {
 	KEEP_ALIVE, // 0x00
 	JOIN_GAME, // 0x01
 	CHAT_MESSAGE, // 0x02

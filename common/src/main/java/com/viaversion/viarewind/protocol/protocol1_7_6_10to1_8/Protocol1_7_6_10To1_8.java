@@ -18,6 +18,8 @@
 
 package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8;
 
+import com.viaversion.viarewind.protocol.protocol1_7_2_5to1_7_6_10.ClientboundPackets1_7_2_5;
+import com.viaversion.viarewind.protocol.protocol1_7_2_5to1_7_6_10.ServerboundPackets1_7_2_5;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.packets.*;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.provider.CompressionHandlerProvider;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.*;
@@ -35,11 +37,11 @@ import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.protocol1_8.ServerboundPackets1_8;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
-public class Protocol1_7_6_10To1_8 extends AbstractProtocol<ClientboundPackets1_8, ClientboundPackets1_7,
-		ServerboundPackets1_8, ServerboundPackets1_7> {
+public class Protocol1_7_6_10To1_8 extends AbstractProtocol<ClientboundPackets1_8, ClientboundPackets1_7_2_5,
+		ServerboundPackets1_8, ServerboundPackets1_7_2_5> {
 
 	public Protocol1_7_6_10To1_8() {
-		super(ClientboundPackets1_8.class, ClientboundPackets1_7.class, ServerboundPackets1_8.class, ServerboundPackets1_7.class);
+		super(ClientboundPackets1_8.class, ClientboundPackets1_7_2_5.class, ServerboundPackets1_8.class, ServerboundPackets1_7_2_5.class);
 	}
 
 	@Override
@@ -60,7 +62,7 @@ public class Protocol1_7_6_10To1_8 extends AbstractProtocol<ClientboundPackets1_
 
 		this.cancelClientbound(ClientboundPackets1_8.SET_COMPRESSION); // unused
 
-		this.registerServerbound(ServerboundPackets1_7.KEEP_ALIVE, new PacketHandlers() {
+		this.registerServerbound(ServerboundPackets1_7_2_5.KEEP_ALIVE, new PacketHandlers() {
 			@Override
 			public void register() {
 				map(Type.INT, Type.VAR_INT);

@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 public class ViaRewindConfig extends Config implements com.viaversion.viarewind.api.ViaRewindConfig {
+
     public ViaRewindConfig(File configFile) {
         super(configFile);
         reloadConfig();

@@ -18,7 +18,7 @@
 
 package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.packets;
 
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.ClientboundPackets1_7;
+import com.viaversion.viarewind.protocol.protocol1_7_2_5to1_7_6_10.ClientboundPackets1_7_2_5;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.entityreplacements.ArmorStandReplacement;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.entityreplacements.EndermiteReplacement;
@@ -78,7 +78,7 @@ public class SpawnPackets {
 					if (gameProfile != null && gameProfile.gamemode == 3) {
 						int entityId = packetWrapper.get(Type.VAR_INT, 0);
 						for (short i = 0; i < 5; i++) {
-							PacketWrapper equipmentPacket = PacketWrapper.create(ClientboundPackets1_7.ENTITY_EQUIPMENT, packetWrapper.user());
+							PacketWrapper equipmentPacket = PacketWrapper.create(ClientboundPackets1_7_2_5.ENTITY_EQUIPMENT, packetWrapper.user());
 							equipmentPacket.write(Type.INT, entityId);
 							equipmentPacket.write(Type.SHORT, i);
 							equipmentPacket.write(Types1_7_6_10.COMPRESSED_NBT_ITEM, i == 4 ? gameProfile.getSkull() : null);

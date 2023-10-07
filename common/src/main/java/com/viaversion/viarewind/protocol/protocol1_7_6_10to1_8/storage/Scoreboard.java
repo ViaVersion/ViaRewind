@@ -18,7 +18,7 @@
 
 package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage;
 
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.ClientboundPackets1_7;
+import com.viaversion.viarewind.protocol.protocol1_7_2_5to1_7_6_10.ClientboundPackets1_7_2_5;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
 import com.viaversion.viarewind.utils.PacketUtil;
 import com.viaversion.viaversion.api.connection.StoredObject;
@@ -134,7 +134,7 @@ public class Scoreboard extends StoredObject {
 		scoreTeams.put(score, scoreTeam);
 		scoreTeamNames.add(name);
 
-		PacketWrapper teamPacket = PacketWrapper.create(ClientboundPackets1_7.TEAMS, getUser());
+		PacketWrapper teamPacket = PacketWrapper.create(ClientboundPackets1_7_2_5.TEAMS, getUser());
 		teamPacket.write(Type.STRING, name);
 		teamPacket.write(Type.BYTE, (byte) 0);
 		teamPacket.write(Type.STRING, "ViaRewind");
@@ -153,7 +153,7 @@ public class Scoreboard extends StoredObject {
 		if (scoreTeam == null) return score;
 		scoreTeamNames.remove(scoreTeam.name);
 
-		PacketWrapper teamPacket = PacketWrapper.create(ClientboundPackets1_7.TEAMS, getUser());
+		PacketWrapper teamPacket = PacketWrapper.create(ClientboundPackets1_7_2_5.TEAMS, getUser());
 		teamPacket.write(Type.STRING, scoreTeam.name);
 		teamPacket.write(Type.BYTE, (byte) 1);
 		PacketUtil.sendPacket(teamPacket, Protocol1_7_6_10To1_8.class, true, true);

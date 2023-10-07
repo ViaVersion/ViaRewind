@@ -18,7 +18,7 @@
 
 package com.viaversion.viarewind.protocol.protocol1_8to1_9.entityreplacement;
 
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.ClientboundPackets1_7;
+import com.viaversion.viarewind.protocol.protocol1_7_2_5to1_7_6_10.ClientboundPackets1_7_2_5;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.Protocol1_8To1_9;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.metadata.MetadataRewriter;
 import com.viaversion.viarewind.utils.PacketUtil;
@@ -108,7 +108,7 @@ public class ShulkerReplacement extends EntityReplacement1_8to1_9 {
 
 	@Override
 	public void despawn() {
-		PacketWrapper despawn = PacketWrapper.create(ClientboundPackets1_7.DESTROY_ENTITIES, null, user);
+		PacketWrapper despawn = PacketWrapper.create(ClientboundPackets1_7_2_5.DESTROY_ENTITIES, null, user);
 		despawn.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[]{entityId});
 
 		PacketUtil.sendPacket(despawn, Protocol1_8To1_9.class, true, true);

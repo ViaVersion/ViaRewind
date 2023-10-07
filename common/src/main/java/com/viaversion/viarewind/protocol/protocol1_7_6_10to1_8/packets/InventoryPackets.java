@@ -19,7 +19,7 @@
 package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.packets;
 
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.ServerboundPackets1_7;
+import com.viaversion.viarewind.protocol.protocol1_7_2_5to1_7_6_10.ServerboundPackets1_7_2_5;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.items.ItemRewriter;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.EntityTracker;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.GameProfileStorage;
@@ -207,7 +207,7 @@ public class InventoryPackets {
 
 		/*  INCOMING  */
 
-		protocol.registerServerbound(ServerboundPackets1_7.CLOSE_WINDOW, new PacketHandlers() {
+		protocol.registerServerbound(ServerboundPackets1_7_2_5.CLOSE_WINDOW, new PacketHandlers() {
 			@Override
 			public void register() {
 				map(Type.UNSIGNED_BYTE);
@@ -218,7 +218,7 @@ public class InventoryPackets {
 			}
 		});
 
-		protocol.registerServerbound(ServerboundPackets1_7.CLICK_WINDOW, new PacketHandlers() {
+		protocol.registerServerbound(ServerboundPackets1_7_2_5.CLICK_WINDOW, new PacketHandlers() {
 			@Override
 			public void register() {
 				handler(packetWrapper -> {
@@ -246,7 +246,7 @@ public class InventoryPackets {
 		});
 
 		//Creative Inventory Action
-		protocol.registerServerbound(ServerboundPackets1_7.CREATIVE_INVENTORY_ACTION, new PacketHandlers() {
+		protocol.registerServerbound(ServerboundPackets1_7_2_5.CREATIVE_INVENTORY_ACTION, new PacketHandlers() {
 			@Override
 			public void register() {
 				map(Type.SHORT);  //Slot

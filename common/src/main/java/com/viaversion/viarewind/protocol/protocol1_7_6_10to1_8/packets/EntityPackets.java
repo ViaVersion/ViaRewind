@@ -20,7 +20,7 @@ package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.packets;
 
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Ints;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.ClientboundPackets1_7;
+import com.viaversion.viarewind.protocol.protocol1_7_2_5to1_7_6_10.ClientboundPackets1_7_2_5;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.items.ItemRewriter;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.metadata.MetadataRewriter;
@@ -125,7 +125,7 @@ public class EntityPackets {
 					List<List<Integer>> parts = Lists.partition(Ints.asList(entityIds), Byte.MAX_VALUE);
 
 					for (int i = 0; i < parts.size() - 1; i++) {
-						PacketWrapper destroy = PacketWrapper.create(ClientboundPackets1_7.DESTROY_ENTITIES,
+						PacketWrapper destroy = PacketWrapper.create(ClientboundPackets1_7_2_5.DESTROY_ENTITIES,
 								packetWrapper.user());
 						destroy.write(Types1_7_6_10.INT_ARRAY, parts.get(i).stream()
 								.mapToInt(Integer::intValue).toArray());

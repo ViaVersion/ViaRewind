@@ -18,7 +18,7 @@
 
 package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.entityreplacements;
 
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.ClientboundPackets1_7;
+import com.viaversion.viarewind.protocol.protocol1_7_2_5to1_7_6_10.ClientboundPackets1_7_2_5;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.metadata.MetadataRewriter;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
@@ -92,7 +92,7 @@ public class GuardianReplacement extends EntityReplacement1_7to1_8 {
 	}
 
 	public void updateMetadata() {
-		PacketWrapper metadataPacket = PacketWrapper.create(ClientboundPackets1_7.ENTITY_METADATA, null, user);
+		PacketWrapper metadataPacket = PacketWrapper.create(ClientboundPackets1_7_2_5.ENTITY_METADATA, null, user);
 		metadataPacket.write(Type.INT, entityId);
 
 		List<Metadata> metadataList = new ArrayList<>();
@@ -115,7 +115,7 @@ public class GuardianReplacement extends EntityReplacement1_7to1_8 {
 
 	@Override
 	public void despawn() {
-		PacketWrapper despawn = PacketWrapper.create(ClientboundPackets1_7.DESTROY_ENTITIES, null, user);
+		PacketWrapper despawn = PacketWrapper.create(ClientboundPackets1_7_2_5.DESTROY_ENTITIES, null, user);
 		despawn.write(Types1_7_6_10.INT_ARRAY, new int[]{entityId});
 
 		PacketUtil.sendPacket(despawn, Protocol1_7_6_10To1_8.class, true, true);
