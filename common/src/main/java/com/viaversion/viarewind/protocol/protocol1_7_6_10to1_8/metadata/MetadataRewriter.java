@@ -86,18 +86,12 @@ public class MetadataRewriter {
 						entry.setValue(ItemRewriter.toClient((Item) value));
 						break;
 					case Float:
-						entry.setValue(value);
+                    case String:
+                    case Short:
+                    case Position:
+                        entry.setValue(value);
 						break;
-					case Short:
-						entry.setValue(value);
-						break;
-					case String:
-						entry.setValue(value);
-						break;
-					case Position:
-						entry.setValue(value);
-						break;
-					default:
+                    default:
 						ViaRewind.getPlatform().getLogger().warning("[Out] Unhandled MetaDataType: " + metaIndex.getNewType());
 						list.remove(entry);
 						break;
