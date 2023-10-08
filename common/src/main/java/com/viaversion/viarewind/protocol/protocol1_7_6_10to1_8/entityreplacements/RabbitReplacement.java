@@ -39,8 +39,8 @@ public class RabbitReplacement extends EntityReplacement1_7to1_8 {
 	private float yaw, pitch;
 	private float headYaw;
 
-	public RabbitReplacement(int entityId, UserConnection user) {
-		super(user);
+	public RabbitReplacement(Protocol1_7_6_10To1_8 protocol, UserConnection user, int entityId) {
+		super(protocol, user);
 		this.entityId = entityId;
 		spawn();
 	}
@@ -100,7 +100,7 @@ public class RabbitReplacement extends EntityReplacement1_7to1_8 {
 			metadataList.add(new Metadata(metadata.id(), metadata.metaType(), metadata.getValue()));
 		}
 
-		MetadataRewriter.transform(Entity1_10Types.EntityType.CHICKEN, metadataList);
+		protocol.getMetadataRewriter().transform(Entity1_10Types.EntityType.CHICKEN, metadataList);
 
 		metadataPacket.write(Types1_7_6_10.METADATA_LIST, metadataList);
 

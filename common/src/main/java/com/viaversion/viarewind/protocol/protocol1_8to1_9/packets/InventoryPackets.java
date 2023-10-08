@@ -18,27 +18,18 @@
 
 package com.viaversion.viarewind.protocol.protocol1_8to1_9.packets;
 
-import com.viaversion.viarewind.protocol.protocol1_8to1_9.items.ItemRewriter;
+import com.viaversion.viarewind.protocol.protocol1_8to1_9.Protocol1_8To1_9;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.storage.Windows;
 import com.viaversion.viaversion.api.minecraft.item.Item;
-import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.libs.gson.JsonParser;
-import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.protocol1_8.ServerboundPackets1_8;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ClientboundPackets1_9;
-import com.viaversion.viaversion.protocols.protocol1_9to1_8.ServerboundPackets1_9;
 
 public class InventoryPackets {
 
-	public static void register(Protocol<ClientboundPackets1_9, ClientboundPackets1_8,
-			ServerboundPackets1_9, ServerboundPackets1_8> protocol) {
-		/*  OUTGOING  */
-
-		//Confirm Transaction
-
-		//Close Window
+	public static void register(final Protocol1_8To1_9 protocol) {
 		protocol.registerClientbound(ClientboundPackets1_9.CLOSE_WINDOW, new PacketHandlers() {
 			@Override
 			public void register() {
@@ -89,7 +80,7 @@ public class InventoryPackets {
 					short windowId = packetWrapper.get(Type.UNSIGNED_BYTE, 0);
 					Item[] items = packetWrapper.read(Type.ITEM_ARRAY);
 					for (int i = 0; i < items.length; i++) {
-						items[i] = ItemRewriter.toClient(items[i]);
+						items[i] = protocol.getItemRewriter().handleItemToClient(items[i]);
 					}
 					if (windowId == 0 && items.length == 46) {
 						Item[] old = items;
@@ -121,7 +112,7 @@ public class InventoryPackets {
 				map(Type.SHORT);
 				map(Type.ITEM);
 				handler(packetWrapper -> {
-					packetWrapper.set(Type.ITEM, 0, ItemRewriter.toClient(packetWrapper.get(Type.ITEM, 0)));
+					packetWrapper.set(Type.ITEM, 0, protocol.getItemRewriter().handleItemToClient(packetWrapper.get(Type.ITEM, 0)));
 					byte windowId = packetWrapper.get(Type.UNSIGNED_BYTE, 0).byteValue();
 					short slot = packetWrapper.get(Type.SHORT, 0);
 					if (windowId == 0 && slot == 45) {
@@ -168,7 +159,7 @@ public class InventoryPackets {
 				map(Type.SHORT);
 				map(Type.BYTE, Type.VAR_INT);
 				map(Type.ITEM);
-				handler(packetWrapper -> packetWrapper.set(Type.ITEM, 0, ItemRewriter.toServer(packetWrapper.get(Type.ITEM, 0))));
+				handler(packetWrapper -> packetWrapper.set(Type.ITEM, 0, protocol.getItemRewriter().handleItemToServer(packetWrapper.get(Type.ITEM, 0))));
 				handler(packetWrapper -> {
 					short windowId = packetWrapper.get(Type.UNSIGNED_BYTE, 0);
 					Windows windows = packetWrapper.user().get(Windows.class);
@@ -184,16 +175,13 @@ public class InventoryPackets {
 			}
 		});
 
-		//Creative Inventory Action
 		protocol.registerServerbound(ServerboundPackets1_8.CREATIVE_INVENTORY_ACTION, new PacketHandlers() {
 			@Override
 			public void register() {
 				map(Type.SHORT);
 				map(Type.ITEM);
-				handler(packetWrapper -> packetWrapper.set(Type.ITEM, 0, ItemRewriter.toServer(packetWrapper.get(Type.ITEM, 0))));
+				handler(packetWrapper -> packetWrapper.set(Type.ITEM, 0, protocol.getItemRewriter().handleItemToServer(packetWrapper.get(Type.ITEM, 0))));
 			}
 		});
-
-		//Enchant Item
 	}
 }

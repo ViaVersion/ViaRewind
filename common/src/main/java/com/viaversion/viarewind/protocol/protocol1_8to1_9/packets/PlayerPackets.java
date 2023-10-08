@@ -20,7 +20,6 @@ package com.viaversion.viarewind.protocol.protocol1_8to1_9.packets;
 
 import com.viaversion.viarewind.ViaRewind;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.Protocol1_8To1_9;
-import com.viaversion.viarewind.protocol.protocol1_8to1_9.items.ItemRewriter;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.storage.*;
 import com.viaversion.viarewind.utils.ChatUtil;
 import com.viaversion.viarewind.utils.PacketUtil;
@@ -29,33 +28,25 @@ import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_8;
-import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
+import com.viaversion.viaversion.api.rewriter.ItemRewriter;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_8;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.CompoundTag;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.ListTag;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.StringTag;
-import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.protocol1_8.ServerboundPackets1_8;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ClientboundPackets1_9;
-import com.viaversion.viaversion.protocols.protocol1_9to1_8.ServerboundPackets1_9;
 
 import java.util.ArrayList;
 import java.util.UUID;
 
 public class PlayerPackets {
 
-	public static void register(Protocol<ClientboundPackets1_9, ClientboundPackets1_8,
-		ServerboundPackets1_9, ServerboundPackets1_8> protocol) {
-		/*  OUTGOING  */
+	public static void register(final Protocol1_8To1_9 protocol) {
 
-		//Animation
-		//Statistics
-
-		//Boss Bar
 		protocol.registerClientbound(ClientboundPackets1_9.BOSSBAR, null, new PacketHandlers() {
 			@Override
 			public void register() {
@@ -105,13 +96,15 @@ public class PlayerPackets {
 							size = packetWrapper.passthrough(Type.UNSIGNED_BYTE);
 						}
 
+						final ItemRewriter<?> itemRewriter = protocol.getItemRewriter();
+
 						for (int i = 0; i < size; i++) {
-							packetWrapper.write(Type.ITEM, ItemRewriter.toClient(packetWrapper.read(Type.ITEM))); //Buy Item 1
-							packetWrapper.write(Type.ITEM, ItemRewriter.toClient(packetWrapper.read(Type.ITEM))); //Buy Item 3
+							packetWrapper.write(Type.ITEM, itemRewriter.handleItemToClient(packetWrapper.read(Type.ITEM))); //Buy Item 1
+							packetWrapper.write(Type.ITEM, itemRewriter.handleItemToClient(packetWrapper.read(Type.ITEM))); //Buy Item 3
 
 							boolean has3Items = packetWrapper.passthrough(Type.BOOLEAN);
 							if (has3Items) {
-								packetWrapper.write(Type.ITEM, ItemRewriter.toClient(packetWrapper.read(Type.ITEM))); //Buy Item 2
+								packetWrapper.write(Type.ITEM, itemRewriter.handleItemToClient(packetWrapper.read(Type.ITEM))); //Buy Item 2
 							}
 
 							packetWrapper.passthrough(Type.BOOLEAN); //Unavailable

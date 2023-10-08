@@ -38,6 +38,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class EntityTracker extends StoredObject implements ClientEntityIdChangeListener {
+	protected final Protocol1_8To1_9 protocol;
 	private final Map<Integer, List<Integer>> vehicleMap = new ConcurrentHashMap<>();
 	private final Map<Integer, Entity1_10Types.EntityType> clientEntityTypes = new ConcurrentHashMap<>();
 	private final Map<Integer, List<Metadata>> metadataBuffer = new ConcurrentHashMap<>();
@@ -46,8 +47,10 @@ public class EntityTracker extends StoredObject implements ClientEntityIdChangeL
 	private int playerId;
 	private int playerGamemode = 0;
 
-	public EntityTracker(UserConnection user) {
+	public EntityTracker(UserConnection user, Protocol1_8To1_9 protocol) {
 		super(user);
+
+		this.protocol = protocol;
 	}
 
 	public void setPlayerId(int entityId) {
@@ -161,7 +164,7 @@ public class EntityTracker extends StoredObject implements ClientEntityIdChangeL
 			PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_8.ENTITY_METADATA, this.getUser());
 			wrapper.write(Type.VAR_INT, entityId);
 			wrapper.write(Types1_8.METADATA_LIST, this.metadataBuffer.get(entityId));
-			MetadataRewriter.transform(this.getClientEntityTypes().get(entityId), this.metadataBuffer.get(entityId));
+			protocol.getMetadataRewriter().transform(this.getClientEntityTypes().get(entityId), this.metadataBuffer.get(entityId));
 			if (!this.metadataBuffer.get(entityId).isEmpty()) {
 				try {
 					wrapper.send(Protocol1_8To1_9.class);

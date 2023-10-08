@@ -20,7 +20,6 @@ package com.viaversion.viarewind.protocol.protocol1_8to1_9.packets;
 
 import com.viaversion.viarewind.ViaRewind;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.Protocol1_8To1_9;
-import com.viaversion.viarewind.protocol.protocol1_8to1_9.items.ReplacementRegistry1_8to1_9;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.sound.Effect;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.sound.SoundRemapper;
 import com.viaversion.viarewind.utils.PacketUtil;
@@ -34,31 +33,22 @@ import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSectionImpl;
 import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
 import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
-import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.CompoundTag;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.StringTag;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
-import com.viaversion.viaversion.protocols.protocol1_8.ServerboundPackets1_8;
 import com.viaversion.viaversion.protocols.protocol1_9_1to1_9.types.Chunk1_9_1_2Type;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ClientboundPackets1_9;
-import com.viaversion.viaversion.protocols.protocol1_9to1_8.ServerboundPackets1_9;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.types.Chunk1_8Type;
 
 import java.util.ArrayList;
 
 public class WorldPackets {
 
-	public static void register(Protocol<ClientboundPackets1_9, ClientboundPackets1_8,
-		ServerboundPackets1_9, ServerboundPackets1_8> protocol) {
-		/*  OUTGOING  */
-
-		//Block Break Animation
-
-		//Update Block Entity
+	public static void register(Protocol1_8To1_9 protocol) {
 		protocol.registerClientbound(ClientboundPackets1_9.BLOCK_ENTITY_DATA, new PacketHandlers() {
 			@Override
 			public void register() {
@@ -104,7 +94,7 @@ public class WorldPackets {
 				map(Type.VAR_INT);
 				handler(packetWrapper -> {
 					int combined = packetWrapper.get(Type.VAR_INT, 0);
-					int replacedCombined = ReplacementRegistry1_8to1_9.replace(combined);
+					int replacedCombined = protocol.getItemRewriter().replace(combined);
 					packetWrapper.set(Type.VAR_INT, 0, replacedCombined);
 				});
 			}
@@ -121,7 +111,7 @@ public class WorldPackets {
 				map(Type.BLOCK_CHANGE_RECORD_ARRAY);
 				handler(packetWrapper -> {
 					for (BlockChangeRecord record : packetWrapper.get(Type.BLOCK_CHANGE_RECORD_ARRAY, 0)) {
-						int replacedCombined = ReplacementRegistry1_8to1_9.replace(record.getBlockId());
+						int replacedCombined = protocol.getItemRewriter().replace(record.getBlockId());
 						record.setBlockId(replacedCombined);
 					}
 				});
@@ -201,7 +191,7 @@ public class WorldPackets {
 						DataPalette palette = section.palette(PaletteType.BLOCKS);
 						for (int i = 0; i < palette.size(); i++) {
 							int block = palette.idByIndex(i);
-							int replacedBlock = ReplacementRegistry1_8to1_9.replace(block);
+							int replacedBlock = protocol.getItemRewriter().replace(block);
 							palette.setIdByIndex(i, replacedBlock);
 						}
 					}
@@ -277,7 +267,7 @@ public class WorldPackets {
 					}
 					packetWrapper.set(Type.INT, 0, id);
 					if (id == 2001) {
-						int replacedBlock = ReplacementRegistry1_8to1_9.replace(packetWrapper.get(Type.INT, 1));
+						int replacedBlock = protocol.getItemRewriter().replace(packetWrapper.get(Type.INT, 1));
 						packetWrapper.set(Type.INT, 1, replacedBlock);
 					}
 				});

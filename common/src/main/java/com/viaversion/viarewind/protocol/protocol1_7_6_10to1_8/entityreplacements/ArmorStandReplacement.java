@@ -49,8 +49,8 @@ public class ArmorStandReplacement extends EntityReplacement1_7to1_8 {
 	private boolean small = false;
 	private boolean marker = false;
 
-	public ArmorStandReplacement(int entityId, UserConnection user) {
-		super(user);
+	public ArmorStandReplacement(Protocol1_7_6_10To1_8 protocol, UserConnection user, int entityId) {
+		super(protocol, user);
 		this.entityId = entityId;
 	}
 
@@ -200,7 +200,7 @@ public class ArmorStandReplacement extends EntityReplacement1_7to1_8 {
 			metadataList.add(new Metadata(metadata.id(), metadata.metaType(), metadata.getValue()));
 		}
 		if (small) metadataList.add(new Metadata(12, MetaType1_8.Byte, (byte) 1));
-		MetadataRewriter.transform(Entity1_10Types.EntityType.ZOMBIE, metadataList);
+		protocol.getMetadataRewriter().transform(Entity1_10Types.EntityType.ZOMBIE, metadataList);
 
 		metadataPacket.write(Types1_7_6_10.METADATA_LIST, metadataList);
 	}

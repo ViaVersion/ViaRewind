@@ -32,9 +32,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class EntityReplacement1_8to1_9 implements EntityReplacement {
+	protected final Protocol1_8To1_9 protocol;
 	protected final UserConnection user;
 
-	protected EntityReplacement1_8to1_9(UserConnection user) {
+	protected EntityReplacement1_8to1_9(Protocol1_8To1_9 protocol, UserConnection user) {
+		this.protocol = protocol;
 		this.user = user;
 	}
 

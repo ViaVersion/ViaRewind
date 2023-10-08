@@ -39,8 +39,8 @@ public class ShulkerReplacement extends EntityReplacement1_8to1_9 {
 	private final List<Metadata> datawatcher = new ArrayList<>();
 	private double locX, locY, locZ;
 
-	public ShulkerReplacement(int entityId, UserConnection user) {
-		super(user);
+	public ShulkerReplacement(Protocol1_8To1_9 protocol, UserConnection user, int entityId) {
+		super(protocol, user);
 		this.entityId = entityId;
 		spawn();
 	}
@@ -93,7 +93,7 @@ public class ShulkerReplacement extends EntityReplacement1_8to1_9 {
 		}
 		metadataList.add(new Metadata(11, MetaType1_9.VarInt, 2));
 
-		MetadataRewriter.transform(Entity1_10Types.EntityType.MAGMA_CUBE, metadataList);
+		protocol.getMetadataRewriter().transform(Entity1_10Types.EntityType.MAGMA_CUBE, metadataList);
 
 		metadataPacket.write(Types1_8.METADATA_LIST, metadataList);
 

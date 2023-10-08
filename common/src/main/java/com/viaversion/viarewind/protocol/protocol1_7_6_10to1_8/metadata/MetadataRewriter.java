@@ -19,7 +19,7 @@
 package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.metadata;
 
 import com.viaversion.viarewind.ViaRewind;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.items.ItemRewriter;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.MetaType1_7_6_10;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
 import com.viaversion.viaversion.api.minecraft.item.Item;
@@ -33,7 +33,13 @@ import java.util.logging.Level;
 @SuppressWarnings({"unchecked", "deprecation"})
 public class MetadataRewriter {
 
-	public static void transform(Entity1_10Types.EntityType type, List<Metadata> list) {
+	private final Protocol1_7_6_10To1_8 protocol;
+
+	public MetadataRewriter(Protocol1_7_6_10To1_8 protocol) {
+		this.protocol = protocol;
+	}
+
+	public void transform(Entity1_10Types.EntityType type, List<Metadata> list) {
 		for (Metadata entry : new ArrayList<>(list)) {
 			final MetaIndex1_7_6_10To1_8 metaIndex = MetaIndex1_7_6_10To1_8.searchIndex(type, entry.id());
 			try {
@@ -46,7 +52,7 @@ public class MetadataRewriter {
 					list.remove(entry);
 					continue;
 				}
-				final Object value = entry.getValue();
+				Object value = entry.getValue();
 				if (!metaIndex.getNewType().type().getOutputClass().isAssignableFrom(value.getClass())) {
 					list.remove(entry);
 					continue;
@@ -77,10 +83,9 @@ public class MetadataRewriter {
 						}
 						if (metaIndex.getNewType() == MetaType1_8.Byte) {
 							if (metaIndex == MetaIndex1_7_6_10To1_8.ITEM_FRAME_ROTATION) {
-								entry.setValue(((Integer) ((Byte) value / 2)).byteValue());
-							} else {
-								entry.setValue(value);
+								value = ((Integer) ((Byte) value / 2)).byteValue();
 							}
+							entry.setValue(value);
 						}
 						if (metaIndex == MetaIndex1_7_6_10To1_8.HUMAN_SKIN_FLAGS) {
 							byte flags = (byte) value;
@@ -90,7 +95,7 @@ public class MetadataRewriter {
 						}
 						break;
 					case Slot:
-						entry.setValue(ItemRewriter.toClient((Item) value));
+						entry.setValue(protocol.getItemRewriter().handleItemToClient((Item) value));
 						break;
 					case Float:
 					case String:

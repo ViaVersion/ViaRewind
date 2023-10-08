@@ -19,7 +19,7 @@
 package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.packets;
 
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.items.ReplacementRegistry1_7_6_10to1_8;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.rewriter.ReplacementItemRewriter1_7_6_10;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.WorldBorder;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Chunk1_7_6_10Type;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.ChunkBulk1_7_6_10Type;
@@ -46,9 +46,6 @@ import com.viaversion.viaversion.util.ChatColorUtil;
 public class WorldPackets {
 
 	public static void register(Protocol1_7_6_10To1_8 protocol) {
-
-		/*  OUTGOING  */
-
 		protocol.registerClientbound(ClientboundPackets1_8.CHUNK_DATA, new PacketHandlers() {
 			@Override
 			public void register() {
@@ -61,7 +58,7 @@ public class WorldPackets {
 						DataPalette palette = section.palette(PaletteType.BLOCKS);
 						for (int i = 0; i < palette.size(); i++) {
 							int block = palette.idByIndex(i);
-							int replacedBlock = ReplacementRegistry1_7_6_10to1_8.replace(block);
+							int replacedBlock = protocol.getItemRewriter().replace(block);
 							palette.setIdByIndex(i, replacedBlock);
 						}
 					}
@@ -81,7 +78,7 @@ public class WorldPackets {
 					for (BlockChangeRecord record : records) {
 						short data = (short) (record.getSectionX() << 12 | record.getSectionZ() << 8 | record.getY());
 						packetWrapper.write(Type.SHORT, data);
-						int replacedBlock = ReplacementRegistry1_7_6_10to1_8.replace(record.getBlockId());
+						int replacedBlock = protocol.getItemRewriter().replace(record.getBlockId());
 						packetWrapper.write(Type.SHORT, (short) replacedBlock);
 					}
 				});
@@ -100,7 +97,7 @@ public class WorldPackets {
 				handler(packetWrapper -> {
 					int data = packetWrapper.read(Type.VAR_INT);
 
-					data = ReplacementRegistry1_7_6_10to1_8.replace(data);
+					data = protocol.getItemRewriter().replace(data);
 
 					packetWrapper.write(Type.VAR_INT, data >> 4);
 					packetWrapper.write(Type.UNSIGNED_BYTE, (short) (data & 0xF));

@@ -19,7 +19,6 @@
 package com.viaversion.viarewind.protocol.protocol1_8to1_9.packets;
 
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.Protocol1_8To1_9;
-import com.viaversion.viarewind.protocol.protocol1_8to1_9.items.ItemRewriter;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.metadata.MetadataRewriter;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.storage.Cooldown;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.storage.EntityTracker;
@@ -49,11 +48,7 @@ import java.util.UUID;
 
 public class EntityPackets {
 
-	public static void register(Protocol<ClientboundPackets1_9, ClientboundPackets1_8,
-			ServerboundPackets1_9, ServerboundPackets1_8> protocol) {
-		/*  OUTGOING  */
-
-		//Entity Status
+	public static void register(final Protocol1_8To1_9 protocol) {
 		protocol.registerClientbound(ClientboundPackets1_9.ENTITY_STATUS, new PacketHandlers() {
 			@Override
 			public void register() {
@@ -298,7 +293,7 @@ public class EntityPackets {
 					int entityId = wrapper.get(Type.VAR_INT, 0);
 					EntityTracker tracker = wrapper.user().get(EntityTracker.class);
 					if (tracker.getClientEntityTypes().containsKey(entityId)) {
-						MetadataRewriter.transform(tracker.getClientEntityTypes().get(entityId), metadataList);
+						protocol.getMetadataRewriter().transform(tracker.getClientEntityTypes().get(entityId), metadataList);
 						if (metadataList.isEmpty()) wrapper.cancel();
 					} else {
 						tracker.addMetadataToBuffer(entityId, metadataList);
@@ -336,7 +331,7 @@ public class EntityPackets {
 					packetWrapper.write(Type.SHORT, (short) slot);
 				});
 				map(Type.ITEM);
-				handler(packetWrapper -> packetWrapper.set(Type.ITEM, 0, ItemRewriter.toClient(packetWrapper.get(Type.ITEM, 0))));
+				handler(packetWrapper -> packetWrapper.set(Type.ITEM, 0, protocol.getItemRewriter().handleItemToClient(packetWrapper.get(Type.ITEM, 0))));
 			}
 		});
 

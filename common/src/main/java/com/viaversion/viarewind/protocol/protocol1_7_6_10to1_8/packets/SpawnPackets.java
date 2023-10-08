@@ -24,7 +24,7 @@ import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.entityreplacement
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.entityreplacements.EndermiteReplacement;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.entityreplacements.GuardianReplacement;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.entityreplacements.RabbitReplacement;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.items.ReplacementRegistry1_7_6_10to1_8;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.rewriter.ReplacementItemRewriter1_7_6_10;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.metadata.MetadataRewriter;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.EntityTracker;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.GameProfileStorage;
@@ -47,9 +47,6 @@ import java.util.UUID;
 public class SpawnPackets {
 
 	public static void register(Protocol1_7_6_10To1_8 protocol) {
-
-		/*  OUTGOING  */
-
 		protocol.registerClientbound(ClientboundPackets1_8.SPAWN_PLAYER, new PacketHandlers() {
 			@Override
 			public void register() {
@@ -96,8 +93,8 @@ public class SpawnPackets {
 				map(Type.SHORT);
 				map(Types1_8.METADATA_LIST, Types1_7_6_10.METADATA_LIST);
 				handler(packetWrapper -> {
-					List<Metadata> metadata = packetWrapper.get(Types1_7_6_10.METADATA_LIST, 0);  //Metadata
-					MetadataRewriter.transform(Entity1_10Types.EntityType.PLAYER, metadata);
+					List<Metadata> metadata = packetWrapper.get(Types1_7_6_10.METADATA_LIST, 0); // Metadata
+					protocol.getMetadataRewriter().transform(Entity1_10Types.EntityType.PLAYER, metadata);
 				});
 				handler(packetWrapper -> {
 					int entityId = packetWrapper.get(Type.VAR_INT, 0);
@@ -151,7 +148,7 @@ public class SpawnPackets {
 					} else if (typeId == 78) {
 						packetWrapper.cancel();
 						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-						ArmorStandReplacement armorStand = new ArmorStandReplacement(entityId, packetWrapper.user());
+						ArmorStandReplacement armorStand = new ArmorStandReplacement(protocol, packetWrapper.user(), entityId);
 						armorStand.setLocation(x / 32.0, y / 32.0, z / 32.0);
 						armorStand.setYawPitch(yaw * 360f / 256, pitch * 360f / 256);
 						armorStand.setHeadYaw(yaw * 360f / 256);
@@ -177,7 +174,7 @@ public class SpawnPackets {
 					if (type != null && type.isOrHasParent(Entity1_10Types.EntityType.FALLING_BLOCK)) {
 						int blockId = data & 0xFFF;
 						int blockData = data >> 12 & 0xF;
-						Replacement replace = ReplacementRegistry1_7_6_10to1_8.getReplacement(blockId, blockData);
+						final Replacement replace = protocol.getItemRewriter().replace(blockId, blockData);
 						if (replace != null) {
 							blockId = replace.getId();
 							blockData = replace.replaceData(blockData);
@@ -225,13 +222,13 @@ public class SpawnPackets {
 						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
 						EntityReplacement replacement = null;
 						if (typeId == 30) {
-							replacement = new ArmorStandReplacement(entityId, packetWrapper.user());
+							replacement = new ArmorStandReplacement(protocol, packetWrapper.user(), entityId);
 						} else if (typeId == 68) {
-							replacement = new GuardianReplacement(entityId, packetWrapper.user());
+							replacement = new GuardianReplacement(protocol, packetWrapper.user(), entityId);
 						} else if (typeId == 67) {
-							replacement = new EndermiteReplacement(entityId, packetWrapper.user());
+							replacement = new EndermiteReplacement(protocol, packetWrapper.user(), entityId);
 						} else if (typeId == 101) {
-							replacement = new RabbitReplacement(entityId, packetWrapper.user());
+							replacement = new RabbitReplacement(protocol, packetWrapper.user(), entityId);
 						}
 						replacement.setLocation(x / 32.0, y / 32.0, z / 32.0);
 						replacement.setYawPitch(yaw * 360f / 256, pitch * 360f / 256);
@@ -255,7 +252,7 @@ public class SpawnPackets {
 					if (tracker.getEntityReplacement(entityId) != null) {
 						tracker.getEntityReplacement(entityId).updateMetadata(metadataList);
 					} else if (tracker.getClientEntityTypes().containsKey(entityId)) {
-						MetadataRewriter.transform(tracker.getClientEntityTypes().get(entityId), metadataList);
+						protocol.getMetadataRewriter().transform(tracker.getClientEntityTypes().get(entityId), metadataList);
 					} else {
 						wrapper.cancel();
 					}

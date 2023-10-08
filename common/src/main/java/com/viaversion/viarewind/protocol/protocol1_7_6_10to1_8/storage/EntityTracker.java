@@ -39,6 +39,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class EntityTracker extends StoredObject implements ClientEntityIdChangeListener {
+	private final Protocol1_7_6_10To1_8 protocol;
 	private final Map<Integer, Entity1_10Types.EntityType> clientEntityTypes = new ConcurrentHashMap<>();
 	private final Map<Integer, List<Metadata>> metadataBuffer = new ConcurrentHashMap<>();
 	private final Map<Integer, Integer> vehicles = new ConcurrentHashMap<>();
@@ -51,8 +52,9 @@ public class EntityTracker extends StoredObject implements ClientEntityIdChangeL
 	private int spectating = -1;
 	private int dimension = 0;
 
-	public EntityTracker(UserConnection user) {
+	public EntityTracker(UserConnection user, Protocol1_7_6_10To1_8 protocol) {
 		super(user);
+		this.protocol = protocol;
 	}
 
 	public void removeEntity(int entityId) {
@@ -126,7 +128,7 @@ public class EntityTracker extends StoredObject implements ClientEntityIdChangeL
 			PacketWrapper wrapper = PacketWrapper.create(0x1C, null, this.getUser());
 			wrapper.write(Type.VAR_INT, entityId);
 			wrapper.write(Types1_8.METADATA_LIST, this.metadataBuffer.get(entityId));
-			MetadataRewriter.transform(type, this.metadataBuffer.get(entityId));
+			protocol.getMetadataRewriter().transform(type, this.metadataBuffer.get(entityId));
 			if (!this.metadataBuffer.get(entityId).isEmpty()) {
 				PacketUtil.sendPacket(wrapper, Protocol1_7_6_10To1_8.class);
 			}

@@ -18,6 +18,9 @@
 
 package com.viaversion.viarewind.protocol.protocol1_8to1_9;
 
+import com.viaversion.viarewind.api.rewriter.ReplacementItemRewriter;
+import com.viaversion.viarewind.protocol.protocol1_8to1_9.metadata.MetadataRewriter;
+import com.viaversion.viarewind.protocol.protocol1_8to1_9.rewriter.ReplacementItemRewriter1_8;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.packets.*;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.storage.*;
 import com.viaversion.viarewind.utils.Ticker;
@@ -38,6 +41,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class Protocol1_8To1_9 extends AbstractProtocol<ClientboundPackets1_9, ClientboundPackets1_8, ServerboundPackets1_9, ServerboundPackets1_8> {
+	private final ReplacementItemRewriter<Protocol1_8To1_9> itemRewriter = new ReplacementItemRewriter1_8(this);
+	private final MetadataRewriter metadataRewriter = new MetadataRewriter(this);
 
 	public Queue<PacketWrapper> animationsToSend = new ConcurrentLinkedQueue<>();
 
@@ -84,12 +89,21 @@ public class Protocol1_8To1_9 extends AbstractProtocol<ClientboundPackets1_9, Cl
 		Ticker.init();
 
 		userConnection.put(new Windows(userConnection));
-		userConnection.put(new EntityTracker(userConnection));
+		userConnection.put(new EntityTracker(userConnection, this));
 		userConnection.put(new Levitation(userConnection));
 		userConnection.put(new PlayerPosition(userConnection));
 		userConnection.put(new Cooldown(userConnection));
 		userConnection.put(new BlockPlaceDestroyTracker(userConnection));
 		userConnection.put(new BossBarStorage(userConnection));
 		userConnection.put(new ClientWorld(userConnection));
+	}
+
+	@Override
+	public ReplacementItemRewriter<Protocol1_8To1_9> getItemRewriter() {
+		return itemRewriter;
+	}
+
+	public MetadataRewriter getMetadataRewriter() {
+		return metadataRewriter;
 	}
 }

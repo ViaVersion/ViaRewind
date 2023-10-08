@@ -23,7 +23,6 @@ import com.viaversion.viarewind.protocol.protocol1_7_2_5to1_7_6_10.ClientboundPa
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
 import com.viaversion.viarewind.protocol.protocol1_7_2_5to1_7_6_10.ServerboundPackets1_7_2_5;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.entityreplacements.ArmorStandReplacement;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.items.ItemRewriter;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.provider.TitleRenderProvider;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.*;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
@@ -445,15 +444,15 @@ public class PlayerPackets {
 						}
 
 						for (int i = 0; i < size; i++) {
-							Item item = ItemRewriter.toClient(packetWrapper.read(Type.ITEM));
+							Item item = protocol.getItemRewriter().handleItemToClient(packetWrapper.read(Type.ITEM));
 							packetWrapper.write(Types1_7_6_10.COMPRESSED_NBT_ITEM, item); //Buy Item 1
 
-							item = ItemRewriter.toClient(packetWrapper.read(Type.ITEM));
+							item = protocol.getItemRewriter().handleItemToClient(packetWrapper.read(Type.ITEM));
 							packetWrapper.write(Types1_7_6_10.COMPRESSED_NBT_ITEM, item); //Buy Item 3
 
 							boolean has3Items = packetWrapper.passthrough(Type.BOOLEAN);
 							if (has3Items) {
-								item = ItemRewriter.toClient(packetWrapper.read(Type.ITEM));
+								item = protocol.getItemRewriter().handleItemToClient(packetWrapper.read(Type.ITEM));
 								packetWrapper.write(Types1_7_6_10.COMPRESSED_NBT_ITEM, item); //Buy Item 2
 							}
 
@@ -709,7 +708,7 @@ public class PlayerPackets {
 
 					packetWrapper.passthrough(Type.BYTE);  //Direction
 					Item item = packetWrapper.read(Types1_7_6_10.COMPRESSED_NBT_ITEM);
-					item = ItemRewriter.toServer(item);
+					item = protocol.getItemRewriter().handleItemToServer(item);
 					packetWrapper.write(Type.ITEM, item);
 
 					for (int i = 0; i < 3; i++) {

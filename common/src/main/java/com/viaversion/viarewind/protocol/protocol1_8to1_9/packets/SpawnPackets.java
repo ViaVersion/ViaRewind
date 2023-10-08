@@ -22,7 +22,6 @@ import com.viaversion.viarewind.ViaRewind;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.Protocol1_8To1_9;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.entityreplacement.ShulkerBulletReplacement;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.entityreplacement.ShulkerReplacement;
-import com.viaversion.viarewind.protocol.protocol1_8to1_9.items.ReplacementRegistry1_8to1_9;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.metadata.MetadataRewriter;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.storage.EntityTracker;
 import com.viaversion.viarewind.replacement.EntityReplacement;
@@ -30,26 +29,18 @@ import com.viaversion.viarewind.replacement.Replacement;
 import com.viaversion.viarewind.utils.PacketUtil;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
-import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_8;
 import com.viaversion.viaversion.api.type.types.version.Types1_9;
-import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
-import com.viaversion.viaversion.protocols.protocol1_8.ServerboundPackets1_8;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ClientboundPackets1_9;
-import com.viaversion.viaversion.protocols.protocol1_9to1_8.ServerboundPackets1_9;
 
 import java.util.List;
 
 public class SpawnPackets {
 
-	public static void register(Protocol<ClientboundPackets1_9, ClientboundPackets1_8,
-			ServerboundPackets1_9, ServerboundPackets1_8> protocol) {
-		/*  OUTGOING  */
-
-		//Spawn Object
+	public static void register(Protocol1_8To1_9 protocol) {
 		protocol.registerClientbound(ClientboundPackets1_9.SPAWN_ENTITY, new PacketHandlers() {
 			@Override
 			public void register() {
@@ -93,7 +84,7 @@ public class SpawnPackets {
 						packetWrapper.set(Type.INT, 1, y);
 					} else if (type.is(Entity1_10Types.EntityType.SHULKER_BULLET)) {
 						packetWrapper.cancel();
-						ShulkerBulletReplacement shulkerBulletReplacement = new ShulkerBulletReplacement(entityId, packetWrapper.user());
+						ShulkerBulletReplacement shulkerBulletReplacement = new ShulkerBulletReplacement(protocol, packetWrapper.user(), entityId);
 						shulkerBulletReplacement.setLocation(x / 32.0, y / 32.0, z / 32.0);
 						tracker.addEntityReplacement(shulkerBulletReplacement);
 						return;
@@ -108,7 +99,7 @@ public class SpawnPackets {
 					if (type.is(Entity1_10Types.EntityType.FALLING_BLOCK)) {
 						int blockId = data & 0xFFF;
 						int blockData = data >> 12 & 0xF;
-						Replacement replace = ReplacementRegistry1_8to1_9.getReplacement(blockId, blockData);
+						Replacement replace = protocol.getItemRewriter().replace(blockId, blockData);
 						if (replace != null) {
 							packetWrapper.set(Type.INT, 3, replace.getId() | replace.replaceData(data) << 12);
 						}
@@ -202,7 +193,7 @@ public class SpawnPackets {
 					if (typeId == 69) {
 						packetWrapper.cancel();
 						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-						ShulkerReplacement shulkerReplacement = new ShulkerReplacement(entityId, packetWrapper.user());
+						ShulkerReplacement shulkerReplacement = new ShulkerReplacement(protocol, packetWrapper.user(), entityId);
 						shulkerReplacement.setLocation(x / 32.0, y / 32.0, z / 32.0);
 						shulkerReplacement.setYawPitch(yaw * 360f / 256, pitch * 360f / 256);
 						shulkerReplacement.setHeadYaw(headYaw * 360f / 256);
@@ -226,7 +217,7 @@ public class SpawnPackets {
 					if ((replacement = tracker.getEntityReplacement(entityId)) != null) {
 						replacement.updateMetadata(metadataList);
 					} else if (tracker.getClientEntityTypes().containsKey(entityId)) {
-						MetadataRewriter.transform(tracker.getClientEntityTypes().get(entityId), metadataList);
+						protocol.getMetadataRewriter().transform(tracker.getClientEntityTypes().get(entityId), metadataList);
 					} else {
 						wrapper.cancel();
 					}
@@ -267,7 +258,7 @@ public class SpawnPackets {
 				map(Types1_9.METADATA_LIST, Types1_8.METADATA_LIST);
 				this.handler(wrapper -> {
 					List<Metadata> metadataList = wrapper.get(Types1_8.METADATA_LIST, 0);
-					MetadataRewriter.transform(Entity1_10Types.EntityType.PLAYER, metadataList);
+					protocol.getMetadataRewriter().transform(Entity1_10Types.EntityType.PLAYER, metadataList);
 				});
 				handler(packetWrapper -> {
 					int entityId = packetWrapper.get(Type.VAR_INT, 0);

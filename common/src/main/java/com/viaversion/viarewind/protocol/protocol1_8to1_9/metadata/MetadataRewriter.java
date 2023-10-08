@@ -19,7 +19,7 @@
 package com.viaversion.viarewind.protocol.protocol1_8to1_9.metadata;
 
 import com.viaversion.viarewind.ViaRewind;
-import com.viaversion.viarewind.protocol.protocol1_8to1_9.items.ItemRewriter;
+import com.viaversion.viarewind.protocol.protocol1_8to1_9.Protocol1_8To1_9;
 import com.viaversion.viaversion.api.minecraft.EulerAngle;
 import com.viaversion.viaversion.api.minecraft.Vector;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
@@ -33,7 +33,13 @@ import java.util.List;
 import java.util.UUID;
 
 public class MetadataRewriter {
-	public static void transform(Entity1_10Types.EntityType type, List<Metadata> list) {
+	private final Protocol1_8To1_9 protocol;
+
+	public MetadataRewriter(Protocol1_8To1_9 protocol) {
+		this.protocol = protocol;
+	}
+
+	public void transform(Entity1_10Types.EntityType type, List<Metadata> list) {
 		for (Metadata entry : new ArrayList<>(list)) {
 			MetaIndex metaIndex = MetaIndex1_8to1_9.searchIndex(type, entry.id());
 			try {
@@ -89,7 +95,7 @@ public class MetadataRewriter {
 							else entry.setValue((byte) ((Boolean) value ? 1 : 0));
 							break;
 						case Slot:
-							entry.setValue(ItemRewriter.toClient((Item) value));
+							entry.setValue(protocol.getItemRewriter().handleItemToClient((Item) value));
 							break;
 						case Position:
 							Vector vector = (Vector) value;

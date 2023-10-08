@@ -22,8 +22,6 @@ import com.google.common.collect.Lists;
 import com.google.common.primitives.Ints;
 import com.viaversion.viarewind.protocol.protocol1_7_2_5to1_7_6_10.ClientboundPackets1_7_2_5;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.items.ItemRewriter;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.metadata.MetadataRewriter;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.EntityTracker;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.GameProfileStorage;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
@@ -50,18 +48,22 @@ public class EntityPackets {
 			public void register() {
 				map(Type.VAR_INT, Type.INT); // entity id
 				map(Type.SHORT); // slot
-				map(Type.ITEM, Types1_7_6_10.COMPRESSED_NBT_ITEM); // Item
-				handler(packetWrapper -> {
-					Item item = packetWrapper.get(Types1_7_6_10.COMPRESSED_NBT_ITEM, 0);
-					ItemRewriter.toClient(item);
-					packetWrapper.set(Types1_7_6_10.COMPRESSED_NBT_ITEM, 0, item);
+				map(Type.ITEM, Types1_7_6_10.COMPRESSED_NBT_ITEM); // item
+
+				// remap item
+				handler(wrapper -> {
+					final Item item = wrapper.get(Types1_7_6_10.COMPRESSED_NBT_ITEM, 0);
+					protocol.getItemRewriter().handleItemToClient(item);
+					wrapper.set(Types1_7_6_10.COMPRESSED_NBT_ITEM, 0, item);
 				});
-				handler(packetWrapper -> {
-					EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-					int id = packetWrapper.get(Type.INT, 0);
-					int limit = tracker.getPlayerId() == id ? 3 : 4;
-					if (packetWrapper.get(Type.SHORT, 0) > limit) packetWrapper.cancel();
-				});
+
+//				handler(packetWrapper -> { TODO | Check if this is important?
+//					final EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
+//					int id = packetWrapper.get(Type.INT, 0);
+//					int limit = tracker.getPlayerId() == id ? 3 : 4;
+//					if (packetWrapper.get(Type.SHORT, 0) > limit) packetWrapper.cancel();
+//				});
+
 				handler(packetWrapper -> {
 					short slot = packetWrapper.get(Type.SHORT, 0);
 					if (packetWrapper.isCancelled()) return;
@@ -82,12 +84,13 @@ public class EntityPackets {
 		protocol.registerClientbound(ClientboundPackets1_8.USE_BED, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Type.VAR_INT, Type.INT);  //Entity Id
-				handler(packetWrapper -> {
-					Position position = packetWrapper.read(Type.POSITION);
-					packetWrapper.write(Type.INT, position.x());
-					packetWrapper.write(Type.UNSIGNED_BYTE, (short) position.y());
-					packetWrapper.write(Type.INT, position.z());
+				map(Type.VAR_INT, Type.INT); // entity id
+				handler(wrapper -> {
+					final Position position = wrapper.read(Type.POSITION);
+
+					wrapper.write(Type.INT, position.x());
+					wrapper.write(Type.UNSIGNED_BYTE, (short) position.y());
+					wrapper.write(Type.INT, position.z());
 				});
 			}
 		});
@@ -95,18 +98,18 @@ public class EntityPackets {
 		protocol.registerClientbound(ClientboundPackets1_8.COLLECT_ITEM, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Type.VAR_INT, Type.INT);  //Collected Entity ID
-				map(Type.VAR_INT, Type.INT);  //Collector Entity ID
+				map(Type.VAR_INT, Type.INT); // collected entity id
+				map(Type.VAR_INT, Type.INT); // collector entity id
 			}
 		});
 
 		protocol.registerClientbound(ClientboundPackets1_8.ENTITY_VELOCITY, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Type.VAR_INT, Type.INT);  //Entity Id
-				map(Type.SHORT);  //velX
-				map(Type.SHORT);  //velY
-				map(Type.SHORT);  //velZ
+				map(Type.VAR_INT, Type.INT); // entity id
+				map(Type.SHORT); // velocity x
+				map(Type.SHORT); // velocity y
+				map(Type.SHORT); // velocity z
 			}
 		});
 
@@ -302,7 +305,7 @@ public class EntityPackets {
 							wrapper.cancel();
 							replacement.updateMetadata(metadataList);
 						} else {
-							MetadataRewriter.transform(tracker.getClientEntityTypes().get(entityId), metadataList);
+							protocol.getMetadataRewriter().transform(tracker.getClientEntityTypes().get(entityId), metadataList);
 							if (metadataList.isEmpty()) wrapper.cancel();
 						}
 					} else {

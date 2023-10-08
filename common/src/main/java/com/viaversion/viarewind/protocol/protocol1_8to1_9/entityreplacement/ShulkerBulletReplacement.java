@@ -36,8 +36,8 @@ public class ShulkerBulletReplacement extends EntityReplacement1_8to1_9 {
 	private float yaw, pitch;
 	private float headYaw;
 
-	public ShulkerBulletReplacement(int entityId, UserConnection user) {
-		super(user);
+	public ShulkerBulletReplacement(Protocol1_8To1_9 protocol, UserConnection user, int entityId) {
+		super(protocol, user);
 		this.entityId = entityId;
 		spawn();
 	}

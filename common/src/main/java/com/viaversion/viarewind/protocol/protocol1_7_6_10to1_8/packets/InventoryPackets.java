@@ -20,7 +20,6 @@ package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.packets;
 
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
 import com.viaversion.viarewind.protocol.protocol1_7_2_5to1_7_6_10.ServerboundPackets1_7_2_5;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.items.ItemRewriter;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.EntityTracker;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.GameProfileStorage;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.Windows;
@@ -37,9 +36,6 @@ import java.util.UUID;
 public class InventoryPackets {
 
 	public static void register(Protocol1_7_6_10To1_8 protocol) {
-
-		/*  OUTGOING  */
-
 		protocol.registerClientbound(ClientboundPackets1_8.OPEN_WINDOW, new PacketHandlers() {
 			@Override
 			public void register() {
@@ -97,7 +93,7 @@ public class InventoryPackets {
 				map(Type.ITEM, Types1_7_6_10.COMPRESSED_NBT_ITEM);  //Item
 				handler(packetWrapper -> {
 					Item item = packetWrapper.get(Types1_7_6_10.COMPRESSED_NBT_ITEM, 0);
-					ItemRewriter.toClient(item);
+					protocol.getItemRewriter().handleItemToClient(item);
 					packetWrapper.set(Types1_7_6_10.COMPRESSED_NBT_ITEM, 0, item);
 				});
 				handler(packetWrapper -> {
@@ -128,7 +124,7 @@ public class InventoryPackets {
 						items[0] = old[0];
 						System.arraycopy(old, 2, items, 1, old.length - 3);
 					}
-					for (int i = 0; i < items.length; i++) items[i] = ItemRewriter.toClient(items[i]);
+					for (int i = 0; i < items.length; i++) items[i] = protocol.getItemRewriter().handleItemToClient(items[i]);
 					packetWrapper.write(Types1_7_6_10.COMPRESSED_NBT_ITEM_ARRAY, items);  //Items
 				});
 				handler(packetWrapper -> {
@@ -239,7 +235,7 @@ public class InventoryPackets {
 				map(Types1_7_6_10.COMPRESSED_NBT_ITEM, Type.ITEM);
 				handler(packetWrapper -> {
 					Item item = packetWrapper.get(Type.ITEM, 0);
-					ItemRewriter.toServer(item);
+					protocol.getItemRewriter().handleItemToServer(item);
 					packetWrapper.set(Type.ITEM, 0, item);
 				});
 			}
@@ -253,7 +249,7 @@ public class InventoryPackets {
 				map(Types1_7_6_10.COMPRESSED_NBT_ITEM, Type.ITEM);  //Item
 				handler(packetWrapper -> {
 					Item item = packetWrapper.get(Type.ITEM, 0);
-					ItemRewriter.toServer(item);
+					protocol.getItemRewriter().handleItemToServer(item);
 					packetWrapper.set(Type.ITEM, 0, item);
 				});
 			}

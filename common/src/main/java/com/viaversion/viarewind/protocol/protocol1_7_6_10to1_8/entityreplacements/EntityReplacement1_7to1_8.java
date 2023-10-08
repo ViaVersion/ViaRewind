@@ -30,9 +30,11 @@ import com.viaversion.viaversion.api.type.Type;
 import java.util.ArrayList;
 
 public abstract class EntityReplacement1_7to1_8 implements EntityReplacement {
+	protected final Protocol1_7_6_10To1_8 protocol;
 	protected final UserConnection user;
 
-	public EntityReplacement1_7to1_8(UserConnection user) {
+	public EntityReplacement1_7to1_8(Protocol1_7_6_10To1_8 protocol, UserConnection user) {
+		this.protocol = protocol;
 		this.user = user;
 	}
 

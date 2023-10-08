@@ -16,97 +16,99 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.viaversion.viarewind.protocol.protocol1_8to1_9.items;
+package com.viaversion.viarewind.protocol.protocol1_8to1_9.rewriter;
 
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.Protocol1_8To1_9;
+import com.viaversion.viarewind.replacement.Replacement;
+import com.viaversion.viarewind.api.rewriter.ReplacementItemRewriter;
 import com.viaversion.viarewind.utils.Enchantments;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.*;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.ItemRewriter;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static com.viaversion.viaversion.protocols.protocol1_9to1_8.ItemRewriter.potionNameFromDamage;
 
-@SuppressWarnings({"MismatchedQueryAndUpdateOfCollection", "unused"})
-public class ItemRewriter {
-	private static Map<String, Integer> ENTITY_NAME_TO_ID;
-	private static Map<Integer, String> ENTITY_ID_TO_NAME;
-	private static Map<String, Integer> POTION_NAME_TO_ID;
-	private static Map<Integer, String> POTION_ID_TO_NAME;
-	private static final Map<String, String> POTION_NAME_INDEX = new HashMap<>();
+public class ReplacementItemRewriter1_8 extends ReplacementItemRewriter<Protocol1_8To1_9> {
+	public final static String VIA_REWIND_TAG_KEY = "ViaRewind1_8to1_9";
 
-	static {
-		for (Field field : ItemRewriter.class.getDeclaredFields()) {
-			try {
-				Field other = com.viaversion.viaversion.protocols.protocol1_9to1_8.ItemRewriter.class.getDeclaredField(field.getName());
-				other.setAccessible(true);
-				field.setAccessible(true);
-				field.set(null, other.get(null));
-			} catch (Exception ignored) {}
-		}
-
-		POTION_NAME_TO_ID.put("luck", 8203);
-
-		POTION_NAME_INDEX.put("water", "§rWater Bottle");
-		POTION_NAME_INDEX.put("mundane", "§rMundane Potion");
-		POTION_NAME_INDEX.put("thick", "§rThick Potion");
-		POTION_NAME_INDEX.put("awkward", "§rAwkward Potion");
-		POTION_NAME_INDEX.put("water_splash", "§rSplash Water Bottle");
-		POTION_NAME_INDEX.put("mundane_splash", "§rMundane Splash Potion");
-		POTION_NAME_INDEX.put("thick_splash", "§rThick Splash Potion");
-		POTION_NAME_INDEX.put("awkward_splash", "§rAwkward Splash Potion");
-		POTION_NAME_INDEX.put("water_lingering", "§rLingering Water Bottle");
-		POTION_NAME_INDEX.put("mundane_lingering", "§rMundane Lingering Potion");
-		POTION_NAME_INDEX.put("thick_lingering", "§rThick Lingering Potion");
-		POTION_NAME_INDEX.put("awkward_lingering", "§rAwkward Lingering Potion");
-		POTION_NAME_INDEX.put("night_vision_lingering", "§rLingering Potion of Night Vision");
-		POTION_NAME_INDEX.put("long_night_vision_lingering", "§rLingering Potion of Night Vision");
-		POTION_NAME_INDEX.put("invisibility_lingering", "§rLingering Potion of Invisibility");
-		POTION_NAME_INDEX.put("long_invisibility_lingering", "§rLingering Potion of Invisibility");
-		POTION_NAME_INDEX.put("leaping_lingering", "§rLingering Potion of Leaping");
-		POTION_NAME_INDEX.put("long_leaping_lingering", "§rLingering Potion of Leaping");
-		POTION_NAME_INDEX.put("strong_leaping_lingering", "§rLingering Potion of Leaping");
-		POTION_NAME_INDEX.put("fire_resistance_lingering", "§rLingering Potion of Fire Resistance");
-		POTION_NAME_INDEX.put("long_fire_resistance_lingering", "§rLingering Potion of Fire Resistance");
-		POTION_NAME_INDEX.put("swiftness_lingering", "§rLingering Potion of Swiftness");
-		POTION_NAME_INDEX.put("long_swiftness_lingering", "§rLingering Potion of Swiftness");
-		POTION_NAME_INDEX.put("strong_swiftness_lingering", "§rLingering Potion of Swiftness");
-		POTION_NAME_INDEX.put("slowness_lingering", "§rLingering Potion of Slowness");
-		POTION_NAME_INDEX.put("long_slowness_lingering", "§rLingering Potion of Slowness");
-		POTION_NAME_INDEX.put("water_breathing_lingering", "§rLingering Potion of Water Breathing");
-		POTION_NAME_INDEX.put("long_water_breathing_lingering", "§rLingering Potion of Water Breathing");
-		POTION_NAME_INDEX.put("healing_lingering", "§rLingering Potion of Healing");
-		POTION_NAME_INDEX.put("strong_healing_lingering", "§rLingering Potion of Healing");
-		POTION_NAME_INDEX.put("harming_lingering", "§rLingering Potion of Harming");
-		POTION_NAME_INDEX.put("strong_harming_lingering", "§rLingering Potion of Harming");
-		POTION_NAME_INDEX.put("poison_lingering", "§rLingering Potion of Poisen");
-		POTION_NAME_INDEX.put("long_poison_lingering", "§rLingering Potion of Poisen");
-		POTION_NAME_INDEX.put("strong_poison_lingering", "§rLingering Potion of Poisen");
-		POTION_NAME_INDEX.put("regeneration_lingering", "§rLingering Potion of Regeneration");
-		POTION_NAME_INDEX.put("long_regeneration_lingering", "§rLingering Potion of Regeneration");
-		POTION_NAME_INDEX.put("strong_regeneration_lingering", "§rLingering Potion of Regeneration");
-		POTION_NAME_INDEX.put("strength_lingering", "§rLingering Potion of Strength");
-		POTION_NAME_INDEX.put("long_strength_lingering", "§rLingering Potion of Strength");
-		POTION_NAME_INDEX.put("strong_strength_lingering", "§rLingering Potion of Strength");
-		POTION_NAME_INDEX.put("weakness_lingering", "§rLingering Potion of Weakness");
-		POTION_NAME_INDEX.put("long_weakness_lingering", "§rLingering Potion of Weakness");
-		POTION_NAME_INDEX.put("luck_lingering", "§rLingering Potion of Luck");
-		POTION_NAME_INDEX.put("luck", "§rPotion of Luck");
-		POTION_NAME_INDEX.put("luck_splash", "§rSplash Potion of Luck");
+	public ReplacementItemRewriter1_8(Protocol1_8To1_9 protocol) {
+		super(protocol);
 	}
 
-	public static Item toClient(Item item) {
+	@Override
+	public void register() {
+		registerItem(198, new Replacement(50, 0, "End Rod"));
+		registerItem(434, new Replacement(391, "Beetroot"));
+		registerItem(435, new Replacement(361, "Beetroot Seeds"));
+		registerItem(436, new Replacement(282, "Beetroot Soup"));
+		registerItem(432, new Replacement(322, "Chorus Fruit"));
+		registerItem(433, new Replacement(393, "Popped Chorus Fruit"));
+		registerItem(437, new Replacement(373, "Dragons Breath"));
+		registerItem(443, new Replacement(299, "Elytra"));
+		registerItem(426, new Replacement(410, "End Crystal"));
+		registerItem(442, new Replacement(425, "Shield"));
+		registerItem(439, new Replacement(262, "Spectral Arrow"));
+		registerItem(440, new Replacement(262, "Tipped Arrow"));
+		registerItem(444, new Replacement(333, "Spruce Boat"));
+		registerItem(445, new Replacement(333, "Birch Boat"));
+		registerItem(446, new Replacement(333, "Jungle Boat"));
+		registerItem(447, new Replacement(333, "Acacia Boat"));
+		registerItem(448, new Replacement(333, "Dark Oak Boat"));
+		registerItem(204, new Replacement(43, 7, "Purpur Double Slab"));
+		registerItem(205, new Replacement(44, 7, "Purpur Slab"));
+
+		registerBlock(209, new Replacement(119));
+		registerBlock(198, 0, new Replacement(50, 5));
+		registerBlock(198, 1, new Replacement(50, 5));
+		registerBlock(198, 2, new Replacement(50, 4));
+		registerBlock(198, 3, new Replacement(50, 3));
+		registerBlock(198, 4, new Replacement(50, 2));
+		registerBlock(198, 5, new Replacement(50, 1));
+		registerBlock(204, new Replacement(43, 7));
+		registerBlock(205, 0, new Replacement(44, 7));
+		registerBlock(205, 8, new Replacement(44, 15));
+		registerBlock(207, new Replacement(141));
+		registerBlock(137, new Replacement(137, 0));
+
+		registerItemBlock(199, new Replacement(35, 10, "Chorus Plant"));
+		registerItemBlock(200, new Replacement(35, 2, "Chorus Flower"));
+		registerItemBlock(201, new Replacement(155, 0, "Purpur Block"));
+		registerItemBlock(202, new Replacement(155, 2, "Purpur Pillar"));
+		registerItemBlock(203, 0, new Replacement(156, 0, "Purpur Stairs"));
+		registerItemBlock(203, 1, new Replacement(156, 1, "Purpur Stairs"));
+		registerItemBlock(203, 2, new Replacement(156, 2, "Purpur Stairs"));
+		registerItemBlock(203, 3, new Replacement(156, 3, "Purpur Stairs"));
+		registerItemBlock(203, 4, new Replacement(156, 4, "Purpur Stairs"));
+		registerItemBlock(203, 5, new Replacement(156, 5, "Purpur Stairs"));
+		registerItemBlock(203, 6, new Replacement(156, 6, "Purpur Stairs"));
+		registerItemBlock(203, 7, new Replacement(156, 7, "Purpur Stairs"));
+		registerItemBlock(203, 8, new Replacement(156, 8, "Purpur Stairs"));
+		registerItemBlock(206, new Replacement(121, 0, "Endstone Bricks"));
+		registerItemBlock(207, new Replacement(141, "Beetroot Block"));
+		registerItemBlock(208, new Replacement(2, 0, "Grass Path"));
+		registerItemBlock(209, new Replacement(90, "End Gateway"));
+		registerItemBlock(210, new Replacement(137, 0, "Repeating Command Block"));
+		registerItemBlock(211, new Replacement(137, 0, "Chain Command Block"));
+		registerItemBlock(212, new Replacement(79, 0, "Frosted Ice"));
+		registerItemBlock(214, new Replacement(87, 0, "Nether Wart Block"));
+		registerItemBlock(215, new Replacement(112, 0, "Red Nether Brick"));
+		registerItemBlock(217, new Replacement(166, 0, "Structure Void"));
+		registerItemBlock(255, new Replacement(137, 0, "Structure Block"));
+		registerItemBlock(397, 5, new Replacement(397, 0, "Dragon Head"));
+	}
+	
+	@Override
+	public Item handleItemToClient(Item item) {
 		if (item == null) return null;
 
 		CompoundTag tag = item.tag();
 		if (tag == null) item.setTag(tag = new CompoundTag());
 
 		CompoundTag viaVersionTag = new CompoundTag();
-		tag.put("ViaRewind1_8to1_9", viaVersionTag);
+		tag.put(VIA_REWIND_TAG_KEY, viaVersionTag);
 
 		viaVersionTag.put("id", new ShortTag((short) item.identifier()));
 		viaVersionTag.put("data", new ShortTag(item.data()));
@@ -176,8 +178,8 @@ public class ItemRewriter {
 				CompoundTag entityTag = tag.get("EntityTag");
 				if (entityTag.contains("id")) {
 					StringTag id = entityTag.get("id");
-					if (ENTITY_NAME_TO_ID.containsKey(id.getValue())) {
-						data = ENTITY_NAME_TO_ID.get(id.getValue());
+					if (ItemRewriter.ENTTIY_NAME_TO_ID.containsKey(id.getValue())) {
+						data = ItemRewriter.ENTTIY_NAME_TO_ID.get(id.getValue());
 					} else if (display == null) {
 						tag.put("display", display = new CompoundTag());
 						viaVersionTag.put("noDisplay", new ByteTag());
@@ -189,24 +191,24 @@ public class ItemRewriter {
 			item.setData((short) data);
 		}
 
-		ReplacementRegistry1_8to1_9.replace(item);
+		replace(item);
 
 		if (item.identifier() == 373 || item.identifier() == 438 || item.identifier() == 441) {
 			int data = 0;
 			if (tag.contains("Potion")) {
 				StringTag potion = tag.get("Potion");
 				String potionName = potion.getValue().replace("minecraft:", "");
-				if (POTION_NAME_TO_ID.containsKey(potionName)) {
-					data = POTION_NAME_TO_ID.get(potionName);
+				if (PotionMappings.POTION_NAME_TO_ID.containsKey(potionName)) {
+					data = PotionMappings.POTION_NAME_TO_ID.get(potionName);
 				}
 				if (item.identifier() == 438) potionName += "_splash";
 				else if (item.identifier() == 441) potionName += "_lingering";
-				if ((display == null || !display.contains("Name")) && POTION_NAME_INDEX.containsKey(potionName)) {
+				if ((display == null || !display.contains("Name")) && PotionMappings.POTION_NAME_INDEX.containsKey(potionName)) {
 					if (display == null) {
 						tag.put("display", display = new CompoundTag());
 						viaVersionTag.put("noDisplay", new ByteTag());
 					}
-					display.put("Name", new StringTag(POTION_NAME_INDEX.get(potionName)));
+					display.put("Name", new StringTag(PotionMappings.POTION_NAME_INDEX.get(potionName)));
 				}
 			}
 
@@ -231,23 +233,24 @@ public class ItemRewriter {
 		}
 
 		if (viaVersionTag.size() == 2 && (short) viaVersionTag.get("id").getValue() == item.identifier() && (short) viaVersionTag.get("data").getValue() == item.data()) {
-			item.tag().remove("ViaRewind1_8to1_9");
+			item.tag().remove(VIA_REWIND_TAG_KEY);
 			if (item.tag().isEmpty()) item.setTag(null);
 		}
 
 		return item;
 	}
 
-	public static Item toServer(Item item) {
+	@Override
+	public Item handleItemToServer(Item item) {
 		if (item == null) return null;
 
 		CompoundTag tag = item.tag();
 
 		if (item.identifier() == 383 && item.data() != 0) {
 			if (tag == null) item.setTag(tag = new CompoundTag());
-			if (!tag.contains("EntityTag") && ENTITY_ID_TO_NAME.containsKey((int) item.data())) {
+			if (!tag.contains("EntityTag") && ItemRewriter.ENTTIY_ID_TO_NAME.containsKey((int) item.data())) {
 				CompoundTag entityTag = new CompoundTag();
-				entityTag.put("id", new StringTag(ENTITY_ID_TO_NAME.get((int) item.data())));
+				entityTag.put("id", new StringTag(ItemRewriter.ENTTIY_ID_TO_NAME.get((int) item.data())));
 				tag.put("EntityTag", entityTag);
 			}
 

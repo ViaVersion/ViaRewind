@@ -18,11 +18,14 @@
 
 package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8;
 
+import com.viaversion.viarewind.api.rewriter.ReplacementItemRewriter;
 import com.viaversion.viarewind.protocol.protocol1_7_2_5to1_7_6_10.ClientboundPackets1_7_2_5;
 import com.viaversion.viarewind.protocol.protocol1_7_2_5to1_7_6_10.ServerboundPackets1_7_2_5;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.metadata.MetadataRewriter;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.packets.*;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.provider.CompressionHandlerProvider;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.provider.compression.TrackingCompressionHandlerProvider;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.rewriter.ReplacementItemRewriter1_7_6_10;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.*;
 import com.viaversion.viarewind.utils.Ticker;
 import com.viaversion.viaversion.api.Via;
@@ -42,12 +45,17 @@ import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.Client
 
 public class Protocol1_7_6_10To1_8 extends AbstractProtocol<ClientboundPackets1_8, ClientboundPackets1_7_2_5, ServerboundPackets1_8, ServerboundPackets1_7_2_5> {
 
+	private final ReplacementItemRewriter<Protocol1_7_6_10To1_8> itemRewriter = new ReplacementItemRewriter1_7_6_10(this);
+	private final MetadataRewriter metadataRewriter = new MetadataRewriter(this);
+
 	public Protocol1_7_6_10To1_8() {
 		super(ClientboundPackets1_8.class, ClientboundPackets1_7_2_5.class, ServerboundPackets1_8.class, ServerboundPackets1_7_2_5.class);
 	}
 
 	@Override
 	protected void registerPackets() {
+		itemRewriter.register();
+
 		EntityPackets.register(this);
 		InventoryPackets.register(this);
 		PlayerPackets.register(this);
@@ -110,7 +118,7 @@ public class Protocol1_7_6_10To1_8 extends AbstractProtocol<ClientboundPackets1_
 		Ticker.init();
 
 		userConnection.put(new Windows(userConnection));
-		userConnection.put(new EntityTracker(userConnection));
+		userConnection.put(new EntityTracker(userConnection, this));
 		userConnection.put(new PlayerPosition(userConnection));
 		userConnection.put(new GameProfileStorage(userConnection));
 		userConnection.put(new Scoreboard(userConnection));
@@ -123,5 +131,14 @@ public class Protocol1_7_6_10To1_8 extends AbstractProtocol<ClientboundPackets1_
 	@Override
 	public void register(ViaProviders providers) {
 		providers.register(CompressionHandlerProvider.class, new TrackingCompressionHandlerProvider());
+	}
+
+	@Override
+	public ReplacementItemRewriter<Protocol1_7_6_10To1_8> getItemRewriter() {
+		return itemRewriter;
+	}
+
+	public MetadataRewriter getMetadataRewriter() {
+		return metadataRewriter;
 	}
 }

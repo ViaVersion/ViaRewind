@@ -18,14 +18,23 @@
 
 package com.viaversion.viarewind.api.rewriter;
 
+import com.viaversion.viarewind.api.minecraft.IdDataCombine;
 import com.viaversion.viarewind.replacement.Replacement;
 import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.protocol.AbstractProtocol;
+import com.viaversion.viaversion.api.rewriter.ItemRewriter;
 import com.viaversion.viaversion.libs.fastutil.ints.Int2ObjectMap;
 import com.viaversion.viaversion.libs.fastutil.ints.Int2ObjectOpenHashMap;
 
-public class ReplacementItemRewriter {
+public abstract class ReplacementItemRewriter<T extends AbstractProtocol<?, ?, ?, ?>> implements ItemRewriter<T> {
 	private final Int2ObjectMap<Replacement> ITEM_REPLACEMENTS = new Int2ObjectOpenHashMap<>();
 	private final Int2ObjectMap<Replacement> BLOCK_REPLACEMENTS = new Int2ObjectOpenHashMap<>();
+
+	private final T protocol;
+
+	public ReplacementItemRewriter(T protocol) {
+		this.protocol = protocol;
+	}
 
 	public void registerItem(int id, Replacement replacement) {
 		registerItem(id, -1, replacement);
@@ -40,11 +49,11 @@ public class ReplacementItemRewriter {
 	}
 
 	public void registerItem(int id, int data, Replacement replacement) {
-		ITEM_REPLACEMENTS.put(combine(id, data), replacement);
+		ITEM_REPLACEMENTS.put(generateTrackingId(id, data), replacement);
 	}
 
 	public void registerBlock(int id, int data, Replacement replacement) {
-		BLOCK_REPLACEMENTS.put(combine(id, data), replacement);
+		BLOCK_REPLACEMENTS.put(generateTrackingId(id, data), replacement);
 	}
 
 	public void registerItemBlock(int id, int data, Replacement replacement) {
@@ -52,21 +61,51 @@ public class ReplacementItemRewriter {
 		registerBlock(id, data, replacement);
 	}
 
+	/**
+	 * @param item The item to replace
+	 * @return The replacement for the item or the item if not found
+	 */
 	public Item replace(Item item) {
-		Replacement replacement = ITEM_REPLACEMENTS.get(combine(item.identifier(), item.data()));
-		if (replacement == null) replacement = ITEM_REPLACEMENTS.get(combine(item.identifier(), -1));
+		Replacement replacement = ITEM_REPLACEMENTS.get(generateTrackingId(item.identifier(), item.data()));
+		if (replacement == null) replacement = ITEM_REPLACEMENTS.get(generateTrackingId(item.identifier(), -1));
+
 		return replacement == null ? item : replacement.replace(item);
 	}
 
+	/**
+	 * @param id   The id of the item/block
+	 * @param data The data of the item/block
+	 * @return The replacement for the item/block or null if not found
+	 */
 	public Replacement replace(int id, int data) {
-		Replacement replacement = BLOCK_REPLACEMENTS.get(combine(id, data));
-		if (replacement == null) {
-			replacement = BLOCK_REPLACEMENTS.get(combine(id, -1));
-		}
+		Replacement replacement = BLOCK_REPLACEMENTS.get(generateTrackingId(id, data));
+		if (replacement == null) replacement = BLOCK_REPLACEMENTS.get(generateTrackingId(id, -1));
+
 		return replacement;
 	}
 
-	public static int combine(int id, int data) {
+	/**
+	 * @param combined The combined id and data
+	 * @return The generated tracking id for the item/block
+	 */
+	public int replace(int combined) {
+		final int data = IdDataCombine.dataFromCombined(combined);
+		final Replacement replace = replace(IdDataCombine.idFromCombined(combined), data);
+
+		return replace != null ? IdDataCombine.toCombined(replace.getId(), replace.replaceData(data)) : combined;
+	}
+
+	/**
+	 * @param id   The id of the item/block
+	 * @param data The data of the item/block
+	 * @return The generated tracking id for the item/block
+	 */
+	private int generateTrackingId(int id, int data) {
 		return (id << 16) | (data & 0xFFFF);
+	}
+
+	@Override
+	public T protocol() {
+		return this.protocol;
 	}
 }
