@@ -185,7 +185,8 @@ public class WorldPackets {
 
 					if (particle == ParticleIndex1_7_6_10.ICON_CRACK || particle == ParticleIndex1_7_6_10.BLOCK_CRACK || particle == ParticleIndex1_7_6_10.BLOCK_DUST) {
 						int id = packetWrapper.read(Type.VAR_INT);
-						int data = particle == ParticleIndex1_7_6_10.ICON_CRACK ? packetWrapper.read(Type.VAR_INT) : 0;
+						int data = particle == ParticleIndex1_7_6_10.ICON_CRACK ? packetWrapper.read(Type.VAR_INT) : id / 4096;
+						id %= 4096;
 						if (id >= 256 && id <= 422 || id >= 2256 && id <= 2267) {  //item
 							particle = ParticleIndex1_7_6_10.ICON_CRACK;
 						} else if (id >= 0 && id <= 164 || id >= 170 && id <= 175) {
