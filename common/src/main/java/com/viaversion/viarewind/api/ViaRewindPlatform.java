@@ -41,8 +41,8 @@ public interface ViaRewindPlatform {
 	/**
 	 * Initialize ViaRewind
 	 */
-	default void init(final File dataFolder) {
-		ViaRewindConfig config = new ViaRewindConfig(new File(dataFolder, "config.yml"));
+	default void init(final File configFile) {
+		ViaRewindConfig config = new ViaRewindConfig(configFile);
 		config.reload();
 		Via.getManager().getConfigurationProvider().register(config);
 

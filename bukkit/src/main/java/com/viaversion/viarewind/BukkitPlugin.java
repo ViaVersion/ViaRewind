@@ -21,10 +21,12 @@ package com.viaversion.viarewind;
 import com.viaversion.viarewind.api.ViaRewindPlatform;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
+
 public class BukkitPlugin extends JavaPlugin implements ViaRewindPlatform {
 
 	@Override
 	public void onEnable() {
-		this.init(getDataFolder());
+		this.init(new File(getDataFolder(), "config.yml"));
 	}
 }

@@ -30,7 +30,7 @@ public class ViaFabricAddon implements ViaRewindPlatform, Runnable {
 
     @Override
     public void run() {
-        this.init(FabricLoader.getInstance().getConfigDir().resolve("ViaRewind").toFile());
+        this.init(FabricLoader.getInstance().getConfigDir().resolve("ViaRewind").resolve("config.yml").toFile());
     }
 
 	@Override

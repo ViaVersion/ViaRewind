@@ -28,6 +28,7 @@ import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.lifecycle.ConstructPluginEvent;
 import org.spongepowered.plugin.builtin.jvm.Plugin;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.util.logging.Logger;
 
@@ -46,7 +47,7 @@ public class SpongePlugin implements ViaRewindPlatform {
 	@Listener(order = Order.LATE)
 	public void loadPlugin(ConstructPluginEvent e) {
 		this.logger = new LoggerWrapper(loggerSlf4j);
-		Via.getManager().addEnableListener(() -> this.init(configDir.toFile()));
+		Via.getManager().addEnableListener(() -> this.init(new File(configDir.toFile(), "config.yml")));
 	}
 
 	@Override

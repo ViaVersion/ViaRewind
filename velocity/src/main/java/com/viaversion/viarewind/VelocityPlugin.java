@@ -30,6 +30,7 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.velocity.util.LoggerWrapper;
 import com.viaversion.viarewind.api.ViaRewindPlatform;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.util.logging.Logger;
 
@@ -56,7 +57,7 @@ public class VelocityPlugin implements ViaRewindPlatform {
 	@Subscribe(order = PostOrder.LATE)
 	public void onProxyStart(ProxyInitializeEvent e) {
 		this.logger = new LoggerWrapper(loggerSlf4j);
-		Via.getManager().addEnableListener(() -> this.init(configDir.toFile()));
+		Via.getManager().addEnableListener(() -> this.init(new File(configDir.toFile(), "config.yml")));
 	}
 
 	@Override
