@@ -23,7 +23,7 @@
   },
   "depends": {
     "fabricloader": ">=0.14.0",
-    "viafabric": "*"
+    "viafabric": ">=0.4.10"
   },
   "recommends": {
     "viabackwards": "*"
