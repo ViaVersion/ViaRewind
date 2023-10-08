@@ -112,7 +112,7 @@ public enum MetaIndex1_7_6_10To1_8 {
 
 	static {
 		for (MetaIndex1_7_6_10To1_8 index : MetaIndex1_7_6_10To1_8.values()) {
-			metadataRewrites.put(new Pair<>(index.getClazz(), index.getIndex()), index);
+			metadataRewrites.put(new Pair<>(index.getClazz(), index.getNewIndex()), index);
 		}
 	}
 
