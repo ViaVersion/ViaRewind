@@ -16,11 +16,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types;
+package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.model;
 
 import java.util.HashMap;
 
-public enum Particle {
+public enum ParticleIndex1_7_6_10 {
 	EXPLOSION_NORMAL("explode"),
 	EXPLOSION_LARGE("largeexplode"),
 	EXPLOSION_HUGE("hugeexplosion"),
@@ -66,31 +66,31 @@ public enum Particle {
 
 	public final String name;
 	public final int extra;
-	private static final HashMap<String, Particle> particleMap = new HashMap<>();
+	private static final HashMap<String, ParticleIndex1_7_6_10> particleMap = new HashMap<>();
 
-	Particle(String name) {
+	ParticleIndex1_7_6_10(String name) {
 		this(name, 0);
 	}
 
-	Particle(String name, int extra) {
+	ParticleIndex1_7_6_10(String name, int extra) {
 		this.name = name;
 		this.extra = extra;
 	}
 
-	public static Particle find(String part) {
+	public static ParticleIndex1_7_6_10 find(String part) {
 		return particleMap.get(part);
 	}
 
-	public static Particle find(int id) {
+	public static ParticleIndex1_7_6_10 find(int id) {
 		if (id < 0) return null;
-		Particle[] values = Particle.values();
+		ParticleIndex1_7_6_10[] values = ParticleIndex1_7_6_10.values();
 		return id >= values.length ? null : values[id];
 	}
 
 	static {
-		Particle[] particles = values();
+		ParticleIndex1_7_6_10[] particles = values();
 
-		for (Particle particle : particles) {
+		for (ParticleIndex1_7_6_10 particle : particles) {
 			particleMap.put(particle.name, particle);
 		}
 	}

@@ -19,11 +19,10 @@
 package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.packets;
 
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.rewriter.ReplacementItemRewriter1_7_6_10;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.WorldBorder;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Chunk1_7_6_10Type;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.ChunkBulk1_7_6_10Type;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Particle;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.model.ParticleIndex1_7_6_10;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
 import com.viaversion.viarewind.utils.ChatUtil;
 import com.viaversion.viarewind.utils.PacketUtil;
@@ -166,8 +165,8 @@ public class WorldPackets {
 			public void register() {
 				handler(packetWrapper -> {
 					int particleId = packetWrapper.read(Type.INT);
-					Particle particle = Particle.find(particleId);
-					if (particle == null) particle = Particle.CRIT;
+					ParticleIndex1_7_6_10 particle = ParticleIndex1_7_6_10.find(particleId);
+					if (particle == null) particle = ParticleIndex1_7_6_10.CRIT;
 					packetWrapper.write(Type.STRING, particle.name);
 
 					packetWrapper.read(Type.BOOLEAN);
@@ -182,15 +181,15 @@ public class WorldPackets {
 				map(Type.INT);
 				handler(packetWrapper -> {
 					String name = packetWrapper.get(Type.STRING, 0);
-					Particle particle = Particle.find(name);
+					ParticleIndex1_7_6_10 particle = ParticleIndex1_7_6_10.find(name);
 
-					if (particle == Particle.ICON_CRACK || particle == Particle.BLOCK_CRACK || particle == Particle.BLOCK_DUST) {
+					if (particle == ParticleIndex1_7_6_10.ICON_CRACK || particle == ParticleIndex1_7_6_10.BLOCK_CRACK || particle == ParticleIndex1_7_6_10.BLOCK_DUST) {
 						int id = packetWrapper.read(Type.VAR_INT);
-						int data = particle == Particle.ICON_CRACK ? packetWrapper.read(Type.VAR_INT) : 0;
+						int data = particle == ParticleIndex1_7_6_10.ICON_CRACK ? packetWrapper.read(Type.VAR_INT) : 0;
 						if (id >= 256 && id <= 422 || id >= 2256 && id <= 2267) {  //item
-							particle = Particle.ICON_CRACK;
+							particle = ParticleIndex1_7_6_10.ICON_CRACK;
 						} else if (id >= 0 && id <= 164 || id >= 170 && id <= 175) {
-							if (particle == Particle.ICON_CRACK) particle = Particle.BLOCK_CRACK;
+							if (particle == ParticleIndex1_7_6_10.ICON_CRACK) particle = ParticleIndex1_7_6_10.BLOCK_CRACK;
 						} else {
 							packetWrapper.cancel();
 							return;

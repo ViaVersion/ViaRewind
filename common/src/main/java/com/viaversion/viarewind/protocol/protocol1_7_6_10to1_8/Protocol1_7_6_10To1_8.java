@@ -21,12 +21,13 @@ package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8;
 import com.viaversion.viarewind.api.rewriter.ReplacementItemRewriter;
 import com.viaversion.viarewind.protocol.protocol1_7_2_5to1_7_6_10.ClientboundPackets1_7_2_5;
 import com.viaversion.viarewind.protocol.protocol1_7_2_5to1_7_6_10.ServerboundPackets1_7_2_5;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.metadata.MetadataRewriter;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.rewriter.MetadataRewriter;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.packets.*;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.provider.CompressionHandlerProvider;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.provider.compression.TrackingCompressionHandlerProvider;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.rewriter.ReplacementItemRewriter1_7_6_10;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.*;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.task.WorldBorderUpdateTask;
 import com.viaversion.viarewind.utils.Ticker;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
@@ -115,8 +116,6 @@ public class Protocol1_7_6_10To1_8 extends AbstractProtocol<ClientboundPackets1_
 
 	@Override
 	public void init(UserConnection userConnection) {
-		Ticker.init();
-
 		userConnection.put(new Windows(userConnection));
 		userConnection.put(new EntityTracker(userConnection, this));
 		userConnection.put(new PlayerPositionTracker(userConnection));
@@ -131,6 +130,8 @@ public class Protocol1_7_6_10To1_8 extends AbstractProtocol<ClientboundPackets1_
 	@Override
 	public void register(ViaProviders providers) {
 		providers.register(CompressionHandlerProvider.class, new TrackingCompressionHandlerProvider());
+
+		Via.getPlatform().runRepeatingSync(new WorldBorderUpdateTask(), 1L);
 	}
 
 	@Override
