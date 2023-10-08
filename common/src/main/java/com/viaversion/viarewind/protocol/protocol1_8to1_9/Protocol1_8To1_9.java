@@ -76,6 +76,8 @@ public class Protocol1_8To1_9 extends AbstractProtocol<ClientboundPackets1_9, Cl
 
 	@Override
 	protected void registerPackets() {
+		itemRewriter.register();
+
 		EntityPackets.register(this);
 		InventoryPackets.register(this);
 		PlayerPackets.register(this);
