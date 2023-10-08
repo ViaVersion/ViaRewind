@@ -27,7 +27,6 @@ import java.util.List;
 
 public class Types1_7_6_10 {
 	public static final Type<CompoundTag> COMPRESSED_NBT = new CompressedNBTType();
-	public static final Type<Item[]> ITEM_ARRAY = new ItemArrayType(false);
 	public static final Type<Item[]> COMPRESSED_NBT_ITEM_ARRAY = new ItemArrayType(true);
 	public static final Type<Item> ITEM = new ItemType(false);
 	public static final Type<Item> COMPRESSED_NBT_ITEM = new ItemType(true);

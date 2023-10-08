@@ -19,10 +19,10 @@
 package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.packets;
 
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.chunks.ChunkPacketTransformer;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.items.ReplacementRegistry1_7_6_10to1_8;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.WorldBorder;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Chunk1_7_10Type;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Chunk1_7_6_10Type;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.ChunkBulk1_7_6_10Type;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Particle;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
 import com.viaversion.viarewind.utils.ChatUtil;
@@ -40,6 +40,7 @@ import com.viaversion.viaversion.api.type.types.CustomByteType;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.types.Chunk1_8Type;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.types.ChunkBulk1_8Type;
 import com.viaversion.viaversion.util.ChatColorUtil;
 
 public class WorldPackets {
@@ -54,7 +55,7 @@ public class WorldPackets {
 				handler(packetWrapper -> {
 					ClientWorld world = packetWrapper.user().get(ClientWorld.class);
 					Chunk chunk = packetWrapper.read(new Chunk1_8Type(world));
-					packetWrapper.write(new Chunk1_7_10Type(world), chunk);
+					packetWrapper.write(new Chunk1_7_6_10Type(world), chunk);
 					for (ChunkSection section : chunk.getSections()) {
 						if (section == null) continue;
 						DataPalette palette = section.palette(PaletteType.BLOCKS);
@@ -139,7 +140,11 @@ public class WorldPackets {
 		protocol.registerClientbound(ClientboundPackets1_8.MAP_BULK_CHUNK, new PacketHandlers() {
 			@Override
 			public void register() {
-				handler(ChunkPacketTransformer::transformChunkBulk);
+				handler(wrapper -> {
+					final ClientWorld world = wrapper.user().get(ClientWorld.class);
+					final Chunk[] chunks = wrapper.read(new ChunkBulk1_8Type(world));
+					wrapper.write(new ChunkBulk1_7_6_10Type(world), chunks);
+				});
 			}
 		});
 
