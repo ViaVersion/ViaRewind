@@ -26,6 +26,7 @@ import com.velocitypowered.api.event.proxy.ProxyReloadEvent;
 import com.velocitypowered.api.plugin.Dependency;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.velocity.util.LoggerWrapper;
 import com.viaversion.viarewind.api.ViaRewindPlatform;
 
@@ -44,27 +45,18 @@ import java.util.logging.Logger;
 )
 public class VelocityPlugin implements ViaRewindPlatform {
     private Logger logger;
+
 	@Inject
 	private org.slf4j.Logger loggerSlf4j;
 
 	@Inject
 	@DataDirectory
 	private Path configDir;
-	private ViaRewindConfig conf;
 
 	@Subscribe(order = PostOrder.LATE)
 	public void onProxyStart(ProxyInitializeEvent e) {
-		// Setup Logger
 		this.logger = new LoggerWrapper(loggerSlf4j);
-		// Init!
-		conf = new ViaRewindConfig(configDir.resolve("config.yml").toFile());
-		conf.reloadConfig();
-		this.init(conf);
-	}
-
-	@Subscribe
-	public void onReload(ProxyReloadEvent e) {
-		conf.reloadConfig();
+		Via.getManager().addEnableListener(() -> this.init(configDir.toFile()));
 	}
 
 	@Override

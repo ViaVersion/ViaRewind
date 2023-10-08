@@ -19,13 +19,13 @@
 package com.viaversion.viarewind;
 
 import com.google.inject.Inject;
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.sponge.util.LoggerWrapper;
 import com.viaversion.viarewind.api.ViaRewindPlatform;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.lifecycle.ConstructPluginEvent;
-import org.spongepowered.api.event.lifecycle.RefreshGameEvent;
 import org.spongepowered.plugin.builtin.jvm.Plugin;
 
 import java.nio.file.Path;
@@ -43,21 +43,10 @@ public class SpongePlugin implements ViaRewindPlatform {
 	@ConfigDir(sharedRoot = false)
 	private Path configDir;
 
-	private ViaRewindConfig conf;
-
 	@Listener(order = Order.LATE)
 	public void loadPlugin(ConstructPluginEvent e) {
-		// Setup Logger
 		this.logger = new LoggerWrapper(loggerSlf4j);
-		// Init!
-		conf = new ViaRewindConfig(configDir.resolve("config.yml").toFile());
-		conf.reloadConfig();
-		this.init(conf);
-	}
-
-	@Listener
-	public void reload(RefreshGameEvent e) {
-		conf.reloadConfig();
+		Via.getManager().addEnableListener(() -> this.init(configDir.toFile()));
 	}
 
 	@Override

@@ -18,10 +18,12 @@
 
 package com.viaversion.viarewind.api;
 
+import com.viaversion.viaversion.api.configuration.Config;
+
 /**
  * This class is used to get the platform specific config
  */
-public interface ViaRewindConfig {
+public interface ViaRewindConfig extends Config {
 
 	enum CooldownIndicator {
 		TITLE, ACTION_BAR, BOSS_BAR, DISABLED

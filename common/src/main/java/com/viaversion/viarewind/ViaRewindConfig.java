@@ -30,7 +30,7 @@ public class ViaRewindConfig extends Config implements com.viaversion.viarewind.
 
     public ViaRewindConfig(File configFile) {
         super(configFile);
-        reloadConfig();
+		reload();
     }
 
     @Override
