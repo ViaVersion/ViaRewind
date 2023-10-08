@@ -26,15 +26,16 @@ import com.viaversion.viaversion.libs.opennbt.tag.builtin.CompoundTag;
 import java.util.List;
 
 public class Types1_7_6_10 {
-	public static final Type<CompoundTag> COMPRESSED_NBT = new CompressedNBTType();
-	public static final Type<Item[]> COMPRESSED_NBT_ITEM_ARRAY = new ItemArrayType(true);
-	public static final Type<Item> ITEM = new ItemType(false);
-	public static final Type<Item> COMPRESSED_NBT_ITEM = new ItemType(true);
-	public static final Type<List<Metadata>> METADATA_LIST = new MetadataListType();
-	public static final Type<Metadata> METADATA = new MetadataType();
-	public static final Type<CompoundTag> NBT = new NBTType();
-	/**
-	 * An int array prefixed with byte representing the size
-	 */
-	public static final Type<int[]> INT_ARRAY = new IntArrayType();
+
+	public final static Type<int[]> INT_ARRAY = new IntArrayType();
+
+	public final static Type<CompoundTag> NBT = new NBTType();
+	public final static Type<Item> ITEM = new ItemType(false);
+	
+	public final static Type<CompoundTag> COMPRESSED_NBT = new CompressedNBTType();
+	public final static Type<Item> COMPRESSED_NBT_ITEM = new ItemType(true);
+	public final static Type<Item[]> COMPRESSED_NBT_ITEM_ARRAY = new ItemArrayType(true);
+
+	public final static Type<Metadata> METADATA = new MetadataType();
+	public final static Type<List<Metadata>> METADATA_LIST = new MetadataListType();
 }

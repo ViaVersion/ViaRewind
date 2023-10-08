@@ -26,20 +26,16 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.entity.ClientEntityIdChangeListener;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
 import com.viaversion.viaversion.api.minecraft.item.Item;
-import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.types.version.Types1_8;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class EntityTracker extends StoredObject implements ClientEntityIdChangeListener {
-	private final Protocol1_7_6_10To1_8 protocol;
-	private final Map<Integer, Entity1_10Types.EntityType> clientEntityTypes = new ConcurrentHashMap<>();
+	private final Map<Integer, Entity1_10Types.EntityType> entityMap = new ConcurrentHashMap<>();
 	private final Map<Integer, Integer> vehicles = new ConcurrentHashMap<>();
 	private final Map<Integer, EntityModel> entityReplacements = new ConcurrentHashMap<>();
 	private final Map<Integer, UUID> playersByEntityId = new HashMap<>();
@@ -50,13 +46,12 @@ public class EntityTracker extends StoredObject implements ClientEntityIdChangeL
 	private int spectating = -1;
 	private int dimension = 0;
 
-	public EntityTracker(UserConnection user, Protocol1_7_6_10To1_8 protocol) {
+	public EntityTracker(UserConnection user) {
 		super(user);
-		this.protocol = protocol;
 	}
 
 	public void removeEntity(int entityId) {
-		clientEntityTypes.remove(entityId);
+		entityMap.remove(entityId);
 		if (entityReplacements.containsKey(entityId)) {
 			entityReplacements.remove(entityId).deleteEntity();
 		}
@@ -93,8 +88,8 @@ public class EntityTracker extends StoredObject implements ClientEntityIdChangeL
 		items[slot] = equipment;
 	}
 
-	public Map<Integer, Entity1_10Types.EntityType> getClientEntityTypes() {
-		return this.clientEntityTypes;
+	public Map<Integer, Entity1_10Types.EntityType> getEntityMap() {
+		return this.entityMap;
 	}
 
 	public void addEntityReplacement(EntityModel entityModel) {
@@ -204,7 +199,7 @@ public class EntityTracker extends StoredObject implements ClientEntityIdChangeL
 	}
 
 	public void clearEntities() {
-		clientEntityTypes.clear();
+		entityMap.clear();
 		entityReplacements.clear();
 		vehicles.clear();
 	}
@@ -222,8 +217,8 @@ public class EntityTracker extends StoredObject implements ClientEntityIdChangeL
 		if (this.spectating == this.playerId) {
 			this.spectating = playerEntityId;
 		}
-		clientEntityTypes.remove(this.playerId);
+		entityMap.remove(this.playerId);
 		this.playerId = playerEntityId;
-		clientEntityTypes.put(this.playerId, Entity1_10Types.EntityType.ENTITY_HUMAN);
+		entityMap.put(this.playerId, Entity1_10Types.EntityType.ENTITY_HUMAN);
 	}
 }

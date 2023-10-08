@@ -98,7 +98,7 @@ public class SpawnPackets {
 					int entityId = packetWrapper.get(Type.VAR_INT, 0);
 
 					EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-					tracker.getClientEntityTypes().put(entityId, Entity1_10Types.EntityType.PLAYER);
+					tracker.getEntityMap().put(entityId, Entity1_10Types.EntityType.PLAYER);
 				});
 			}
 		});
@@ -164,7 +164,7 @@ public class SpawnPackets {
 
 					EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
 					Entity1_10Types.EntityType type = Entity1_10Types.getTypeFromId(typeId, true);
-					tracker.getClientEntityTypes().put(entityId, type);
+					tracker.getEntityMap().put(entityId, type);
 //					tracker.sendMetadataBuffer(entityId); TODO | ChecK?
 
 					int data = packetWrapper.get(Type.INT, 3);
@@ -240,7 +240,7 @@ public class SpawnPackets {
 					int entityId = packetWrapper.get(Type.VAR_INT, 0);
 					int typeId = packetWrapper.get(Type.UNSIGNED_BYTE, 0);
 					EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-					tracker.getClientEntityTypes().put(entityId, Entity1_10Types.getTypeFromId(typeId, false));
+					tracker.getEntityMap().put(entityId, Entity1_10Types.getTypeFromId(typeId, false));
 				});
 				handler(wrapper -> {
 					List<Metadata> metadataList = wrapper.get(Types1_7_6_10.METADATA_LIST, 0);
@@ -248,8 +248,8 @@ public class SpawnPackets {
 					EntityTracker tracker = wrapper.user().get(EntityTracker.class);
 					if (tracker.getEntityReplacement(entityId) != null) {
 						tracker.getEntityReplacement(entityId).updateMetadata(metadataList);
-					} else if (tracker.getClientEntityTypes().containsKey(entityId)) {
-						protocol.getMetadataRewriter().transform(tracker.getClientEntityTypes().get(entityId), metadataList);
+					} else if (tracker.getEntityMap().containsKey(entityId)) {
+						protocol.getMetadataRewriter().transform(tracker.getEntityMap().get(entityId), metadataList);
 					} else {
 						wrapper.cancel();
 					}
@@ -271,7 +271,7 @@ public class SpawnPackets {
 				map(Type.UNSIGNED_BYTE, Type.INT);  //Rotation
 				handler(packetWrapper -> {
 					EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-					tracker.getClientEntityTypes().put(packetWrapper.get(Type.VAR_INT, 0), Entity1_10Types.EntityType.PAINTING);
+					tracker.getEntityMap().put(packetWrapper.get(Type.VAR_INT, 0), Entity1_10Types.EntityType.PAINTING);
 				});
 			}
 		});
@@ -286,7 +286,7 @@ public class SpawnPackets {
 				map(Type.SHORT);
 				handler(packetWrapper -> {
 					EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-					tracker.getClientEntityTypes().put(packetWrapper.get(Type.VAR_INT, 0), Entity1_10Types.EntityType.EXPERIENCE_ORB);
+					tracker.getEntityMap().put(packetWrapper.get(Type.VAR_INT, 0), Entity1_10Types.EntityType.EXPERIENCE_ORB);
 				});
 			}
 		});
@@ -301,7 +301,7 @@ public class SpawnPackets {
 				map(Type.INT);
 				handler(packetWrapper -> {
 					EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-					tracker.getClientEntityTypes().put(packetWrapper.get(Type.VAR_INT, 0), Entity1_10Types.EntityType.LIGHTNING);
+					tracker.getEntityMap().put(packetWrapper.get(Type.VAR_INT, 0), Entity1_10Types.EntityType.LIGHTNING);
 				});
 			}
 		});

@@ -18,20 +18,15 @@
 
 package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.packets;
 
-import com.google.common.collect.Lists;
-import com.google.common.primitives.Ints;
-import com.viaversion.viarewind.protocol.protocol1_7_2_5to1_7_6_10.ClientboundPackets1_7_2_5;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.EntityTracker;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.GameProfileStorage;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
 import com.viaversion.viarewind.api.minecraft.EntityModel;
-import com.viaversion.viarewind.utils.PacketUtil;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
-import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_8;
@@ -222,7 +217,7 @@ public class EntityPackets {
 				handler(wrapper -> {
 					int entityId = wrapper.get(Type.INT, 0);
 					EntityTracker tracker = wrapper.user().get(EntityTracker.class);
-					Entity1_10Types.EntityType type = tracker.getClientEntityTypes().get(entityId);
+					Entity1_10Types.EntityType type = tracker.getEntityMap().get(entityId);
 					if (type == Entity1_10Types.EntityType.MINECART_ABSTRACT) { // TODO | Realign all entities?
 						int y = wrapper.get(Type.INT, 2);
 						y += 12;
@@ -298,13 +293,13 @@ public class EntityPackets {
 					final List<Metadata> metadataList = wrapper.get(Types1_7_6_10.METADATA_LIST, 0);
 
 					final EntityTracker tracker = wrapper.user().get(EntityTracker.class);
-					if (tracker.getClientEntityTypes().containsKey(entityId)) {
+					if (tracker.getEntityMap().containsKey(entityId)) {
 						final EntityModel<?> replacement = tracker.getEntityReplacement(entityId);
 						if (replacement != null) {
 							wrapper.cancel();
 							replacement.updateMetadata(metadataList);
 						} else {
-							protocol.getMetadataRewriter().transform(tracker.getClientEntityTypes().get(entityId), metadataList);
+							protocol.getMetadataRewriter().transform(tracker.getEntityMap().get(entityId), metadataList);
 							if (metadataList.isEmpty()) {
 								wrapper.cancel();
 							}

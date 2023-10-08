@@ -18,6 +18,7 @@
 
 package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8;
 
+import com.viaversion.viarewind.ViaRewind;
 import com.viaversion.viarewind.api.rewriter.ReplacementItemRewriter;
 import com.viaversion.viarewind.protocol.protocol1_7_2_5to1_7_6_10.ClientboundPackets1_7_2_5;
 import com.viaversion.viarewind.protocol.protocol1_7_2_5to1_7_6_10.ServerboundPackets1_7_2_5;
@@ -28,7 +29,6 @@ import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.provider.compress
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.rewriter.ReplacementItemRewriter1_7_6_10;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.*;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.task.WorldBorderUpdateTask;
-import com.viaversion.viarewind.utils.Ticker;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.platform.providers.ViaProviders;
@@ -118,13 +118,13 @@ public class Protocol1_7_6_10To1_8 extends AbstractProtocol<ClientboundPackets1_
 
 	@Override
 	public void init(UserConnection userConnection) {
-		userConnection.put(new Windows(userConnection));
-		userConnection.put(new EntityTracker(userConnection, this));
+		userConnection.put(new WindowTracker(userConnection));
+		userConnection.put(new EntityTracker(userConnection));
 		userConnection.put(new PlayerPositionTracker(userConnection));
 		userConnection.put(new GameProfileStorage(userConnection));
 		userConnection.put(new Scoreboard(userConnection));
 		userConnection.put(new CompressionStatusTracker(userConnection));
-		userConnection.put(new WorldBorder(userConnection));
+		userConnection.put(new WorldBorderEmulator(userConnection));
 		userConnection.put(new PlayerAbilitiesTracker(userConnection));
 		userConnection.put(new ClientWorld(userConnection));
 	}
@@ -133,7 +133,9 @@ public class Protocol1_7_6_10To1_8 extends AbstractProtocol<ClientboundPackets1_
 	public void register(ViaProviders providers) {
 		providers.register(CompressionHandlerProvider.class, new TrackingCompressionHandlerProvider());
 
-		Via.getManager().getScheduler().scheduleRepeating(new WorldBorderUpdateTask(), 0L, 50L, TimeUnit.MILLISECONDS);
+		if (ViaRewind.getConfig().isEmulateWorldBorder()) {
+			Via.getManager().getScheduler().scheduleRepeating(new WorldBorderUpdateTask(), 0L, 50L, TimeUnit.MILLISECONDS);
+		}
 	}
 
 	@Override

@@ -177,7 +177,7 @@ public class Cooldown extends StoredObject implements Tickable {
 		return Math.min(x, b);
 	}
 
-	private static final int max = 10;
+	private final static int max = 10;
 
 	private String getTitle() {
 		String symbol = cooldownIndicator == ViaRewindConfig.CooldownIndicator.ACTION_BAR ? "■" : "˙";

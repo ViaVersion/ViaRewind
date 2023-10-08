@@ -58,19 +58,16 @@ import java.util.UUID;
 public class PlayerPackets {
 
 	public static void register(Protocol1_7_6_10To1_8 protocol) {
-
-		/*  OUTGOING  */
-
 		protocol.registerClientbound(ClientboundPackets1_8.JOIN_GAME, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Type.INT);  //Entity Id
-				map(Type.UNSIGNED_BYTE);  //Gamemode
-				map(Type.BYTE);  //Dimension
-				map(Type.UNSIGNED_BYTE);  //Difficulty
-				map(Type.UNSIGNED_BYTE);  //Max players
-				map(Type.STRING);  //Level Type
-				map(Type.BOOLEAN, Type.NOTHING);//Reduced Debug Info
+				map(Type.INT); //Entity Id
+				map(Type.UNSIGNED_BYTE); //Gamemode
+				map(Type.BYTE); //Dimension
+				map(Type.UNSIGNED_BYTE); //Difficulty
+				map(Type.UNSIGNED_BYTE); //Max players
+				map(Type.STRING); //Level Type
+				map(Type.BOOLEAN, Type.NOTHING); //Reduced Debug Info
 				handler(packetWrapper -> {
 					if (!ViaRewind.getConfig().isReplaceAdventureMode()) return;
 					if (packetWrapper.get(Type.UNSIGNED_BYTE, 0) == 2) {
@@ -81,7 +78,7 @@ public class PlayerPackets {
 					EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
 					tracker.setGamemode(packetWrapper.get(Type.UNSIGNED_BYTE, 0));
 					tracker.setPlayerId(packetWrapper.get(Type.INT, 0));
-					tracker.getClientEntityTypes().put(tracker.getPlayerId(), Entity1_10Types.EntityType.ENTITY_HUMAN);
+					tracker.getEntityMap().put(tracker.getPlayerId(), Entity1_10Types.EntityType.ENTITY_HUMAN);
 					tracker.setDimension(packetWrapper.get(Type.BYTE, 0));
 					tracker.addPlayer(tracker.getPlayerId(), packetWrapper.user().getProtocolInfo().getUuid());
 				});
@@ -147,7 +144,7 @@ public class PlayerPackets {
 					if (tracker.getDimension() != packetWrapper.get(Type.INT, 0)) {
 						tracker.setDimension(packetWrapper.get(Type.INT, 0));
 						tracker.clearEntities();
-						tracker.getClientEntityTypes().put(tracker.getPlayerId(), Entity1_10Types.EntityType.ENTITY_HUMAN);
+						tracker.getEntityMap().put(tracker.getPlayerId(), Entity1_10Types.EntityType.ENTITY_HUMAN);
 					}
 				});
 				handler(packetWrapper -> {
@@ -901,11 +898,11 @@ public class PlayerPackets {
 
 							packetWrapper.write(Type.STRING, name);
 
-							Windows windows = packetWrapper.user().get(Windows.class);
+							WindowTracker windowTracker = packetWrapper.user().get(WindowTracker.class);
 							PacketWrapper updateCost = PacketWrapper.create(0x31, null, packetWrapper.user());
-							updateCost.write(Type.UNSIGNED_BYTE, windows.anvilId);
+							updateCost.write(Type.UNSIGNED_BYTE, windowTracker.anvilId);
 							updateCost.write(Type.SHORT, (short) 0);
-							updateCost.write(Type.SHORT, windows.levelCost);
+							updateCost.write(Type.SHORT, windowTracker.levelCost);
 
 							PacketUtil.sendPacket(updateCost, Protocol1_7_6_10To1_8.class, true, true);
 							break;

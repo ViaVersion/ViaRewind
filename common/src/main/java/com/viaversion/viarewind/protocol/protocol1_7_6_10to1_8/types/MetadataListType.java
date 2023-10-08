@@ -26,8 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MetadataListType extends MetaListTypeTemplate {
-	private final MetadataType metadataType = new MetadataType();
-
 	@Override
 	public List<Metadata> read(ByteBuf buffer) throws Exception {
 		ArrayList<Metadata> list = new ArrayList<>();

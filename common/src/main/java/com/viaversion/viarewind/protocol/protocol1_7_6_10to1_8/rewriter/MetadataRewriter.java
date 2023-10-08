@@ -31,7 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
-@SuppressWarnings({"unchecked", "deprecation"})
+@SuppressWarnings({"deprecation"})
 public class MetadataRewriter {
 
 	private final Protocol1_7_6_10To1_8 protocol;
@@ -53,11 +53,8 @@ public class MetadataRewriter {
 					list.remove(entry);
 					continue;
 				}
-				Object value = entry.getValue();
-				if (!metaIndex.getNewType().type().getOutputClass().isAssignableFrom(value.getClass())) {
-					list.remove(entry);
-					continue;
-				}
+				final Object value = entry.getValue();
+				entry.setTypeAndValue(metaIndex.getNewType(), value);
 				entry.setMetaTypeUnsafe(metaIndex.getOldType());
 				entry.setId(metaIndex.getIndex());
 
@@ -84,9 +81,10 @@ public class MetadataRewriter {
 						}
 						if (metaIndex.getNewType() == MetaType1_8.Byte) {
 							if (metaIndex == MetaIndex1_7_6_10To1_8.ITEM_FRAME_ROTATION) {
-								value = ((Integer) ((Byte) value / 2)).byteValue();
+								entry.setValue(Integer.valueOf((Byte) value / 2).byteValue());
+							} else {
+								entry.setValue(value);
 							}
-							entry.setValue(value);
 						}
 						if (metaIndex == MetaIndex1_7_6_10To1_8.HUMAN_SKIN_FLAGS) {
 							byte flags = (byte) value;
@@ -102,7 +100,6 @@ public class MetadataRewriter {
 					case String:
 					case Short:
 					case Position:
-						entry.setValue(value);
 						break;
 					default:
 						ViaRewind.getPlatform().getLogger().warning("Could not transform metadata for " + type + " with index " + entry.id() + " and type " + metaIndex.getOldType());

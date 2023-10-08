@@ -108,7 +108,7 @@ public enum MetaIndex1_7_6_10To1_8 {
 	ENDER_CRYSTAL_HEALTH(Entity1_10Types.EntityType.ENDER_CRYSTAL, 8, MetaType1_7_6_10.Int, 9, MetaType1_8.Int),
 	;
 
-	private static final HashMap<Pair<Entity1_10Types.EntityType, Integer>, MetaIndex1_7_6_10To1_8> metadataRewrites = new HashMap<>();
+	private final static HashMap<Pair<Entity1_10Types.EntityType, Integer>, MetaIndex1_7_6_10To1_8> metadataRewrites = new HashMap<>();
 
 	static {
 		for (MetaIndex1_7_6_10To1_8 index : MetaIndex1_7_6_10To1_8.values()) {

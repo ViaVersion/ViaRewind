@@ -20,3 +20,10 @@ max-book-pages: 100
 #
 # Max amount of characters in the json (!) string of a book page before a client gets kicked
 max-book-page-length: 5000
+#
+# Whether to emulate the 1.8+ world border for 1.7.x clients
+emulate-world-border: true
+#
+# The particle to show the world border for the 1.8+ world border for 1.7.x clients
+# see https://wiki.vg/index.php?title=Protocol&oldid=7368#Particle_2
+world-border-particle: 'fireworksSpark'

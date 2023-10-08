@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Enchantments {
-	public static final Map<Short, String> ENCHANTMENTS = new HashMap<>();
+	public final static Map<Short, String> ENCHANTMENTS = new HashMap<>();
 
 	static {
 		ENCHANTMENTS.put((short) 1, "I");

@@ -1,13 +1,16 @@
 package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.task;
 
+import com.viaversion.viarewind.ViaRewind;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.PlayerPositionTracker;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.WorldBorder;
-import com.viaversion.viarewind.utils.PacketUtil;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.WorldBorderEmulator;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
+
+import java.util.logging.Level;
 
 public class WorldBorderUpdateTask implements Runnable {
 	public final static int VIEW_DISTANCE = 16;
@@ -15,25 +18,25 @@ public class WorldBorderUpdateTask implements Runnable {
 	@Override
 	public void run() {
 		for (UserConnection connection : Via.getManager().getConnectionManager().getConnections()) {
-			final WorldBorder worldBorderTracker = connection.get(WorldBorder.class);
-			if (!worldBorderTracker.isInit()) continue;
+			final WorldBorderEmulator worldBorderEmulatorTracker = connection.get(WorldBorderEmulator.class);
+			if (!worldBorderEmulatorTracker.isInit()) continue;
 
 			final PlayerPositionTracker position = connection.get(PlayerPositionTracker.class);
 
-			double radius = worldBorderTracker.getSize() / 2.0;
+			double radius = worldBorderEmulatorTracker.getSize() / 2.0;
 
-			for (WorldBorder.Side side : WorldBorder.Side.values()) {
+			for (WorldBorderEmulator.Side side : WorldBorderEmulator.Side.values()) {
 				double d;
 				double pos;
 				double center;
 				if (side.modX != 0) {
 					pos = position.getPosZ();
-					center = worldBorderTracker.getZ();
-					d = Math.abs(worldBorderTracker.getX() + radius * side.modX - position.getPosX());
+					center = worldBorderEmulatorTracker.getZ();
+					d = Math.abs(worldBorderEmulatorTracker.getX() + radius * side.modX - position.getPosX());
 				} else {
-					center = worldBorderTracker.getX();
+					center = worldBorderEmulatorTracker.getX();
 					pos = position.getPosX();
-					d = Math.abs(worldBorderTracker.getZ() + radius * side.modZ - position.getPosZ());
+					d = Math.abs(worldBorderEmulatorTracker.getZ() + radius * side.modZ - position.getPosZ());
 				}
 				if (d >= VIEW_DISTANCE) continue;
 
@@ -51,22 +54,24 @@ public class WorldBorderUpdateTask implements Runnable {
 				double centerH = (minH + maxH) / 2.0;
 				double centerV = (minV + maxV) / 2.0;
 
-				int a = (int) Math.floor((maxH - minH) * (maxV - minV) * 0.5);
+				double particleOffset = 2.5;
 
-				double b = 2.5;
+				final PacketWrapper spawnParticle = PacketWrapper.create(ClientboundPackets1_8.SPAWN_PARTICLE, connection);
+				spawnParticle.write(Type.STRING, ViaRewind.getConfig().getWorldBorderParticle()); // particle name
+				spawnParticle.write(Type.FLOAT, (float) (side.modX != 0 ? worldBorderEmulatorTracker.getX() + (radius * side.modX) : centerH)); // x
+				spawnParticle.write(Type.FLOAT, (float) centerV); // y
+				spawnParticle.write(Type.FLOAT, (float) (side.modX == 0 ? worldBorderEmulatorTracker.getZ() + (radius * side.modZ) : centerH)); // z
+				spawnParticle.write(Type.FLOAT, (float) (side.modX != 0 ? 0f : (maxH - minH) / particleOffset)); // offset x
+				spawnParticle.write(Type.FLOAT, (float) ((maxV - minV) / particleOffset)); // offset y
+				spawnParticle.write(Type.FLOAT, (float) (side.modX == 0 ? 0f : (maxH - minH) / particleOffset)); // offset z
+				spawnParticle.write(Type.FLOAT, 0F); // particle data
+				spawnParticle.write(Type.INT, (int) Math.floor((maxH - minH) * (maxV - minV) * 0.5));
 
-				PacketWrapper particles = PacketWrapper.create(0x2A, null, connection);
-				particles.write(Type.STRING, "fireworksSpark");
-				particles.write(Type.FLOAT, (float) (side.modX != 0 ? worldBorderTracker.getX() + (radius * side.modX) : centerH));
-				particles.write(Type.FLOAT, (float) centerV);
-				particles.write(Type.FLOAT, (float) (side.modX == 0 ? worldBorderTracker.getZ() + (radius * side.modZ) : centerH));
-				particles.write(Type.FLOAT, (float) (side.modX != 0 ? 0f : (maxH - minH) / b));
-				particles.write(Type.FLOAT, (float) ((maxV - minV) / b));
-				particles.write(Type.FLOAT, (float) (side.modX == 0 ? 0f : (maxH - minH) / b));
-				particles.write(Type.FLOAT, 0f);
-				particles.write(Type.INT, a);
-
-				PacketUtil.sendPacket(particles, Protocol1_7_6_10To1_8.class, true, true);
+				try {
+					spawnParticle.send(Protocol1_7_6_10To1_8.class, true);
+				} catch (Exception e) {
+					ViaRewind.getPlatform().getLogger().log(Level.SEVERE, "Failed to send world border particle", e);
+				}
 			}
 		}
 	}

@@ -66,7 +66,7 @@ public enum ParticleIndex1_7_6_10 {
 
 	public final String name;
 	public final int extra;
-	private static final HashMap<String, ParticleIndex1_7_6_10> particleMap = new HashMap<>();
+	private final static HashMap<String, ParticleIndex1_7_6_10> particleMap = new HashMap<>();
 
 	ParticleIndex1_7_6_10(String name) {
 		this(name, 0);

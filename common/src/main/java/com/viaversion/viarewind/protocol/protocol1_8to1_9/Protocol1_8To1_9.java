@@ -46,14 +46,14 @@ public class Protocol1_8To1_9 extends AbstractProtocol<ClientboundPackets1_9, Cl
 
 	public Queue<PacketWrapper> animationsToSend = new ConcurrentLinkedQueue<>();
 
-	public static final Set<String> VALID_ATTRIBUTES = new HashSet<>();
-	public static final ValueTransformer<Double, Integer> TO_OLD_INT = new ValueTransformer<Double, Integer>(Type.INT) {
+	public final static Set<String> VALID_ATTRIBUTES = new HashSet<>();
+	public final static ValueTransformer<Double, Integer> TO_OLD_INT = new ValueTransformer<Double, Integer>(Type.INT) {
 		@Override
 		public Integer transform(PacketWrapper wrapper, Double inputValue) {
 			return (int) (inputValue * 32.0D);
 		}
 	};
-	public static final ValueTransformer<Float, Byte> DEGREES_TO_ANGLE = new ValueTransformer<Float, Byte>(Type.BYTE) {
+	public final static ValueTransformer<Float, Byte> DEGREES_TO_ANGLE = new ValueTransformer<Float, Byte>(Type.BYTE) {
 		@Override
 		public Byte transform(PacketWrapper packetWrapper, Float degrees) throws Exception {
 			return (byte) ((degrees / 360F) * 256);

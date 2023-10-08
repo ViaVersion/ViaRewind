@@ -21,59 +21,34 @@ package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage;
 import com.viaversion.viaversion.api.connection.StoredObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 
-public class WorldBorder extends StoredObject {
-
+public class WorldBorderEmulator extends StoredObject {
 	private double x, z;
 	private double oldDiameter, newDiameter;
+
 	private long lerpTime;
 	private long lerpStartTime;
-	private int portalTeleportBoundary;
-	private int warningTime, warningBlocks;
+
 	private boolean init = false;
 
-	public WorldBorder(UserConnection user) {
+	public WorldBorderEmulator(UserConnection user) {
 		super(user);
 	}
 
-	public boolean isInit() {
-		return init;
-	}
-
-	public void init(double x, double z, double oldDiameter, double newDiameter, long lerpTime, int portalTeleportBoundary, int warningTime, int warningBlocks) {
+	public void init(double x, double z, double oldDiameter, double newDiameter, long lerpTime) {
 		this.x = x;
 		this.z = z;
+
 		this.oldDiameter = oldDiameter;
 		this.newDiameter = newDiameter;
+
 		this.lerpTime = lerpTime;
-		this.portalTeleportBoundary = portalTeleportBoundary;
-		this.warningTime = warningTime;
-		this.warningBlocks = warningBlocks;
+
 		init = true;
-	}
-
-	public double getX() {
-		return x;
-	}
-
-	public double getZ() {
-		return z;
 	}
 
 	public void setCenter(double x, double z) {
 		this.x = x;
 		this.z = z;
-	}
-
-	public double getOldDiameter() {
-		return oldDiameter;
-	}
-
-	public double getNewDiameter() {
-		return newDiameter;
-	}
-
-	public long getLerpTime() {
-		return lerpTime;
 	}
 
 	public void lerpSize(double oldDiameter, double newDiameter, long lerpTime) {
@@ -86,50 +61,41 @@ public class WorldBorder extends StoredObject {
 	public void setSize(double size) {
 		this.oldDiameter = size;
 		this.newDiameter = size;
+
 		this.lerpTime = 0;
 	}
 
 	public double getSize() {
-		if (lerpTime == 0) return newDiameter;
+		if (lerpTime == 0) {
+			return newDiameter;
+		}
 
-		long time = System.currentTimeMillis() - lerpStartTime;
-		double percent = ((double) (time) / (double) (lerpTime));
-		if (percent > 1.0d) percent = 1.0d;
-		else if (percent < 0.0d) percent = 0.0d;
+		double percent = ((double) (System.currentTimeMillis() - lerpStartTime) / (double) (lerpTime));
+
+		// Clamp value
+		if (percent > 1.0D) percent = 1.0d;
+		else if (percent < 0.0D) percent = 0.0d;
 
 		return oldDiameter + (newDiameter - oldDiameter) * percent;
 	}
 
-	public int getPortalTeleportBoundary() {
-		return portalTeleportBoundary;
+	public double getX() {
+		return x;
 	}
 
-	public void setPortalTeleportBoundary(int portalTeleportBoundary) {
-		this.portalTeleportBoundary = portalTeleportBoundary;
+	public double getZ() {
+		return z;
 	}
 
-	public int getWarningTime() {
-		return warningTime;
-	}
-
-	public void setWarningTime(int warningTime) {
-		this.warningTime = warningTime;
-	}
-
-	public int getWarningBlocks() {
-		return warningBlocks;
-	}
-
-	public void setWarningBlocks(int warningBlocks) {
-		this.warningBlocks = warningBlocks;
+	public boolean isInit() {
+		return init;
 	}
 
 	public enum Side {
 		NORTH(0, -1),
 		EAST(1, 0),
 		SOUTH(0, 1),
-		WEST(-1, 0),
-		;
+		WEST(-1, 0);
 
 		public final int modX;
 		public final int modZ;

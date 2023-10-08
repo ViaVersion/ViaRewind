@@ -19,13 +19,12 @@
 package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.packets;
 
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.WorldBorder;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.WorldBorderEmulator;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Chunk1_7_6_10Type;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.ChunkBulk1_7_6_10Type;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.model.ParticleIndex1_7_6_10;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
 import com.viaversion.viarewind.utils.ChatUtil;
-import com.viaversion.viarewind.utils.PacketUtil;
 import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
@@ -45,160 +44,148 @@ import com.viaversion.viaversion.util.ChatColorUtil;
 public class WorldPackets {
 
 	public static void register(Protocol1_7_6_10To1_8 protocol) {
-		protocol.registerClientbound(ClientboundPackets1_8.CHUNK_DATA, new PacketHandlers() {
-			@Override
-			public void register() {
-				handler(packetWrapper -> {
-					ClientWorld world = packetWrapper.user().get(ClientWorld.class);
-					Chunk chunk = packetWrapper.read(new Chunk1_8Type(world));
-					packetWrapper.write(new Chunk1_7_6_10Type(world), chunk);
-					for (ChunkSection section : chunk.getSections()) {
-						if (section == null) continue;
-						DataPalette palette = section.palette(PaletteType.BLOCKS);
-						for (int i = 0; i < palette.size(); i++) {
-							int block = palette.idByIndex(i);
-							int replacedBlock = protocol.getItemRewriter().replace(block);
-							palette.setIdByIndex(i, replacedBlock);
-						}
-					}
-				});
+		protocol.registerClientbound(ClientboundPackets1_8.CHUNK_DATA, wrapper -> {
+			final ClientWorld world = wrapper.user().get(ClientWorld.class);
+			Chunk chunk = wrapper.read(new Chunk1_8Type(world));
+			wrapper.write(new Chunk1_7_6_10Type(world), chunk);
+
+			// Rewrite block ids
+			for (ChunkSection section : chunk.getSections()) {
+				if (section == null) continue;
+				final DataPalette palette = section.palette(PaletteType.BLOCKS);
+
+				for (int i = 0; i < palette.size(); i++) {
+					palette.setIdByIndex(i, protocol.getItemRewriter().replace(palette.idByIndex(i)));
+				}
 			}
 		});
 
 		protocol.registerClientbound(ClientboundPackets1_8.MULTI_BLOCK_CHANGE, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Type.INT);
-				map(Type.INT);
-				handler(packetWrapper -> {
-					final BlockChangeRecord[] records = packetWrapper.read(Type.BLOCK_CHANGE_RECORD_ARRAY);
-					packetWrapper.write(Type.SHORT, (short) records.length);
-					packetWrapper.write(Type.INT, records.length * 4);
+				map(Type.INT); // chunk x
+				map(Type.INT); // chunk z
+
+				handler(wrapper -> {
+					final BlockChangeRecord[] records = wrapper.read(Type.BLOCK_CHANGE_RECORD_ARRAY);
+
+					wrapper.write(Type.SHORT, (short) records.length); // record count
+					wrapper.write(Type.INT, records.length * 4); // data array length (position + block id)
+
 					for (BlockChangeRecord record : records) {
-						short data = (short) (record.getSectionX() << 12 | record.getSectionZ() << 8 | record.getY());
-						packetWrapper.write(Type.SHORT, data);
-						int replacedBlock = protocol.getItemRewriter().replace(record.getBlockId());
-						packetWrapper.write(Type.SHORT, (short) replacedBlock);
+						wrapper.write(Type.SHORT, (short) (record.getSectionX() << 12 | record.getSectionZ() << 8 | record.getY())); // position
+						wrapper.write(Type.SHORT, (short) protocol.getItemRewriter().replace(record.getBlockId())); // block id
 					}
 				});
 			}
 		});
 
-		protocol.registerClientbound(ClientboundPackets1_8.BLOCK_CHANGE, new PacketHandlers() {
-			@Override
-			public void register() {
-				handler(packetWrapper -> {
-					Position position = packetWrapper.read(Type.POSITION);
-					packetWrapper.write(Type.INT, position.x());
-					packetWrapper.write(Type.UNSIGNED_BYTE, (short) position.y());
-					packetWrapper.write(Type.INT, position.z());
-				});
-				handler(packetWrapper -> {
-					int data = packetWrapper.read(Type.VAR_INT);
+		protocol.registerClientbound(ClientboundPackets1_8.BLOCK_CHANGE, wrapper -> {
+			final Position position = wrapper.read(Type.POSITION); // position
+			wrapper.write(Type.INT, position.x());
+			wrapper.write(Type.UNSIGNED_BYTE, (short) position.y());
+			wrapper.write(Type.INT, position.z());
 
-					data = protocol.getItemRewriter().replace(data);
+			int data = wrapper.read(Type.VAR_INT); // block data
+			data = protocol.getItemRewriter().replace(data);
 
-					packetWrapper.write(Type.VAR_INT, data >> 4);
-					packetWrapper.write(Type.UNSIGNED_BYTE, (short) (data & 0xF));
-				});  //Block Data
-			}
+			wrapper.write(Type.VAR_INT, data >> 4); // block id
+			wrapper.write(Type.UNSIGNED_BYTE, (short) (data & 0xF)); // block data
 		});
 
 		protocol.registerClientbound(ClientboundPackets1_8.BLOCK_ACTION, new PacketHandlers() {
 			@Override
 			public void register() {
-				handler(packetWrapper -> {
-					Position position = packetWrapper.read(Type.POSITION);
-					packetWrapper.write(Type.INT, position.x());
-					packetWrapper.write(Type.SHORT, (short) position.y());
-					packetWrapper.write(Type.INT, position.z());
+				handler(wrapper -> {
+					final Position position = wrapper.read(Type.POSITION); // position
+
+					wrapper.write(Type.INT, position.x());
+					wrapper.write(Type.SHORT, (short) position.y());
+					wrapper.write(Type.INT, position.z());
 				});
-				map(Type.UNSIGNED_BYTE);
-				map(Type.UNSIGNED_BYTE);
-				map(Type.VAR_INT);
+				map(Type.UNSIGNED_BYTE); // type
+				map(Type.UNSIGNED_BYTE); // data
+				map(Type.VAR_INT); // block id
 			}
 		});
 
 		protocol.registerClientbound(ClientboundPackets1_8.BLOCK_BREAK_ANIMATION, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Type.VAR_INT);  //Entity Id
-				handler(packetWrapper -> {
-					Position position = packetWrapper.read(Type.POSITION);
-					packetWrapper.write(Type.INT, position.x());
-					packetWrapper.write(Type.INT, position.y());
-					packetWrapper.write(Type.INT, position.z());
-				});
-				map(Type.BYTE);  //Progress
-			}
-		});
-
-		protocol.registerClientbound(ClientboundPackets1_8.MAP_BULK_CHUNK, new PacketHandlers() {
-			@Override
-			public void register() {
+				map(Type.VAR_INT); // entity id
 				handler(wrapper -> {
-					final ClientWorld world = wrapper.user().get(ClientWorld.class);
-					final Chunk[] chunks = wrapper.read(new ChunkBulk1_8Type(world));
-					wrapper.write(new ChunkBulk1_7_6_10Type(world), chunks);
+					final Position position = wrapper.read(Type.POSITION);
+
+					wrapper.write(Type.INT, position.x());
+					wrapper.write(Type.INT, position.y());
+					wrapper.write(Type.INT, position.z());
 				});
+				map(Type.BYTE); // progress
 			}
 		});
 
-		//Effect
+		protocol.registerClientbound(ClientboundPackets1_8.MAP_BULK_CHUNK, wrapper -> {
+			final ClientWorld world = wrapper.user().get(ClientWorld.class);
+
+			final Chunk[] chunks = wrapper.read(new ChunkBulk1_8Type(world));
+			wrapper.write(new ChunkBulk1_7_6_10Type(world), chunks);
+		});
+
 		protocol.registerClientbound(ClientboundPackets1_8.EFFECT, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Type.INT);
-				handler(packetWrapper -> {
-					Position position = packetWrapper.read(Type.POSITION);
-					packetWrapper.write(Type.INT, position.x());
-					packetWrapper.write(Type.BYTE, (byte) position.y());
-					packetWrapper.write(Type.INT, position.z());
+				map(Type.INT); // effect id
+				handler(wrapper -> {
+					final Position position = wrapper.read(Type.POSITION);
+
+					wrapper.write(Type.INT, position.x());
+					wrapper.write(Type.BYTE, (byte) position.y());
+					wrapper.write(Type.INT, position.z());
 				});
-				map(Type.INT);
-				map(Type.BOOLEAN);
+				map(Type.INT); // data
+				map(Type.BOOLEAN); // disable relative volume
 			}
 		});
 
 		protocol.registerClientbound(ClientboundPackets1_8.SPAWN_PARTICLE, new PacketHandlers() {
 			@Override
 			public void register() {
-				handler(packetWrapper -> {
-					int particleId = packetWrapper.read(Type.INT);
+				handler(wrapper -> {
+					final int particleId = wrapper.read(Type.INT); // particle id
 					ParticleIndex1_7_6_10 particle = ParticleIndex1_7_6_10.find(particleId);
 					if (particle == null) particle = ParticleIndex1_7_6_10.CRIT;
-					packetWrapper.write(Type.STRING, particle.name);
+					wrapper.write(Type.STRING, particle.name); // particle name
 
-					packetWrapper.read(Type.BOOLEAN);
 				});
-				map(Type.FLOAT);
-				map(Type.FLOAT);
-				map(Type.FLOAT);
-				map(Type.FLOAT);
-				map(Type.FLOAT);
-				map(Type.FLOAT);
-				map(Type.FLOAT);
-				map(Type.INT);
-				handler(packetWrapper -> {
-					String name = packetWrapper.get(Type.STRING, 0);
+				read(Type.BOOLEAN); // long distance
+				map(Type.FLOAT); // x
+				map(Type.FLOAT); // y
+				map(Type.FLOAT); // z
+				map(Type.FLOAT); // offset x
+				map(Type.FLOAT); // offset y
+				map(Type.FLOAT); // offset z
+				map(Type.FLOAT); // particle data
+				map(Type.INT); // particle count
+				handler(wrapper -> {
+					String name = wrapper.get(Type.STRING, 0);
 					ParticleIndex1_7_6_10 particle = ParticleIndex1_7_6_10.find(name);
 
 					if (particle == ParticleIndex1_7_6_10.ICON_CRACK || particle == ParticleIndex1_7_6_10.BLOCK_CRACK || particle == ParticleIndex1_7_6_10.BLOCK_DUST) {
-						int id = packetWrapper.read(Type.VAR_INT);
-						int data = particle == ParticleIndex1_7_6_10.ICON_CRACK ? packetWrapper.read(Type.VAR_INT) : id / 4096;
+						int id = wrapper.read(Type.VAR_INT);
+						int data = particle == ParticleIndex1_7_6_10.ICON_CRACK ? wrapper.read(Type.VAR_INT) : id / 4096;
 						id %= 4096;
 						if (id >= 256 && id <= 422 || id >= 2256 && id <= 2267) {  //item
 							particle = ParticleIndex1_7_6_10.ICON_CRACK;
 						} else if (id >= 0 && id <= 164 || id >= 170 && id <= 175) {
 							if (particle == ParticleIndex1_7_6_10.ICON_CRACK) particle = ParticleIndex1_7_6_10.BLOCK_CRACK;
 						} else {
-							packetWrapper.cancel();
+							wrapper.cancel();
 							return;
 						}
 						name = particle.name + "_" + id + "_" + data;
 					}
 
-					packetWrapper.set(Type.STRING, 0, name);
+					wrapper.set(Type.STRING, 0, name);
 				});
 			}
 		});
@@ -206,22 +193,24 @@ public class WorldPackets {
 		protocol.registerClientbound(ClientboundPackets1_8.UPDATE_SIGN, new PacketHandlers() {
 			@Override
 			public void register() {
-				handler(packetWrapper -> {
-					Position position = packetWrapper.read(Type.POSITION);
-					packetWrapper.write(Type.INT, position.x());
-					packetWrapper.write(Type.SHORT, (short) position.y());
-					packetWrapper.write(Type.INT, position.z());
+				handler(wrapper -> {
+					final Position position = wrapper.read(Type.POSITION);
+
+					wrapper.write(Type.INT, position.x());
+					wrapper.write(Type.SHORT, (short) position.y());
+					wrapper.write(Type.INT, position.z());
 				});
-				handler(packetWrapper -> {
+				handler(wrapper -> {
 					for (int i = 0; i < 4; i++) {
-						String line = packetWrapper.read(Type.STRING);
+						String line = wrapper.read(Type.STRING);
 						line = ChatUtil.jsonToLegacy(line);
 						line = ChatUtil.removeUnusedColor(line, '0');
+
 						if (line.length() > 15) {
 							line = ChatColorUtil.stripColor(line);
 							if (line.length() > 15) line = line.substring(0, 15);
 						}
-						packetWrapper.write(Type.STRING, line);
+						wrapper.write(Type.STRING, line);
 					}
 				});
 			}
@@ -230,27 +219,28 @@ public class WorldPackets {
 		protocol.registerClientbound(ClientboundPackets1_8.MAP_DATA, new PacketHandlers() {
 			@Override
 			public void register() {
-				handler(packetWrapper -> {
-					packetWrapper.cancel();
-					int id = packetWrapper.read(Type.VAR_INT);
-					byte scale = packetWrapper.read(Type.BYTE);
+				handler(wrapper -> {
+					wrapper.cancel();
+					final int id = wrapper.read(Type.VAR_INT);
+					final byte scale = wrapper.read(Type.BYTE);
 
-					int count = packetWrapper.read(Type.VAR_INT);
-					byte[] icons = new byte[count * 4];
-					for (int i = 0; i < count; i++) {
-						int j = packetWrapper.read(Type.BYTE);
-						icons[i * 4] = (byte) (j >> 4 & 0xF);
-						icons[i * 4 + 1] = packetWrapper.read(Type.BYTE);
-						icons[i * 4 + 2] = packetWrapper.read(Type.BYTE);
-						icons[i * 4 + 3] = (byte) (j & 0xF);
+					final int iconCount = wrapper.read(Type.VAR_INT);
+					byte[] icons = new byte[iconCount * 4];
+					for (int i = 0; i < iconCount; i++) {
+						final int directionAndType = wrapper.read(Type.BYTE);
+
+						icons[i * 4] = (byte) (directionAndType >> 4 & 0xF);
+						icons[i * 4 + 1] = wrapper.read(Type.BYTE); // x
+						icons[i * 4 + 2] = wrapper.read(Type.BYTE); // z
+						icons[i * 4 + 3] = (byte) (directionAndType & 0xF);
 					}
-					short columns = packetWrapper.read(Type.UNSIGNED_BYTE);
+					final short columns = wrapper.read(Type.UNSIGNED_BYTE);
 					if (columns > 0) {
-						short rows = packetWrapper.read(Type.UNSIGNED_BYTE);
-						short x = packetWrapper.read(Type.UNSIGNED_BYTE);
-						short z = packetWrapper.read(Type.UNSIGNED_BYTE);
-						byte[] data = packetWrapper.read(Type.BYTE_ARRAY_PRIMITIVE);
+						final short rows = wrapper.read(Type.UNSIGNED_BYTE);
+						final short x = wrapper.read(Type.UNSIGNED_BYTE);
+						final short z = wrapper.read(Type.UNSIGNED_BYTE);
 
+						final byte[] data = wrapper.read(Type.BYTE_ARRAY_PRIMITIVE);
 						for (int column = 0; column < columns; column++) {
 							byte[] columnData = new byte[rows + 3];
 							columnData[0] = 0;
@@ -261,36 +251,39 @@ public class WorldPackets {
 								columnData[i + 3] = data[column + i * columns];
 							}
 
-							PacketWrapper columnUpdate = PacketWrapper.create(0x34, null, packetWrapper.user());
-							columnUpdate.write(Type.VAR_INT, id);
-							columnUpdate.write(Type.SHORT, (short) columnData.length);
-							columnUpdate.write(new CustomByteType(columnData.length), columnData);
+							final PacketWrapper mapData = PacketWrapper.create(ClientboundPackets1_8.MAP_DATA, wrapper.user());
+							mapData.write(Type.VAR_INT, id); // map id
+							mapData.write(Type.SHORT, (short) columnData.length); // data length
+							mapData.write(new CustomByteType(columnData.length), columnData); // data
 
-							PacketUtil.sendPacket(columnUpdate, Protocol1_7_6_10To1_8.class, true, true);
+							mapData.send(Protocol1_7_6_10To1_8.class, true);
 						}
 					}
 
-					if (count > 0) {
-						byte[] iconData = new byte[count * 3 + 1];
+					if (iconCount > 0) {
+						final byte[] iconData = new byte[iconCount * 3 + 1];
 						iconData[0] = 1;
-						for (int i = 0; i < count; i++) {
+						for (int i = 0; i < iconCount; i++) {
 							iconData[i * 3 + 1] = (byte) (icons[i * 4] << 4 | icons[i * 4 + 3] & 0xF);
 							iconData[i * 3 + 2] = icons[i * 4 + 1];
 							iconData[i * 3 + 3] = icons[i * 4 + 2];
 						}
-						PacketWrapper iconUpdate = PacketWrapper.create(0x34, null, packetWrapper.user());
-						iconUpdate.write(Type.VAR_INT, id);
-						iconUpdate.write(Type.SHORT, (short) iconData.length);
-						CustomByteType customByteType = new CustomByteType(iconData.length);
-						iconUpdate.write(customByteType, iconData);
-						PacketUtil.sendPacket(iconUpdate, Protocol1_7_6_10To1_8.class, true, true);
+
+						final PacketWrapper mapData = PacketWrapper.create(ClientboundPackets1_8.MAP_DATA, wrapper.user());
+						mapData.write(Type.VAR_INT, id); // map id
+						mapData.write(Type.SHORT, (short) iconData.length); // data length
+						mapData.write(new CustomByteType(iconData.length), iconData); // data
+
+						mapData.send(Protocol1_7_6_10To1_8.class, true);
 					}
 
-					PacketWrapper scaleUpdate = PacketWrapper.create(0x34, null, packetWrapper.user());
-					scaleUpdate.write(Type.VAR_INT, id);
-					scaleUpdate.write(Type.SHORT, (short) 2);
-					scaleUpdate.write(new CustomByteType(2), new byte[]{2, scale});
-					PacketUtil.sendPacket(scaleUpdate, Protocol1_7_6_10To1_8.class, true, true);
+					// Update scale
+					final PacketWrapper mapData = PacketWrapper.create(ClientboundPackets1_8.MAP_DATA, wrapper.user());
+					mapData.write(Type.VAR_INT, id); // map id
+					mapData.write(Type.SHORT, (short) 2); // data length
+					mapData.write(new CustomByteType(2), new byte[]{ 2, scale }); // data
+
+					mapData.send(Protocol1_7_6_10To1_8.class, true);
 				});
 			}
 		});
@@ -298,50 +291,38 @@ public class WorldPackets {
 		protocol.registerClientbound(ClientboundPackets1_8.BLOCK_ENTITY_DATA, new PacketHandlers() {
 			@Override
 			public void register() {
-				handler(packetWrapper -> {
+				handler(packetWrapper -> { // position
 					Position position = packetWrapper.read(Type.POSITION);
 					packetWrapper.write(Type.INT, position.x());
 					packetWrapper.write(Type.SHORT, (short) position.y());
 					packetWrapper.write(Type.INT, position.z());
 				});
-				map(Type.UNSIGNED_BYTE);  //Action
-				map(Type.NBT, Types1_7_6_10.COMPRESSED_NBT);
+				map(Type.UNSIGNED_BYTE); // action
+				map(Type.NAMED_COMPOUND_TAG, Types1_7_6_10.COMPRESSED_NBT); // nbt
 			}
 		});
 
 		protocol.cancelClientbound(ClientboundPackets1_8.SERVER_DIFFICULTY);
 		protocol.cancelClientbound(ClientboundPackets1_8.COMBAT_EVENT);
 
-		protocol.registerClientbound(ClientboundPackets1_8.WORLD_BORDER, null, new PacketHandlers() {
-			@Override
-			public void register() {
-				handler(packetWrapper -> {
-					int action = packetWrapper.read(Type.VAR_INT);
-					WorldBorder worldBorder = packetWrapper.user().get(WorldBorder.class);
-					if (action == 0) {
-						worldBorder.setSize(packetWrapper.read(Type.DOUBLE));
-					} else if (action == 1) {
-						worldBorder.lerpSize(packetWrapper.read(Type.DOUBLE), packetWrapper.read(Type.DOUBLE), packetWrapper.read(Type.VAR_LONG));
-					} else if (action == 2) {
-						worldBorder.setCenter(packetWrapper.read(Type.DOUBLE), packetWrapper.read(Type.DOUBLE));
-					} else if (action == 3) {
-						worldBorder.init(
-								packetWrapper.read(Type.DOUBLE), packetWrapper.read(Type.DOUBLE),
-								packetWrapper.read(Type.DOUBLE), packetWrapper.read(Type.DOUBLE),
-								packetWrapper.read(Type.VAR_LONG),
-								packetWrapper.read(Type.VAR_INT),
-								packetWrapper.read(Type.VAR_INT), packetWrapper.read(Type.VAR_INT)
-						);
-					} else if (action == 4) {
-						worldBorder.setWarningTime(packetWrapper.read(Type.VAR_INT));
-					} else if (action == 5) {
-						worldBorder.setWarningBlocks(packetWrapper.read(Type.VAR_INT));
-					}
+		protocol.registerClientbound(ClientboundPackets1_8.WORLD_BORDER, null, wrapper -> {
+			final WorldBorderEmulator emulator = wrapper.user().get(WorldBorderEmulator.class);
+			wrapper.cancel();
 
-					packetWrapper.cancel();
-				});
+			final int action = wrapper.read(Type.VAR_INT);
+			if (action == 0) { // set size
+				emulator.setSize(wrapper.read(Type.DOUBLE)); // radius
+			} else if (action == 1) { // lerp size
+				emulator.lerpSize(wrapper.read(Type.DOUBLE), wrapper.read(Type.DOUBLE), wrapper.read(Type.VAR_LONG)); // old radius, new radius, speed
+			} else if (action == 2) { // set center
+				emulator.setCenter(wrapper.read(Type.DOUBLE), wrapper.read(Type.DOUBLE)); // x, z
+			} else if (action == 3) { // initialize
+				emulator.init(
+					wrapper.read(Type.DOUBLE), wrapper.read(Type.DOUBLE), // x, z
+					wrapper.read(Type.DOUBLE), wrapper.read(Type.DOUBLE), // old radius, new radius
+					wrapper.read(Type.VAR_LONG) // speed
+				);
 			}
 		});
-
 	}
 }

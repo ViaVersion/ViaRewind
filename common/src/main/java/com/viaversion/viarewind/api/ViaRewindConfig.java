@@ -69,4 +69,18 @@ public interface ViaRewindConfig extends Config {
 	 * @return the max amount of characters
 	 */
 	int getMaxBookPageSize();
+
+	/**
+	 * Whether to emulate the 1.8+ world border for 1.7.x clients
+	 *
+	 * @return true if enabled
+	 */
+	boolean isEmulateWorldBorder();
+
+	/**
+	 * The particle to show the world border for the 1.8+ world border for 1.7.x clients
+	 *
+	 * @return the particle name (see https://wiki.vg/index.php?title=Protocol&oldid=7368#Particle_2)
+	 */
+	String getWorldBorderParticle();
 }

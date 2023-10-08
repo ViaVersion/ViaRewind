@@ -58,7 +58,17 @@ public class ViaRewindConfig extends Config implements com.viaversion.viarewind.
         return getInt("max-book-page-length", 5000);
     }
 
-    @Override
+	@Override
+	public boolean isEmulateWorldBorder() {
+		return getBoolean("emulate-world-border", true);
+	}
+
+	@Override
+	public String getWorldBorderParticle() {
+		return getString("world-border-particle", "fireworksSpark");
+	}
+
+	@Override
     public URL getDefaultConfigURL() {
         return getClass().getClassLoader().getResource("assets/viarewind/config.yml");
     }
