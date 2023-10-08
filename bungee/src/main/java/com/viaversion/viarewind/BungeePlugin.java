@@ -19,14 +19,15 @@
 package com.viaversion.viarewind;
 
 import com.viaversion.viarewind.api.ViaRewindPlatform;
+import com.viaversion.viaversion.api.Via;
 import net.md_5.bungee.api.plugin.Plugin;
 
 import java.io.File;
 
 public class BungeePlugin extends Plugin implements ViaRewindPlatform {
 
-    @Override
-    public void onEnable() {
-        this.init(new File(getDataFolder(), "config.yml"));
-    }
+	@Override
+	public void onLoad() {
+		Via.getManager().addEnableListener(() -> this.init(new File(getDataFolder(), "config.yml")));
+	}
 }

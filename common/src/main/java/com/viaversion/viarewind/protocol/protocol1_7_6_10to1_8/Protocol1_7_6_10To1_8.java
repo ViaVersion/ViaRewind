@@ -44,6 +44,8 @@ import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.protocol1_8.ServerboundPackets1_8;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 
+import java.util.concurrent.TimeUnit;
+
 public class Protocol1_7_6_10To1_8 extends AbstractProtocol<ClientboundPackets1_8, ClientboundPackets1_7_2_5, ServerboundPackets1_8, ServerboundPackets1_7_2_5> {
 
 	private final ReplacementItemRewriter<Protocol1_7_6_10To1_8> itemRewriter = new ReplacementItemRewriter1_7_6_10(this);
@@ -131,7 +133,7 @@ public class Protocol1_7_6_10To1_8 extends AbstractProtocol<ClientboundPackets1_
 	public void register(ViaProviders providers) {
 		providers.register(CompressionHandlerProvider.class, new TrackingCompressionHandlerProvider());
 
-		Via.getPlatform().runRepeatingSync(new WorldBorderUpdateTask(), 1L);
+		Via.getManager().getScheduler().scheduleRepeating(new WorldBorderUpdateTask(), 0L, 50L, TimeUnit.MILLISECONDS);
 	}
 
 	@Override
