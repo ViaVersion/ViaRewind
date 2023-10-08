@@ -19,12 +19,12 @@
 package com.viaversion.viarewind.protocol.protocol1_8to1_9.items;
 
 import com.viaversion.viarewind.replacement.Replacement;
-import com.viaversion.viarewind.replacement.ReplacementRegistry;
-import com.viaversion.viarewind.utils.BlockState;
+import com.viaversion.viarewind.api.rewriter.ReplacementItemRewriter;
+import com.viaversion.viarewind.api.minecraft.IdDataCombine;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 
 public class ReplacementRegistry1_8to1_9 {
-	private static final ReplacementRegistry registry = new ReplacementRegistry();
+	private static final ReplacementItemRewriter registry = new ReplacementItemRewriter();
 
 	static {
 		registry.registerItem(198, new Replacement(50, 0, "End Rod"));
@@ -92,10 +92,10 @@ public class ReplacementRegistry1_8to1_9 {
 	}
 
 	public static int replace(int raw) {
-		int data = BlockState.extractData(raw);
-		Replacement replace = registry.replace(BlockState.extractId(raw), data);
+		int data = IdDataCombine.dataFromCombined(raw);
+		Replacement replace = registry.replace(IdDataCombine.idFromCombined(raw), data);
 		if (replace == null) return raw;
-		return BlockState.stateToRaw(replace.getId(), replace.replaceData(data));
+		return IdDataCombine.toCombined(replace.getId(), replace.replaceData(data));
 	}
 
 	public static Replacement getReplacement(int id, int data) {

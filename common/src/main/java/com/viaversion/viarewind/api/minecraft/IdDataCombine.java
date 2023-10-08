@@ -16,19 +16,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.viaversion.viarewind.utils;
+package com.viaversion.viarewind.api.minecraft;
 
-public class BlockState {
+public class IdDataCombine {
 
-	public static int extractId(int raw) {
-		return raw >> 4;
+	public static int idFromCombined(final int combined) {
+		return combined >> 4;
 	}
 
-	public static int extractData(int raw) {
-		return raw & 0xF;
+	public static int dataFromCombined(final int combined) {
+		return combined & 0xF;
 	}
 
-	public static int stateToRaw(int id, int data) {
+	public static int toCombined(final int id, final int data) {
 		return (id << 4) | (data & 0xF);
 	}
 }

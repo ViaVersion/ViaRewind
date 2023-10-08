@@ -48,9 +48,9 @@ public class EntityPackets {
 		protocol.registerClientbound(ClientboundPackets1_8.ENTITY_EQUIPMENT, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Type.VAR_INT, Type.INT);  //Entity Id
-				map(Type.SHORT);  //Slot
-				map(Type.ITEM, Types1_7_6_10.COMPRESSED_NBT_ITEM);  //Item
+				map(Type.VAR_INT, Type.INT); // entity id
+				map(Type.SHORT); // slot
+				map(Type.ITEM, Types1_7_6_10.COMPRESSED_NBT_ITEM); // Item
 				handler(packetWrapper -> {
 					Item item = packetWrapper.get(Types1_7_6_10.COMPRESSED_NBT_ITEM, 0);
 					ItemRewriter.toClient(item);
@@ -123,14 +123,14 @@ public class EntityPackets {
 
 					for (int i = 0; i < parts.size() - 1; i++) {
 						PacketWrapper destroy = PacketWrapper.create(ClientboundPackets1_7_2_5.DESTROY_ENTITIES,
-								packetWrapper.user());
+							packetWrapper.user());
 						destroy.write(Types1_7_6_10.INT_ARRAY, parts.get(i).stream()
-								.mapToInt(Integer::intValue).toArray());
+							.mapToInt(Integer::intValue).toArray());
 						PacketUtil.sendPacket(destroy, Protocol1_7_6_10To1_8.class);
 					}
 
 					packetWrapper.write(Types1_7_6_10.INT_ARRAY, parts.get(parts.size() - 1).stream()
-							.mapToInt(Integer::intValue).toArray());
+						.mapToInt(Integer::intValue).toArray());
 				});  //Entity Id Array
 			}
 		});

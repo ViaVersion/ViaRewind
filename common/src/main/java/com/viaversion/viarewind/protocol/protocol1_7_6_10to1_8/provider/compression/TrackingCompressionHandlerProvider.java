@@ -1,7 +1,7 @@
 package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.provider.compression;
 
-import com.viaversion.viarewind.netty.EmptyChannelHandler;
-import com.viaversion.viarewind.netty.ForwardMessageToByteEncoder;
+import com.viaversion.viarewind.api.netty.EmptyChannelHandler;
+import com.viaversion.viarewind.api.netty.ForwardMessageToByteEncoder;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.provider.CompressionHandlerProvider;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;

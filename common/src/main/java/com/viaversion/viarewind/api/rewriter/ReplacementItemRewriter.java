@@ -16,15 +16,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.viaversion.viarewind.replacement;
+package com.viaversion.viarewind.api.rewriter;
 
+import com.viaversion.viarewind.replacement.Replacement;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.libs.fastutil.ints.Int2ObjectMap;
 import com.viaversion.viaversion.libs.fastutil.ints.Int2ObjectOpenHashMap;
 
-public class ReplacementRegistry {
-	private final Int2ObjectMap<Replacement> itemReplacements = new Int2ObjectOpenHashMap<>();
-	private final Int2ObjectMap<Replacement> blockReplacements = new Int2ObjectOpenHashMap<>();
+public class ReplacementItemRewriter {
+	private final Int2ObjectMap<Replacement> ITEM_REPLACEMENTS = new Int2ObjectOpenHashMap<>();
+	private final Int2ObjectMap<Replacement> BLOCK_REPLACEMENTS = new Int2ObjectOpenHashMap<>();
 
 	public void registerItem(int id, Replacement replacement) {
 		registerItem(id, -1, replacement);
@@ -39,11 +40,11 @@ public class ReplacementRegistry {
 	}
 
 	public void registerItem(int id, int data, Replacement replacement) {
-		itemReplacements.put(combine(id, data), replacement);
+		ITEM_REPLACEMENTS.put(combine(id, data), replacement);
 	}
 
 	public void registerBlock(int id, int data, Replacement replacement) {
-		blockReplacements.put(combine(id, data), replacement);
+		BLOCK_REPLACEMENTS.put(combine(id, data), replacement);
 	}
 
 	public void registerItemBlock(int id, int data, Replacement replacement) {
@@ -52,15 +53,15 @@ public class ReplacementRegistry {
 	}
 
 	public Item replace(Item item) {
-		Replacement replacement = itemReplacements.get(combine(item.identifier(), item.data()));
-		if (replacement == null) replacement = itemReplacements.get(combine(item.identifier(), -1));
+		Replacement replacement = ITEM_REPLACEMENTS.get(combine(item.identifier(), item.data()));
+		if (replacement == null) replacement = ITEM_REPLACEMENTS.get(combine(item.identifier(), -1));
 		return replacement == null ? item : replacement.replace(item);
 	}
 
 	public Replacement replace(int id, int data) {
-		Replacement replacement = blockReplacements.get(combine(id, data));
+		Replacement replacement = BLOCK_REPLACEMENTS.get(combine(id, data));
 		if (replacement == null) {
-			replacement = blockReplacements.get(combine(id, -1));
+			replacement = BLOCK_REPLACEMENTS.get(combine(id, -1));
 		}
 		return replacement;
 	}
