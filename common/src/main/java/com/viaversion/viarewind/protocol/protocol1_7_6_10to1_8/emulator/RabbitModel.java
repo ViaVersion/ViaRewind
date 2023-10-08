@@ -16,11 +16,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.entityreplacements;
+package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.emulator;
 
 import com.viaversion.viarewind.protocol.protocol1_7_2_5to1_7_6_10.ClientboundPackets1_7_2_5;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.metadata.MetadataRewriter;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
 import com.viaversion.viarewind.utils.PacketUtil;
 import com.viaversion.viaversion.api.connection.UserConnection;
@@ -32,21 +31,21 @@ import com.viaversion.viaversion.api.type.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EndermiteReplacement extends EntityReplacement1_7to1_8 {
+public class RabbitModel extends EntityModel1_7_6_10 {
 	private final int entityId;
 	private final List<Metadata> datawatcher = new ArrayList<>();
 	private double locX, locY, locZ;
 	private float yaw, pitch;
 	private float headYaw;
 
-	public EndermiteReplacement(Protocol1_7_6_10To1_8 protocol, UserConnection user, int entityId) {
-		super(protocol, user);
+	public RabbitModel(UserConnection user, Protocol1_7_6_10To1_8 protocol, int entityId) {
+		super(user, protocol);
 		this.entityId = entityId;
-		spawn();
+		sendSpawnPacket();
 	}
 
 	@Override
-	public void setLocation(double x, double y, double z) {
+	public void updateReplacementPosition(double x, double y, double z) {
 		this.locX = x;
 		this.locY = y;
 		this.locZ = z;
@@ -54,7 +53,7 @@ public class EndermiteReplacement extends EntityReplacement1_7to1_8 {
 	}
 
 	@Override
-	public void relMove(double x, double y, double z) {
+	public void handleOriginalMovementPacket(double x, double y, double z) {
 		this.locX += x;
 		this.locY += y;
 		this.locZ += z;
@@ -88,11 +87,11 @@ public class EndermiteReplacement extends EntityReplacement1_7to1_8 {
 	}
 
 	public void updateLocation() {
-		sendTeleportWithHead(entityId, locX, locY, locZ, yaw, pitch, headYaw);
+		teleportAndUpdate(entityId, locX, locY, locZ, yaw, pitch, headYaw);
 	}
 
 	public void updateMetadata() {
-		PacketWrapper metadataPacket = PacketWrapper.create(ClientboundPackets1_7_2_5.ENTITY_METADATA, user);
+		PacketWrapper metadataPacket = PacketWrapper.create(ClientboundPackets1_7_2_5.ENTITY_METADATA, null, user);
 		metadataPacket.write(Type.INT, entityId);
 
 		List<Metadata> metadataList = new ArrayList<>();
@@ -100,20 +99,20 @@ public class EndermiteReplacement extends EntityReplacement1_7to1_8 {
 			metadataList.add(new Metadata(metadata.id(), metadata.metaType(), metadata.getValue()));
 		}
 
-		protocol.getMetadataRewriter().transform(Entity1_10Types.EntityType.SQUID, metadataList);
+		getProtocol().getMetadataRewriter().transform(Entity1_10Types.EntityType.CHICKEN, metadataList);
 
 		metadataPacket.write(Types1_7_6_10.METADATA_LIST, metadataList);
 
-		PacketUtil.sendPacket(metadataPacket, Protocol1_7_6_10To1_8.class);
+		PacketUtil.sendPacket(metadataPacket, Protocol1_7_6_10To1_8.class, true, true);
 	}
 
 	@Override
-	public void spawn() {
-		sendSpawn(entityId, 60, locX, locY, locZ);
+	public void sendSpawnPacket() {
+		spawnEntity(entityId, 93, locX, locY, locZ); // Chicken
 	}
 
 	@Override
-	public void despawn() {
+	public void deleteEntity() {
 		PacketWrapper despawn = PacketWrapper.create(ClientboundPackets1_7_2_5.DESTROY_ENTITIES, null, user);
 		despawn.write(Types1_7_6_10.INT_ARRAY, new int[]{entityId});
 

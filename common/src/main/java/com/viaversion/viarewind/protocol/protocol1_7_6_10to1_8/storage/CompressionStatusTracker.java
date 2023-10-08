@@ -16,27 +16,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.viaversion.viarewind.replacement;
+package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage;
 
-import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
+import com.viaversion.viaversion.api.connection.StoredObject;
+import com.viaversion.viaversion.api.connection.UserConnection;
 
-import java.util.List;
+/**
+ * @see com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.provider.CompressionHandlerProvider
+ */
+public class CompressionStatusTracker extends StoredObject {
+	public boolean removeCompression = false;
 
-public interface EntityReplacement {
-
-	int getEntityId();
-
-	void setLocation(double x, double y, double z);
-
-	void relMove(double x, double y, double z);
-
-	void setYawPitch(float yaw, float pitch);
-
-	void setHeadYaw(float yaw);
-
-	void spawn();
-
-	void despawn();
-
-	void updateMetadata(List<Metadata> metadataList);
+	public CompressionStatusTracker(UserConnection user) {
+		super(user);
+	}
 }

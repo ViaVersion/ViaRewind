@@ -19,27 +19,23 @@
 package com.viaversion.viarewind.protocol.protocol1_8to1_9.packets;
 
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.Protocol1_8To1_9;
-import com.viaversion.viarewind.protocol.protocol1_8to1_9.metadata.MetadataRewriter;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.storage.Cooldown;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.storage.EntityTracker;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.storage.Levitation;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.storage.PlayerPosition;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.util.RelativeMoveUtil;
-import com.viaversion.viarewind.replacement.EntityReplacement;
+import com.viaversion.viarewind.api.minecraft.EntityModel;
 import com.viaversion.viarewind.utils.PacketUtil;
 import com.viaversion.viaversion.api.minecraft.Vector;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
-import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_8;
 import com.viaversion.viaversion.api.type.types.version.Types1_9;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
-import com.viaversion.viaversion.protocols.protocol1_8.ServerboundPackets1_8;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ClientboundPackets1_9;
-import com.viaversion.viaversion.protocols.protocol1_9to1_8.ServerboundPackets1_9;
 import com.viaversion.viaversion.util.Pair;
 
 import java.util.ArrayList;
@@ -76,10 +72,10 @@ public class EntityPackets {
 					int relZ = packetWrapper.read(Type.SHORT);
 
 					EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-					EntityReplacement replacement = tracker.getEntityReplacement(entityId);
+					EntityModel replacement = tracker.getEntityReplacement(entityId);
 					if (replacement != null) {
 						packetWrapper.cancel();
-						replacement.relMove(relX / 4096.0, relY / 4096.0, relZ / 4096.0);
+						replacement.handleOriginalMovementPacket(relX / 4096.0, relY / 4096.0, relZ / 4096.0);
 						return;
 					}
 
@@ -117,10 +113,10 @@ public class EntityPackets {
 					int relZ = packetWrapper.read(Type.SHORT);
 
 					EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-					EntityReplacement replacement = tracker.getEntityReplacement(entityId);
+					EntityModel replacement = tracker.getEntityReplacement(entityId);
 					if (replacement != null) {
 						packetWrapper.cancel();
-						replacement.relMove(relX / 4096.0, relY / 4096.0, relZ / 4096.0);
+						replacement.handleOriginalMovementPacket(relX / 4096.0, relY / 4096.0, relZ / 4096.0);
 						replacement.setYawPitch(packetWrapper.read(Type.BYTE) * 360f / 256, packetWrapper.read(Type.BYTE) * 360f / 256);
 						return;
 					}
@@ -168,7 +164,7 @@ public class EntityPackets {
 				handler(packetWrapper -> {
 					int entityId = packetWrapper.get(Type.VAR_INT, 0);
 					EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-					EntityReplacement replacement = tracker.getEntityReplacement(entityId);
+					EntityModel replacement = tracker.getEntityReplacement(entityId);
 					if (replacement != null) {
 						packetWrapper.cancel();
 						int yaw = packetWrapper.get(Type.BYTE, 0);
@@ -272,7 +268,7 @@ public class EntityPackets {
 				handler(packetWrapper -> {
 					int entityId = packetWrapper.get(Type.VAR_INT, 0);
 					EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-					EntityReplacement replacement = tracker.getEntityReplacement(entityId);
+					EntityModel replacement = tracker.getEntityReplacement(entityId);
 					if (replacement != null) {
 						packetWrapper.cancel();
 						int yaw = packetWrapper.get(Type.BYTE, 0);
@@ -402,7 +398,7 @@ public class EntityPackets {
 				handler(packetWrapper -> {
 					int entityId = packetWrapper.get(Type.VAR_INT, 0);
 					EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-					EntityReplacement replacement = tracker.getEntityReplacement(entityId);
+					EntityModel replacement = tracker.getEntityReplacement(entityId);
 					if (replacement != null) {
 						packetWrapper.cancel();
 						int x = packetWrapper.get(Type.INT, 0);
@@ -410,7 +406,7 @@ public class EntityPackets {
 						int z = packetWrapper.get(Type.INT, 2);
 						int yaw = packetWrapper.get(Type.BYTE, 0);
 						int pitch = packetWrapper.get(Type.BYTE, 1);
-						replacement.setLocation(x / 32.0, y / 32.0, z / 32.0);
+						replacement.updateReplacementPosition(x / 32.0, y / 32.0, z / 32.0);
 						replacement.setYawPitch(yaw * 360f / 256, pitch * 360f / 256);
 					}
 				});

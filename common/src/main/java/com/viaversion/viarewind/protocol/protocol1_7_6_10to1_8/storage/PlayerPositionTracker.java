@@ -21,14 +21,14 @@ package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage;
 import com.viaversion.viaversion.api.connection.StoredObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 
-public class PlayerPosition extends StoredObject {
+public class PlayerPositionTracker extends StoredObject {
 	private double posX, posY, posZ;
 	private float yaw, pitch;
 	private boolean onGround;
 	private boolean positionPacketReceived;
 	private double receivedPosY;
 
-	public PlayerPosition(UserConnection user) {
+	public PlayerPositionTracker(UserConnection user) {
 		super(user);
 	}
 

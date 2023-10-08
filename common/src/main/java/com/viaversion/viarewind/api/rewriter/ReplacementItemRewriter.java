@@ -19,7 +19,6 @@
 package com.viaversion.viarewind.api.rewriter;
 
 import com.viaversion.viarewind.api.minecraft.IdDataCombine;
-import com.viaversion.viarewind.replacement.Replacement;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.rewriter.ItemRewriter;

@@ -19,10 +19,11 @@
 package com.viaversion.viarewind.protocol.protocol1_8to1_9.entityreplacement;
 
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.Protocol1_8To1_9;
-import com.viaversion.viarewind.replacement.EntityReplacement;
+import com.viaversion.viarewind.api.minecraft.EntityModel;
 import com.viaversion.viarewind.utils.PacketUtil;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
+import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_8;
@@ -31,21 +32,18 @@ import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class EntityReplacement1_8to1_9 implements EntityReplacement {
-	protected final Protocol1_8To1_9 protocol;
-	protected final UserConnection user;
+public abstract class EntityModel1_8To1_9 extends EntityModel<Protocol1_8To1_9> {
 
-	protected EntityReplacement1_8to1_9(Protocol1_8To1_9 protocol, UserConnection user) {
-		this.protocol = protocol;
-		this.user = user;
+	public EntityModel1_8To1_9(UserConnection user, Protocol1_8To1_9 protocol) {
+		super(user, protocol);
 	}
 
 	protected void sendTeleportWithHead(int entityId, double locX, double locY, double locZ, float yaw, float pitch, float headYaw) {
-		sendTeleport(entityId, locX, locY, locZ, yaw, pitch);
+		teleportEntity(entityId, locX, locY, locZ, yaw, pitch);
 		sendHeadYaw(entityId, headYaw);
 	}
 
-	protected void sendTeleport(int entityId, double locX, double locY, double locZ, float yaw, float pitch) {
+	protected void teleportEntity(int entityId, double locX, double locY, double locZ, float yaw, float pitch) {
 		PacketWrapper teleport = PacketWrapper.create(ClientboundPackets1_8.ENTITY_TELEPORT, null, user);
 		teleport.write(Type.VAR_INT, entityId);
 		teleport.write(Type.INT, (int) (locX * 32.0));

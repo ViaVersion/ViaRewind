@@ -21,11 +21,11 @@ package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage;
 import com.viaversion.viaversion.api.connection.StoredObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 
-public class PlayerAbilities extends StoredObject {
+public class PlayerAbilitiesTracker extends StoredObject {
 	private boolean sprinting, allowFly, flying, invincible, creative;
 	private float flySpeed, walkSpeed;
 
-	public PlayerAbilities(UserConnection user) {
+	public PlayerAbilitiesTracker(UserConnection user) {
 		super(user);
 	}
 
@@ -96,9 +96,9 @@ public class PlayerAbilities extends StoredObject {
 
 	public boolean equals(final Object o) {
 		if (o == this) return true;
-		if (!(o instanceof PlayerAbilities))
+		if (!(o instanceof PlayerAbilitiesTracker))
 			return false;
-		final PlayerAbilities other = (PlayerAbilities) o;
+		final PlayerAbilitiesTracker other = (PlayerAbilitiesTracker) o;
 		if (!other.canEqual(this)) return false;
 		if (this.isSprinting() != other.isSprinting()) return false;
 		if (this.isAllowFly() != other.isAllowFly()) return false;
@@ -110,7 +110,7 @@ public class PlayerAbilities extends StoredObject {
 	}
 
 	protected boolean canEqual(final Object other) {
-		return other instanceof PlayerAbilities;
+		return other instanceof PlayerAbilitiesTracker;
 	}
 
 	public int hashCode() {

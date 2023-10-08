@@ -19,8 +19,7 @@
 package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage;
 
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.metadata.MetadataRewriter;
-import com.viaversion.viarewind.replacement.EntityReplacement;
+import com.viaversion.viarewind.api.minecraft.EntityModel;
 import com.viaversion.viarewind.utils.PacketUtil;
 import com.viaversion.viaversion.api.connection.StoredObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
@@ -41,9 +40,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class EntityTracker extends StoredObject implements ClientEntityIdChangeListener {
 	private final Protocol1_7_6_10To1_8 protocol;
 	private final Map<Integer, Entity1_10Types.EntityType> clientEntityTypes = new ConcurrentHashMap<>();
-	private final Map<Integer, List<Metadata>> metadataBuffer = new ConcurrentHashMap<>();
 	private final Map<Integer, Integer> vehicles = new ConcurrentHashMap<>();
-	private final Map<Integer, EntityReplacement> entityReplacements = new ConcurrentHashMap<>();
+	private final Map<Integer, EntityModel> entityReplacements = new ConcurrentHashMap<>();
 	private final Map<Integer, UUID> playersByEntityId = new HashMap<>();
 	private final Map<UUID, Integer> playersByUniqueId = new HashMap<>();
 	private final Map<UUID, Item[]> playerEquipment = new HashMap<>();
@@ -60,7 +58,7 @@ public class EntityTracker extends StoredObject implements ClientEntityIdChangeL
 	public void removeEntity(int entityId) {
 		clientEntityTypes.remove(entityId);
 		if (entityReplacements.containsKey(entityId)) {
-			entityReplacements.remove(entityId).despawn();
+			entityReplacements.remove(entityId).deleteEntity();
 		}
 		if (playersByEntityId.containsKey(entityId)) {
 			UUID playerId = playersByEntityId.remove(entityId);
@@ -99,42 +97,12 @@ public class EntityTracker extends StoredObject implements ClientEntityIdChangeL
 		return this.clientEntityTypes;
 	}
 
-	public void addMetadataToBuffer(int entityID, List<Metadata> metadataList) {
-		if (this.metadataBuffer.containsKey(entityID)) {
-			this.metadataBuffer.get(entityID).addAll(metadataList);
-		} else if (!metadataList.isEmpty()) {
-			this.metadataBuffer.put(entityID, metadataList);
-		}
+	public void addEntityReplacement(EntityModel entityModel) {
+		entityReplacements.put(entityModel.getEntityId(), entityModel);
 	}
 
-	public void addEntityReplacement(EntityReplacement entityReplacement) {
-		entityReplacements.put(entityReplacement.getEntityId(), entityReplacement);
-	}
-
-	public EntityReplacement getEntityReplacement(int entityId) {
+	public EntityModel getEntityReplacement(int entityId) {
 		return entityReplacements.get(entityId);
-	}
-
-	public List<Metadata> getBufferedMetadata(int entityId) {
-		return metadataBuffer.get(entityId);
-	}
-
-	public void sendMetadataBuffer(int entityId) {
-		if (!this.metadataBuffer.containsKey(entityId)) return;
-		if (entityReplacements.containsKey(entityId)) {
-			entityReplacements.get(entityId).updateMetadata(this.metadataBuffer.remove(entityId));
-		} else {
-			Entity1_10Types.EntityType type = this.getClientEntityTypes().get(entityId);
-			PacketWrapper wrapper = PacketWrapper.create(0x1C, null, this.getUser());
-			wrapper.write(Type.VAR_INT, entityId);
-			wrapper.write(Types1_8.METADATA_LIST, this.metadataBuffer.get(entityId));
-			protocol.getMetadataRewriter().transform(type, this.metadataBuffer.get(entityId));
-			if (!this.metadataBuffer.get(entityId).isEmpty()) {
-				PacketUtil.sendPacket(wrapper, Protocol1_7_6_10To1_8.class);
-			}
-
-			this.metadataBuffer.remove(entityId);
-		}
 	}
 
 	public int getVehicle(int passengerId) {
@@ -239,7 +207,6 @@ public class EntityTracker extends StoredObject implements ClientEntityIdChangeL
 		clientEntityTypes.clear();
 		entityReplacements.clear();
 		vehicles.clear();
-		metadataBuffer.clear();
 	}
 
 	public int getDimension() {

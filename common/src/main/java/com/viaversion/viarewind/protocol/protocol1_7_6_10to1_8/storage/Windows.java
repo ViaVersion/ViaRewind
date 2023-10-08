@@ -45,10 +45,9 @@ public class Windows extends StoredObject {
 	public static int getInventoryType(String name) {
 		switch (name) {
 			case "minecraft:container":
-				return 0;
-			case "minecraft:chest":
-				return 0;
-			case "minecraft:crafting_table":
+            case "minecraft:chest":
+                return 0;
+            case "minecraft:crafting_table":
 				return 1;
 			case "minecraft:furnace":
 				return 2;

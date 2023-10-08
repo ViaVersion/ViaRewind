@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.viaversion.viarewind.replacement;
+package com.viaversion.viarewind.api.rewriter;
 
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.CompoundTag;
@@ -26,25 +26,27 @@ public class Replacement {
 	private final int id;
 	private final int data;
 	private final String name;
+
 	private String resetName;
 	private String bracketName;
 
-	public Replacement(int id) {
+	public Replacement(final int id) {
 		this(id, -1);
 	}
 
-	public Replacement(int id, int data) {
+	public Replacement(final int id, final int data) {
 		this(id, data, null);
 	}
 
-	public Replacement(int id, String name) {
+	public Replacement(final int id, final String name) {
 		this(id, -1, name);
 	}
 
-	public Replacement(int id, int data, String name) {
+	public Replacement(final int id, final int data, final String name) {
 		this.id = id;
 		this.data = data;
 		this.name = name;
+
 		if (name != null) {
 			this.resetName = "§r" + name;
 			this.bracketName = " §r§7(" + name + "§r§7)";
@@ -63,25 +65,38 @@ public class Replacement {
 		return name;
 	}
 
+	/**
+	 * @param item The item to replace
+	 * @return The replacement for the item or the item if not found
+	 */
 	public Item replace(Item item) {
-		item.setIdentifier(id);
-		if (data != -1) item.setData((short) data);
-		if (name != null) {
-			CompoundTag compoundTag = item.tag() == null ? new CompoundTag() : item.tag();
-			if (!compoundTag.contains("display")) compoundTag.put("display", new CompoundTag());
-			CompoundTag display = compoundTag.get("display");
+		item.setIdentifier(id); // Set the new id
+		if (data != -1) {
+			item.setData((short) data); // Set the new data
+		}
+		if (name != null) { // Set the new name
+			CompoundTag rootTag = item.tag() == null ? new CompoundTag() : item.tag(); // Get root tag or create new one if not exists
+
+			if (!rootTag.contains("display")) rootTag.put("display", new CompoundTag()); // Create display tag if not exists
+
+			final CompoundTag display = rootTag.get("display");
 			if (display.contains("Name")) {
-				StringTag name = display.get("Name");
-				if (!name.getValue().equals(resetName) && !name.getValue().endsWith(bracketName))
-					name.setValue(name.getValue() + bracketName);
+				final StringTag name = display.get("Name");
+				if (!name.getValue().equals(resetName) && !name.getValue().endsWith(bracketName)) {
+					name.setValue(name.getValue() + bracketName); // Append the new name tag
+				}
 			} else {
-				display.put("Name", new StringTag(resetName));
+				display.put("Name", new StringTag(resetName)); // Set the new name tag
 			}
-			item.setTag(compoundTag);
+			item.setTag(rootTag);
 		}
 		return item;
 	}
 
+	/**
+	 * @param data The data of the item/block
+	 * @return The replacement data for the item/block
+	 */
 	public int replaceData(int data) {
 		return this.data == -1 ? data : this.data;
 	}

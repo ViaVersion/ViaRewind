@@ -50,7 +50,7 @@ public class WorldBorder extends StoredObject implements Tickable {
 	}
 
 	private void sendPackets() {
-		PlayerPosition position = getUser().get(PlayerPosition.class);
+		PlayerPositionTracker position = getUser().get(PlayerPositionTracker.class);
 
 		double radius = getSize() / 2.0;
 

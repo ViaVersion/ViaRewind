@@ -20,12 +20,11 @@ package com.viaversion.viarewind.protocol.protocol1_8to1_9.packets;
 
 import com.viaversion.viarewind.ViaRewind;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.Protocol1_8To1_9;
-import com.viaversion.viarewind.protocol.protocol1_8to1_9.entityreplacement.ShulkerBulletReplacement;
-import com.viaversion.viarewind.protocol.protocol1_8to1_9.entityreplacement.ShulkerReplacement;
-import com.viaversion.viarewind.protocol.protocol1_8to1_9.metadata.MetadataRewriter;
+import com.viaversion.viarewind.protocol.protocol1_8to1_9.entityreplacement.ShulkerBulletModel;
+import com.viaversion.viarewind.protocol.protocol1_8to1_9.entityreplacement.ShulkerModel;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.storage.EntityTracker;
-import com.viaversion.viarewind.replacement.EntityReplacement;
-import com.viaversion.viarewind.replacement.Replacement;
+import com.viaversion.viarewind.api.minecraft.EntityModel;
+import com.viaversion.viarewind.api.rewriter.Replacement;
 import com.viaversion.viarewind.utils.PacketUtil;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
@@ -84,8 +83,8 @@ public class SpawnPackets {
 						packetWrapper.set(Type.INT, 1, y);
 					} else if (type.is(Entity1_10Types.EntityType.SHULKER_BULLET)) {
 						packetWrapper.cancel();
-						ShulkerBulletReplacement shulkerBulletReplacement = new ShulkerBulletReplacement(protocol, packetWrapper.user(), entityId);
-						shulkerBulletReplacement.setLocation(x / 32.0, y / 32.0, z / 32.0);
+						ShulkerBulletModel shulkerBulletReplacement = new ShulkerBulletModel(packetWrapper.user(), protocol, entityId);
+						shulkerBulletReplacement.updateReplacementPosition(x / 32.0, y / 32.0, z / 32.0);
 						tracker.addEntityReplacement(shulkerBulletReplacement);
 						return;
 					}
@@ -193,8 +192,8 @@ public class SpawnPackets {
 					if (typeId == 69) {
 						packetWrapper.cancel();
 						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-						ShulkerReplacement shulkerReplacement = new ShulkerReplacement(protocol, packetWrapper.user(), entityId);
-						shulkerReplacement.setLocation(x / 32.0, y / 32.0, z / 32.0);
+						ShulkerModel shulkerReplacement = new ShulkerModel(packetWrapper.user(), protocol, entityId);
+						shulkerReplacement.updateReplacementPosition(x / 32.0, y / 32.0, z / 32.0);
 						shulkerReplacement.setYawPitch(yaw * 360f / 256, pitch * 360f / 256);
 						shulkerReplacement.setHeadYaw(headYaw * 360f / 256);
 						tracker.addEntityReplacement(shulkerReplacement);
@@ -213,7 +212,7 @@ public class SpawnPackets {
 					List<Metadata> metadataList = wrapper.get(Types1_8.METADATA_LIST, 0);
 					int entityId = wrapper.get(Type.VAR_INT, 0);
 					EntityTracker tracker = wrapper.user().get(EntityTracker.class);
-					EntityReplacement replacement;
+					EntityModel replacement;
 					if ((replacement = tracker.getEntityReplacement(entityId)) != null) {
 						replacement.updateMetadata(metadataList);
 					} else if (tracker.getClientEntityTypes().containsKey(entityId)) {

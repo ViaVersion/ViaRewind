@@ -16,11 +16,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.entityreplacements;
+package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.emulator;
 
 import com.viaversion.viarewind.protocol.protocol1_7_2_5to1_7_6_10.ClientboundPackets1_7_2_5;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.metadata.MetadataRewriter;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.MetaType1_7_6_10;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
 import com.viaversion.viarewind.utils.PacketUtil;
@@ -36,7 +35,7 @@ import com.viaversion.viaversion.api.type.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ArmorStandReplacement extends EntityReplacement1_7to1_8 {
+public class ArmorStandModel extends EntityModel1_7_6_10 {
 	private final int entityId;
 	private final List<Metadata> datawatcher = new ArrayList<>();
 	private int[] entityIds = null;
@@ -49,8 +48,8 @@ public class ArmorStandReplacement extends EntityReplacement1_7to1_8 {
 	private boolean small = false;
 	private boolean marker = false;
 
-	public ArmorStandReplacement(Protocol1_7_6_10To1_8 protocol, UserConnection user, int entityId) {
-		super(protocol, user);
+	public ArmorStandModel(UserConnection user, Protocol1_7_6_10To1_8 protocol, int entityId) {
+		super(user, protocol);
 		this.entityId = entityId;
 	}
 
@@ -60,7 +59,7 @@ public class ArmorStandReplacement extends EntityReplacement1_7to1_8 {
 	}
 
 	@Override
-	public void setLocation(double x, double y, double z) {
+	public void updateReplacementPosition(double x, double y, double z) {
 		if (x != this.locX || y != this.locY || z != this.locZ) {
 			this.locX = x;
 			this.locY = y;
@@ -70,7 +69,7 @@ public class ArmorStandReplacement extends EntityReplacement1_7to1_8 {
 	}
 
 	@Override
-	public void relMove(double x, double y, double z) {
+	public void handleOriginalMovementPacket(double x, double y, double z) {
 		if (x == 0.0 && y == 0.0 && z == 0.0) return;
 		this.locX += x;
 		this.locY += y;
@@ -123,15 +122,15 @@ public class ArmorStandReplacement extends EntityReplacement1_7to1_8 {
 		marker = (armorStandFlags & 0x10) != 0;
 
 		State prevState = currentState;
-		if (invisible && (name != null || marker)) {
+		if (invisible && name != null) {
 			currentState = State.HOLOGRAM;
 		} else {
 			currentState = State.ZOMBIE;
 		}
 
 		if (currentState != prevState) {
-			despawn();
-			spawn();
+			deleteEntity();
+			sendSpawnPacket();
 		} else {
 			updateMetadata();
 			updateLocation(false);
@@ -149,7 +148,7 @@ public class ArmorStandReplacement extends EntityReplacement1_7to1_8 {
 	}
 
 	private void updateZombieLocation() {
-		sendTeleportWithHead(entityId, locX, locY, locZ, yaw, pitch, headYaw);
+		teleportAndUpdate(entityId, locX, locY, locZ, yaw, pitch, headYaw);
 	}
 
 	private void updateHologramLocation(boolean remount) {
@@ -162,10 +161,10 @@ public class ArmorStandReplacement extends EntityReplacement1_7to1_8 {
 		}
 
 		// Don't ask me where this offset is coming from
-		sendTeleport(entityIds[0], locX, (locY + (marker ? 54.85 : small ? 56 : 57)), locZ, 0, 0); // Skull
+		teleportEntity(entityIds[0], locX, (locY + (marker ? 54.85 : small ? 56 : 57)), locZ, 0, 0); // Skull
 
 		if (remount) {
-			sendTeleport(entityIds[1], locX, locY + 56.75, locZ, 0, 0); // Horse
+			teleportEntity(entityIds[1], locX, locY + 56.75, locZ, 0, 0); // Horse
 
 			PacketWrapper attach = PacketWrapper.create(ClientboundPackets1_7_2_5.ATTACH_ENTITY, null, user);
 			attach.write(Type.INT, entityIds[1]);
@@ -200,7 +199,7 @@ public class ArmorStandReplacement extends EntityReplacement1_7to1_8 {
 			metadataList.add(new Metadata(metadata.id(), metadata.metaType(), metadata.getValue()));
 		}
 		if (small) metadataList.add(new Metadata(12, MetaType1_8.Byte, (byte) 1));
-		protocol.getMetadataRewriter().transform(Entity1_10Types.EntityType.ZOMBIE, metadataList);
+		getProtocol().getMetadataRewriter().transform(Entity1_10Types.EntityType.ZOMBIE, metadataList);
 
 		metadataPacket.write(Types1_7_6_10.METADATA_LIST, metadataList);
 	}
@@ -217,8 +216,8 @@ public class ArmorStandReplacement extends EntityReplacement1_7to1_8 {
 	}
 
 	@Override
-	public void spawn() {
-		if (entityIds != null) despawn();
+	public void sendSpawnPacket() {
+		if (entityIds != null) deleteEntity();
 
 		if (currentState == State.ZOMBIE) {
 			spawnZombie();
@@ -231,7 +230,7 @@ public class ArmorStandReplacement extends EntityReplacement1_7to1_8 {
 	}
 
 	private void spawnZombie() {
-		sendSpawn(entityId, 54, locX, locY, locZ);
+		spawnEntity(entityId, 54, locX, locY, locZ);
 
 		entityIds = new int[]{entityId};
 	}
@@ -250,7 +249,7 @@ public class ArmorStandReplacement extends EntityReplacement1_7to1_8 {
 		spawnSkull.write(Type.INT, 0);
 		PacketUtil.sendPacket(spawnSkull, Protocol1_7_6_10To1_8.class, true, true);
 
-		sendSpawn(entityIds[1], 100, locX, locY, locZ); // Horse
+		spawnEntity(entityIds[1], 100, locX, locY, locZ); // Horse
 
 		this.entityIds = entityIds;
 	}
@@ -268,7 +267,7 @@ public class ArmorStandReplacement extends EntityReplacement1_7to1_8 {
 	}
 
 	@Override
-	public void despawn() {
+	public void deleteEntity() {
 		if (entityIds == null) return;
 		PacketWrapper despawn = PacketWrapper.create(ClientboundPackets1_7_2_5.DESTROY_ENTITIES, null, user);
 		despawn.write(Type.BYTE, (byte) entityIds.length);

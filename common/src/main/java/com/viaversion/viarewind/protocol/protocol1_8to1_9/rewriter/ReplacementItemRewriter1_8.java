@@ -19,7 +19,7 @@
 package com.viaversion.viarewind.protocol.protocol1_8to1_9.rewriter;
 
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.Protocol1_8To1_9;
-import com.viaversion.viarewind.replacement.Replacement;
+import com.viaversion.viarewind.api.rewriter.Replacement;
 import com.viaversion.viarewind.api.rewriter.ReplacementItemRewriter;
 import com.viaversion.viarewind.utils.Enchantments;
 import com.viaversion.viaversion.api.minecraft.item.Item;
@@ -178,8 +178,8 @@ public class ReplacementItemRewriter1_8 extends ReplacementItemRewriter<Protocol
 				CompoundTag entityTag = tag.get("EntityTag");
 				if (entityTag.contains("id")) {
 					StringTag id = entityTag.get("id");
-					if (ItemRewriter.ENTTIY_NAME_TO_ID.containsKey(id.getValue())) {
-						data = ItemRewriter.ENTTIY_NAME_TO_ID.get(id.getValue());
+					if (ItemRewriter.ENTITY_NAME_TO_ID.containsKey(id.getValue())) {
+						data = ItemRewriter.ENTITY_NAME_TO_ID.get(id.getValue());
 					} else if (display == null) {
 						tag.put("display", display = new CompoundTag());
 						viaVersionTag.put("noDisplay", new ByteTag());
@@ -248,9 +248,9 @@ public class ReplacementItemRewriter1_8 extends ReplacementItemRewriter<Protocol
 
 		if (item.identifier() == 383 && item.data() != 0) {
 			if (tag == null) item.setTag(tag = new CompoundTag());
-			if (!tag.contains("EntityTag") && ItemRewriter.ENTTIY_ID_TO_NAME.containsKey((int) item.data())) {
+			if (!tag.contains("EntityTag") && ItemRewriter.ENTITY_ID_TO_NAME.containsKey((int) item.data())) {
 				CompoundTag entityTag = new CompoundTag();
-				entityTag.put("id", new StringTag(ItemRewriter.ENTTIY_ID_TO_NAME.get((int) item.data())));
+				entityTag.put("id", new StringTag(ItemRewriter.ENTITY_ID_TO_NAME.get((int) item.data())));
 				tag.put("EntityTag", entityTag);
 			}
 

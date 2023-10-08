@@ -19,8 +19,7 @@
 package com.viaversion.viarewind.protocol.protocol1_8to1_9.storage;
 
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.Protocol1_8To1_9;
-import com.viaversion.viarewind.protocol.protocol1_8to1_9.metadata.MetadataRewriter;
-import com.viaversion.viarewind.replacement.EntityReplacement;
+import com.viaversion.viarewind.api.minecraft.EntityModel;
 import com.viaversion.viaversion.api.connection.StoredObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.entity.ClientEntityIdChangeListener;
@@ -42,7 +41,7 @@ public class EntityTracker extends StoredObject implements ClientEntityIdChangeL
 	private final Map<Integer, List<Integer>> vehicleMap = new ConcurrentHashMap<>();
 	private final Map<Integer, Entity1_10Types.EntityType> clientEntityTypes = new ConcurrentHashMap<>();
 	private final Map<Integer, List<Metadata>> metadataBuffer = new ConcurrentHashMap<>();
-	private final Map<Integer, EntityReplacement> entityReplacements = new ConcurrentHashMap<>();
+	private final Map<Integer, EntityModel> entityReplacements = new ConcurrentHashMap<>();
 	private final Map<Integer, Vector> entityOffsets = new ConcurrentHashMap<>();
 	private int playerId;
 	private int playerGamemode = 0;
@@ -76,7 +75,7 @@ public class EntityTracker extends StoredObject implements ClientEntityIdChangeL
 		clientEntityTypes.remove(entityId);
 		entityOffsets.remove(entityId);
 		if (entityReplacements.containsKey(entityId)) {
-			entityReplacements.remove(entityId).despawn();
+			entityReplacements.remove(entityId).deleteEntity();
 		}
 	}
 
@@ -114,11 +113,11 @@ public class EntityTracker extends StoredObject implements ClientEntityIdChangeL
 		vehicleMap.put(entityId, passengers);
 	}
 
-	public void addEntityReplacement(EntityReplacement entityReplacement) {
-		entityReplacements.put(entityReplacement.getEntityId(), entityReplacement);
+	public void addEntityReplacement(EntityModel entityModel) {
+		entityReplacements.put(entityModel.getEntityId(), entityModel);
 	}
 
-	public EntityReplacement getEntityReplacement(int entityId) {
+	public EntityModel getEntityReplacement(int entityId) {
 		return entityReplacements.get(entityId);
 	}
 

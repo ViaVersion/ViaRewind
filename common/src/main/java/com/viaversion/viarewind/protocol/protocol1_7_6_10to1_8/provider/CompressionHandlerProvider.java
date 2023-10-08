@@ -18,7 +18,7 @@
 
 package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.provider;
 
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.CompressionSendStorage;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.CompressionStatusTracker;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.platform.providers.Provider;
 import io.netty.channel.ChannelHandler;
@@ -32,10 +32,10 @@ public abstract class CompressionHandlerProvider implements Provider {
 	public abstract ChannelHandler getDecoder(int threshold);
 
 	public boolean isCompressionEnabled(UserConnection user) {
-		return user.get(CompressionSendStorage.class).removeCompression;
+		return user.get(CompressionStatusTracker.class).removeCompression;
 	}
 
 	public void setCompressionEnabled(UserConnection user, boolean enabled) {
-		user.get(CompressionSendStorage.class).removeCompression = enabled;
+		user.get(CompressionStatusTracker.class).removeCompression = enabled;
 	}
 }

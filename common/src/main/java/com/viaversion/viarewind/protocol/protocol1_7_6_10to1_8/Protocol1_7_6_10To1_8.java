@@ -119,12 +119,12 @@ public class Protocol1_7_6_10To1_8 extends AbstractProtocol<ClientboundPackets1_
 
 		userConnection.put(new Windows(userConnection));
 		userConnection.put(new EntityTracker(userConnection, this));
-		userConnection.put(new PlayerPosition(userConnection));
+		userConnection.put(new PlayerPositionTracker(userConnection));
 		userConnection.put(new GameProfileStorage(userConnection));
 		userConnection.put(new Scoreboard(userConnection));
-		userConnection.put(new CompressionSendStorage(userConnection));
+		userConnection.put(new CompressionStatusTracker(userConnection));
 		userConnection.put(new WorldBorder(userConnection));
-		userConnection.put(new PlayerAbilities(userConnection));
+		userConnection.put(new PlayerAbilitiesTracker(userConnection));
 		userConnection.put(new ClientWorld(userConnection));
 	}
 

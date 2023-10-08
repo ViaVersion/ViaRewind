@@ -22,11 +22,11 @@ import com.viaversion.viarewind.ViaRewind;
 import com.viaversion.viarewind.protocol.protocol1_7_2_5to1_7_6_10.ClientboundPackets1_7_2_5;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
 import com.viaversion.viarewind.protocol.protocol1_7_2_5to1_7_6_10.ServerboundPackets1_7_2_5;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.entityreplacements.ArmorStandReplacement;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.emulator.ArmorStandModel;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.provider.TitleRenderProvider;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.*;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
-import com.viaversion.viarewind.replacement.EntityReplacement;
+import com.viaversion.viarewind.api.minecraft.EntityModel;
 import com.viaversion.viarewind.utils.ChatUtil;
 import com.viaversion.viarewind.utils.PacketUtil;
 import com.viaversion.viarewind.utils.math.AABB;
@@ -166,41 +166,41 @@ public class PlayerPackets {
 				map(Type.FLOAT);  //yaw
 				map(Type.FLOAT);  //pitch
 				handler(packetWrapper -> {
-					PlayerPosition playerPosition = packetWrapper.user().get(PlayerPosition.class);
-					playerPosition.setPositionPacketReceived(true);
+					PlayerPositionTracker playerPositionTracker = packetWrapper.user().get(PlayerPositionTracker.class);
+					playerPositionTracker.setPositionPacketReceived(true);
 
 					int flags = packetWrapper.read(Type.BYTE);
 					if ((flags & 0x01) == 0x01) {
 						double x = packetWrapper.get(Type.DOUBLE, 0);
-						x += playerPosition.getPosX();
+						x += playerPositionTracker.getPosX();
 						packetWrapper.set(Type.DOUBLE, 0, x);
 					}
 					double y = packetWrapper.get(Type.DOUBLE, 1);
 					if ((flags & 0x02) == 0x02) {
-						y += playerPosition.getPosY();
+						y += playerPositionTracker.getPosY();
 					}
-					playerPosition.setReceivedPosY(y);
+					playerPositionTracker.setReceivedPosY(y);
 					y += 1.62F;
 					packetWrapper.set(Type.DOUBLE, 1, y);
 					if ((flags & 0x04) == 0x04) {
 						double z = packetWrapper.get(Type.DOUBLE, 2);
-						z += playerPosition.getPosZ();
+						z += playerPositionTracker.getPosZ();
 						packetWrapper.set(Type.DOUBLE, 2, z);
 					}
 					if ((flags & 0x08) == 0x08) {
 						float yaw = packetWrapper.get(Type.FLOAT, 0);
-						yaw += playerPosition.getYaw();
+						yaw += playerPositionTracker.getYaw();
 						packetWrapper.set(Type.FLOAT, 0, yaw);
 					}
 					if ((flags & 0x10) == 0x10) {
 						float pitch = packetWrapper.get(Type.FLOAT, 1);
-						pitch += playerPosition.getPitch();
+						pitch += playerPositionTracker.getPitch();
 						packetWrapper.set(Type.FLOAT, 1, pitch);
 					}
 				});
 				handler(packetWrapper -> {
-					PlayerPosition playerPosition = packetWrapper.user().get(PlayerPosition.class);
-					packetWrapper.write(Type.BOOLEAN, playerPosition.isOnGround());
+					PlayerPositionTracker playerPositionTracker = packetWrapper.user().get(PlayerPositionTracker.class);
+					packetWrapper.write(Type.BOOLEAN, playerPositionTracker.isOnGround());
 				});
 				handler(packetWrapper -> {
 					EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
@@ -413,7 +413,7 @@ public class PlayerPackets {
 					byte flags = packetWrapper.get(Type.BYTE, 0);
 					float flySpeed = packetWrapper.get(Type.FLOAT, 0);
 					float walkSpeed = packetWrapper.get(Type.FLOAT, 1);
-					PlayerAbilities abilities = packetWrapper.user().get(PlayerAbilities.class);
+					PlayerAbilitiesTracker abilities = packetWrapper.user().get(PlayerAbilitiesTracker.class);
 					abilities.setInvincible((flags & 8) == 8);
 					abilities.setAllowFly((flags & 4) == 4);
 					abilities.setFlying((flags & 2) == 2);
@@ -587,14 +587,14 @@ public class PlayerPackets {
 					if (mode != 0) return;
 					int entityId = packetWrapper.get(Type.VAR_INT, 0);
 					EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-					EntityReplacement replacement = tracker.getEntityReplacement(entityId);
-					if (!(replacement instanceof ArmorStandReplacement)) return;
-					ArmorStandReplacement armorStand = (ArmorStandReplacement) replacement;
+					EntityModel replacement = tracker.getEntityReplacement(entityId);
+					if (!(replacement instanceof ArmorStandModel)) return;
+					ArmorStandModel armorStand = (ArmorStandModel) replacement;
 					AABB boundingBox = armorStand.getBoundingBox();
-					PlayerPosition playerPosition = packetWrapper.user().get(PlayerPosition.class);
-					Vector3d pos = new Vector3d(playerPosition.getPosX(), playerPosition.getPosY() + 1.8, playerPosition.getPosZ());
-					double yaw = Math.toRadians(playerPosition.getYaw());
-					double pitch = Math.toRadians(playerPosition.getPitch());
+					PlayerPositionTracker playerPositionTracker = packetWrapper.user().get(PlayerPositionTracker.class);
+					Vector3d pos = new Vector3d(playerPositionTracker.getPosX(), playerPositionTracker.getPosY() + 1.8, playerPositionTracker.getPosZ());
+					double yaw = Math.toRadians(playerPositionTracker.getYaw());
+					double pitch = Math.toRadians(playerPositionTracker.getPitch());
 					Vector3d dir = new Vector3d(-Math.cos(pitch) * Math.sin(yaw), -Math.sin(pitch), Math.cos(pitch) * Math.cos(yaw));
 					Ray3d ray = new Ray3d(pos, dir);
 					Vector3d intersection = RayTracing.trace(ray, boundingBox, 5.0);
@@ -614,8 +614,8 @@ public class PlayerPackets {
 			public void register() {
 				map(Type.BOOLEAN);
 				handler(packetWrapper -> {
-					PlayerPosition playerPosition = packetWrapper.user().get(PlayerPosition.class);
-					playerPosition.setOnGround(packetWrapper.get(Type.BOOLEAN, 0));
+					PlayerPositionTracker playerPositionTracker = packetWrapper.user().get(PlayerPositionTracker.class);
+					playerPositionTracker.setOnGround(packetWrapper.get(Type.BOOLEAN, 0));
 				});
 			}
 		});
@@ -633,10 +633,10 @@ public class PlayerPackets {
 					double feetY = packetWrapper.get(Type.DOUBLE, 1);
 					double z = packetWrapper.get(Type.DOUBLE, 2);
 
-					PlayerPosition playerPosition = packetWrapper.user().get(PlayerPosition.class);
+					PlayerPositionTracker playerPositionTracker = packetWrapper.user().get(PlayerPositionTracker.class);
 
-					playerPosition.setOnGround(packetWrapper.get(Type.BOOLEAN, 0));
-					playerPosition.setPos(x, feetY, z);
+					playerPositionTracker.setOnGround(packetWrapper.get(Type.BOOLEAN, 0));
+					playerPositionTracker.setPos(x, feetY, z);
 				});
 			}
 		});
@@ -648,10 +648,10 @@ public class PlayerPackets {
 				map(Type.FLOAT);
 				map(Type.BOOLEAN);
 				handler(packetWrapper -> {
-					PlayerPosition playerPosition = packetWrapper.user().get(PlayerPosition.class);
-					playerPosition.setYaw(packetWrapper.get(Type.FLOAT, 0));
-					playerPosition.setPitch(packetWrapper.get(Type.FLOAT, 1));
-					playerPosition.setOnGround(packetWrapper.get(Type.BOOLEAN, 0));
+					PlayerPositionTracker playerPositionTracker = packetWrapper.user().get(PlayerPositionTracker.class);
+					playerPositionTracker.setYaw(packetWrapper.get(Type.FLOAT, 0));
+					playerPositionTracker.setPitch(packetWrapper.get(Type.FLOAT, 1));
+					playerPositionTracker.setOnGround(packetWrapper.get(Type.BOOLEAN, 0));
 				});
 			}
 		});
@@ -674,12 +674,12 @@ public class PlayerPackets {
 					float yaw = packetWrapper.get(Type.FLOAT, 0);
 					float pitch = packetWrapper.get(Type.FLOAT, 1);
 
-					PlayerPosition playerPosition = packetWrapper.user().get(PlayerPosition.class);
+					PlayerPositionTracker playerPositionTracker = packetWrapper.user().get(PlayerPositionTracker.class);
 
-					playerPosition.setOnGround(packetWrapper.get(Type.BOOLEAN, 0));
-					playerPosition.setPos(x, feetY, z);
-					playerPosition.setYaw(yaw);
-					playerPosition.setPitch(pitch);
+					playerPositionTracker.setOnGround(packetWrapper.get(Type.BOOLEAN, 0));
+					playerPositionTracker.setPos(x, feetY, z);
+					playerPositionTracker.setYaw(yaw);
+					playerPositionTracker.setPitch(pitch);
 				});
 			}
 		});
@@ -758,7 +758,7 @@ public class PlayerPackets {
 				handler(packetWrapper -> {
 					int action = packetWrapper.get(Type.VAR_INT, 1);
 					if (action == 3 || action == 4) {
-						PlayerAbilities abilities = packetWrapper.user().get(PlayerAbilities.class);
+						PlayerAbilitiesTracker abilities = packetWrapper.user().get(PlayerAbilitiesTracker.class);
 						abilities.setSprinting(action == 3);
 						PacketWrapper abilitiesPacket = PacketWrapper.create(0x39, null, packetWrapper.user());
 						abilitiesPacket.write(Type.BYTE, abilities.getFlags());
@@ -827,7 +827,7 @@ public class PlayerPackets {
 				map(Type.FLOAT);
 				map(Type.FLOAT);
 				handler(packetWrapper -> {
-					PlayerAbilities abilities = packetWrapper.user().get(PlayerAbilities.class);
+					PlayerAbilitiesTracker abilities = packetWrapper.user().get(PlayerAbilitiesTracker.class);
 					if (abilities.isAllowFly()) {
 						byte flags = packetWrapper.get(Type.BYTE, 0);
 						abilities.setFlying((flags & 2) == 2);
