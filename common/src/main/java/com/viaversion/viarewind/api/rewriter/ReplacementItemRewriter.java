@@ -30,9 +30,11 @@ public abstract class ReplacementItemRewriter<T extends AbstractProtocol<?, ?, ?
 	private final Int2ObjectMap<Replacement> BLOCK_REPLACEMENTS = new Int2ObjectOpenHashMap<>();
 
 	private final T protocol;
+	private final String protocolName;
 
-	public ReplacementItemRewriter(T protocol) {
+	public ReplacementItemRewriter(final T protocol, final String protocolName) {
 		this.protocol = protocol;
+		this.protocolName = protocolName;
 	}
 
 	public void registerItem(int id, Replacement replacement) {
@@ -49,10 +51,12 @@ public abstract class ReplacementItemRewriter<T extends AbstractProtocol<?, ?, ?
 
 	public void registerItem(int id, int data, Replacement replacement) {
 		ITEM_REPLACEMENTS.put(generateTrackingId(id, data), replacement);
+		replacement.buildNames(protocolName);
 	}
 
 	public void registerBlock(int id, int data, Replacement replacement) {
 		BLOCK_REPLACEMENTS.put(generateTrackingId(id, data), replacement);
+		replacement.buildNames(protocolName);
 	}
 
 	public void registerItemBlock(int id, int data, Replacement replacement) {

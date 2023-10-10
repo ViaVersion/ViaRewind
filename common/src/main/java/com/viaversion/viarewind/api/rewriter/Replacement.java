@@ -21,6 +21,7 @@ package com.viaversion.viarewind.api.rewriter;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.CompoundTag;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.StringTag;
+import com.viaversion.viaversion.util.ChatColorUtil;
 
 public class Replacement {
 	private final int id;
@@ -46,10 +47,12 @@ public class Replacement {
 		this.id = id;
 		this.data = data;
 		this.name = name;
+	}
 
-		if (name != null) {
-			this.resetName = "§r" + name;
-			this.bracketName = " §r§7(" + name + "§r§7)";
+	public void buildNames(final String protocolVersion) {
+		if (this.name != null) {
+			this.resetName = ChatColorUtil.translateAlternateColorCodes("&r" + protocolVersion + " " + this.name);
+			this.bracketName = ChatColorUtil.translateAlternateColorCodes(" &r&7(" + protocolVersion + " " + this.name + "&r&7)");
 		}
 	}
 
@@ -69,7 +72,7 @@ public class Replacement {
 	 * @param item The item to replace
 	 * @return The replacement for the item or the item if not found
 	 */
-	public Item replace(Item item) {
+	public Item replace(final Item item) {
 		item.setIdentifier(id); // Set the new id
 		if (data != -1) {
 			item.setData((short) data); // Set the new data

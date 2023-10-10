@@ -23,6 +23,7 @@ import com.viaversion.viarewind.api.rewriter.Replacement;
 import com.viaversion.viarewind.api.rewriter.ReplacementItemRewriter;
 import com.viaversion.viarewind.utils.Enchantments;
 import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.*;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ItemRewriter;
 
@@ -35,7 +36,7 @@ public class ReplacementItemRewriter1_8 extends ReplacementItemRewriter<Protocol
 	public final static String VIA_REWIND_TAG_KEY = "ViaRewind1_8to1_9";
 
 	public ReplacementItemRewriter1_8(Protocol1_8To1_9 protocol) {
-		super(protocol);
+		super(protocol, ProtocolVersion.v1_9.getName());
 	}
 
 	@Override
