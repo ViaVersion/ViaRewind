@@ -16,8 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types;
+package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.item;
 
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.type.Type;
 import io.netty.buffer.ByteBuf;

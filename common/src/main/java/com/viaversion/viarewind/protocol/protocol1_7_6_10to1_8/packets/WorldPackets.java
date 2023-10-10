@@ -20,13 +20,12 @@ package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.packets;
 
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.WorldBorderEmulator;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Chunk1_7_6_10Type;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.ChunkBulk1_7_6_10Type;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.chunk.Chunk1_7_6_10Type;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.chunk.ChunkBulk1_7_6_10Type;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.model.ParticleIndex1_7_6_10;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
 import com.viaversion.viarewind.utils.ChatUtil;
 import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
-import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
@@ -80,29 +79,24 @@ public class WorldPackets {
 			}
 		});
 
-		protocol.registerClientbound(ClientboundPackets1_8.BLOCK_CHANGE, wrapper -> {
-			final Position position = wrapper.read(Type.POSITION); // position
-			wrapper.write(Type.INT, position.x());
-			wrapper.write(Type.UNSIGNED_BYTE, (short) position.y());
-			wrapper.write(Type.INT, position.z());
+		protocol.registerClientbound(ClientboundPackets1_8.BLOCK_CHANGE, new PacketHandlers() {
+			@Override
+			protected void register() {
+				map(Type.POSITION, Types1_7_6_10.U_BYTE_POSITION); // position
+				handler(wrapper -> {
+					int data = wrapper.read(Type.VAR_INT); // block data
+					data = protocol.getItemRewriter().replace(data);
 
-			int data = wrapper.read(Type.VAR_INT); // block data
-			data = protocol.getItemRewriter().replace(data);
-
-			wrapper.write(Type.VAR_INT, data >> 4); // block id
-			wrapper.write(Type.UNSIGNED_BYTE, (short) (data & 0xF)); // block data
+					wrapper.write(Type.VAR_INT, data >> 4); // block id
+					wrapper.write(Type.UNSIGNED_BYTE, (short) (data & 0xF)); // block data
+				});
+			}
 		});
 
 		protocol.registerClientbound(ClientboundPackets1_8.BLOCK_ACTION, new PacketHandlers() {
 			@Override
 			public void register() {
-				handler(wrapper -> {
-					final Position position = wrapper.read(Type.POSITION); // position
-
-					wrapper.write(Type.INT, position.x());
-					wrapper.write(Type.SHORT, (short) position.y());
-					wrapper.write(Type.INT, position.z());
-				});
+				map(Type.POSITION, Types1_7_6_10.SHORT_POSITION); // position
 				map(Type.UNSIGNED_BYTE); // type
 				map(Type.UNSIGNED_BYTE); // data
 				map(Type.VAR_INT); // block id
@@ -113,13 +107,7 @@ public class WorldPackets {
 			@Override
 			public void register() {
 				map(Type.VAR_INT); // entity id
-				handler(wrapper -> {
-					final Position position = wrapper.read(Type.POSITION);
-
-					wrapper.write(Type.INT, position.x());
-					wrapper.write(Type.INT, position.y());
-					wrapper.write(Type.INT, position.z());
-				});
+				map(Type.POSITION, Types1_7_6_10.INT_POSITION); // position
 				map(Type.BYTE); // progress
 			}
 		});
@@ -135,13 +123,7 @@ public class WorldPackets {
 			@Override
 			public void register() {
 				map(Type.INT); // effect id
-				handler(wrapper -> {
-					final Position position = wrapper.read(Type.POSITION);
-
-					wrapper.write(Type.INT, position.x());
-					wrapper.write(Type.BYTE, (byte) position.y());
-					wrapper.write(Type.INT, position.z());
-				});
+				map(Type.POSITION, Types1_7_6_10.BYTE_POSITION); // position
 				map(Type.INT); // data
 				map(Type.BOOLEAN); // disable relative volume
 			}
@@ -193,13 +175,7 @@ public class WorldPackets {
 		protocol.registerClientbound(ClientboundPackets1_8.UPDATE_SIGN, new PacketHandlers() {
 			@Override
 			public void register() {
-				handler(wrapper -> {
-					final Position position = wrapper.read(Type.POSITION);
-
-					wrapper.write(Type.INT, position.x());
-					wrapper.write(Type.SHORT, (short) position.y());
-					wrapper.write(Type.INT, position.z());
-				});
+				map(Type.POSITION, Types1_7_6_10.SHORT_POSITION); // position
 				handler(wrapper -> {
 					for (int i = 0; i < 4; i++) {
 						String line = wrapper.read(Type.STRING);
@@ -291,12 +267,7 @@ public class WorldPackets {
 		protocol.registerClientbound(ClientboundPackets1_8.BLOCK_ENTITY_DATA, new PacketHandlers() {
 			@Override
 			public void register() {
-				handler(packetWrapper -> { // position
-					Position position = packetWrapper.read(Type.POSITION);
-					packetWrapper.write(Type.INT, position.x());
-					packetWrapper.write(Type.SHORT, (short) position.y());
-					packetWrapper.write(Type.INT, position.z());
-				});
+				map(Type.POSITION, Types1_7_6_10.SHORT_POSITION); // position
 				map(Type.UNSIGNED_BYTE); // action
 				map(Type.NAMED_COMPOUND_TAG, Types1_7_6_10.COMPRESSED_NBT); // nbt
 			}

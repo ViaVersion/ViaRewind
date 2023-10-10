@@ -115,7 +115,7 @@ public class RabbitModel extends EntityModel1_7_6_10 {
 	@Override
 	public void deleteEntity() {
 		PacketWrapper despawn = PacketWrapper.create(ClientboundPackets1_7_2_5.DESTROY_ENTITIES, null, user);
-		despawn.write(Types1_7_6_10.INT_ARRAY, new int[]{entityId});
+		despawn.write(Types1_7_6_10.BYTE_INT_ARRAY, new int[]{entityId});
 
 		PacketUtil.sendPacket(despawn, Protocol1_7_6_10To1_8.class, true, true);
 	}

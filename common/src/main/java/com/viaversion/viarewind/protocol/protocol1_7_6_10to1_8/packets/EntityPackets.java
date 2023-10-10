@@ -75,13 +75,7 @@ public class EntityPackets {
 			@Override
 			public void register() {
 				map(Type.VAR_INT, Type.INT); // entity id
-				handler(wrapper -> {
-					final Position position = wrapper.read(Type.POSITION);
-
-					wrapper.write(Type.INT, position.x());
-					wrapper.write(Type.UNSIGNED_BYTE, (short) position.y());
-					wrapper.write(Type.INT, position.z());
-				});
+				map(Type.POSITION, Types1_7_6_10.U_BYTE_POSITION); // position
 			}
 		});
 
@@ -109,12 +103,12 @@ public class EntityPackets {
 		protocol.registerClientbound(ClientboundPackets1_8.DESTROY_ENTITIES, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Type.VAR_INT_ARRAY_PRIMITIVE, Types1_7_6_10.INT_ARRAY); // entity ids
+				map(Type.VAR_INT_ARRAY_PRIMITIVE, Types1_7_6_10.BYTE_INT_ARRAY); // entity ids
 
 				handler(wrapper -> {
 					final EntityTracker tracker = wrapper.user().get(EntityTracker.class);
 
-					for (int entityId : wrapper.get(Types1_7_6_10.INT_ARRAY, 0)) {
+					for (int entityId : wrapper.get(Types1_7_6_10.BYTE_INT_ARRAY, 0)) {
 						tracker.removeEntity(entityId);
 					}
 				});

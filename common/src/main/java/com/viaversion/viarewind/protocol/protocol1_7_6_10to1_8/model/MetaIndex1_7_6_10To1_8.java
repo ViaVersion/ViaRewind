@@ -18,7 +18,7 @@
 
 package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.model;
 
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.MetaType1_7_6_10;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.metadata.MetaType1_7_6_10;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
 import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_8;
 import com.viaversion.viaversion.util.Pair;

@@ -16,8 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types;
+package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.metadata;
 
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.type.types.minecraft.MetaListTypeTemplate;
 import io.netty.buffer.ByteBuf;

@@ -1,4 +1,4 @@
-package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types;
+package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.chunk;
 
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.type.PartialType;
