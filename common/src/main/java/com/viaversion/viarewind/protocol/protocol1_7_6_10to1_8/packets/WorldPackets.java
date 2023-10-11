@@ -42,21 +42,24 @@ import com.viaversion.viaversion.util.ChatColorUtil;
 
 public class WorldPackets {
 
+	public static void rewriteBlockIds(final Protocol1_7_6_10To1_8 protocol, final Chunk chunk) {
+		for (ChunkSection section : chunk.getSections()) {
+			if (section == null) continue;
+			final DataPalette palette = section.palette(PaletteType.BLOCKS);
+
+			for (int i = 0; i < palette.size(); i++) {
+				palette.setIdByIndex(i, protocol.getItemRewriter().replace(palette.idByIndex(i)));
+			}
+		}
+	}
+
 	public static void register(Protocol1_7_6_10To1_8 protocol) {
 		protocol.registerClientbound(ClientboundPackets1_8.CHUNK_DATA, wrapper -> {
 			final ClientWorld world = wrapper.user().get(ClientWorld.class);
-			Chunk chunk = wrapper.read(new Chunk1_8Type(world));
+			final Chunk chunk = wrapper.read(new Chunk1_8Type(world));
+			rewriteBlockIds(protocol, chunk);
+
 			wrapper.write(new Chunk1_7_6_10Type(world), chunk);
-
-			// Rewrite block ids
-			for (ChunkSection section : chunk.getSections()) {
-				if (section == null) continue;
-				final DataPalette palette = section.palette(PaletteType.BLOCKS);
-
-				for (int i = 0; i < palette.size(); i++) {
-					palette.setIdByIndex(i, protocol.getItemRewriter().replace(palette.idByIndex(i)));
-				}
-			}
 		});
 
 		protocol.registerClientbound(ClientboundPackets1_8.MULTI_BLOCK_CHANGE, new PacketHandlers() {
@@ -116,6 +119,10 @@ public class WorldPackets {
 			final ClientWorld world = wrapper.user().get(ClientWorld.class);
 
 			final Chunk[] chunks = wrapper.read(new ChunkBulk1_8Type(world));
+			for (Chunk chunk : chunks) {
+				rewriteBlockIds(protocol, chunk);
+			}
+
 			wrapper.write(new ChunkBulk1_7_6_10Type(world), chunks);
 		});
 
