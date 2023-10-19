@@ -24,7 +24,7 @@ import com.viaversion.viarewind.protocol.protocol1_8to1_9.storage.*;
 import com.viaversion.viarewind.utils.ChatUtil;
 import com.viaversion.viarewind.utils.PacketUtil;
 import com.viaversion.viaversion.api.minecraft.Position;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_8;
@@ -37,7 +37,7 @@ import com.viaversion.viaversion.libs.opennbt.tag.builtin.CompoundTag;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.ListTag;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.StringTag;
 import com.viaversion.viaversion.protocols.protocol1_8.ServerboundPackets1_8;
-import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
+import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ClientboundPackets1_9;
 
 import java.util.ArrayList;
@@ -148,7 +148,7 @@ public class PlayerPackets {
 					EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
 					tracker.setPlayerId(packetWrapper.get(Type.INT, 0));
 					tracker.setPlayerGamemode(packetWrapper.get(Type.UNSIGNED_BYTE, 0));
-					tracker.getClientEntityTypes().put(tracker.getPlayerId(), Entity1_10Types.EntityType.ENTITY_HUMAN);
+					tracker.getClientEntityTypes().put(tracker.getPlayerId(), EntityTypes1_10.EntityType.ENTITY_HUMAN);
 				});
 				handler(packetWrapper -> {
 					ClientWorld world = packetWrapper.user().get(ClientWorld.class);
@@ -259,7 +259,7 @@ public class PlayerPackets {
 						packetWrapper.cancel();
 						PacketWrapper swapItems = PacketWrapper.create(0x13, null, packetWrapper.user());
 						swapItems.write(Type.VAR_INT, 6);
-						swapItems.write(Type.POSITION, new Position(0, 0, 0));
+						swapItems.write(Type.POSITION1_8, new Position(0, 0, 0));
 						swapItems.write(Type.BYTE, (byte) 255);
 
 						PacketUtil.sendToServer(swapItems, Protocol1_8To1_9.class, true, true);
@@ -409,7 +409,7 @@ public class PlayerPackets {
 			@Override
 			public void register() {
 				map(Type.VAR_INT);
-				map(Type.POSITION);
+				map(Type.POSITION1_8);
 				handler(packetWrapper -> {
 					int state = packetWrapper.get(Type.VAR_INT, 0);
 					if (state == 0) {
@@ -433,9 +433,9 @@ public class PlayerPackets {
 		protocol.registerServerbound(ServerboundPackets1_8.PLAYER_BLOCK_PLACEMENT, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Type.POSITION);
+				map(Type.POSITION1_8);
 				map(Type.BYTE, Type.VAR_INT);
-				map(Type.ITEM, Type.NOTHING);
+				read(Type.ITEM1_8);
 				create(Type.VAR_INT, 0); //Main Hand
 				map(Type.BYTE, Type.UNSIGNED_BYTE);
 				map(Type.BYTE, Type.UNSIGNED_BYTE);
@@ -529,7 +529,7 @@ public class PlayerPackets {
 					EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
 					int playerId = tracker.getPlayerId();
 					int vehicle = tracker.getVehicle(playerId);
-					if (vehicle != -1 && tracker.getClientEntityTypes().get(vehicle) == Entity1_10Types.EntityType.BOAT) {
+					if (vehicle != -1 && tracker.getClientEntityTypes().get(vehicle) == EntityTypes1_10.EntityType.BOAT) {
 						PacketWrapper steerBoat = PacketWrapper.create(0x11, null, packetWrapper.user());
 						float left = packetWrapper.get(Type.FLOAT, 0);
 						float forward = packetWrapper.get(Type.FLOAT, 1);
@@ -545,7 +545,7 @@ public class PlayerPackets {
 		protocol.registerServerbound(ServerboundPackets1_8.UPDATE_SIGN, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Type.POSITION);
+				map(Type.POSITION1_8);
 				handler(packetWrapper -> {
 					for (int i = 0; i < 4; i++) {
 						packetWrapper.write(Type.STRING, ChatUtil.jsonToLegacy(packetWrapper.read(Type.COMPONENT)));
@@ -562,7 +562,7 @@ public class PlayerPackets {
 			public void register() {
 				map(Type.STRING);
 				handler(packetWrapper -> packetWrapper.write(Type.BOOLEAN, false));
-				map(Type.OPTIONAL_POSITION);
+				map(Type.OPTIONAL_POSITION1_8);
 			}
 		});
 

@@ -24,7 +24,7 @@ import com.viaversion.viarewind.utils.PacketUtil;
 import com.viaversion.viaversion.api.connection.StoredObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.entity.ClientEntityIdChangeListener;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
@@ -35,7 +35,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class EntityTracker extends StoredObject implements ClientEntityIdChangeListener {
-	private final Map<Integer, Entity1_10Types.EntityType> entityMap = new ConcurrentHashMap<>();
+	private final Map<Integer, EntityTypes1_10.EntityType> entityMap = new ConcurrentHashMap<>();
 	private final Map<Integer, Integer> vehicles = new ConcurrentHashMap<>();
 	private final Map<Integer, EntityModel> entityReplacements = new ConcurrentHashMap<>();
 	private final Map<Integer, UUID> playersByEntityId = new HashMap<>();
@@ -88,7 +88,7 @@ public class EntityTracker extends StoredObject implements ClientEntityIdChangeL
 		items[slot] = equipment;
 	}
 
-	public Map<Integer, Entity1_10Types.EntityType> getEntityMap() {
+	public Map<Integer, EntityTypes1_10.EntityType> getEntityMap() {
 		return this.entityMap;
 	}
 
@@ -219,6 +219,6 @@ public class EntityTracker extends StoredObject implements ClientEntityIdChangeL
 		}
 		entityMap.remove(this.playerId);
 		this.playerId = playerEntityId;
-		entityMap.put(this.playerId, Entity1_10Types.EntityType.ENTITY_HUMAN);
+		entityMap.put(this.playerId, EntityTypes1_10.EntityType.ENTITY_HUMAN);
 	}
 }

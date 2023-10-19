@@ -24,7 +24,7 @@ import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.GameProfi
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
 import com.viaversion.viarewind.api.minecraft.EntityModel;
 import com.viaversion.viaversion.api.minecraft.Position;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
@@ -75,7 +75,7 @@ public class EntityPackets {
 			@Override
 			public void register() {
 				map(Type.VAR_INT, Type.INT); // entity id
-				map(Type.POSITION, Types1_7_6_10.U_BYTE_POSITION); // position
+				map(Type.POSITION1_8, Types1_7_6_10.U_BYTE_POSITION); // position
 			}
 		});
 
@@ -129,7 +129,7 @@ public class EntityPackets {
 				map(Type.BYTE); // x
 				map(Type.BYTE); // y
 				map(Type.BYTE); // z
-				map(Type.BOOLEAN, Type.NOTHING); // on ground
+				read(Type.BOOLEAN); // on ground
 				handler(wrapper -> {
 					final EntityTracker tracker = wrapper.user().get(EntityTracker.class);
 
@@ -152,7 +152,7 @@ public class EntityPackets {
 				map(Type.VAR_INT, Type.INT); // entity id
 				map(Type.BYTE); // yaw
 				map(Type.BYTE); // pitch
-				map(Type.BOOLEAN, Type.NOTHING); // on ground
+				read(Type.BOOLEAN); // on ground
 				handler(wrapper -> {
 					final EntityTracker tracker = wrapper.user().get(EntityTracker.class);
 
@@ -177,7 +177,7 @@ public class EntityPackets {
 				map(Type.BYTE); // z
 				map(Type.BYTE); // yaw
 				map(Type.BYTE); // pitch
-				map(Type.BOOLEAN, Type.NOTHING); // on ground
+				read(Type.BOOLEAN); // on ground
 				handler(wrapper -> {
 					final EntityTracker tracker = wrapper.user().get(EntityTracker.class);
 
@@ -207,12 +207,12 @@ public class EntityPackets {
 				map(Type.INT); // z
 				map(Type.BYTE); // yaw
 				map(Type.BYTE); // pitch
-				map(Type.BOOLEAN, Type.NOTHING); // on ground
+				read(Type.BOOLEAN); // on ground
 				handler(wrapper -> {
 					int entityId = wrapper.get(Type.INT, 0);
 					EntityTracker tracker = wrapper.user().get(EntityTracker.class);
-					Entity1_10Types.EntityType type = tracker.getEntityMap().get(entityId);
-					if (type == Entity1_10Types.EntityType.MINECART_ABSTRACT) { // TODO | Realign all entities?
+					EntityTypes1_10.EntityType type = tracker.getEntityMap().get(entityId);
+					if (type == EntityTypes1_10.EntityType.MINECART_ABSTRACT) { // TODO | Realign all entities?
 						int y = wrapper.get(Type.INT, 2);
 						y += 12;
 						wrapper.set(Type.INT, 2, y);
@@ -312,7 +312,7 @@ public class EntityPackets {
 				map(Type.BYTE); // effect id
 				map(Type.BYTE); // amplifier
 				map(Type.VAR_INT, Type.SHORT); // duration
-				map(Type.BYTE, Type.NOTHING); // hide particles
+				read(Type.BYTE); // hide particles
 			}
 		});
 

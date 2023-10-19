@@ -36,13 +36,13 @@ import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_8;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_9_1;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.CompoundTag;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.StringTag;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
-import com.viaversion.viaversion.protocols.protocol1_9_1to1_9.types.Chunk1_9_1_2Type;
-import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
+import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ClientboundPackets1_9;
-import com.viaversion.viaversion.protocols.protocol1_9to1_8.types.Chunk1_8Type;
 
 import java.util.ArrayList;
 
@@ -52,11 +52,11 @@ public class WorldPackets {
 		protocol.registerClientbound(ClientboundPackets1_9.BLOCK_ENTITY_DATA, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Type.POSITION);
+				map(Type.POSITION1_8);
 				map(Type.UNSIGNED_BYTE);
-				map(Type.NBT);
+				map(Type.NAMED_COMPOUND_TAG);
 				handler(packetWrapper -> {
-					CompoundTag tag = packetWrapper.get(Type.NBT, 0);
+					CompoundTag tag = packetWrapper.get(Type.NAMED_COMPOUND_TAG, 0);
 					if (tag != null && tag.contains("SpawnData")) {
 						CompoundTag spawnData = tag.get("SpawnData");
 						if (spawnData.contains("id")) {
@@ -73,7 +73,7 @@ public class WorldPackets {
 		protocol.registerClientbound(ClientboundPackets1_9.BLOCK_ACTION, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Type.POSITION);
+				map(Type.POSITION1_8);
 				map(Type.UNSIGNED_BYTE);
 				map(Type.UNSIGNED_BYTE);
 				map(Type.VAR_INT);
@@ -90,7 +90,7 @@ public class WorldPackets {
 		protocol.registerClientbound(ClientboundPackets1_9.BLOCK_CHANGE, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Type.POSITION);
+				map(Type.POSITION1_8);
 				map(Type.VAR_INT);
 				handler(packetWrapper -> {
 					int combined = packetWrapper.get(Type.VAR_INT, 0);
@@ -132,7 +132,7 @@ public class WorldPackets {
 						packetWrapper.set(Type.STRING, 0, name);
 					}
 				});
-				map(Type.VAR_INT, Type.NOTHING);
+				read(Type.VAR_INT);
 				map(Type.INT);
 				map(Type.INT);
 				map(Type.INT);
@@ -172,7 +172,7 @@ public class WorldPackets {
 					int chunkX = packetWrapper.read(Type.INT);
 					int chunkZ = packetWrapper.read(Type.INT);
 					ClientWorld world = packetWrapper.user().get(ClientWorld.class);
-					packetWrapper.write(new Chunk1_8Type(world), new BaseChunk(chunkX, chunkZ, true, false, 0, new ChunkSection[16], null, new ArrayList<>()));
+					packetWrapper.write(new ChunkType1_8(world), new BaseChunk(chunkX, chunkZ, true, false, 0, new ChunkSection[16], null, new ArrayList<>()));
 				});
 			}
 		});
@@ -184,7 +184,7 @@ public class WorldPackets {
 				handler(packetWrapper -> {
 					ClientWorld world = packetWrapper.user().get(ClientWorld.class);
 
-					Chunk chunk = packetWrapper.read(new Chunk1_9_1_2Type(world));
+					Chunk chunk = packetWrapper.read(new ChunkType1_9_1(world));
 
 					for (ChunkSection section : chunk.getSections()) {
 						if (section == null) continue;
@@ -206,7 +206,7 @@ public class WorldPackets {
 						chunk = new BaseChunk(chunk.getX(), chunk.getZ(), true, false, 1, sections, chunk.getBiomeData(), chunk.getBlockEntities());
 					}
 
-					packetWrapper.write(new Chunk1_8Type(world), chunk);
+					packetWrapper.write(new ChunkType1_8(world), chunk);
 
 					final UserConnection user = packetWrapper.user();
 					chunk.getBlockEntities().forEach(nbt -> {
@@ -240,7 +240,7 @@ public class WorldPackets {
 						}
 
 						PacketWrapper updateTileEntity = PacketWrapper.create(0x09, null, user);
-						updateTileEntity.write(Type.POSITION, position);
+						updateTileEntity.write(Type.POSITION1_8, position);
 						updateTileEntity.write(Type.UNSIGNED_BYTE, action);
 						updateTileEntity.write(Type.NBT, nbt);
 
@@ -255,7 +255,7 @@ public class WorldPackets {
 			@Override
 			public void register() {
 				map(Type.INT);
-				map(Type.POSITION);
+				map(Type.POSITION1_8);
 				map(Type.INT);
 				map(Type.BOOLEAN);
 				handler(packetWrapper -> {
@@ -304,7 +304,7 @@ public class WorldPackets {
 			public void register() {
 				map(Type.VAR_INT);
 				map(Type.BYTE);
-				map(Type.BOOLEAN, Type.NOTHING);
+				read(Type.BOOLEAN);
 			}
 		});
 

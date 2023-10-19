@@ -26,7 +26,7 @@ import com.viaversion.viarewind.protocol.protocol1_8to1_9.storage.EntityTracker;
 import com.viaversion.viarewind.api.minecraft.EntityModel;
 import com.viaversion.viarewind.api.rewriter.Replacement;
 import com.viaversion.viarewind.utils.PacketUtil;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
@@ -44,7 +44,7 @@ public class SpawnPackets {
 			@Override
 			public void register() {
 				map(Type.VAR_INT);
-				map(Type.UUID, Type.NOTHING);
+				read(Type.UUID);
 				map(Type.BYTE);
 				map(Type.DOUBLE, Protocol1_8To1_9.TO_OLD_INT);
 				map(Type.DOUBLE, Protocol1_8To1_9.TO_OLD_INT);
@@ -57,7 +57,7 @@ public class SpawnPackets {
 					final int entityId = packetWrapper.get(Type.VAR_INT, 0);
 					final int typeId = packetWrapper.get(Type.BYTE, 0);
 					EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-					final Entity1_10Types.EntityType type = Entity1_10Types.getTypeFromId(typeId, true);
+					final EntityTypes1_10.EntityType type = EntityTypes1_10.getTypeFromId(typeId, true);
 
 					//cancel AREA_EFFECT_CLOUD = 3, SPECTRAL_ARROW = 91, DRAGON_FIREBALL = 93
 					if (typeId == 3 || typeId == 91 || typeId == 92 || typeId == 93) {
@@ -75,13 +75,13 @@ public class SpawnPackets {
 					int y = packetWrapper.get(Type.INT, 1);
 					int z = packetWrapper.get(Type.INT, 2);
 
-					if (type.is(Entity1_10Types.EntityType.BOAT)) {
+					if (type.is(EntityTypes1_10.EntityType.BOAT)) {
 						byte yaw = packetWrapper.get(Type.BYTE, 1);
 						yaw -= 64;
 						packetWrapper.set(Type.BYTE, 1, yaw);
 						y += 10;
 						packetWrapper.set(Type.INT, 1, y);
-					} else if (type.is(Entity1_10Types.EntityType.SHULKER_BULLET)) {
+					} else if (type.is(EntityTypes1_10.EntityType.SHULKER_BULLET)) {
 						packetWrapper.cancel();
 						ShulkerBulletModel shulkerBulletReplacement = new ShulkerBulletModel(packetWrapper.user(), protocol, entityId);
 						shulkerBulletReplacement.updateReplacementPosition(x / 32.0, y / 32.0, z / 32.0);
@@ -92,10 +92,10 @@ public class SpawnPackets {
 					int data = packetWrapper.get(Type.INT, 3);
 
 					//Rewrite Object Data
-					if (type.isOrHasParent(Entity1_10Types.EntityType.ARROW) && data != 0) {
+					if (type.isOrHasParent(EntityTypes1_10.EntityType.ARROW) && data != 0) {
 						packetWrapper.set(Type.INT, 3, --data);
 					}
-					if (type.is(Entity1_10Types.EntityType.FALLING_BLOCK)) {
+					if (type.is(EntityTypes1_10.EntityType.FALLING_BLOCK)) {
 						int blockId = data & 0xFFF;
 						int blockData = data >> 12 & 0xF;
 						Replacement replace = protocol.getItemRewriter().replace(blockId, blockData);
@@ -138,7 +138,7 @@ public class SpawnPackets {
 				handler(packetWrapper -> {
 					int entityId = packetWrapper.get(Type.VAR_INT, 0);
 					EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-					tracker.getClientEntityTypes().put(entityId, Entity1_10Types.EntityType.EXPERIENCE_ORB);
+					tracker.getClientEntityTypes().put(entityId, EntityTypes1_10.EntityType.EXPERIENCE_ORB);
 					tracker.sendMetadataBuffer(entityId);
 				});
 			}
@@ -156,7 +156,7 @@ public class SpawnPackets {
 				handler(packetWrapper -> {
 					int entityId = packetWrapper.get(Type.VAR_INT, 0);
 					EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-					tracker.getClientEntityTypes().put(entityId, Entity1_10Types.EntityType.LIGHTNING);
+					tracker.getClientEntityTypes().put(entityId, EntityTypes1_10.EntityType.LIGHTNING);
 					tracker.sendMetadataBuffer(entityId);
 				});
 			}
@@ -167,7 +167,7 @@ public class SpawnPackets {
 			@Override
 			public void register() {
 				map(Type.VAR_INT);
-				map(Type.UUID, Type.NOTHING);
+				read(Type.UUID);
 				map(Type.UNSIGNED_BYTE);
 				map(Type.DOUBLE, Protocol1_8To1_9.TO_OLD_INT);
 				map(Type.DOUBLE, Protocol1_8To1_9.TO_OLD_INT);
@@ -205,7 +205,7 @@ public class SpawnPackets {
 					int entityId = packetWrapper.get(Type.VAR_INT, 0);
 					int typeId = packetWrapper.get(Type.UNSIGNED_BYTE, 0);
 					EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-					tracker.getClientEntityTypes().put(entityId, Entity1_10Types.getTypeFromId(typeId, false));
+					tracker.getClientEntityTypes().put(entityId, EntityTypes1_10.getTypeFromId(typeId, false));
 					tracker.sendMetadataBuffer(entityId);
 				});
 				handler(wrapper -> {
@@ -229,14 +229,14 @@ public class SpawnPackets {
 			@Override
 			public void register() {
 				map(Type.VAR_INT);
-				map(Type.UUID, Type.NOTHING);
+				read(Type.UUID);
 				map(Type.STRING);
-				map(Type.POSITION);
+				map(Type.POSITION1_8);
 				map(Type.BYTE, Type.UNSIGNED_BYTE);
 				handler(packetWrapper -> {
 					int entityId = packetWrapper.get(Type.VAR_INT, 0);
 					EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-					tracker.getClientEntityTypes().put(entityId, Entity1_10Types.EntityType.PAINTING);
+					tracker.getClientEntityTypes().put(entityId, EntityTypes1_10.EntityType.PAINTING);
 					tracker.sendMetadataBuffer(entityId);
 				});
 			}
@@ -257,12 +257,12 @@ public class SpawnPackets {
 				map(Types1_9.METADATA_LIST, Types1_8.METADATA_LIST);
 				this.handler(wrapper -> {
 					List<Metadata> metadataList = wrapper.get(Types1_8.METADATA_LIST, 0);
-					protocol.getMetadataRewriter().transform(Entity1_10Types.EntityType.PLAYER, metadataList);
+					protocol.getMetadataRewriter().transform(EntityTypes1_10.EntityType.PLAYER, metadataList);
 				});
 				handler(packetWrapper -> {
 					int entityId = packetWrapper.get(Type.VAR_INT, 0);
 					EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-					tracker.getClientEntityTypes().put(entityId, Entity1_10Types.EntityType.PLAYER);
+					tracker.getClientEntityTypes().put(entityId, EntityTypes1_10.EntityType.PLAYER);
 					tracker.sendMetadataBuffer(entityId);
 				});
 			}

@@ -24,7 +24,7 @@ import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.model.EntityModel
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
 import com.viaversion.viarewind.utils.PacketUtil;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
@@ -101,7 +101,7 @@ public class GuardianModel extends EntityModel1_7_6_10 {
 			metadataList.add(new Metadata(metadata.id(), metadata.metaType(), metadata.getValue()));
 		}
 
-		getProtocol().getMetadataRewriter().transform(Entity1_10Types.EntityType.SQUID, metadataList);
+		getProtocol().getMetadataRewriter().transform(EntityTypes1_10.EntityType.SQUID, metadataList);
 
 		metadataPacket.write(Types1_7_6_10.METADATA_LIST, metadataList);
 

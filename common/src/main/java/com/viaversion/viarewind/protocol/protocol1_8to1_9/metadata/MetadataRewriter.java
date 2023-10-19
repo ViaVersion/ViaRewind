@@ -22,7 +22,7 @@ import com.viaversion.viarewind.ViaRewind;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.Protocol1_8To1_9;
 import com.viaversion.viaversion.api.minecraft.EulerAngle;
 import com.viaversion.viaversion.api.minecraft.Vector;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_8;
@@ -39,7 +39,7 @@ public class MetadataRewriter {
 		this.protocol = protocol;
 	}
 
-	public void transform(Entity1_10Types.EntityType type, List<Metadata> list) {
+	public void transform(EntityTypes1_10.EntityType type, List<Metadata> list) {
 		for (Metadata entry : new ArrayList<>(list)) {
 			MetaIndex metaIndex = MetaIndex1_8to1_9.searchIndex(type, entry.id());
 			try {

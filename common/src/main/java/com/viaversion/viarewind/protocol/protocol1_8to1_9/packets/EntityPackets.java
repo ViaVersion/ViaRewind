@@ -27,7 +27,7 @@ import com.viaversion.viarewind.protocol.protocol1_8to1_9.util.RelativeMoveUtil;
 import com.viaversion.viarewind.api.minecraft.EntityModel;
 import com.viaversion.viarewind.utils.PacketUtil;
 import com.viaversion.viaversion.api.minecraft.Vector;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
@@ -131,8 +131,8 @@ public class EntityPackets {
 					byte pitch = packetWrapper.passthrough(Type.BYTE);
 					boolean onGround = packetWrapper.passthrough(Type.BOOLEAN);
 
-					Entity1_10Types.EntityType type = packetWrapper.user().get(EntityTracker.class).getClientEntityTypes().get(entityId);
-					if (type == Entity1_10Types.EntityType.BOAT) {
+					EntityTypes1_10.EntityType type = packetWrapper.user().get(EntityTracker.class).getClientEntityTypes().get(entityId);
+					if (type == EntityTypes1_10.EntityType.BOAT) {
 						yaw -= 64;
 						packetWrapper.set(Type.BYTE, 3, yaw);
 					}
@@ -174,8 +174,8 @@ public class EntityPackets {
 				});
 				handler(packetWrapper -> {
 					int entityId = packetWrapper.get(Type.VAR_INT, 0);
-					Entity1_10Types.EntityType type = packetWrapper.user().get(EntityTracker.class).getClientEntityTypes().get(entityId);
-					if (type == Entity1_10Types.EntityType.BOAT) {
+					EntityTypes1_10.EntityType type = packetWrapper.user().get(EntityTracker.class).getClientEntityTypes().get(entityId);
+					if (type == EntityTypes1_10.EntityType.BOAT) {
 						byte yaw = packetWrapper.get(Type.BYTE, 0);
 						yaw -= 64;
 						packetWrapper.set(Type.BYTE, 0, yaw);
@@ -212,8 +212,8 @@ public class EntityPackets {
 				create(Type.BOOLEAN, true);
 				handler(packetWrapper -> {
 					int entityId = packetWrapper.get(Type.VAR_INT, 0);
-					Entity1_10Types.EntityType type = packetWrapper.user().get(EntityTracker.class).getClientEntityTypes().get(entityId);
-					if (type == Entity1_10Types.EntityType.BOAT) {
+					EntityTypes1_10.EntityType type = packetWrapper.user().get(EntityTracker.class).getClientEntityTypes().get(entityId);
+					if (type == EntityTypes1_10.EntityType.BOAT) {
 						byte yaw = packetWrapper.get(Type.BYTE, 1);
 						yaw -= 64;
 						packetWrapper.set(Type.BYTE, 0, yaw);
@@ -381,8 +381,8 @@ public class EntityPackets {
 				map(Type.BOOLEAN);
 				handler(packetWrapper -> {
 					int entityId = packetWrapper.get(Type.VAR_INT, 0);
-					Entity1_10Types.EntityType type = packetWrapper.user().get(EntityTracker.class).getClientEntityTypes().get(entityId);
-					if (type == Entity1_10Types.EntityType.BOAT) {
+					EntityTypes1_10.EntityType type = packetWrapper.user().get(EntityTracker.class).getClientEntityTypes().get(entityId);
+					if (type == EntityTypes1_10.EntityType.BOAT) {
 						byte yaw = packetWrapper.get(Type.BYTE, 1);
 						yaw -= 64;
 						packetWrapper.set(Type.BYTE, 0, yaw);

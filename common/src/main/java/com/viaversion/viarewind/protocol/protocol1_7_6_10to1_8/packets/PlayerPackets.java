@@ -35,7 +35,7 @@ import com.viaversion.viarewind.utils.math.RayTracing;
 import com.viaversion.viarewind.utils.math.Vector3d;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.Position;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
@@ -46,7 +46,7 @@ import com.viaversion.viaversion.libs.opennbt.tag.builtin.CompoundTag;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.ListTag;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.StringTag;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
-import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
+import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.Unpooled;
@@ -67,7 +67,7 @@ public class PlayerPackets {
 				map(Type.UNSIGNED_BYTE); //Difficulty
 				map(Type.UNSIGNED_BYTE); //Max players
 				map(Type.STRING); //Level Type
-				map(Type.BOOLEAN, Type.NOTHING); //Reduced Debug Info
+				read(Type.BOOLEAN); //Reduced Debug Info
 				handler(packetWrapper -> {
 					if (!ViaRewind.getConfig().isReplaceAdventureMode()) return;
 					if (packetWrapper.get(Type.UNSIGNED_BYTE, 0) == 2) {
@@ -78,7 +78,7 @@ public class PlayerPackets {
 					EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
 					tracker.setGamemode(packetWrapper.get(Type.UNSIGNED_BYTE, 0));
 					tracker.setPlayerId(packetWrapper.get(Type.INT, 0));
-					tracker.getEntityMap().put(tracker.getPlayerId(), Entity1_10Types.EntityType.ENTITY_HUMAN);
+					tracker.getEntityMap().put(tracker.getPlayerId(), EntityTypes1_10.EntityType.ENTITY_HUMAN);
 					tracker.setDimension(packetWrapper.get(Type.BYTE, 0));
 					tracker.addPlayer(tracker.getPlayerId(), packetWrapper.user().getProtocolInfo().getUuid());
 				});
@@ -108,7 +108,7 @@ public class PlayerPackets {
 			@Override
 			public void register() {
 				handler(packetWrapper -> {
-					Position position = packetWrapper.read(Type.POSITION);
+					Position position = packetWrapper.read(Type.POSITION1_8);
 					packetWrapper.write(Type.INT, position.x());
 					packetWrapper.write(Type.INT, position.y());
 					packetWrapper.write(Type.INT, position.z());
@@ -144,7 +144,7 @@ public class PlayerPackets {
 					if (tracker.getDimension() != packetWrapper.get(Type.INT, 0)) {
 						tracker.setDimension(packetWrapper.get(Type.INT, 0));
 						tracker.clearEntities();
-						tracker.getEntityMap().put(tracker.getPlayerId(), Entity1_10Types.EntityType.ENTITY_HUMAN);
+						tracker.getEntityMap().put(tracker.getPlayerId(), EntityTypes1_10.EntityType.ENTITY_HUMAN);
 					}
 				});
 				handler(packetWrapper -> {
@@ -266,7 +266,7 @@ public class PlayerPackets {
 			@Override
 			public void register() {
 				handler(packetWrapper -> {
-					Position position = packetWrapper.read(Type.POSITION);
+					Position position = packetWrapper.read(Type.POSITION1_8);
 					packetWrapper.write(Type.INT, position.x());
 					packetWrapper.write(Type.INT, position.y());
 					packetWrapper.write(Type.INT, position.z());
@@ -544,7 +544,7 @@ public class PlayerPackets {
 						buf.release();
 					}
 				});
-				map(Type.STRING, Type.NOTHING); // Hash
+				read(Type.STRING); // Hash
 			}
 		});
 
@@ -622,7 +622,7 @@ public class PlayerPackets {
 			public void register() {
 				map(Type.DOUBLE);  //X
 				map(Type.DOUBLE);  //Y
-				map(Type.DOUBLE, Type.NOTHING);
+				read(Type.DOUBLE);
 				map(Type.DOUBLE);  //Z
 				map(Type.BOOLEAN);  //OnGround
 				handler(packetWrapper -> {
@@ -658,7 +658,7 @@ public class PlayerPackets {
 			public void register() {
 				map(Type.DOUBLE);  //X
 				map(Type.DOUBLE);  //Y
-				map(Type.DOUBLE, Type.NOTHING);
+				read(Type.DOUBLE);
 				map(Type.DOUBLE);  //Z
 				map(Type.FLOAT);  //Yaw
 				map(Type.FLOAT);  //Pitch
@@ -689,7 +689,7 @@ public class PlayerPackets {
 					int x = packetWrapper.read(Type.INT);
 					int y = packetWrapper.read(Type.UNSIGNED_BYTE);
 					int z = packetWrapper.read(Type.INT);
-					packetWrapper.write(Type.POSITION, new Position(x, y, z));
+					packetWrapper.write(Type.POSITION1_8, new Position(x, y, z));
 				});
 			}
 		});
@@ -701,7 +701,7 @@ public class PlayerPackets {
 					int x = packetWrapper.read(Type.INT);
 					int y = packetWrapper.read(Type.UNSIGNED_BYTE);
 					int z = packetWrapper.read(Type.INT);
-					packetWrapper.write(Type.POSITION, new Position(x, y, z));
+					packetWrapper.write(Type.POSITION1_8, new Position(x, y, z));
 
 					packetWrapper.passthrough(Type.BYTE);  //Direction
 					Item item = packetWrapper.read(Types1_7_6_10.COMPRESSED_NBT_ITEM);
@@ -807,7 +807,7 @@ public class PlayerPackets {
 					int x = packetWrapper.read(Type.INT);
 					int y = packetWrapper.read(Type.SHORT);
 					int z = packetWrapper.read(Type.INT);
-					packetWrapper.write(Type.POSITION, new Position(x, y, z));
+					packetWrapper.write(Type.POSITION1_8, new Position(x, y, z));
 					for (int i = 0; i < 4; i++) {
 						String line = packetWrapper.read(Type.STRING);
 						line = ChatUtil.legacyToJson(line);
@@ -838,7 +838,7 @@ public class PlayerPackets {
 			@Override
 			public void register() {
 				map(Type.STRING);
-				create(Type.OPTIONAL_POSITION, null);
+				create(Type.OPTIONAL_POSITION1_8, null);
 				handler(packetWrapper -> {
 					String msg = packetWrapper.get(Type.STRING, 0);
 					if (msg.toLowerCase().startsWith("/stp ")) {
@@ -870,7 +870,7 @@ public class PlayerPackets {
 				map(Type.BYTE);
 				map(Type.BYTE);
 				map(Type.BOOLEAN);
-				map(Type.BYTE, Type.NOTHING);
+				read(Type.BYTE);
 				handler(packetWrapper -> {
 					boolean cape = packetWrapper.read(Type.BOOLEAN);
 					packetWrapper.write(Type.UNSIGNED_BYTE, (short) (cape ? 127 : 126));
@@ -882,7 +882,7 @@ public class PlayerPackets {
 			@Override
 			public void register() {
 				map(Type.STRING);
-				map(Type.SHORT, Type.NOTHING); // Length
+				read(Type.SHORT); // Length
 				handler(packetWrapper -> {
 					String channel = packetWrapper.get(Type.STRING, 0);
 

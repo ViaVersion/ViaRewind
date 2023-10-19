@@ -21,7 +21,7 @@ package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.chunk;
 import com.viaversion.viarewind.api.minecraft.ExtendedBlockStorage;
 import com.viaversion.viaversion.api.minecraft.chunks.*;
 import com.viaversion.viaversion.api.type.PartialType;
-import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
+import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.util.Pair;
 import io.netty.buffer.ByteBuf;
 

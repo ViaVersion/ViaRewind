@@ -34,7 +34,7 @@ import java.util.regex.Pattern;
 
 public class ChatUtil {
 	private final static Pattern UNUSED_COLOR_PATTERN = Pattern.compile("(?>(?>§[0-fk-or])*(§r|\\Z))|(?>(?>§[0-f])*(§[0-f]))");
-	private final static ComponentRewriter<ClientboundPacketType> LEGACY_REWRITER = new ComponentRewriter<ClientboundPacketType>() {
+	private final static ComponentRewriter<ClientboundPacketType> LEGACY_REWRITER = new ComponentRewriter<ClientboundPacketType>(null, ComponentRewriter.ReadType.JSON) {
 		@Override
 		protected void handleTranslate(JsonObject object, String translate) {
 			String text = Protocol1_13To1_12_2.MAPPINGS.getMojangTranslation().get(translate);

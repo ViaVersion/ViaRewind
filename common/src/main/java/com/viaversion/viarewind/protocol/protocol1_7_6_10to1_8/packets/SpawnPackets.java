@@ -31,7 +31,7 @@ import com.viaversion.viarewind.api.minecraft.EntityModel;
 import com.viaversion.viarewind.api.rewriter.Replacement;
 import com.viaversion.viarewind.utils.PacketUtil;
 import com.viaversion.viaversion.api.minecraft.Position;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
@@ -95,14 +95,14 @@ public class SpawnPackets {
 				map(Types1_8.METADATA_LIST, Types1_7_6_10.METADATA_LIST); // metadata
 				handler(wrapper -> {
 					final List<Metadata> metadata = wrapper.get(Types1_7_6_10.METADATA_LIST, 0);
-					protocol.getMetadataRewriter().transform(Entity1_10Types.EntityType.PLAYER, metadata);
+					protocol.getMetadataRewriter().transform(EntityTypes1_10.EntityType.PLAYER, metadata);
 
 					wrapper.set(Types1_7_6_10.METADATA_LIST, 0, metadata);
 				});
 				handler(wrapper -> {
 					final EntityTracker tracker = wrapper.user().get(EntityTracker.class);
 
-					tracker.getEntityMap().put(wrapper.get(Type.VAR_INT, 0), Entity1_10Types.EntityType.PLAYER);
+					tracker.getEntityMap().put(wrapper.get(Type.VAR_INT, 0), EntityTypes1_10.EntityType.PLAYER);
 				});
 			}
 		});
@@ -120,7 +120,7 @@ public class SpawnPackets {
 				map(Type.INT); // data
 
 				handler(wrapper -> {
-					final Entity1_10Types.EntityType type = Entity1_10Types.getTypeFromId(wrapper.get(Type.BYTE, 0), true);
+					final EntityTypes1_10.EntityType type = EntityTypes1_10.getTypeFromId(wrapper.get(Type.BYTE, 0), true);
 					final int entityId = wrapper.get(Type.VAR_INT, 0);
 
 					int x = wrapper.get(Type.INT, 0);
@@ -132,7 +132,7 @@ public class SpawnPackets {
 
 					int data = wrapper.get(Type.INT, 3);
 
-					if (type == Entity1_10Types.ObjectType.ITEM_FRAME.getType()) {
+					if (type == EntityTypes1_10.ObjectType.ITEM_FRAME.getType()) {
 						switch (yaw) {
 							case -128:
 								z += 32;
@@ -151,7 +151,7 @@ public class SpawnPackets {
 								yaw = 64;
 								break;
 						}
-					} else if (type == Entity1_10Types.ObjectType.ARMOR_STAND.getType()) {
+					} else if (type == EntityTypes1_10.ObjectType.ARMOR_STAND.getType()) {
 						wrapper.cancel();
 						EntityTracker tracker = wrapper.user().get(EntityTracker.class);
 						ArmorStandModel armorStand = new ArmorStandModel(wrapper.user(), protocol, entityId);
@@ -170,7 +170,7 @@ public class SpawnPackets {
 					final EntityTracker tracker = wrapper.user().get(EntityTracker.class);
 					tracker.getEntityMap().put(entityId, type);
 
-					if (type != null && type.isOrHasParent(Entity1_10Types.EntityType.FALLING_BLOCK)) {
+					if (type != null && type.isOrHasParent(EntityTypes1_10.EntityType.FALLING_BLOCK)) {
 						int blockId = data & 0xFFF;
 						int blockData = data >> 12 & 0xF;
 						final Replacement replace = protocol.getItemRewriter().replace(blockId, blockData);
@@ -206,7 +206,7 @@ public class SpawnPackets {
 				map(Type.SHORT); // velocity z
 				map(Types1_8.METADATA_LIST, Types1_7_6_10.METADATA_LIST); // metadata
 				handler(wrapper -> {
-					final Entity1_10Types.EntityType type = Entity1_10Types.getTypeFromId(wrapper.get(Type.UNSIGNED_BYTE, 0), false);
+					final EntityTypes1_10.EntityType type = EntityTypes1_10.getTypeFromId(wrapper.get(Type.UNSIGNED_BYTE, 0), false);
 					final int entityId = wrapper.get(Type.VAR_INT, 0);
 
 					final int x = wrapper.get(Type.INT, 0);
@@ -222,14 +222,14 @@ public class SpawnPackets {
 					final EntityTracker tracker = wrapper.user().get(EntityTracker.class);
 					tracker.getEntityMap().put(entityId, type);
 
-					if (type == Entity1_10Types.EntityType.ARMOR_STAND || type == Entity1_10Types.EntityType.GUARDIAN || type == Entity1_10Types.EntityType.ENDERMITE || type == Entity1_10Types.EntityType.RABBIT) { // TODO: delete this
+					if (type == EntityTypes1_10.EntityType.ARMOR_STAND || type == EntityTypes1_10.EntityType.GUARDIAN || type == EntityTypes1_10.EntityType.ENDERMITE || type == EntityTypes1_10.EntityType.RABBIT) { // TODO: delete this
 						wrapper.cancel();
 						EntityModel<?> replacement;
-						if (type == Entity1_10Types.EntityType.ARMOR_STAND) {
+						if (type == EntityTypes1_10.EntityType.ARMOR_STAND) {
 							replacement = new ArmorStandModel(wrapper.user(), protocol, entityId);
-						} else if (type == Entity1_10Types.EntityType.GUARDIAN) {
+						} else if (type == EntityTypes1_10.EntityType.GUARDIAN) {
 							replacement = new GuardianModel(wrapper.user(), protocol, entityId);
-						} else if (type == Entity1_10Types.EntityType.ENDERMITE) {
+						} else if (type == EntityTypes1_10.EntityType.ENDERMITE) {
 							replacement = new EndermiteModel(wrapper.user(), protocol, entityId);
 						} else {
 							replacement = new RabbitModel(wrapper.user(), protocol, entityId);
@@ -254,7 +254,7 @@ public class SpawnPackets {
 				map(Type.VAR_INT); // entity id
 				map(Type.STRING); // title
 				handler(wrapper -> {
-					final Position position = wrapper.read(Type.POSITION);
+					final Position position = wrapper.read(Type.POSITION1_8);
 
 					wrapper.write(Type.INT, position.x());
 					wrapper.write(Type.INT, position.y());
@@ -264,7 +264,7 @@ public class SpawnPackets {
 				handler(wrapper -> {
 					final EntityTracker tracker = wrapper.user().get(EntityTracker.class);
 
-					tracker.getEntityMap().put(wrapper.get(Type.VAR_INT, 0), Entity1_10Types.EntityType.PAINTING);
+					tracker.getEntityMap().put(wrapper.get(Type.VAR_INT, 0), EntityTypes1_10.EntityType.PAINTING);
 				});
 			}
 		});
@@ -280,7 +280,7 @@ public class SpawnPackets {
 				handler(wrapper -> {
 					final EntityTracker tracker = wrapper.user().get(EntityTracker.class);
 
-					tracker.getEntityMap().put(wrapper.get(Type.VAR_INT, 0), Entity1_10Types.EntityType.EXPERIENCE_ORB);
+					tracker.getEntityMap().put(wrapper.get(Type.VAR_INT, 0), EntityTypes1_10.EntityType.EXPERIENCE_ORB);
 				});
 			}
 		});
@@ -296,7 +296,7 @@ public class SpawnPackets {
 				handler(wrapper -> {
 					final EntityTracker tracker = wrapper.user().get(EntityTracker.class);
 
-					tracker.getEntityMap().put(wrapper.get(Type.VAR_INT, 0), Entity1_10Types.EntityType.LIGHTNING);
+					tracker.getEntityMap().put(wrapper.get(Type.VAR_INT, 0), EntityTypes1_10.EntityType.LIGHTNING);
 				});
 			}
 		});

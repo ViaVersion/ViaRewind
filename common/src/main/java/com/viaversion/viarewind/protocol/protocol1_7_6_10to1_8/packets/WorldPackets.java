@@ -34,10 +34,10 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.CustomByteType;
+import com.viaversion.viaversion.api.type.types.chunk.BulkChunkType1_8;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_8;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
-import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
-import com.viaversion.viaversion.protocols.protocol1_9to1_8.types.Chunk1_8Type;
-import com.viaversion.viaversion.protocols.protocol1_9to1_8.types.ChunkBulk1_8Type;
+import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.util.ChatColorUtil;
 
 public class WorldPackets {
@@ -56,7 +56,7 @@ public class WorldPackets {
 	public static void register(Protocol1_7_6_10To1_8 protocol) {
 		protocol.registerClientbound(ClientboundPackets1_8.CHUNK_DATA, wrapper -> {
 			final ClientWorld world = wrapper.user().get(ClientWorld.class);
-			final Chunk chunk = wrapper.read(new Chunk1_8Type(world));
+			final Chunk chunk = wrapper.read(new ChunkType1_8(world));
 			rewriteBlockIds(protocol, chunk);
 
 			wrapper.write(new Chunk1_7_6_10Type(world), chunk);
@@ -85,7 +85,7 @@ public class WorldPackets {
 		protocol.registerClientbound(ClientboundPackets1_8.BLOCK_CHANGE, new PacketHandlers() {
 			@Override
 			protected void register() {
-				map(Type.POSITION, Types1_7_6_10.U_BYTE_POSITION); // position
+				map(Type.POSITION1_8, Types1_7_6_10.U_BYTE_POSITION); // position
 				handler(wrapper -> {
 					int data = wrapper.read(Type.VAR_INT); // block data
 					data = protocol.getItemRewriter().replace(data);
@@ -99,7 +99,7 @@ public class WorldPackets {
 		protocol.registerClientbound(ClientboundPackets1_8.BLOCK_ACTION, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Type.POSITION, Types1_7_6_10.SHORT_POSITION); // position
+				map(Type.POSITION1_8, Types1_7_6_10.SHORT_POSITION); // position
 				map(Type.UNSIGNED_BYTE); // type
 				map(Type.UNSIGNED_BYTE); // data
 				map(Type.VAR_INT); // block id
@@ -110,7 +110,7 @@ public class WorldPackets {
 			@Override
 			public void register() {
 				map(Type.VAR_INT); // entity id
-				map(Type.POSITION, Types1_7_6_10.INT_POSITION); // position
+				map(Type.POSITION1_8, Types1_7_6_10.INT_POSITION); // position
 				map(Type.BYTE); // progress
 			}
 		});
@@ -118,7 +118,7 @@ public class WorldPackets {
 		protocol.registerClientbound(ClientboundPackets1_8.MAP_BULK_CHUNK, wrapper -> {
 			final ClientWorld world = wrapper.user().get(ClientWorld.class);
 
-			final Chunk[] chunks = wrapper.read(new ChunkBulk1_8Type(world));
+			final Chunk[] chunks = wrapper.read(new BulkChunkType1_8(world));
 			for (Chunk chunk : chunks) {
 				rewriteBlockIds(protocol, chunk);
 			}
@@ -130,7 +130,7 @@ public class WorldPackets {
 			@Override
 			public void register() {
 				map(Type.INT); // effect id
-				map(Type.POSITION, Types1_7_6_10.BYTE_POSITION); // position
+				map(Type.POSITION1_8, Types1_7_6_10.BYTE_POSITION); // position
 				map(Type.INT); // data
 				map(Type.BOOLEAN); // disable relative volume
 			}
@@ -182,7 +182,7 @@ public class WorldPackets {
 		protocol.registerClientbound(ClientboundPackets1_8.UPDATE_SIGN, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Type.POSITION, Types1_7_6_10.SHORT_POSITION); // position
+				map(Type.POSITION1_8, Types1_7_6_10.SHORT_POSITION); // position
 				handler(wrapper -> {
 					for (int i = 0; i < 4; i++) {
 						String line = wrapper.read(Type.STRING);
@@ -274,7 +274,7 @@ public class WorldPackets {
 		protocol.registerClientbound(ClientboundPackets1_8.BLOCK_ENTITY_DATA, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Type.POSITION, Types1_7_6_10.SHORT_POSITION); // position
+				map(Type.POSITION1_8, Types1_7_6_10.SHORT_POSITION); // position
 				map(Type.UNSIGNED_BYTE); // action
 				map(Type.NAMED_COMPOUND_TAG, Types1_7_6_10.COMPRESSED_NBT); // nbt
 			}

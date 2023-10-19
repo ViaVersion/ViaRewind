@@ -18,7 +18,7 @@
 
 package com.viaversion.viarewind.protocol.protocol1_8to1_9.metadata;
 
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.metadata.MetaIndex;
 import com.viaversion.viaversion.util.Pair;
 
@@ -27,15 +27,15 @@ import java.util.Optional;
 
 public class MetaIndex1_8to1_9 {
 
-	private final static HashMap<Pair<Entity1_10Types.EntityType, Integer>, MetaIndex> metadataRewrites = new HashMap<>();
+	private final static HashMap<Pair<EntityTypes1_10.EntityType, Integer>, MetaIndex> metadataRewrites = new HashMap<>();
 
 	static {
 		for (MetaIndex index : MetaIndex.values())
 			metadataRewrites.put(new Pair<>(index.getClazz(), index.getNewIndex()), index);
 	}
 
-	private static Optional<MetaIndex> getIndex(Entity1_10Types.EntityType type, int index) {
-		Pair<Entity1_10Types.EntityType, Integer> pair = new Pair<>(type, index);
+	private static Optional<MetaIndex> getIndex(EntityTypes1_10.EntityType type, int index) {
+		Pair<EntityTypes1_10.EntityType, Integer> pair = new Pair<>(type, index);
 		if (metadataRewrites.containsKey(pair)) {
 			return Optional.of(metadataRewrites.get(pair));
 		}
@@ -43,8 +43,8 @@ public class MetaIndex1_8to1_9 {
 		return Optional.empty();
 	}
 
-	public static MetaIndex searchIndex(Entity1_10Types.EntityType type, int index) {
-		Entity1_10Types.EntityType currentType = type;
+	public static MetaIndex searchIndex(EntityTypes1_10.EntityType type, int index) {
+		EntityTypes1_10.EntityType currentType = type;
 		do {
 			Optional<MetaIndex> optMeta = getIndex(currentType, index);
 
