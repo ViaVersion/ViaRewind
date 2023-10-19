@@ -42,7 +42,7 @@ import com.viaversion.viaversion.util.ChatColorUtil;
 
 public class WorldPackets {
 
-	public static void rewriteBlockIds(final Protocol1_7_6_10To1_8 protocol, final Chunk chunk) {
+	private static void rewriteBlockIds(final Protocol1_7_6_10To1_8 protocol, final Chunk chunk) {
 		for (ChunkSection section : chunk.getSections()) {
 			if (section == null) continue;
 			final DataPalette palette = section.palette(PaletteType.BLOCKS);

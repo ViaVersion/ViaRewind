@@ -22,18 +22,13 @@ import com.viaversion.viarewind.ViaRewind;
 import com.viaversion.viarewind.protocol.protocol1_7_2_5to1_7_6_10.ClientboundPackets1_7_2_5;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
 import com.viaversion.viarewind.protocol.protocol1_7_2_5to1_7_6_10.ServerboundPackets1_7_2_5;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.emulator.ArmorStandModel;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.provider.TitleRenderProvider;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.*;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
-import com.viaversion.viarewind.api.minecraft.EntityModel;
 import com.viaversion.viarewind.utils.ChatUtil;
 import com.viaversion.viarewind.utils.PacketUtil;
-import com.viaversion.viarewind.utils.math.AABB;
-import com.viaversion.viarewind.utils.math.Ray3d;
-import com.viaversion.viarewind.utils.math.RayTracing;
-import com.viaversion.viarewind.utils.math.Vector3d;
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.minecraft.Environment;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
 import com.viaversion.viaversion.api.minecraft.item.Item;
@@ -61,32 +56,28 @@ public class PlayerPackets {
 		protocol.registerClientbound(ClientboundPackets1_8.JOIN_GAME, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Type.INT); //Entity Id
-				map(Type.UNSIGNED_BYTE); //Gamemode
-				map(Type.BYTE); //Dimension
-				map(Type.UNSIGNED_BYTE); //Difficulty
-				map(Type.UNSIGNED_BYTE); //Max players
-				map(Type.STRING); //Level Type
-				map(Type.BOOLEAN, Type.NOTHING); //Reduced Debug Info
-				handler(packetWrapper -> {
-					if (!ViaRewind.getConfig().isReplaceAdventureMode()) return;
-					if (packetWrapper.get(Type.UNSIGNED_BYTE, 0) == 2) {
-						packetWrapper.set(Type.UNSIGNED_BYTE, 0, (short) 0);
-					}
-				});
-				handler(packetWrapper -> {
-					EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-					tracker.setGamemode(packetWrapper.get(Type.UNSIGNED_BYTE, 0));
-					tracker.setPlayerId(packetWrapper.get(Type.INT, 0));
-					tracker.getEntityMap().put(tracker.getPlayerId(), Entity1_10Types.EntityType.ENTITY_HUMAN);
-					tracker.setDimension(packetWrapper.get(Type.BYTE, 0));
-					tracker.addPlayer(tracker.getPlayerId(), packetWrapper.user().getProtocolInfo().getUuid());
-				});
-				handler(packetWrapper -> {
-					ClientWorld world = packetWrapper.user().get(ClientWorld.class);
-					world.setEnvironment(packetWrapper.get(Type.BYTE, 0));
-				});
+				map(Type.INT); // entity id
+				map(Type.UNSIGNED_BYTE);// game mode
+				map(Type.BYTE); // dimension
+				map(Type.UNSIGNED_BYTE); // difficulty
+				map(Type.UNSIGNED_BYTE); // max players
+				map(Type.STRING); // level type
+				map(Type.BOOLEAN, Type.NOTHING); // reduced debug info
+
 				handler(wrapper -> {
+					if (ViaRewind.getConfig().isReplaceAdventureMode()) {
+						if (wrapper.get(Type.UNSIGNED_BYTE, 0) == 2) { // adventure
+							wrapper.set(Type.UNSIGNED_BYTE, 0, (short) 0); // survival
+						}
+					}
+
+					final EntityTracker1_7_6_10 tracker = wrapper.user().get(EntityTracker1_7_6_10.class);
+					tracker.setClientEntityId(wrapper.get(Type.INT, 0));
+					tracker.addPlayer(wrapper.get(Type.INT, 0), wrapper.user().getProtocolInfo().getUuid());
+
+					wrapper.user().get(PlayerSessionStorage.class).gameMode = wrapper.get(Type.UNSIGNED_BYTE, 0);
+					wrapper.user().get(ClientWorld.class).setEnvironment(wrapper.get(Type.BYTE, 0));
+
 					// Reset on Velocity server change
 					wrapper.user().put(new Scoreboard(wrapper.user()));
 				});
@@ -96,10 +87,12 @@ public class PlayerPackets {
 		protocol.registerClientbound(ClientboundPackets1_8.CHAT_MESSAGE, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Type.COMPONENT);  //Chat Message
-				handler(packetWrapper -> {
-					int position = packetWrapper.read(Type.BYTE);
-					if (position == 2) packetWrapper.cancel();
+				map(Type.COMPONENT); // chat message
+				handler(wrapper -> {
+					final int position = wrapper.read(Type.BYTE);
+					if (position == 2) { // above hotbar
+						wrapper.cancel();
+					}
 				});
 			}
 		});
@@ -107,49 +100,46 @@ public class PlayerPackets {
 		protocol.registerClientbound(ClientboundPackets1_8.SPAWN_POSITION, new PacketHandlers() {
 			@Override
 			public void register() {
-				handler(packetWrapper -> {
-					Position position = packetWrapper.read(Type.POSITION);
-					packetWrapper.write(Type.INT, position.x());
-					packetWrapper.write(Type.INT, position.y());
-					packetWrapper.write(Type.INT, position.z());
-				});
+				map(Type.POSITION, Types1_7_6_10.INT_POSITION); // spawn position
 			}
 		});
 
 		protocol.registerClientbound(ClientboundPackets1_8.UPDATE_HEALTH, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Type.FLOAT);  //Health
-				map(Type.VAR_INT, Type.SHORT);  //Food
-				map(Type.FLOAT);  //Food Saturation
+				map(Type.FLOAT); // health
+				map(Type.VAR_INT, Type.SHORT); // food
+				map(Type.FLOAT); // food saturation
 			}
 		});
 
 		protocol.registerClientbound(ClientboundPackets1_8.RESPAWN, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Type.INT);
-				map(Type.UNSIGNED_BYTE);
-				map(Type.UNSIGNED_BYTE);
-				map(Type.STRING);
-				handler(packetWrapper -> {
-					if (!ViaRewind.getConfig().isReplaceAdventureMode()) return;
-					if (packetWrapper.get(Type.UNSIGNED_BYTE, 1) == 2) {
-						packetWrapper.set(Type.UNSIGNED_BYTE, 1, (short) 0);
+				map(Type.INT); // dimension
+				map(Type.UNSIGNED_BYTE); // difficulty
+				map(Type.UNSIGNED_BYTE); // game mode
+				map(Type.STRING); // level type
+				handler(wrapper -> {
+					if (ViaRewind.getConfig().isReplaceAdventureMode()) {
+						if (wrapper.get(Type.UNSIGNED_BYTE, 1) == 2) {
+							wrapper.set(Type.UNSIGNED_BYTE, 1, (short) 0);
+						}
 					}
-				});
-				handler(packetWrapper -> {
-					EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-					tracker.setGamemode(packetWrapper.get(Type.UNSIGNED_BYTE, 1));
-					if (tracker.getDimension() != packetWrapper.get(Type.INT, 0)) {
-						tracker.setDimension(packetWrapper.get(Type.INT, 0));
-						tracker.clearEntities();
+
+					wrapper.user().get(PlayerSessionStorage.class).gameMode = wrapper.get(Type.UNSIGNED_BYTE, 1);
+
+					final ClientWorld world = wrapper.user().get(ClientWorld.class);
+					final Environment dimension = Environment.getEnvironmentById(wrapper.get(Type.INT, 0));
+
+					final EntityTracker1_7_6_10 tracker = wrapper.user().get(EntityTracker1_7_6_10.class);
+					if (world.getEnvironment() != dimension) {
+						world.setEnvironment(dimension.id());
+
+						// Reset on dimension change
+						tracker.clear();
 						tracker.getEntityMap().put(tracker.getPlayerId(), Entity1_10Types.EntityType.ENTITY_HUMAN);
 					}
-				});
-				handler(packetWrapper -> {
-					ClientWorld world = packetWrapper.user().get(ClientWorld.class);
-					world.setEnvironment(packetWrapper.get(Type.INT, 0));
 				});
 			}
 		});
@@ -157,52 +147,42 @@ public class PlayerPackets {
 		protocol.registerClientbound(ClientboundPackets1_8.PLAYER_POSITION, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Type.DOUBLE);  //x
-				map(Type.DOUBLE);  //y
-				map(Type.DOUBLE);  //z
-				map(Type.FLOAT);  //yaw
-				map(Type.FLOAT);  //pitch
-				handler(packetWrapper -> {
-					PlayerPositionTracker playerPositionTracker = packetWrapper.user().get(PlayerPositionTracker.class);
-					playerPositionTracker.setPositionPacketReceived(true);
+				map(Type.DOUBLE); // x
+				map(Type.DOUBLE); // y
+				map(Type.DOUBLE); // z
+				map(Type.FLOAT); // yaw
+				map(Type.FLOAT); // pitch
+				handler(wrapper -> {
+					final double x = wrapper.get(Type.DOUBLE, 0);
+					double y = wrapper.get(Type.DOUBLE, 1);
+					final double z = wrapper.get(Type.DOUBLE, 2);
 
-					int flags = packetWrapper.read(Type.BYTE);
-					if ((flags & 0x01) == 0x01) {
-						double x = packetWrapper.get(Type.DOUBLE, 0);
-						x += playerPositionTracker.getPosX();
-						packetWrapper.set(Type.DOUBLE, 0, x);
-					}
-					double y = packetWrapper.get(Type.DOUBLE, 1);
-					if ((flags & 0x02) == 0x02) {
-						y += playerPositionTracker.getPosY();
-					}
-					playerPositionTracker.setReceivedPosY(y);
-					y += 1.62F;
-					packetWrapper.set(Type.DOUBLE, 1, y);
-					if ((flags & 0x04) == 0x04) {
-						double z = packetWrapper.get(Type.DOUBLE, 2);
-						z += playerPositionTracker.getPosZ();
-						packetWrapper.set(Type.DOUBLE, 2, z);
-					}
-					if ((flags & 0x08) == 0x08) {
-						float yaw = packetWrapper.get(Type.FLOAT, 0);
-						yaw += playerPositionTracker.getYaw();
-						packetWrapper.set(Type.FLOAT, 0, yaw);
-					}
-					if ((flags & 0x10) == 0x10) {
-						float pitch = packetWrapper.get(Type.FLOAT, 1);
-						pitch += playerPositionTracker.getPitch();
-						packetWrapper.set(Type.FLOAT, 1, pitch);
-					}
-				});
-				handler(packetWrapper -> {
-					PlayerPositionTracker playerPositionTracker = packetWrapper.user().get(PlayerPositionTracker.class);
-					packetWrapper.write(Type.BOOLEAN, playerPositionTracker.isOnGround());
-				});
-				handler(packetWrapper -> {
-					EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-					if (tracker.getSpectating() != tracker.getPlayerId()) {
-						packetWrapper.cancel();
+					final float yaw = wrapper.get(Type.FLOAT, 0);
+					final float pitch = wrapper.get(Type.FLOAT, 1);
+
+					final PlayerSessionStorage playerSession = wrapper.user().get(PlayerSessionStorage.class);
+					playerSession.positionPacketReceived = true;
+
+					final int flags = wrapper.read(Type.BYTE);
+
+					// x, y, and z
+					if ((flags & 0x01) == 0x01) wrapper.set(Type.DOUBLE, 0, x + playerSession.getPosX());
+					if ((flags & 0x02) == 0x02) y += playerSession.getPosY();
+
+					playerSession.receivedPosY = y;
+					wrapper.set(Type.DOUBLE, 1, y + 1.92F);
+
+					if ((flags & 0x04) == 0x04) wrapper.set(Type.DOUBLE, 2, z + playerSession.getPosZ());
+
+					// yaw and pitch
+					if ((flags & 0x08) == 0x08) wrapper.set(Type.FLOAT, 0, yaw + playerSession.yaw);
+					if ((flags & 0x10) == 0x10) wrapper.set(Type.FLOAT, 1, pitch + playerSession.pitch);
+
+					wrapper.write(Type.BOOLEAN, playerSession.onGround);
+
+					final EntityTracker1_7_6_10 tracker = wrapper.user().get(EntityTracker1_7_6_10.class);
+					if (tracker.spectatingPlayerId != tracker.getPlayerId()) {
+						wrapper.cancel();
 					}
 				});
 			}
@@ -211,53 +191,48 @@ public class PlayerPackets {
 		protocol.registerClientbound(ClientboundPackets1_8.SET_EXPERIENCE, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Type.FLOAT);  //Experience bar
-				map(Type.VAR_INT, Type.SHORT);  //Level
-				map(Type.VAR_INT, Type.SHORT);  //Total Experience
+				map(Type.FLOAT); // experience bar
+				map(Type.VAR_INT, Type.SHORT); // level
+				map(Type.VAR_INT, Type.SHORT); // total experience
 			}
 		});
 
 		protocol.registerClientbound(ClientboundPackets1_8.GAME_EVENT, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Type.UNSIGNED_BYTE);
-				map(Type.FLOAT);
-				handler(packetWrapper -> {
-					int mode = packetWrapper.get(Type.UNSIGNED_BYTE, 0);
-					if (mode != 3) return;
-					int gamemode = packetWrapper.get(Type.FLOAT, 0).intValue();
-					EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-					if (gamemode == 3 || tracker.getGamemode() == 3) {
-						UUID myId = packetWrapper.user().getProtocolInfo().getUuid();
+				map(Type.UNSIGNED_BYTE); // reason
+				map(Type.FLOAT); // value
+				handler(wrapper -> {
+					if (wrapper.get(Type.UNSIGNED_BYTE, 0) != 3) return; // Change game mode
+					int gameMode = wrapper.get(Type.FLOAT, 0).intValue();
+
+					final PlayerSessionStorage playerSession = wrapper.user().get(PlayerSessionStorage.class);
+					if (gameMode == 3 || playerSession.gameMode == 3) {
+						UUID myId = wrapper.user().getProtocolInfo().getUuid();
 						Item[] equipment = new Item[4];
-						if (gamemode == 3) {
-							GameProfileStorage.GameProfile profile = packetWrapper.user().get(GameProfileStorage.class).get(myId);
+						if (gameMode == 3) {
+							GameProfileStorage.GameProfile profile = wrapper.user().get(GameProfileStorage.class).get(myId);
 							equipment[3] = profile.getSkull();
 						} else {
 							for (int i = 0; i < equipment.length; i++) {
-								equipment[i] = tracker.getPlayerEquipment(myId, i);
+								equipment[i] = playerSession.getPlayerEquipment(myId, i);
 							}
 						}
 
 						for (int i = 0; i < equipment.length; i++) {
-							PacketWrapper setSlot = PacketWrapper.create(ClientboundPackets1_7_2_5.SET_SLOT, packetWrapper.user());
+							PacketWrapper setSlot = PacketWrapper.create(ClientboundPackets1_7_2_5.SET_SLOT, wrapper.user());
 							setSlot.write(Type.BYTE, (byte) 0);
 							setSlot.write(Type.SHORT, (short) (8 - i));
 							setSlot.write(Types1_7_6_10.COMPRESSED_NBT_ITEM, equipment[i]);
 							PacketUtil.sendPacket(setSlot, Protocol1_7_6_10To1_8.class);
 						}
 					}
-				});
-				handler(packetWrapper -> {
-					int mode = packetWrapper.get(Type.UNSIGNED_BYTE, 0);
-					if (mode == 3) {
-						int gamemode = packetWrapper.get(Type.FLOAT, 0).intValue();
-						if (gamemode == 2 && ViaRewind.getConfig().isReplaceAdventureMode()) {
-							gamemode = 0;
-							packetWrapper.set(Type.FLOAT, 0, 0.0f);
-						}
-						packetWrapper.user().get(EntityTracker.class).setGamemode(gamemode);
+
+					if (gameMode == 2 && ViaRewind.getConfig().isReplaceAdventureMode()) {
+						gameMode = 0;
+						wrapper.set(Type.FLOAT, 0, 0.0f);
 					}
+					wrapper.user().get(PlayerSessionStorage.class).gameMode = gameMode;
 				});
 			}
 		});
@@ -265,12 +240,7 @@ public class PlayerPackets {
 		protocol.registerClientbound(ClientboundPackets1_8.OPEN_SIGN_EDITOR, new PacketHandlers() {
 			@Override
 			public void register() {
-				handler(packetWrapper -> {
-					Position position = packetWrapper.read(Type.POSITION);
-					packetWrapper.write(Type.INT, position.x());
-					packetWrapper.write(Type.INT, position.y());
-					packetWrapper.write(Type.INT, position.z());
-				});
+				map(Type.POSITION, Types1_7_6_10.INT_POSITION); // position
 			}
 		});
 
@@ -319,7 +289,7 @@ public class PlayerPackets {
 							if (gameProfile == null || gameProfile.gamemode == gamemode) continue;
 
 							if (gamemode == 3 || gameProfile.gamemode == 3) {
-								EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
+								EntityTracker1_7_6_10 tracker = packetWrapper.user().get(EntityTracker1_7_6_10.class);
 								int entityId = tracker.getPlayerEntityId(uuid);
 								boolean isOwnPlayer = entityId == tracker.getPlayerId();
 								if (entityId != -1) {
@@ -329,7 +299,7 @@ public class PlayerPackets {
 										equipment[isOwnPlayer ? 3 : 4] = gameProfile.getSkull();
 									} else {
 										for (int j = 0; j < equipment.length; j++) {
-											equipment[j] = tracker.getPlayerEquipment(uuid, j);
+											equipment[j] = packetWrapper.user().get(PlayerSessionStorage.class).getPlayerEquipment(uuid, j);
 										}
 									}
 
@@ -410,15 +380,16 @@ public class PlayerPackets {
 					byte flags = packetWrapper.get(Type.BYTE, 0);
 					float flySpeed = packetWrapper.get(Type.FLOAT, 0);
 					float walkSpeed = packetWrapper.get(Type.FLOAT, 1);
-					PlayerAbilitiesTracker abilities = packetWrapper.user().get(PlayerAbilitiesTracker.class);
-					abilities.setInvincible((flags & 8) == 8);
-					abilities.setAllowFly((flags & 4) == 4);
-					abilities.setFlying((flags & 2) == 2);
-					abilities.setCreative((flags & 1) == 1);
-					abilities.setFlySpeed(flySpeed);
-					abilities.setWalkSpeed(walkSpeed);
-					if (abilities.isSprinting() && abilities.isFlying()) {
-						packetWrapper.set(Type.FLOAT, 0, abilities.getFlySpeed() * 2.0f);
+					PlayerSessionStorage abilities = packetWrapper.user().get(PlayerSessionStorage.class);
+					abilities.invincible = (flags & 8) == 8;
+					abilities.allowFly = (flags & 4) == 4;
+					abilities.flying = (flags & 2) == 2;
+					abilities.creative = (flags & 1) == 1;
+					abilities.flySpeed = flySpeed;
+					abilities.walkSpeed = walkSpeed;
+
+					if (abilities.sprinting && abilities.flying) {
+						packetWrapper.set(Type.FLOAT, 0, abilities.flySpeed * 2.0f);
 					}
 				});
 			}
@@ -482,10 +453,10 @@ public class PlayerPackets {
 				handler(packetWrapper -> {
 					packetWrapper.cancel();
 
-					EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
+					EntityTracker1_7_6_10 tracker = packetWrapper.user().get(EntityTracker1_7_6_10.class);
 
 					int entityId = packetWrapper.read(Type.VAR_INT);
-					int spectating = tracker.getSpectating();
+					int spectating = tracker.spectatingPlayerId;
 
 					if (spectating != entityId) {
 						tracker.setSpectating(entityId);
@@ -556,7 +527,7 @@ public class PlayerPackets {
 				map(Type.STRING);
 				handler(packetWrapper -> {
 					String msg = packetWrapper.get(Type.STRING, 0);
-					int gamemode = packetWrapper.user().get(EntityTracker.class).getGamemode();
+					int gamemode = packetWrapper.user().get(PlayerSessionStorage.class).gameMode;
 					if (gamemode == 3 && msg.toLowerCase().startsWith("/stp ")) {
 						String username = msg.split(" ")[1];
 						GameProfileStorage storage = packetWrapper.user().get(GameProfileStorage.class);
@@ -580,28 +551,29 @@ public class PlayerPackets {
 				map(Type.INT, Type.VAR_INT);
 				map(Type.BYTE, Type.VAR_INT);
 				handler(packetWrapper -> {
-					int mode = packetWrapper.get(Type.VAR_INT, 1);
-					if (mode != 0) return;
-					int entityId = packetWrapper.get(Type.VAR_INT, 0);
-					EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-					EntityModel replacement = tracker.getEntityReplacement(entityId);
-					if (!(replacement instanceof ArmorStandModel)) return;
-					ArmorStandModel armorStand = (ArmorStandModel) replacement;
-					AABB boundingBox = armorStand.getBoundingBox();
-					PlayerPositionTracker playerPositionTracker = packetWrapper.user().get(PlayerPositionTracker.class);
-					Vector3d pos = new Vector3d(playerPositionTracker.getPosX(), playerPositionTracker.getPosY() + 1.8, playerPositionTracker.getPosZ());
-					double yaw = Math.toRadians(playerPositionTracker.getYaw());
-					double pitch = Math.toRadians(playerPositionTracker.getPitch());
-					Vector3d dir = new Vector3d(-Math.cos(pitch) * Math.sin(yaw), -Math.sin(pitch), Math.cos(pitch) * Math.cos(yaw));
-					Ray3d ray = new Ray3d(pos, dir);
-					Vector3d intersection = RayTracing.trace(ray, boundingBox, 5.0);
-					if (intersection == null) return;
-					intersection.substract(boundingBox.getMin());
-					mode = 2;
-					packetWrapper.set(Type.VAR_INT, 1, mode);
-					packetWrapper.write(Type.FLOAT, (float) intersection.getX());
-					packetWrapper.write(Type.FLOAT, (float) intersection.getY());
-					packetWrapper.write(Type.FLOAT, (float) intersection.getZ());
+					// TODO | Fix Armor Stands
+//					int mode = packetWrapper.get(Type.VAR_INT, 1);
+//					if (mode != 0) return;
+//					int entityId = packetWrapper.get(Type.VAR_INT, 0);
+//					EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
+//					EntityModel replacement = tracker.getEntityReplacement(entityId);
+//					if (!(replacement instanceof ArmorStandModel)) return;
+//					ArmorStandModel armorStand = (ArmorStandModel) replacement;
+//					AABB boundingBox = armorStand.getBoundingBox();
+//					PlayerPositionTracker playerPositionTracker = packetWrapper.user().get(PlayerPositionTracker.class);
+//					Vector3d pos = new Vector3d(playerPositionTracker.getPosX(), playerPositionTracker.getPosY() + 1.8, playerPositionTracker.getPosZ());
+//					double yaw = Math.toRadians(playerPositionTracker.getYaw());
+//					double pitch = Math.toRadians(playerPositionTracker.getPitch());
+//					Vector3d dir = new Vector3d(-Math.cos(pitch) * Math.sin(yaw), -Math.sin(pitch), Math.cos(pitch) * Math.cos(yaw));
+//					Ray3d ray = new Ray3d(pos, dir);
+//					Vector3d intersection = RayTracing.trace(ray, boundingBox, 5.0);
+//					if (intersection == null) return;
+//					intersection.substract(boundingBox.getMin());
+//					mode = 2;
+//					packetWrapper.set(Type.VAR_INT, 1, mode);
+//					packetWrapper.write(Type.FLOAT, (float) intersection.getX());
+//					packetWrapper.write(Type.FLOAT, (float) intersection.getY());
+//					packetWrapper.write(Type.FLOAT, (float) intersection.getZ());
 				});
 			}
 		});
@@ -611,8 +583,8 @@ public class PlayerPackets {
 			public void register() {
 				map(Type.BOOLEAN);
 				handler(packetWrapper -> {
-					PlayerPositionTracker playerPositionTracker = packetWrapper.user().get(PlayerPositionTracker.class);
-					playerPositionTracker.setOnGround(packetWrapper.get(Type.BOOLEAN, 0));
+					PlayerSessionStorage playerSession = packetWrapper.user().get(PlayerSessionStorage.class);
+					playerSession.onGround = packetWrapper.get(Type.BOOLEAN, 0);
 				});
 			}
 		});
@@ -630,10 +602,10 @@ public class PlayerPackets {
 					double feetY = packetWrapper.get(Type.DOUBLE, 1);
 					double z = packetWrapper.get(Type.DOUBLE, 2);
 
-					PlayerPositionTracker playerPositionTracker = packetWrapper.user().get(PlayerPositionTracker.class);
+					PlayerSessionStorage playerSession = packetWrapper.user().get(PlayerSessionStorage.class);
 
-					playerPositionTracker.setOnGround(packetWrapper.get(Type.BOOLEAN, 0));
-					playerPositionTracker.setPos(x, feetY, z);
+					playerSession.onGround = packetWrapper.get(Type.BOOLEAN, 0);
+					playerSession.setPos(x, feetY, z);
 				});
 			}
 		});
@@ -645,10 +617,10 @@ public class PlayerPackets {
 				map(Type.FLOAT);
 				map(Type.BOOLEAN);
 				handler(packetWrapper -> {
-					PlayerPositionTracker playerPositionTracker = packetWrapper.user().get(PlayerPositionTracker.class);
-					playerPositionTracker.setYaw(packetWrapper.get(Type.FLOAT, 0));
-					playerPositionTracker.setPitch(packetWrapper.get(Type.FLOAT, 1));
-					playerPositionTracker.setOnGround(packetWrapper.get(Type.BOOLEAN, 0));
+					PlayerSessionStorage playerSession = packetWrapper.user().get(PlayerSessionStorage.class);
+					playerSession.yaw = packetWrapper.get(Type.FLOAT, 0);
+					playerSession.pitch = packetWrapper.get(Type.FLOAT, 1);
+					playerSession.onGround = packetWrapper.get(Type.BOOLEAN, 0);
 				});
 			}
 		});
@@ -671,12 +643,12 @@ public class PlayerPackets {
 					float yaw = packetWrapper.get(Type.FLOAT, 0);
 					float pitch = packetWrapper.get(Type.FLOAT, 1);
 
-					PlayerPositionTracker playerPositionTracker = packetWrapper.user().get(PlayerPositionTracker.class);
+					PlayerSessionStorage playerSession = packetWrapper.user().get(PlayerSessionStorage.class);
 
-					playerPositionTracker.setOnGround(packetWrapper.get(Type.BOOLEAN, 0));
-					playerPositionTracker.setPos(x, feetY, z);
-					playerPositionTracker.setYaw(yaw);
-					playerPositionTracker.setPitch(pitch);
+					playerSession.onGround = packetWrapper.get(Type.BOOLEAN, 0);
+					playerSession.setPos(x, feetY, z);
+					playerSession.yaw = yaw;
+					playerSession.pitch = pitch;
 				});
 			}
 		});
@@ -755,12 +727,12 @@ public class PlayerPackets {
 				handler(packetWrapper -> {
 					int action = packetWrapper.get(Type.VAR_INT, 1);
 					if (action == 3 || action == 4) {
-						PlayerAbilitiesTracker abilities = packetWrapper.user().get(PlayerAbilitiesTracker.class);
-						abilities.setSprinting(action == 3);
+						PlayerSessionStorage playerSession = packetWrapper.user().get(PlayerSessionStorage.class);
+						playerSession.sprinting = action == 3;
 						PacketWrapper abilitiesPacket = PacketWrapper.create(0x39, null, packetWrapper.user());
-						abilitiesPacket.write(Type.BYTE, abilities.getFlags());
-						abilitiesPacket.write(Type.FLOAT, abilities.isSprinting() ? abilities.getFlySpeed() * 2.0f : abilities.getFlySpeed());
-						abilitiesPacket.write(Type.FLOAT, abilities.getWalkSpeed());
+						abilitiesPacket.write(Type.BYTE, playerSession.combineAbilities());
+						abilitiesPacket.write(Type.FLOAT, playerSession.sprinting ? playerSession.flySpeed * 2.0f : playerSession.flySpeed);
+						abilitiesPacket.write(Type.FLOAT, playerSession.walkSpeed);
 						PacketUtil.sendPacket(abilitiesPacket, Protocol1_7_6_10To1_8.class);
 					}
 				});
@@ -781,8 +753,8 @@ public class PlayerPackets {
 					packetWrapper.write(Type.UNSIGNED_BYTE, flags);
 
 					if (unmount) {
-						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-						if (tracker.getSpectating() != tracker.getPlayerId()) {
+						EntityTracker1_7_6_10 tracker = packetWrapper.user().get(EntityTracker1_7_6_10.class);
+						if (tracker.spectatingPlayerId != tracker.getPlayerId()) {
 							PacketWrapper sneakPacket = PacketWrapper.create(0x0B, null, packetWrapper.user());
 							sneakPacket.write(Type.VAR_INT, tracker.getPlayerId());
 							sneakPacket.write(Type.VAR_INT, 0);  //Start sneaking
@@ -824,12 +796,12 @@ public class PlayerPackets {
 				map(Type.FLOAT);
 				map(Type.FLOAT);
 				handler(packetWrapper -> {
-					PlayerAbilitiesTracker abilities = packetWrapper.user().get(PlayerAbilitiesTracker.class);
-					if (abilities.isAllowFly()) {
+					PlayerSessionStorage playerSession = packetWrapper.user().get(PlayerSessionStorage.class);
+					if (playerSession.allowFly) {
 						byte flags = packetWrapper.get(Type.BYTE, 0);
-						abilities.setFlying((flags & 2) == 2);
+						playerSession.flying = (flags & 2) == 2;
 					}
-					packetWrapper.set(Type.FLOAT, 0, abilities.getFlySpeed());
+					packetWrapper.set(Type.FLOAT, 0, playerSession.flySpeed);
 				});
 			}
 		});
@@ -898,7 +870,7 @@ public class PlayerPackets {
 
 							packetWrapper.write(Type.STRING, name);
 
-							WindowTracker windowTracker = packetWrapper.user().get(WindowTracker.class);
+							InventoryTracker windowTracker = packetWrapper.user().get(InventoryTracker.class);
 							PacketWrapper updateCost = PacketWrapper.create(0x31, null, packetWrapper.user());
 							updateCost.write(Type.UNSIGNED_BYTE, windowTracker.anvilId);
 							updateCost.write(Type.SHORT, (short) 0);

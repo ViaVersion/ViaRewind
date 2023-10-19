@@ -20,16 +20,10 @@ package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.packets;
 
 import com.viaversion.viarewind.protocol.protocol1_7_2_5to1_7_6_10.ClientboundPackets1_7_2_5;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.emulator.ArmorStandModel;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.emulator.EndermiteModel;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.emulator.GuardianModel;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.emulator.RabbitModel;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.EntityTracker;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.GameProfileStorage;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.EntityTracker1_7_6_10;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
-import com.viaversion.viarewind.api.minecraft.EntityModel;
-import com.viaversion.viarewind.api.rewriter.Replacement;
-import com.viaversion.viarewind.utils.PacketUtil;
+import com.viaversion.viarewind.api.rewriter.item.Replacement;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
@@ -72,7 +66,7 @@ public class SpawnPackets {
 
 					final int entityId = wrapper.get(Type.VAR_INT, 0);
 
-					final EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+					final EntityTracker1_7_6_10 tracker = wrapper.user().get(EntityTracker1_7_6_10.class);
 					if (gameProfile != null && gameProfile.gamemode == 3) { // Spectator mode
 						for (short i = 0; i < 5; i++) {
 							final PacketWrapper entityEquipment = PacketWrapper.create(ClientboundPackets1_7_2_5.ENTITY_EQUIPMENT, wrapper.user());
@@ -100,9 +94,9 @@ public class SpawnPackets {
 					wrapper.set(Types1_7_6_10.METADATA_LIST, 0, metadata);
 				});
 				handler(wrapper -> {
-					final EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+					final EntityTracker1_7_6_10 tracker = wrapper.user().get(EntityTracker1_7_6_10.class);
 
-					tracker.getEntityMap().put(wrapper.get(Type.VAR_INT, 0), Entity1_10Types.EntityType.PLAYER);
+					tracker.addEntity(wrapper.get(Type.VAR_INT, 0), Entity1_10Types.EntityType.PLAYER);
 				});
 			}
 		});
@@ -153,12 +147,13 @@ public class SpawnPackets {
 						}
 					} else if (type == Entity1_10Types.ObjectType.ARMOR_STAND.getType()) {
 						wrapper.cancel();
-						EntityTracker tracker = wrapper.user().get(EntityTracker.class);
-						ArmorStandModel armorStand = new ArmorStandModel(wrapper.user(), protocol, entityId);
-						armorStand.updateReplacementPosition(x / 32.0, y / 32.0, z / 32.0);
-						armorStand.setYawPitch(yaw * 360f / 256, pitch * 360f / 256);
-						armorStand.setHeadYaw(yaw * 360f / 256);
-						tracker.addEntityReplacement(armorStand);
+						// TODO | Tick Virtual Holograms
+//						EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+//						ArmorStandModel armorStand = new ArmorStandModel(wrapper.user(), protocol, entityId);
+//						armorStand.updateReplacementPosition(x / 32.0, y / 32.0, z / 32.0);
+//						armorStand.setYawPitch(yaw * 360f / 256, pitch * 360f / 256);
+//						armorStand.setHeadYaw(yaw * 360f / 256);
+//						tracker.addEntityReplacement(armorStand);
 					}
 					// TODO | Realign all entities
 
@@ -167,8 +162,8 @@ public class SpawnPackets {
 					wrapper.set(Type.INT, 2, z);
 					wrapper.set(Type.BYTE, 2, yaw);
 
-					final EntityTracker tracker = wrapper.user().get(EntityTracker.class);
-					tracker.getEntityMap().put(entityId, type);
+					final EntityTracker1_7_6_10 tracker = wrapper.user().get(EntityTracker1_7_6_10.class);
+					tracker.addEntity(entityId, type);
 
 					if (type != null && type.isOrHasParent(Entity1_10Types.EntityType.FALLING_BLOCK)) {
 						int blockId = data & 0xFFF;
@@ -217,32 +212,17 @@ public class SpawnPackets {
 					final byte yaw = wrapper.get(Type.BYTE, 0);
 					final byte headYaw = wrapper.get(Type.BYTE, 2);
 
+					final EntityTracker1_7_6_10 tracker = wrapper.user().get(EntityTracker1_7_6_10.class);
 					final List<Metadata> metadataList = wrapper.get(Types1_7_6_10.METADATA_LIST, 0);
 
-					final EntityTracker tracker = wrapper.user().get(EntityTracker.class);
-					tracker.getEntityMap().put(entityId, type);
+					tracker.addEntity(entityId, type);
+					protocol.getMetadataRewriter().transform(type, metadataList);
 
-					if (type == Entity1_10Types.EntityType.ARMOR_STAND || type == Entity1_10Types.EntityType.GUARDIAN || type == Entity1_10Types.EntityType.ENDERMITE || type == Entity1_10Types.EntityType.RABBIT) { // TODO: delete this
-						wrapper.cancel();
-						EntityModel<?> replacement;
-						if (type == Entity1_10Types.EntityType.ARMOR_STAND) {
-							replacement = new ArmorStandModel(wrapper.user(), protocol, entityId);
-						} else if (type == Entity1_10Types.EntityType.GUARDIAN) {
-							replacement = new GuardianModel(wrapper.user(), protocol, entityId);
-						} else if (type == Entity1_10Types.EntityType.ENDERMITE) {
-							replacement = new EndermiteModel(wrapper.user(), protocol, entityId);
-						} else {
-							replacement = new RabbitModel(wrapper.user(), protocol, entityId);
-						}
+					if (tracker.isReplaced(type)) {
+						final int newTypeId = tracker.replaceEntity(entityId, type);
+						wrapper.set(Type.UNSIGNED_BYTE, 0, (short) newTypeId);
 
-						replacement.updateReplacementPosition(x / 32.0, y / 32.0, z / 32.0);
-						replacement.setYawPitch(yaw * 360f / 256, pitch * 360f / 256);
-						replacement.setHeadYaw(headYaw * 360f / 256);
-
-						tracker.addEntityReplacement(replacement);
-						tracker.getEntityReplacement(entityId).updateMetadata(metadataList);
-					} else {
-						protocol.getMetadataRewriter().transform(tracker.getEntityMap().get(entityId), metadataList);
+						tracker.updateMetadata(entityId, metadataList);
 					}
 				});
 			}
@@ -262,9 +242,9 @@ public class SpawnPackets {
 				});
 				map(Type.UNSIGNED_BYTE, Type.INT); // rotation
 				handler(wrapper -> {
-					final EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+					final EntityTracker1_7_6_10 tracker = wrapper.user().get(EntityTracker1_7_6_10.class);
 
-					tracker.getEntityMap().put(wrapper.get(Type.VAR_INT, 0), Entity1_10Types.EntityType.PAINTING);
+					tracker.addEntity(wrapper.get(Type.VAR_INT, 0), Entity1_10Types.EntityType.PAINTING);
 				});
 			}
 		});
@@ -278,9 +258,9 @@ public class SpawnPackets {
 				map(Type.INT); // z
 				map(Type.SHORT); // count
 				handler(wrapper -> {
-					final EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+					final EntityTracker1_7_6_10 tracker = wrapper.user().get(EntityTracker1_7_6_10.class);
 
-					tracker.getEntityMap().put(wrapper.get(Type.VAR_INT, 0), Entity1_10Types.EntityType.EXPERIENCE_ORB);
+					tracker.addEntity(wrapper.get(Type.VAR_INT, 0), Entity1_10Types.EntityType.EXPERIENCE_ORB);
 				});
 			}
 		});
@@ -294,9 +274,9 @@ public class SpawnPackets {
 				map(Type.INT); // y
 				map(Type.INT); // z
 				handler(wrapper -> {
-					final EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+					final EntityTracker1_7_6_10 tracker = wrapper.user().get(EntityTracker1_7_6_10.class);
 
-					tracker.getEntityMap().put(wrapper.get(Type.VAR_INT, 0), Entity1_10Types.EntityType.LIGHTNING);
+					tracker.addEntity(wrapper.get(Type.VAR_INT, 0), Entity1_10Types.EntityType.LIGHTNING);
 				});
 			}
 		});

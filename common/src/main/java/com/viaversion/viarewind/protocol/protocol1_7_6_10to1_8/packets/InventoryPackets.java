@@ -21,9 +21,9 @@ package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.packets;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
 import com.viaversion.viarewind.protocol.protocol1_7_2_5to1_7_6_10.ServerboundPackets1_7_2_5;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.model.FurnaceData;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.EntityTracker;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.GameProfileStorage;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.WindowTracker;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.InventoryTracker;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.PlayerSessionStorage;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
 import com.viaversion.viarewind.utils.ChatUtil;
 import com.viaversion.viaversion.api.minecraft.item.Item;
@@ -38,10 +38,10 @@ public class InventoryPackets {
 
 	public static void register(Protocol1_7_6_10To1_8 protocol) {
 		protocol.registerClientbound(ClientboundPackets1_8.OPEN_WINDOW, wrapper -> {
-			final WindowTracker windowTracker = wrapper.user().get(WindowTracker.class);
+			final InventoryTracker windowTracker = wrapper.user().get(InventoryTracker.class);
 
 			final short windowId = wrapper.passthrough(Type.UNSIGNED_BYTE); // window id
-			final short windowTypeId = WindowTracker.getInventoryType(wrapper.read(Type.STRING)); // window type
+			final short windowTypeId = InventoryTracker.getInventoryType(wrapper.read(Type.STRING)); // window type
 
 			windowTracker.getWindowTypeMap().put(windowId, windowTypeId);
 			wrapper.write(Type.UNSIGNED_BYTE, windowTypeId); // window type id
@@ -65,7 +65,7 @@ public class InventoryPackets {
 		protocol.registerClientbound(ClientboundPackets1_8.CLOSE_WINDOW, wrapper -> {
 			final short windowId = wrapper.passthrough(Type.UNSIGNED_BYTE); // window id
 
-			wrapper.user().get(WindowTracker.class).remove(windowId);
+			wrapper.user().get(InventoryTracker.class).remove(windowId);
 		});
 
 		protocol.registerClientbound(ClientboundPackets1_8.SET_SLOT, new PacketHandlers() {
@@ -75,7 +75,7 @@ public class InventoryPackets {
 				map(Type.SHORT); // slot
 
 				handler(wrapper -> {
-					final short windowType = wrapper.user().get(WindowTracker.class).get(wrapper.get(Type.UNSIGNED_BYTE, 0));
+					final short windowType = wrapper.user().get(InventoryTracker.class).get(wrapper.get(Type.UNSIGNED_BYTE, 0));
 					final short slot = wrapper.get(Type.SHORT, 0);
 					if (windowType == 4) { // Enchantment Table
 						if (slot == 1) {
@@ -103,11 +103,11 @@ public class InventoryPackets {
 					final short slot = wrapper.get(Type.SHORT, 0);
 					if (slot < 5 || slot > 8) return;
 
-					final EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+					final PlayerSessionStorage playerSession = wrapper.user().get(PlayerSessionStorage.class);
 					final Item item = wrapper.get(Types1_7_6_10.COMPRESSED_NBT_ITEM, 0);
 
-					tracker.setPlayerEquipment(wrapper.user().getProtocolInfo().getUuid(), item, 8 - slot);
-					if (tracker.getGamemode() == 3) { // Spectator mode didn't exist in 1.7.10
+					playerSession.setPlayerEquipment(wrapper.user().getProtocolInfo().getUuid(), item, 8 - slot);
+					if (playerSession.isSpectator()) { // Spectator mode didn't exist in 1.7.10
 						wrapper.cancel();
 					}
 				});
@@ -121,7 +121,7 @@ public class InventoryPackets {
 
 				// remap enchantment table items
 				handler(wrapper -> {
-					final short windowType = wrapper.user().get(WindowTracker.class).get(wrapper.get(Type.UNSIGNED_BYTE, 0));
+					final short windowType = wrapper.user().get(InventoryTracker.class).get(wrapper.get(Type.UNSIGNED_BYTE, 0));
 
 					Item[] items = wrapper.read(Type.ITEM_ARRAY);
 					if (windowType == 4) { // Enchantment Table
@@ -141,16 +141,16 @@ public class InventoryPackets {
 					if (windowId != 0) return;
 
 					final UUID userId = wrapper.user().getProtocolInfo().getUuid();
-					final EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+					final PlayerSessionStorage playerSession = wrapper.user().get(PlayerSessionStorage.class);
 
 					final Item[] items = wrapper.get(Types1_7_6_10.COMPRESSED_NBT_ITEM_ARRAY, 0);
 					for (int i = 5; i < 9; i++) {
-						tracker.setPlayerEquipment(userId, items[i], 8 - i);
-						if (tracker.getGamemode() == 3) {
+						playerSession.setPlayerEquipment(userId, items[i], 8 - i);
+						if (playerSession.isSpectator()) {
 							items[i] = null;
 						}
 					}
-					if (tracker.getGamemode() == 3) {
+					if (playerSession.isSpectator()) {
 						final GameProfileStorage.GameProfile profile = wrapper.user().get(GameProfileStorage.class).get(userId);
 						if (profile != null) {
 							items[5] = profile.getSkull();
@@ -168,7 +168,7 @@ public class InventoryPackets {
 				map(Type.SHORT); // progress bar value
 
 				handler(wrapper -> {
-					final WindowTracker windowTracker = wrapper.user().get(WindowTracker.class);
+					final InventoryTracker windowTracker = wrapper.user().get(InventoryTracker.class);
 
 					final short windowId = wrapper.get(Type.UNSIGNED_BYTE, 0);
 					final short windowType = windowTracker.get(windowId);
@@ -218,7 +218,7 @@ public class InventoryPackets {
 		protocol.registerServerbound(ServerboundPackets1_7_2_5.CLOSE_WINDOW, wrapper -> {
 			final short windowId = wrapper.passthrough(Type.UNSIGNED_BYTE);
 
-			wrapper.user().get(WindowTracker.class).remove(windowId);
+			wrapper.user().get(InventoryTracker.class).remove(windowId);
 		});
 
 		protocol.registerServerbound(ServerboundPackets1_7_2_5.CLICK_WINDOW, new PacketHandlers() {
@@ -230,7 +230,7 @@ public class InventoryPackets {
 					final short windowId = wrapper.get(Type.UNSIGNED_BYTE, 0);  //Window Id
 					final short slot = wrapper.get(Type.SHORT, 0);
 
-					final short windowType = wrapper.user().get(WindowTracker.class).get(windowId);
+					final short windowType = wrapper.user().get(InventoryTracker.class).get(windowId);
 					if (windowType == 4) { // Enchantment Table
 						if (slot > 0) {
 							wrapper.set(Type.SHORT, 0, (short) (slot + 1));

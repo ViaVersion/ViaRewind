@@ -16,11 +16,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.viaversion.viarewind.api.rewriter;
+package com.viaversion.viarewind.api.rewriter.item;
 
 import com.viaversion.viarewind.api.minecraft.IdDataCombine;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.rewriter.ItemRewriter;
 import com.viaversion.viaversion.libs.fastutil.ints.Int2ObjectMap;
 import com.viaversion.viaversion.libs.fastutil.ints.Int2ObjectOpenHashMap;
@@ -30,11 +31,11 @@ public abstract class ReplacementItemRewriter<T extends AbstractProtocol<?, ?, ?
 	private final Int2ObjectMap<Replacement> BLOCK_REPLACEMENTS = new Int2ObjectOpenHashMap<>();
 
 	private final T protocol;
-	private final String protocolName;
+	private final ProtocolVersion protocolVersion;
 
-	public ReplacementItemRewriter(final T protocol, final String protocolName) {
+	public ReplacementItemRewriter(final T protocol, final ProtocolVersion protocolVersion) {
 		this.protocol = protocol;
-		this.protocolName = protocolName;
+		this.protocolVersion = protocolVersion;
 	}
 
 	public void registerItem(int id, Replacement replacement) {
@@ -51,12 +52,12 @@ public abstract class ReplacementItemRewriter<T extends AbstractProtocol<?, ?, ?
 
 	public void registerItem(int id, int data, Replacement replacement) {
 		ITEM_REPLACEMENTS.put(generateTrackingId(id, data), replacement);
-		replacement.buildNames(protocolName);
+		replacement.buildNames(protocolVersion.getName());
 	}
 
 	public void registerBlock(int id, int data, Replacement replacement) {
 		BLOCK_REPLACEMENTS.put(generateTrackingId(id, data), replacement);
-		replacement.buildNames(protocolName);
+		replacement.buildNames(protocolVersion.getName());
 	}
 
 	public void registerItemBlock(int id, int data, Replacement replacement) {

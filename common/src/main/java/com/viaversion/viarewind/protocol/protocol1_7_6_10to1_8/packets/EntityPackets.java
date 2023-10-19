@@ -19,11 +19,10 @@
 package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.packets;
 
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.EntityTracker;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.EntityTracker1_7_6_10;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.GameProfileStorage;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.PlayerSessionStorage;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
-import com.viaversion.viarewind.api.minecraft.EntityModel;
-import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
@@ -53,14 +52,12 @@ public class EntityPackets {
 				});
 
 				handler(wrapper -> {
-					final EntityTracker tracker = wrapper.user().get(EntityTracker.class);
-
 					final short slot = wrapper.get(Type.SHORT, 0);
-					final UUID uuid = tracker.getPlayerUUID(wrapper.get(Type.INT, 0));
+					final UUID uuid =  wrapper.user().get(EntityTracker1_7_6_10.class).getPlayerUUID(wrapper.get(Type.INT, 0));
 					if (uuid == null) return;
 
 					final Item item = wrapper.get(Types1_7_6_10.COMPRESSED_NBT_ITEM, 0);
-					tracker.setPlayerEquipment(uuid, item, slot);
+					wrapper.user().get(PlayerSessionStorage.class).setPlayerEquipment(uuid, item, slot);
 
 					final GameProfileStorage storage = wrapper.user().get(GameProfileStorage.class);
 					GameProfileStorage.GameProfile profile = storage.get(uuid);
@@ -85,7 +82,7 @@ public class EntityPackets {
 				map(Type.VAR_INT, Type.INT); // collected entity id
 				map(Type.VAR_INT, Type.INT); // collector entity id
 
-				handler(wrapper -> wrapper.user().get(EntityTracker.class).removeEntity(wrapper.get(Type.INT, 0)));
+				handler(wrapper -> wrapper.user().get(EntityTracker1_7_6_10.class).removeEntity(wrapper.get(Type.INT, 0)));
 			}
 		});
 
@@ -106,7 +103,7 @@ public class EntityPackets {
 				map(Type.VAR_INT_ARRAY_PRIMITIVE, Types1_7_6_10.BYTE_INT_ARRAY); // entity ids
 
 				handler(wrapper -> {
-					final EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+					final EntityTracker1_7_6_10 tracker = wrapper.user().get(EntityTracker1_7_6_10.class);
 
 					for (int entityId : wrapper.get(Types1_7_6_10.BYTE_INT_ARRAY, 0)) {
 						tracker.removeEntity(entityId);
@@ -130,19 +127,6 @@ public class EntityPackets {
 				map(Type.BYTE); // y
 				map(Type.BYTE); // z
 				map(Type.BOOLEAN, Type.NOTHING); // on ground
-				handler(wrapper -> {
-					final EntityTracker tracker = wrapper.user().get(EntityTracker.class);
-
-					final EntityModel<?> replacement = tracker.getEntityReplacement(wrapper.get(Type.INT, 0));
-					if (replacement != null) {
-						wrapper.cancel();
-						final int x = wrapper.get(Type.BYTE, 0);
-						final int y = wrapper.get(Type.BYTE, 1);
-						final int z = wrapper.get(Type.BYTE, 2);
-
-						replacement.handleOriginalMovementPacket(x / 32.0, y / 32.0, z / 32.0);
-					}
-				});
 			}
 		});
 
@@ -153,18 +137,6 @@ public class EntityPackets {
 				map(Type.BYTE); // yaw
 				map(Type.BYTE); // pitch
 				map(Type.BOOLEAN, Type.NOTHING); // on ground
-				handler(wrapper -> {
-					final EntityTracker tracker = wrapper.user().get(EntityTracker.class);
-
-					final EntityModel<?> replacement = tracker.getEntityReplacement(wrapper.get(Type.INT, 0));
-					if (replacement != null) {
-						wrapper.cancel();
-						final int yaw = wrapper.get(Type.BYTE, 0);
-						final int pitch = wrapper.get(Type.BYTE, 1);
-
-						replacement.setYawPitch(yaw * 360f / 256, pitch * 360f / 256);
-					}
-				});
 			}
 		});
 
@@ -178,23 +150,6 @@ public class EntityPackets {
 				map(Type.BYTE); // yaw
 				map(Type.BYTE); // pitch
 				map(Type.BOOLEAN, Type.NOTHING); // on ground
-				handler(wrapper -> {
-					final EntityTracker tracker = wrapper.user().get(EntityTracker.class);
-
-					final EntityModel<?> replacement = tracker.getEntityReplacement(wrapper.get(Type.INT, 0));
-					if (replacement != null) {
-						wrapper.cancel();
-						final int x = wrapper.get(Type.BYTE, 0);
-						final int y = wrapper.get(Type.BYTE, 1);
-						final int z = wrapper.get(Type.BYTE, 2);
-
-						final int yaw = wrapper.get(Type.BYTE, 3);
-						final int pitch = wrapper.get(Type.BYTE, 4);
-
-						replacement.handleOriginalMovementPacket(x / 32.0, y / 32.0, z / 32.0);
-						replacement.setYawPitch(yaw * 360f / 256, pitch * 360f / 256);
-					}
-				});
 			}
 		});
 
@@ -210,29 +165,12 @@ public class EntityPackets {
 				map(Type.BOOLEAN, Type.NOTHING); // on ground
 				handler(wrapper -> {
 					int entityId = wrapper.get(Type.INT, 0);
-					EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+					EntityTracker1_7_6_10 tracker = wrapper.user().get(EntityTracker1_7_6_10.class);
 					Entity1_10Types.EntityType type = tracker.getEntityMap().get(entityId);
 					if (type == Entity1_10Types.EntityType.MINECART_ABSTRACT) { // TODO | Realign all entities?
 						int y = wrapper.get(Type.INT, 2);
 						y += 12;
 						wrapper.set(Type.INT, 2, y);
-					}
-				});
-				handler(wrapper -> {
-					final EntityTracker tracker = wrapper.user().get(EntityTracker.class);
-
-					final EntityModel<?> replacement = tracker.getEntityReplacement(wrapper.get(Type.INT, 0));
-					if (replacement != null) {
-						wrapper.cancel();
-						final int x = wrapper.get(Type.INT, 1);
-						final int y = wrapper.get(Type.INT, 2);
-						final int z = wrapper.get(Type.INT, 3);
-
-						final int yaw = wrapper.get(Type.BYTE, 0);
-						final int pitch = wrapper.get(Type.BYTE, 1);
-
-						replacement.updateReplacementPosition(x / 32.0, y / 32.0, z / 32.0);
-						replacement.setYawPitch(yaw * 360f / 256, pitch * 360f / 256);
 					}
 				});
 			}
@@ -243,17 +181,6 @@ public class EntityPackets {
 			public void register() {
 				map(Type.VAR_INT, Type.INT); // entity id
 				map(Type.BYTE); // head yaw
-				handler(wrapper -> {
-					final EntityTracker tracker = wrapper.user().get(EntityTracker.class);
-
-					final EntityModel<?> replacement = tracker.getEntityReplacement(wrapper.get(Type.INT, 0));
-					if (replacement != null) {
-						wrapper.cancel();
-						final int yaw = wrapper.get(Type.BYTE, 0);
-
-						replacement.setHeadYaw(yaw * 360f / 256);
-					}
-				});
 			}
 		});
 
@@ -266,7 +193,7 @@ public class EntityPackets {
 				handler(packetWrapper -> {
 					final boolean leash = packetWrapper.get(Type.BOOLEAN, 0);
 					if (!leash) {
-						final EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
+						final EntityTracker1_7_6_10 tracker = packetWrapper.user().get(EntityTracker1_7_6_10.class);
 
 						final int passenger = packetWrapper.get(Type.INT, 0);
 						final int vehicle = packetWrapper.get(Type.INT, 1);
@@ -286,17 +213,14 @@ public class EntityPackets {
 					final int entityId = wrapper.get(Type.INT, 0);
 					final List<Metadata> metadataList = wrapper.get(Types1_7_6_10.METADATA_LIST, 0);
 
-					final EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+					final EntityTracker1_7_6_10 tracker = wrapper.user().get(EntityTracker1_7_6_10.class);
+					if (tracker.getEntityReplacementMap().containsKey(entityId)) {
+						tracker.updateMetadata(entityId, metadataList);
+					}
 					if (tracker.getEntityMap().containsKey(entityId)) {
-						final EntityModel<?> replacement = tracker.getEntityReplacement(entityId);
-						if (replacement != null) {
+						protocol.getMetadataRewriter().transform(tracker.getEntityMap().get(entityId), metadataList);
+						if (metadataList.isEmpty()) {
 							wrapper.cancel();
-							replacement.updateMetadata(metadataList);
-						} else {
-							protocol.getMetadataRewriter().transform(tracker.getEntityMap().get(entityId), metadataList);
-							if (metadataList.isEmpty()) {
-								wrapper.cancel();
-							}
 						}
 					} else {
 						wrapper.cancel();
@@ -330,9 +254,7 @@ public class EntityPackets {
 				map(Type.VAR_INT, Type.INT); // entity id
 				handler(wrapper -> {
 					final int entityId = wrapper.get(Type.INT, 0);
-
-					final EntityTracker tracker = wrapper.user().get(EntityTracker.class);
-					if (tracker.getEntityReplacement(entityId) != null) {
+					if (wrapper.user().get(EntityTracker1_7_6_10.class).getEntityReplacementMap().containsKey(entityId)) {
 						wrapper.cancel();
 						return;
 					}

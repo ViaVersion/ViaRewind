@@ -21,11 +21,13 @@ package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.model.FurnaceData;
 import com.viaversion.viaversion.api.connection.StoredObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.item.Item;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
-public class WindowTracker extends StoredObject {
+public class InventoryTracker extends StoredObject {
 	public final static Map<String, Integer> WINDOW_TYPE_REGISTRY = new HashMap<>();
 
 	static {
@@ -50,7 +52,7 @@ public class WindowTracker extends StoredObject {
 	public short levelCost = 0;
 	public short anvilId = -1;
 
-	public WindowTracker(UserConnection user) {
+	public InventoryTracker(UserConnection user) {
 		super(user);
 	}
 

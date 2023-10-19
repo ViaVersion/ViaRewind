@@ -1,28 +1,10 @@
-/*
- * This file is part of ViaRewind - https://github.com/ViaVersion/ViaRewind
- * Copyright (C) 2016-2023 ViaVersion and contributors
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
-package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.emulator;
+package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.model;
 
 import com.viaversion.viarewind.protocol.protocol1_7_2_5to1_7_6_10.ClientboundPackets1_7_2_5;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.model.EntityModel1_7_6_10;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.metadata.MetaType1_7_6_10;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.rewriter.MetadataRewriter;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.metadata.MetaType1_7_6_10;
 import com.viaversion.viarewind.utils.PacketUtil;
 import com.viaversion.viarewind.utils.math.AABB;
 import com.viaversion.viarewind.utils.math.Vector3d;
@@ -36,11 +18,15 @@ import com.viaversion.viaversion.api.type.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ArmorStandModel extends EntityModel1_7_6_10 {
-	private final int entityId;
-	private final List<Metadata> datawatcher = new ArrayList<>();
-	private int[] entityIds = null;
+public class VirtualHologramEntity {
+	private final List<Metadata> metadataTracker = new ArrayList<>();
 	private double locX, locY, locZ;
+
+	private final UserConnection user;
+	private final MetadataRewriter metadataRewriter;
+	private final int entityId;
+
+	private int[] entityIds = null;
 	private State currentState = null;
 	private boolean invisible = false;
 	private String name = null;
@@ -49,58 +35,53 @@ public class ArmorStandModel extends EntityModel1_7_6_10 {
 	private boolean small = false;
 	private boolean marker = false;
 
-	public ArmorStandModel(UserConnection user, Protocol1_7_6_10To1_8 protocol, int entityId) {
-		super(user, protocol);
+	public VirtualHologramEntity(final UserConnection user, final MetadataRewriter metadataRewriter, final int entityId) {
+		this.user = user;
+		this.metadataRewriter = metadataRewriter;
 		this.entityId = entityId;
 	}
 
-	@Override
-	public int getEntityId() {
-		return this.entityId;
-	}
-
-	@Override
 	public void updateReplacementPosition(double x, double y, double z) {
 		if (x != this.locX || y != this.locY || z != this.locZ) {
 			this.locX = x;
 			this.locY = y;
 			this.locZ = z;
+
 			updateLocation(false);
 		}
 	}
 
-	@Override
 	public void handleOriginalMovementPacket(double x, double y, double z) {
 		if (x == 0.0 && y == 0.0 && z == 0.0) return;
 		this.locX += x;
 		this.locY += y;
 		this.locZ += z;
+
 		updateLocation(false);
 	}
 
-	@Override
 	public void setYawPitch(float yaw, float pitch) {
 		if (this.yaw != yaw && this.pitch != pitch || this.headYaw != yaw) {
 			this.yaw = yaw;
 			this.headYaw = yaw;
 			this.pitch = pitch;
+
 			updateLocation(false);
 		}
 	}
 
-	@Override
 	public void setHeadYaw(float yaw) {
 		if (this.headYaw != yaw) {
 			this.headYaw = yaw;
+
 			updateLocation(false);
 		}
 	}
 
-	@Override
 	public void updateMetadata(List<Metadata> metadataList) {
 		for (Metadata metadata : metadataList) {
-			datawatcher.removeIf(m -> m.id() == metadata.id());
-			datawatcher.add(metadata);
+			metadataTracker.removeIf(m -> m.id() == metadata.id());
+			metadataTracker.add(metadata);
 		}
 		updateState();
 	}
@@ -108,7 +89,7 @@ public class ArmorStandModel extends EntityModel1_7_6_10 {
 	public void updateState() {
 		byte flags = 0;
 		byte armorStandFlags = 0;
-		for (Metadata metadata : datawatcher) {
+		for (Metadata metadata : metadataTracker) {
 			if (metadata.id() == 0 && metadata.metaType() == MetaType1_8.Byte) {
 				flags = ((Number) metadata.getValue()).byteValue();
 			} else if (metadata.id() == 2 && metadata.metaType() == MetaType1_8.String) {
@@ -148,8 +129,50 @@ public class ArmorStandModel extends EntityModel1_7_6_10 {
 		}
 	}
 
+	protected void teleportEntity(final int entityId, final double x, final double y, final double z, final float yaw, final float pitch) {
+		final PacketWrapper entityTeleport = PacketWrapper.create(ClientboundPackets1_7_2_5.ENTITY_TELEPORT, user);
+
+		entityTeleport.write(Type.INT, entityId); // entity id
+		entityTeleport.write(Type.INT, (int) (x * 32.0)); // x
+		entityTeleport.write(Type.INT, (int) (y * 32.0)); // y
+		entityTeleport.write(Type.INT, (int) (z * 32.0)); // z
+		entityTeleport.write(Type.BYTE, (byte) ((yaw / 360f) * 256)); // yaw
+		entityTeleport.write(Type.BYTE, (byte) ((pitch / 360f) * 256)); // pitch
+
+		PacketUtil.sendPacket(entityTeleport, Protocol1_7_6_10To1_8.class, true, true);
+	}
+
+	protected void updateHeadYaw(final int entityId, final float headYaw) {
+		final PacketWrapper entityHeadLook = PacketWrapper.create(ClientboundPackets1_7_2_5.ENTITY_HEAD_LOOK, user);
+
+		entityHeadLook.write(Type.INT, entityId);
+		entityHeadLook.write(Type.BYTE, (byte) ((headYaw / 360f) * 256));
+
+		PacketUtil.sendPacket(entityHeadLook, Protocol1_7_6_10To1_8.class, true, true);
+	}
+
+	protected void spawnEntity(final int entityId, final int type, final double locX, final double locY, final double locZ) {
+		final PacketWrapper spawnMob = PacketWrapper.create(ClientboundPackets1_7_2_5.SPAWN_MOB, null, user);
+
+		spawnMob.write(Type.VAR_INT, entityId); // entity id
+		spawnMob.write(Type.UNSIGNED_BYTE, (short) type); // type
+		spawnMob.write(Type.INT, (int) (locX * 32.0)); // x
+		spawnMob.write(Type.INT, (int) (locY * 32.0)); // y
+		spawnMob.write(Type.INT, (int) (locZ * 32.0)); // z
+		spawnMob.write(Type.BYTE, (byte) 0); // yaw
+		spawnMob.write(Type.BYTE, (byte) 0); // pitch
+		spawnMob.write(Type.BYTE, (byte) 0); // head pitch
+		spawnMob.write(Type.SHORT, (short) 0); // velocity x
+		spawnMob.write(Type.SHORT, (short) 0); // velocity y
+		spawnMob.write(Type.SHORT, (short) 0); // velocity z
+		spawnMob.write(Types1_7_6_10.METADATA_LIST, new ArrayList<>()); // metadata
+
+		PacketUtil.sendPacket(spawnMob, Protocol1_7_6_10To1_8.class, true, true);
+	}
+
 	private void updateZombieLocation() {
-		teleportAndUpdate(entityId, locX, locY, locZ, yaw, pitch, headYaw);
+		teleportEntity(entityId, locX, locY, locZ, yaw, pitch);
+		updateHeadYaw(entityId, headYaw);
 	}
 
 	private void updateHologramLocation(boolean remount) {
@@ -195,12 +218,12 @@ public class ArmorStandModel extends EntityModel1_7_6_10 {
 		metadataPacket.write(Type.INT, entityIds[0]);
 
 		List<Metadata> metadataList = new ArrayList<>();
-		for (Metadata metadata : datawatcher) {
+		for (Metadata metadata : metadataTracker) {
 			if (metadata.id() < 0 || metadata.id() > 9) continue;
 			metadataList.add(new Metadata(metadata.id(), metadata.metaType(), metadata.getValue()));
 		}
 		if (small) metadataList.add(new Metadata(12, MetaType1_8.Byte, (byte) 1));
-		getProtocol().getMetadataRewriter().transform(Entity1_10Types.EntityType.ZOMBIE, metadataList);
+		metadataRewriter.transform(Entity1_10Types.EntityType.ZOMBIE, metadataList);
 
 		metadataPacket.write(Types1_7_6_10.METADATA_LIST, metadataList);
 	}
@@ -216,7 +239,6 @@ public class ArmorStandModel extends EntityModel1_7_6_10 {
 		metadataPacket.write(Types1_7_6_10.METADATA_LIST, metadataList);
 	}
 
-	@Override
 	public void sendSpawnPacket() {
 		if (entityIds != null) deleteEntity();
 
@@ -267,7 +289,6 @@ public class ArmorStandModel extends EntityModel1_7_6_10 {
 		return new AABB(min, max);
 	}
 
-	@Override
 	public void deleteEntity() {
 		if (entityIds == null) return;
 		PacketWrapper despawn = PacketWrapper.create(ClientboundPackets1_7_2_5.DESTROY_ENTITIES, null, user);
@@ -281,5 +302,9 @@ public class ArmorStandModel extends EntityModel1_7_6_10 {
 
 	private enum State {
 		HOLOGRAM, ZOMBIE
+	}
+
+	public int getEntityId() {
+		return entityId;
 	}
 }

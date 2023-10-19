@@ -2,7 +2,7 @@ package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.task;
 
 import com.viaversion.viarewind.ViaRewind;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.PlayerPositionTracker;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.PlayerSessionStorage;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.WorldBorderEmulator;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
@@ -21,7 +21,7 @@ public class WorldBorderUpdateTask implements Runnable {
 			final WorldBorderEmulator worldBorderEmulatorTracker = connection.get(WorldBorderEmulator.class);
 			if (!worldBorderEmulatorTracker.isInit()) continue;
 
-			final PlayerPositionTracker position = connection.get(PlayerPositionTracker.class);
+			final PlayerSessionStorage playerSession = connection.get(PlayerSessionStorage.class);
 
 			double radius = worldBorderEmulatorTracker.getSize() / 2.0;
 
@@ -30,13 +30,13 @@ public class WorldBorderUpdateTask implements Runnable {
 				double pos;
 				double center;
 				if (side.modX != 0) {
-					pos = position.getPosZ();
+					pos = playerSession.getPosZ();
 					center = worldBorderEmulatorTracker.getZ();
-					d = Math.abs(worldBorderEmulatorTracker.getX() + radius * side.modX - position.getPosX());
+					d = Math.abs(worldBorderEmulatorTracker.getX() + radius * side.modX - playerSession.getPosX());
 				} else {
 					center = worldBorderEmulatorTracker.getX();
-					pos = position.getPosX();
-					d = Math.abs(worldBorderEmulatorTracker.getZ() + radius * side.modZ - position.getPosZ());
+					pos = playerSession.getPosX();
+					d = Math.abs(worldBorderEmulatorTracker.getZ() + radius * side.modZ - playerSession.getPosZ());
 				}
 				if (d >= VIEW_DISTANCE) continue;
 
@@ -44,8 +44,8 @@ public class WorldBorderUpdateTask implements Runnable {
 
 				double minH = Math.ceil(pos - r);
 				double maxH = Math.floor(pos + r);
-				double minV = Math.ceil(position.getPosY() - r);
-				double maxV = Math.floor(position.getPosY() + r);
+				double minV = Math.ceil(playerSession.getPosY() - r);
+				double maxV = Math.floor(playerSession.getPosY() + r);
 
 				if (minH < center - radius) minH = Math.ceil(center - radius);
 				if (maxH > center + radius) maxH = Math.floor(center + radius);
