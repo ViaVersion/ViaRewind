@@ -20,7 +20,7 @@ package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.metadata;
 
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
-import com.viaversion.viaversion.api.type.types.minecraft.MetaListTypeTemplate;
+import com.viaversion.viaversion.api.type.types.metadata.MetaListTypeTemplate;
 import io.netty.buffer.ByteBuf;
 
 import java.util.ArrayList;

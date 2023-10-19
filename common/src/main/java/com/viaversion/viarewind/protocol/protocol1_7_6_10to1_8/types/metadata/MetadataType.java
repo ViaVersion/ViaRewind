@@ -19,7 +19,7 @@
 package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.metadata;
 
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
-import com.viaversion.viaversion.api.type.types.minecraft.MetaTypeTemplate;
+import com.viaversion.viaversion.api.type.types.metadata.MetaTypeTemplate;
 import io.netty.buffer.ByteBuf;
 
 public class MetadataType extends MetaTypeTemplate {

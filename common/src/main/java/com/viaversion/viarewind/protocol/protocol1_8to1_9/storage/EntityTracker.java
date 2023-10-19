@@ -24,7 +24,7 @@ import com.viaversion.viaversion.api.connection.StoredObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.entity.ClientEntityIdChangeListener;
 import com.viaversion.viaversion.api.minecraft.Vector;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
@@ -39,7 +39,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class EntityTracker extends StoredObject implements ClientEntityIdChangeListener {
 	protected final Protocol1_8To1_9 protocol;
 	private final Map<Integer, List<Integer>> vehicleMap = new ConcurrentHashMap<>();
-	private final Map<Integer, Entity1_10Types.EntityType> clientEntityTypes = new ConcurrentHashMap<>();
+	private final Map<Integer, EntityTypes1_10.EntityType> clientEntityTypes = new ConcurrentHashMap<>();
 	private final Map<Integer, List<Metadata>> metadataBuffer = new ConcurrentHashMap<>();
 	private final Map<Integer, EntityModel> entityReplacements = new ConcurrentHashMap<>();
 	private final Map<Integer, Vector> entityOffsets = new ConcurrentHashMap<>();
@@ -121,7 +121,7 @@ public class EntityTracker extends StoredObject implements ClientEntityIdChangeL
 		return entityReplacements.get(entityId);
 	}
 
-	public Map<Integer, Entity1_10Types.EntityType> getClientEntityTypes() {
+	public Map<Integer, EntityTypes1_10.EntityType> getClientEntityTypes() {
 		return this.clientEntityTypes;
 	}
 
@@ -180,6 +180,6 @@ public class EntityTracker extends StoredObject implements ClientEntityIdChangeL
 	public void setClientEntityId(int playerEntityId) {
 		clientEntityTypes.remove(this.playerId);
 		this.playerId = playerEntityId;
-		clientEntityTypes.put(this.playerId, Entity1_10Types.EntityType.ENTITY_HUMAN);
+		clientEntityTypes.put(this.playerId, EntityTypes1_10.EntityType.ENTITY_HUMAN);
 	}
 }

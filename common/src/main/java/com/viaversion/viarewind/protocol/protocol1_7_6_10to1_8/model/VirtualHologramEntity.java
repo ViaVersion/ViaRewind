@@ -9,7 +9,7 @@ import com.viaversion.viarewind.utils.PacketUtil;
 import com.viaversion.viarewind.utils.math.AABB;
 import com.viaversion.viarewind.utils.math.Vector3d;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_8;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
@@ -223,7 +223,7 @@ public class VirtualHologramEntity {
 			metadataList.add(new Metadata(metadata.id(), metadata.metaType(), metadata.getValue()));
 		}
 		if (small) metadataList.add(new Metadata(12, MetaType1_8.Byte, (byte) 1));
-		metadataRewriter.transform(Entity1_10Types.EntityType.ZOMBIE, metadataList);
+		metadataRewriter.transform(EntityTypes1_10.EntityType.ZOMBIE, metadataList);
 
 		metadataPacket.write(Types1_7_6_10.METADATA_LIST, metadataList);
 	}
