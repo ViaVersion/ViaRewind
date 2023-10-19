@@ -125,6 +125,7 @@ public class Protocol1_7_6_10To1_8 extends AbstractProtocol<ClientboundPackets1_
 		userConnection.put(new Scoreboard(userConnection));
 		userConnection.put(new CompressionStatusTracker(userConnection));
 		userConnection.put(new WorldBorderEmulator(userConnection));
+
 		if (!userConnection.has(ClientWorld.class)) {
 			userConnection.put(new ClientWorld(userConnection));
 		}

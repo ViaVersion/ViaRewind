@@ -5,7 +5,7 @@ import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.metadata.Me
 import com.viaversion.viaversion.api.connection.StoredObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.entity.ClientEntityIdChangeListener;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.util.Pair;
@@ -15,10 +15,10 @@ import java.util.List;
 import java.util.Map;
 
 public class ReplacementEntityTracker extends StoredObject implements ClientEntityIdChangeListener {
-	private final Map<Entity1_10Types.EntityType, Pair<Entity1_10Types.EntityType, String>> ENTITY_REPLACEMENTS = new HashMap<>();
+	private final Map<EntityTypes1_10.EntityType, Pair<EntityTypes1_10.EntityType, String>> ENTITY_REPLACEMENTS = new HashMap<>();
 
-	private final Map<Integer, Entity1_10Types.EntityType> entityMap = new HashMap<>();
-	private final Map<Integer, Entity1_10Types.EntityType> entityReplacementMap = new HashMap<>();
+	private final Map<Integer, EntityTypes1_10.EntityType> entityMap = new HashMap<>();
+	private final Map<Integer, EntityTypes1_10.EntityType> entityReplacementMap = new HashMap<>();
 
 	private int playerId;
 
@@ -29,15 +29,15 @@ public class ReplacementEntityTracker extends StoredObject implements ClientEnti
 		this.version = version;
 	}
 
-	public void registerEntity(final Entity1_10Types.EntityType oldType, final Entity1_10Types.EntityType newType, final String name) {
+	public void registerEntity(final EntityTypes1_10.EntityType oldType, final EntityTypes1_10.EntityType newType, final String name) {
 		ENTITY_REPLACEMENTS.put(oldType, new Pair<>(newType, this.version.getName() + " " + name));
 	}
 
-	public void addEntity(final int entityId, final Entity1_10Types.EntityType type) {
+	public void addEntity(final int entityId, final EntityTypes1_10.EntityType type) {
 		entityMap.put(entityId, type);
 	}
 
-	public int replaceEntity(final int entityId, final Entity1_10Types.EntityType type) {
+	public int replaceEntity(final int entityId, final EntityTypes1_10.EntityType type) {
 		entityReplacementMap.put(entityId, type);
 
 		return ENTITY_REPLACEMENTS.get(type).key().getId();
@@ -53,7 +53,7 @@ public class ReplacementEntityTracker extends StoredObject implements ClientEnti
 		entityReplacementMap.clear();
 	}
 
-	public boolean isReplaced(final Entity1_10Types.EntityType type) {
+	public boolean isReplaced(final EntityTypes1_10.EntityType type) {
 		return ENTITY_REPLACEMENTS.containsKey(type);
 	}
 
@@ -67,16 +67,16 @@ public class ReplacementEntityTracker extends StoredObject implements ClientEnti
 	@Override
 	public void setClientEntityId(int entityId) {
 		removeEntity(this.playerId);
-		addEntity(entityId, Entity1_10Types.EntityType.ENTITY_HUMAN);
+		addEntity(entityId, EntityTypes1_10.EntityType.ENTITY_HUMAN);
 
 		this.playerId = entityId;
 	}
 
-	public Map<Integer, Entity1_10Types.EntityType> getEntityMap() {
+	public Map<Integer, EntityTypes1_10.EntityType> getEntityMap() {
 		return entityMap;
 	}
 
-	public Map<Integer, Entity1_10Types.EntityType> getEntityReplacementMap() {
+	public Map<Integer, EntityTypes1_10.EntityType> getEntityReplacementMap() {
 		return entityReplacementMap;
 	}
 

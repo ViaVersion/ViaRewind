@@ -234,7 +234,7 @@ public class SpawnPackets {
 				map(Type.VAR_INT); // entity id
 				map(Type.STRING); // title
 				handler(wrapper -> {
-					final Position position = wrapper.read(Type.POSITION);
+					final Position position = wrapper.read(Type.POSITION1_8);
 
 					wrapper.write(Type.INT, position.x());
 					wrapper.write(Type.INT, position.y());

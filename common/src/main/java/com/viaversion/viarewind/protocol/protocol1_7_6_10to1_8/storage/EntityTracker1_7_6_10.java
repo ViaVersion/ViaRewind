@@ -6,7 +6,7 @@ import com.viaversion.viarewind.protocol.protocol1_7_2_5to1_7_6_10.ServerboundPa
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.model.VirtualHologramEntity;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.type.Type;
@@ -31,9 +31,9 @@ public class EntityTracker1_7_6_10 extends ReplacementEntityTracker {
 	public EntityTracker1_7_6_10(UserConnection user) {
 		super(user, ProtocolVersion.v1_8);
 
-		registerEntity(Entity1_10Types.EntityType.GUARDIAN, Entity1_10Types.EntityType.SQUID, "Guardian");
-		registerEntity(Entity1_10Types.EntityType.ENDERMITE, Entity1_10Types.EntityType.SQUID, "Endermite");
-		registerEntity(Entity1_10Types.EntityType.RABBIT, Entity1_10Types.EntityType.CHICKEN, "Rabbit");
+		registerEntity(EntityTypes1_10.EntityType.GUARDIAN, EntityTypes1_10.EntityType.SQUID, "Guardian");
+		registerEntity(EntityTypes1_10.EntityType.ENDERMITE, EntityTypes1_10.EntityType.SQUID, "Endermite");
+		registerEntity(EntityTypes1_10.EntityType.RABBIT, EntityTypes1_10.EntityType.CHICKEN, "Rabbit");
 	}
 
 	@Override
