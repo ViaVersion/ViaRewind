@@ -22,7 +22,6 @@ public class PlayerSessionStorage extends StoredObject {
 	public double receivedPosY;
 	public float yaw, pitch;
 	public boolean onGround;
-	public boolean positionPacketReceived;
 
 	// Player inventory
 	private final Map<UUID, Item[]> playerEquipment = new HashMap<>();

@@ -113,7 +113,19 @@ public class Protocol1_7_6_10To1_8 extends AbstractProtocol<ClientboundPackets1_
 	public void transform(Direction direction, State state, PacketWrapper packetWrapper) throws Exception {
 		Via.getManager().getProviders().get(CompressionHandlerProvider.class).onTransformPacket(packetWrapper.user());
 
+//		if (direction == Direction.CLIENTBOUND) {
+//			System.out.println("Pre: " + direction + " " + state + " " + packetWrapper.getId() + " " + ClientboundPackets1_8.values()[packetWrapper.getId()].getName() + ": " + packetWrapper);
+//		} else {
+//			System.out.println("Pre: " + direction + " " + state + " " + packetWrapper.getId() + " " + ServerboundPackets1_7_2_5.values()[packetWrapper.getId()].getName() + ": " + packetWrapper);
+//		}
+
 		super.transform(direction, state, packetWrapper);
+
+//		if (direction == Direction.CLIENTBOUND) {
+//			System.out.println("Post: " + direction + " " + state + " " + packetWrapper.getId() + " " + ClientboundPackets1_7_2_5.values()[packetWrapper.getId()].getName() + ": " + packetWrapper);
+//		} else {
+//			System.out.println("Post: " + direction + " " + state + " " + packetWrapper.getId() + " " + ServerboundPackets1_8.values()[packetWrapper.getId()].getName() + ": " + packetWrapper);
+//		}
 	}
 
 	@Override

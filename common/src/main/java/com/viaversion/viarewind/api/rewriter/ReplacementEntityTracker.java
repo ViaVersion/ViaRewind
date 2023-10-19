@@ -20,7 +20,7 @@ public class ReplacementEntityTracker extends StoredObject implements ClientEnti
 	private final Map<Integer, EntityTypes1_10.EntityType> entityMap = new HashMap<>();
 	private final Map<Integer, EntityTypes1_10.EntityType> entityReplacementMap = new HashMap<>();
 
-	private int playerId;
+	private int playerId = -1;
 
 	private final ProtocolVersion version;
 

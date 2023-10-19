@@ -161,8 +161,6 @@ public class PlayerPackets {
 					final float pitch = wrapper.get(Type.FLOAT, 1);
 
 					final PlayerSessionStorage playerSession = wrapper.user().get(PlayerSessionStorage.class);
-					playerSession.positionPacketReceived = true;
-
 					final int flags = wrapper.read(Type.BYTE);
 
 					// x, y, and z

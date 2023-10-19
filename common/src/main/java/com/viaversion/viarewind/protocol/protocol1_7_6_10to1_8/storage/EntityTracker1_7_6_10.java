@@ -55,6 +55,12 @@ public class EntityTracker1_7_6_10 extends ReplacementEntityTracker {
 		vehicleMap.clear();
 	}
 
+	@Override
+	public void setClientEntityId(int entityId) {
+		super.setClientEntityId(entityId);
+		spectatingPlayerId = entityId;
+	}
+
 	public void addPlayer(final Integer entityId, final UUID uuid) {
 		playersByUniqueId.put(uuid, entityId);
 		playersByEntityId.put(entityId, uuid);
