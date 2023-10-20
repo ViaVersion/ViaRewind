@@ -20,8 +20,7 @@ package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.chunk;
 
 import com.viaversion.viarewind.api.minecraft.ExtendedBlockStorage;
 import com.viaversion.viaversion.api.minecraft.chunks.*;
-import com.viaversion.viaversion.api.type.PartialType;
-import com.viaversion.viaversion.api.minecraft.ClientWorld;
+import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.util.Pair;
 import io.netty.buffer.ByteBuf;
 
@@ -29,19 +28,21 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.zip.Deflater;
 
-public class Chunk1_7_6_10Type extends PartialType<Chunk, ClientWorld> {
+public class ChunkType1_7_6 extends Type<Chunk> {
 
-	public Chunk1_7_6_10Type(ClientWorld param) {
-		super(param, Chunk.class);
+	public final static ChunkType1_7_6 TYPE = new ChunkType1_7_6();
+
+	public ChunkType1_7_6() {
+		super(Chunk.class);
 	}
 
 	@Override
-	public Chunk read(ByteBuf byteBuf, ClientWorld clientWorld) throws Exception {
+	public Chunk read(ByteBuf byteBuf) throws Exception {
 		throw new UnsupportedOperationException(); // Not needed, see https://github.com/ViaVersion/ViaLegacy/blob/main/src/main/java/net/raphimc/vialegacy/protocols/release/protocol1_8to1_7_6_10/types/Chunk1_7_6Type.java
 	}
 
 	@Override
-	public void write(ByteBuf output, ClientWorld clientWorld, Chunk chunk) throws Exception {
+	public void write(ByteBuf output, Chunk chunk) throws Exception {
 		final Pair<byte[], Short> chunkData = serialize(chunk);
 		final byte[] data = chunkData.key();
 		final short additionalBitMask = chunkData.value();
