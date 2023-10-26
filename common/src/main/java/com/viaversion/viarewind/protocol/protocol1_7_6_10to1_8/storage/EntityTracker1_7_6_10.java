@@ -150,11 +150,11 @@ public class EntityTracker1_7_6_10 extends ReplacementEntityTracker {
 		}
 	}
 
-	public boolean setSpectating(int spectating) {
+	public void setSpectating(int spectating) {
 		if (spectating != this.getPlayerId() && getPassenger(spectating) != -1) {
 			startSneaking();
 			setSpectating(this.getPlayerId());
-			return false;
+			return;
 		}
 		if (this.spectatingPlayerId != spectating && this.spectatingPlayerId != this.getPlayerId()) {
 			attachEntity(-1);
@@ -163,11 +163,6 @@ public class EntityTracker1_7_6_10 extends ReplacementEntityTracker {
 		if (spectating != this.getPlayerId()) {
 			attachEntity(this.spectatingPlayerId);
 		}
-		return true;
-	}
-
-	public Map<Integer, Integer> getVehicleMap() {
-		return vehicleMap;
 	}
 
 	public Map<Integer, VirtualHologramEntity> getVirtualHologramMap() {

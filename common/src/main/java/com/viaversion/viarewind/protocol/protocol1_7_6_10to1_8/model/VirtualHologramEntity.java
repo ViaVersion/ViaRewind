@@ -1,3 +1,21 @@
+/*
+ * This file is part of ViaRewind - https://github.com/ViaVersion/ViaRewind
+ * Copyright (C) 2016-2023 ViaVersion and contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.model;
 
 import com.viaversion.viarewind.protocol.protocol1_7_2_5to1_7_6_10.ClientboundPackets1_7_2_5;
@@ -6,8 +24,6 @@ import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.rewriter.Metadata
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.metadata.MetaType1_7_6_10;
 import com.viaversion.viarewind.utils.PacketUtil;
-import com.viaversion.viarewind.utils.math.AABB;
-import com.viaversion.viarewind.utils.math.Vector3d;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
@@ -42,47 +58,53 @@ public class VirtualHologramEntity {
 	}
 
 	public void updateReplacementPosition(double x, double y, double z) {
-		if (x != this.locX || y != this.locY || z != this.locZ) {
-			this.locX = x;
-			this.locY = y;
-			this.locZ = z;
-
-			updateLocation(false);
+		if (x == this.locX && y == this.locY && z == this.locZ) {
+			return;
 		}
+
+		this.locX = x;
+		this.locY = y;
+		this.locZ = z;
+		updateLocation(false);
 	}
 
 	public void handleOriginalMovementPacket(double x, double y, double z) {
-		if (x == 0.0 && y == 0.0 && z == 0.0) return;
+		if (x == 0.0 && y == 0.0 && z == 0.0) {
+			return;
+		}
+
 		this.locX += x;
 		this.locY += y;
 		this.locZ += z;
-
 		updateLocation(false);
 	}
 
 	public void setYawPitch(float yaw, float pitch) {
-		if (this.yaw != yaw && this.pitch != pitch || this.headYaw != yaw) {
-			this.yaw = yaw;
-			this.headYaw = yaw;
-			this.pitch = pitch;
-
-			updateLocation(false);
+		if (this.yaw == yaw || this.headYaw == yaw || this.pitch == pitch) {
+			return;
 		}
+
+		this.yaw = yaw;
+		this.headYaw = yaw;
+		this.pitch = pitch;
+		updateLocation(false);
 	}
 
 	public void setHeadYaw(float yaw) {
-		if (this.headYaw != yaw) {
-			this.headYaw = yaw;
-
-			updateLocation(false);
+		if (this.headYaw == yaw) {
+			return;
 		}
+
+		this.headYaw = yaw;
+		updateLocation(false);
 	}
 
-	public void updateMetadata(List<Metadata> metadataList) {
+	public void updateMetadata(final List<Metadata> metadataList) {
 		for (Metadata metadata : metadataList) {
 			metadataTracker.removeIf(m -> m.id() == metadata.id());
 			metadataTracker.add(metadata);
 		}
+
 		updateState();
 	}
 

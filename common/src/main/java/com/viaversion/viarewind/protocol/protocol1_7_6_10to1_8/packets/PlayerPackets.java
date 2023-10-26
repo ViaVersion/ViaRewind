@@ -168,7 +168,7 @@ public class PlayerPackets {
 					if ((flags & 0x02) == 0x02) y += playerSession.getPosY();
 
 					playerSession.receivedPosY = y;
-					wrapper.set(Type.DOUBLE, 1, y + 1.92F);
+					wrapper.set(Type.DOUBLE, 1, y + 1.62F);
 
 					if ((flags & 0x04) == 0x04) wrapper.set(Type.DOUBLE, 2, z + playerSession.getPosZ());
 
