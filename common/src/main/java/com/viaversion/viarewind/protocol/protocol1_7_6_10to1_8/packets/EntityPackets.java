@@ -43,7 +43,7 @@ public class EntityPackets {
 			public void register() {
 				map(Type.VAR_INT, Type.INT); // entity id
 				map(Type.SHORT); // slot
-				map(Type.ITEM, Types1_7_6_10.COMPRESSED_NBT_ITEM); // item
+				map(Type.ITEM1_8, Types1_7_6_10.COMPRESSED_NBT_ITEM); // item
 
 				// remap item
 				handler(wrapper -> {

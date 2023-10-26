@@ -326,8 +326,8 @@ public class EntityPackets {
 					}
 					packetWrapper.write(Type.SHORT, (short) slot);
 				});
-				map(Type.ITEM);
-				handler(packetWrapper -> packetWrapper.set(Type.ITEM, 0, protocol.getItemRewriter().handleItemToClient(packetWrapper.get(Type.ITEM, 0))));
+				map(Type.ITEM1_8);
+				handler(packetWrapper -> packetWrapper.set(Type.ITEM1_8, 0, protocol.getItemRewriter().handleItemToClient(packetWrapper.get(Type.ITEM1_8, 0))));
 			}
 		});
 

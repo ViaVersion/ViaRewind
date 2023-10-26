@@ -99,12 +99,12 @@ public class PlayerPackets {
 						final ItemRewriter<?> itemRewriter = protocol.getItemRewriter();
 
 						for (int i = 0; i < size; i++) {
-							packetWrapper.write(Type.ITEM, itemRewriter.handleItemToClient(packetWrapper.read(Type.ITEM))); //Buy Item 1
-							packetWrapper.write(Type.ITEM, itemRewriter.handleItemToClient(packetWrapper.read(Type.ITEM))); //Buy Item 3
+							packetWrapper.write(Type.ITEM1_8, itemRewriter.handleItemToClient(packetWrapper.read(Type.ITEM1_8))); //Buy Item 1
+							packetWrapper.write(Type.ITEM1_8, itemRewriter.handleItemToClient(packetWrapper.read(Type.ITEM1_8))); //Buy Item 3
 
 							boolean has3Items = packetWrapper.passthrough(Type.BOOLEAN);
 							if (has3Items) {
-								packetWrapper.write(Type.ITEM, itemRewriter.handleItemToClient(packetWrapper.read(Type.ITEM))); //Buy Item 2
+								packetWrapper.write(Type.ITEM1_8, itemRewriter.handleItemToClient(packetWrapper.read(Type.ITEM1_8))); //Buy Item 2
 							}
 
 							packetWrapper.passthrough(Type.BOOLEAN); //Unavailable

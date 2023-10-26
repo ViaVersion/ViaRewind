@@ -83,7 +83,7 @@ public class Windows extends StoredObject {
 			PacketWrapper setSlot = PacketWrapper.create(ClientboundPackets1_8.SET_SLOT, user);
 			setSlot.write(Type.UNSIGNED_BYTE, windowId);
 			setSlot.write(Type.SHORT, (short) i);
-			setSlot.write(Type.ITEM, items[i]);
+			setSlot.write(Type.ITEM1_8, items[i]);
 			PacketUtil.sendPacket(setSlot, Protocol1_8To1_9.class);
 		}
 	}

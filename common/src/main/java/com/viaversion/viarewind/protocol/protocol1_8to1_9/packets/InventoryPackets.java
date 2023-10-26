@@ -78,7 +78,7 @@ public class InventoryPackets {
 				map(Type.UNSIGNED_BYTE);
 				handler(packetWrapper -> {
 					short windowId = packetWrapper.get(Type.UNSIGNED_BYTE, 0);
-					Item[] items = packetWrapper.read(Type.ITEM_ARRAY);
+					Item[] items = packetWrapper.read(Type.ITEM1_8_SHORT_ARRAY);
 					for (int i = 0; i < items.length; i++) {
 						items[i] = protocol.getItemRewriter().handleItemToClient(items[i]);
 					}
@@ -97,7 +97,7 @@ public class InventoryPackets {
 							System.arraycopy(old, 5, items, 4, old.length - 5);
 						}
 					}
-					packetWrapper.write(Type.ITEM_ARRAY, items);
+					packetWrapper.write(Type.ITEM1_8_SHORT_ARRAY, items);
 				});
 			}
 		});
@@ -110,9 +110,9 @@ public class InventoryPackets {
 			public void register() {
 				map(Type.UNSIGNED_BYTE);
 				map(Type.SHORT);
-				map(Type.ITEM);
+				map(Type.ITEM1_8);
 				handler(packetWrapper -> {
-					packetWrapper.set(Type.ITEM, 0, protocol.getItemRewriter().handleItemToClient(packetWrapper.get(Type.ITEM, 0)));
+					packetWrapper.set(Type.ITEM1_8, 0, protocol.getItemRewriter().handleItemToClient(packetWrapper.get(Type.ITEM1_8, 0)));
 					byte windowId = packetWrapper.get(Type.UNSIGNED_BYTE, 0).byteValue();
 					short slot = packetWrapper.get(Type.SHORT, 0);
 					if (windowId == 0 && slot == 45) {
@@ -126,9 +126,9 @@ public class InventoryPackets {
 							packetWrapper.set(Type.SHORT, 0, slot -= 1);
 						} else if (slot == 4) {
 							packetWrapper.cancel();
-							Windows.updateBrewingStand(packetWrapper.user(), packetWrapper.get(Type.ITEM, 0), windowId);
+							Windows.updateBrewingStand(packetWrapper.user(), packetWrapper.get(Type.ITEM1_8, 0), windowId);
 						} else {
-							packetWrapper.user().get(Windows.class).getBrewingItems(windowId)[slot] = packetWrapper.get(Type.ITEM, 0);
+							packetWrapper.user().get(Windows.class).getBrewingItems(windowId)[slot] = packetWrapper.get(Type.ITEM1_8, 0);
 						}
 					}
 				});
@@ -158,8 +158,8 @@ public class InventoryPackets {
 				map(Type.BYTE);
 				map(Type.SHORT);
 				map(Type.BYTE, Type.VAR_INT);
-				map(Type.ITEM);
-				handler(packetWrapper -> packetWrapper.set(Type.ITEM, 0, protocol.getItemRewriter().handleItemToServer(packetWrapper.get(Type.ITEM, 0))));
+				map(Type.ITEM1_8);
+				handler(packetWrapper -> packetWrapper.set(Type.ITEM1_8, 0, protocol.getItemRewriter().handleItemToServer(packetWrapper.get(Type.ITEM1_8, 0))));
 				handler(packetWrapper -> {
 					short windowId = packetWrapper.get(Type.UNSIGNED_BYTE, 0);
 					Windows windows = packetWrapper.user().get(Windows.class);
@@ -179,8 +179,8 @@ public class InventoryPackets {
 			@Override
 			public void register() {
 				map(Type.SHORT);
-				map(Type.ITEM);
-				handler(packetWrapper -> packetWrapper.set(Type.ITEM, 0, protocol.getItemRewriter().handleItemToServer(packetWrapper.get(Type.ITEM, 0))));
+				map(Type.ITEM1_8);
+				handler(packetWrapper -> packetWrapper.set(Type.ITEM1_8, 0, protocol.getItemRewriter().handleItemToServer(packetWrapper.get(Type.ITEM1_8, 0))));
 			}
 		});
 	}

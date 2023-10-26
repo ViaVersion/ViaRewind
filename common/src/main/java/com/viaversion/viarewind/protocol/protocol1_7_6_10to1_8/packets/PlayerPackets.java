@@ -410,15 +410,15 @@ public class PlayerPackets {
 						}
 
 						for (int i = 0; i < size; i++) {
-							Item item = protocol.getItemRewriter().handleItemToClient(packetWrapper.read(Type.ITEM));
+							Item item = protocol.getItemRewriter().handleItemToClient(packetWrapper.read(Type.ITEM1_8));
 							packetWrapper.write(Types1_7_6_10.COMPRESSED_NBT_ITEM, item); //Buy Item 1
 
-							item = protocol.getItemRewriter().handleItemToClient(packetWrapper.read(Type.ITEM));
+							item = protocol.getItemRewriter().handleItemToClient(packetWrapper.read(Type.ITEM1_8));
 							packetWrapper.write(Types1_7_6_10.COMPRESSED_NBT_ITEM, item); //Buy Item 3
 
 							boolean has3Items = packetWrapper.passthrough(Type.BOOLEAN);
 							if (has3Items) {
-								item = protocol.getItemRewriter().handleItemToClient(packetWrapper.read(Type.ITEM));
+								item = protocol.getItemRewriter().handleItemToClient(packetWrapper.read(Type.ITEM1_8));
 								packetWrapper.write(Types1_7_6_10.COMPRESSED_NBT_ITEM, item); //Buy Item 2
 							}
 
@@ -676,7 +676,7 @@ public class PlayerPackets {
 					packetWrapper.passthrough(Type.BYTE);  //Direction
 					Item item = packetWrapper.read(Types1_7_6_10.COMPRESSED_NBT_ITEM);
 					item = protocol.getItemRewriter().handleItemToServer(item);
-					packetWrapper.write(Type.ITEM, item);
+					packetWrapper.write(Type.ITEM1_8, item);
 
 					for (int i = 0; i < 3; i++) {
 						packetWrapper.passthrough(Type.BYTE);
@@ -890,7 +890,7 @@ public class PlayerPackets {
 									page.setValue(value);
 								}
 							}
-							packetWrapper.write(Type.ITEM, book);
+							packetWrapper.write(Type.ITEM1_8, book);
 							break;
 						}
 						case "MC|Brand": {

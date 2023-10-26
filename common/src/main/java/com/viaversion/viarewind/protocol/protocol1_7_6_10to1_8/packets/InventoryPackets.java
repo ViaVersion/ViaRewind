@@ -86,7 +86,7 @@ public class InventoryPackets {
 					}
 				});
 
-				map(Type.ITEM, Types1_7_6_10.COMPRESSED_NBT_ITEM); // item
+				map(Type.ITEM1_8, Types1_7_6_10.COMPRESSED_NBT_ITEM); // item
 
 				// remap item
 				handler(wrapper -> {
@@ -123,7 +123,7 @@ public class InventoryPackets {
 				handler(wrapper -> {
 					final short windowType = wrapper.user().get(InventoryTracker.class).get(wrapper.get(Type.UNSIGNED_BYTE, 0));
 
-					Item[] items = wrapper.read(Type.ITEM_ARRAY);
+					Item[] items = wrapper.read(Type.ITEM1_8_SHORT_ARRAY);
 					if (windowType == 4) { // Enchantment Table
 						Item[] old = items;
 						items = new Item[old.length - 1];
@@ -240,13 +240,13 @@ public class InventoryPackets {
 				map(Type.BYTE); // button
 				map(Type.SHORT); // action number
 				map(Type.BYTE); // mode
-				map(Types1_7_6_10.COMPRESSED_NBT_ITEM, Type.ITEM); // clicked item
+				map(Types1_7_6_10.COMPRESSED_NBT_ITEM, Type.ITEM1_8); // clicked item
 
 				// remap item
 				handler(wrapper -> {
-					final Item item = wrapper.get(Type.ITEM, 0);
+					final Item item = wrapper.get(Type.ITEM1_8, 0);
 					protocol.getItemRewriter().handleItemToServer(item);
-					wrapper.set(Type.ITEM, 0, item);
+					wrapper.set(Type.ITEM1_8, 0, item);
 				});
 			}
 		});
@@ -255,13 +255,13 @@ public class InventoryPackets {
 			@Override
 			public void register() {
 				map(Type.SHORT); // slot
-				map(Types1_7_6_10.COMPRESSED_NBT_ITEM, Type.ITEM); // item
+				map(Types1_7_6_10.COMPRESSED_NBT_ITEM, Type.ITEM1_8); // item
 
 				// remap item
 				handler(wrapper -> {
-					final Item item = wrapper.get(Type.ITEM, 0);
+					final Item item = wrapper.get(Type.ITEM1_8, 0);
 					protocol.getItemRewriter().handleItemToServer(item);
-					wrapper.set(Type.ITEM, 0, item);
+					wrapper.set(Type.ITEM1_8, 0, item);
 				});
 			}
 		});
