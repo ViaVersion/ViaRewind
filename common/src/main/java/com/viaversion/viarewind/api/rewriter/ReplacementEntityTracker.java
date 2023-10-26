@@ -64,6 +64,10 @@ public class ReplacementEntityTracker extends StoredObject implements ClientEnti
 		metadata.add(new Metadata(MetaIndex1_7_6_10To1_8.ENTITY_LIVING_NAME_TAG.getNewIndex(), MetaType1_7_6_10.String, name));
 	}
 
+	public void setPlayerId(int playerId) {
+		this.playerId = playerId;
+	}
+
 	@Override
 	public void setClientEntityId(int entityId) {
 		removeEntity(this.playerId);

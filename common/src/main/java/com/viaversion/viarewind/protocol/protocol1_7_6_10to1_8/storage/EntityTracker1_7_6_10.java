@@ -80,8 +80,16 @@ public class EntityTracker1_7_6_10 extends ReplacementEntityTracker {
 
 	@Override
 	public void setClientEntityId(int entityId) {
+		if (this.spectatingPlayerId == this.getPlayerId()) {
+			this.spectatingPlayerId = entityId;
+		}
 		super.setClientEntityId(entityId);
-		spectatingPlayerId = entityId;
+	}
+
+	@Override
+	public void setPlayerId(int playerId) {
+		super.setPlayerId(playerId);
+		this.spectatingPlayerId = playerId;
 	}
 
 	public void addPlayer(final Integer entityId, final UUID uuid) {

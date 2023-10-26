@@ -72,7 +72,7 @@ public class PlayerPackets {
 					}
 
 					final EntityTracker1_7_6_10 tracker = wrapper.user().get(EntityTracker1_7_6_10.class);
-					tracker.setClientEntityId(wrapper.get(Type.INT, 0));
+					tracker.setPlayerId(wrapper.get(Type.INT, 0));
 					tracker.addPlayer(wrapper.get(Type.INT, 0), wrapper.user().getProtocolInfo().getUuid());
 
 					wrapper.user().get(PlayerSessionStorage.class).gameMode = wrapper.get(Type.UNSIGNED_BYTE, 0);
