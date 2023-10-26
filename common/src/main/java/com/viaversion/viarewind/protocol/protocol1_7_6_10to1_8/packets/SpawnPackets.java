@@ -20,6 +20,7 @@ package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.packets;
 
 import com.viaversion.viarewind.protocol.protocol1_7_2_5to1_7_6_10.ClientboundPackets1_7_2_5;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.model.VirtualHologramEntity;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.GameProfileStorage;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.EntityTracker1_7_6_10;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
@@ -114,6 +115,8 @@ public class SpawnPackets {
 				map(Type.INT); // data
 
 				handler(wrapper -> {
+					final EntityTracker1_7_6_10 tracker = wrapper.user().get(EntityTracker1_7_6_10.class);
+
 					final EntityTypes1_10.EntityType type = EntityTypes1_10.getTypeFromId(wrapper.get(Type.BYTE, 0), true);
 					final int entityId = wrapper.get(Type.VAR_INT, 0);
 
@@ -147,13 +150,12 @@ public class SpawnPackets {
 						}
 					} else if (type == EntityTypes1_10.ObjectType.ARMOR_STAND.getType()) {
 						wrapper.cancel();
-						// TODO | Tick Virtual Holograms
-//						EntityTracker tracker = wrapper.user().get(EntityTracker.class);
-//						ArmorStandModel armorStand = new ArmorStandModel(wrapper.user(), protocol, entityId);
-//						armorStand.updateReplacementPosition(x / 32.0, y / 32.0, z / 32.0);
-//						armorStand.setYawPitch(yaw * 360f / 256, pitch * 360f / 256);
-//						armorStand.setHeadYaw(yaw * 360f / 256);
-//						tracker.addEntityReplacement(armorStand);
+						final VirtualHologramEntity hologram = new VirtualHologramEntity(wrapper.user(), protocol.getMetadataRewriter(), entityId);
+						hologram.updateReplacementPosition(x / 32.0, y / 32.0, z / 32.0);
+						hologram.setYawPitch(yaw * 360f / 256, pitch * 360f / 256);
+						hologram.setHeadYaw(yaw * 360f / 256);
+
+						tracker.trackHologram(entityId, hologram);
 					}
 					// TODO | Realign all entities
 
@@ -162,7 +164,6 @@ public class SpawnPackets {
 					wrapper.set(Type.INT, 2, z);
 					wrapper.set(Type.BYTE, 2, yaw);
 
-					final EntityTracker1_7_6_10 tracker = wrapper.user().get(EntityTracker1_7_6_10.class);
 					tracker.addEntity(entityId, type);
 
 					if (type != null && type.isOrHasParent(EntityTypes1_10.EntityType.FALLING_BLOCK)) {
@@ -201,7 +202,12 @@ public class SpawnPackets {
 				map(Type.SHORT); // velocity z
 				map(Types1_8.METADATA_LIST, Types1_7_6_10.METADATA_LIST); // metadata
 				handler(wrapper -> {
-					final EntityTypes1_10.EntityType type = EntityTypes1_10.getTypeFromId(wrapper.get(Type.UNSIGNED_BYTE, 0), false);
+					final EntityTracker1_7_6_10 tracker = wrapper.user().get(EntityTracker1_7_6_10.class);
+					final short typeId = wrapper.get(Type.UNSIGNED_BYTE, 0);
+					if (typeId == 255 || typeId == -1) {
+						wrapper.cancel();
+					}
+					final EntityTypes1_10.EntityType type = EntityTypes1_10.getTypeFromId(typeId, false);
 					final int entityId = wrapper.get(Type.VAR_INT, 0);
 
 					final int x = wrapper.get(Type.INT, 0);
@@ -212,17 +218,28 @@ public class SpawnPackets {
 					final byte yaw = wrapper.get(Type.BYTE, 0);
 					final byte headYaw = wrapper.get(Type.BYTE, 2);
 
-					final EntityTracker1_7_6_10 tracker = wrapper.user().get(EntityTracker1_7_6_10.class);
 					final List<Metadata> metadataList = wrapper.get(Types1_7_6_10.METADATA_LIST, 0);
 
-					tracker.addEntity(entityId, type);
-					protocol.getMetadataRewriter().transform(type, metadataList);
+					if (type == EntityTypes1_10.EntityType.ARMOR_STAND) {
+						final VirtualHologramEntity hologram = new VirtualHologramEntity(wrapper.user(), protocol.getMetadataRewriter(), entityId);
 
-					if (tracker.isReplaced(type)) {
-						final int newTypeId = tracker.replaceEntity(entityId, type);
-						wrapper.set(Type.UNSIGNED_BYTE, 0, (short) newTypeId);
+						hologram.updateReplacementPosition(x / 32.0, y / 32.0, z / 32.0);
+						hologram.setYawPitch(yaw * 360f / 256, pitch * 360f / 256);
+						hologram.setHeadYaw(headYaw * 360f / 256);
 
-						tracker.updateMetadata(entityId, metadataList);
+						tracker.trackHologram(entityId, hologram);
+						tracker.updateMetadata(entityId, metadataList); // Track and remap hologram <-> zombie metadata
+						wrapper.cancel();
+					} else {
+						protocol.getMetadataRewriter().transform(type, metadataList);
+
+						tracker.addEntity(entityId, type);
+						if (tracker.isReplaced(type)) {
+							final int newTypeId = tracker.replaceEntity(entityId, type);
+							wrapper.set(Type.UNSIGNED_BYTE, 0, (short) newTypeId);
+
+							tracker.updateMetadata(entityId, metadataList);
+						}
 					}
 				});
 			}

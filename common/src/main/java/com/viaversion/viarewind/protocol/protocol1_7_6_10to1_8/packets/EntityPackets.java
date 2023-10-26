@@ -19,12 +19,11 @@
 package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.packets;
 
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.model.VirtualHologramEntity;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.EntityTracker1_7_6_10;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.GameProfileStorage;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.PlayerSessionStorage;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
-import com.viaversion.viarewind.api.minecraft.EntityModel;
-import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
@@ -55,7 +54,7 @@ public class EntityPackets {
 
 				handler(wrapper -> {
 					final short slot = wrapper.get(Type.SHORT, 0);
-					final UUID uuid =  wrapper.user().get(EntityTracker1_7_6_10.class).getPlayerUUID(wrapper.get(Type.INT, 0));
+					final UUID uuid = wrapper.user().get(EntityTracker1_7_6_10.class).getPlayerUUID(wrapper.get(Type.INT, 0));
 					if (uuid == null) return;
 
 					final Item item = wrapper.get(Types1_7_6_10.COMPRESSED_NBT_ITEM, 0);
@@ -129,6 +128,20 @@ public class EntityPackets {
 				map(Type.BYTE); // y
 				map(Type.BYTE); // z
 				read(Type.BOOLEAN); // on ground
+
+				handler(wrapper -> {
+					final EntityTracker1_7_6_10 tracker = wrapper.user().get(EntityTracker1_7_6_10.class);
+
+					final VirtualHologramEntity hologram = tracker.getVirtualHologramMap().get(wrapper.get(Type.INT, 0));
+					if (hologram != null) {
+						wrapper.cancel();
+						final int x = wrapper.get(Type.BYTE, 0);
+						final int y = wrapper.get(Type.BYTE, 1);
+						final int z = wrapper.get(Type.BYTE, 2);
+
+						hologram.handleOriginalMovementPacket(x / 32.0, y / 32.0, z / 32.0);
+					}
+				});
 			}
 		});
 
@@ -139,6 +152,19 @@ public class EntityPackets {
 				map(Type.BYTE); // yaw
 				map(Type.BYTE); // pitch
 				read(Type.BOOLEAN); // on ground
+
+				handler(wrapper -> {
+					final EntityTracker1_7_6_10 tracker = wrapper.user().get(EntityTracker1_7_6_10.class);
+
+					final VirtualHologramEntity hologram = tracker.getVirtualHologramMap().get(wrapper.get(Type.INT, 0));
+					if (hologram != null) {
+						wrapper.cancel();
+						final int yaw = wrapper.get(Type.BYTE, 0);
+						final int pitch = wrapper.get(Type.BYTE, 1);
+
+						hologram.setYawPitch(yaw * 360f / 256, pitch * 360f / 256);
+					}
+				});
 			}
 		});
 
@@ -152,6 +178,24 @@ public class EntityPackets {
 				map(Type.BYTE); // yaw
 				map(Type.BYTE); // pitch
 				read(Type.BOOLEAN); // on ground
+
+				handler(wrapper -> {
+					final EntityTracker1_7_6_10 tracker = wrapper.user().get(EntityTracker1_7_6_10.class);
+
+					final VirtualHologramEntity hologram = tracker.getVirtualHologramMap().get(wrapper.get(Type.INT, 0));
+					if (hologram != null) {
+						wrapper.cancel();
+						final int x = wrapper.get(Type.BYTE, 0);
+						final int y = wrapper.get(Type.BYTE, 1);
+						final int z = wrapper.get(Type.BYTE, 2);
+
+						final int yaw = wrapper.get(Type.BYTE, 3);
+						final int pitch = wrapper.get(Type.BYTE, 4);
+
+						hologram.handleOriginalMovementPacket(x / 32.0, y / 32.0, z / 32.0);
+						hologram.setYawPitch(yaw * 360f / 256, pitch * 360f / 256);
+					}
+				});
 			}
 		});
 
@@ -166,13 +210,29 @@ public class EntityPackets {
 				map(Type.BYTE); // pitch
 				read(Type.BOOLEAN); // on ground
 				handler(wrapper -> {
-					int entityId = wrapper.get(Type.INT, 0);
-					EntityTracker1_7_6_10 tracker = wrapper.user().get(EntityTracker1_7_6_10.class);
-					EntityTypes1_10.EntityType type = tracker.getEntityMap().get(entityId);
+					final EntityTracker1_7_6_10 tracker = wrapper.user().get(EntityTracker1_7_6_10.class);
+
+					final int entityId = wrapper.get(Type.INT, 0);
+					final EntityTypes1_10.EntityType type = tracker.getEntityMap().get(entityId);
+
 					if (type == EntityTypes1_10.EntityType.MINECART_ABSTRACT) { // TODO | Realign all entities?
 						int y = wrapper.get(Type.INT, 2);
 						y += 12;
 						wrapper.set(Type.INT, 2, y);
+					}
+
+					final VirtualHologramEntity hologram = tracker.getVirtualHologramMap().get(entityId);
+					if (hologram != null) {
+						wrapper.cancel();
+						final int x = wrapper.get(Type.INT, 1);
+						final int y = wrapper.get(Type.INT, 2);
+						final int z = wrapper.get(Type.INT, 3);
+
+						final int yaw = wrapper.get(Type.BYTE, 0);
+						final int pitch = wrapper.get(Type.BYTE, 1);
+
+						hologram.updateReplacementPosition(x / 32.0, y / 32.0, z / 32.0);
+						hologram.setYawPitch(yaw * 360f / 256, pitch * 360f / 256);
 					}
 				});
 			}
@@ -183,6 +243,18 @@ public class EntityPackets {
 			public void register() {
 				map(Type.VAR_INT, Type.INT); // entity id
 				map(Type.BYTE); // head yaw
+
+				handler(wrapper -> {
+					final EntityTracker1_7_6_10 tracker = wrapper.user().get(EntityTracker1_7_6_10.class);
+
+					final VirtualHologramEntity hologram = tracker.getVirtualHologramMap().get(wrapper.get(Type.INT, 0));
+					if (hologram != null) {
+						wrapper.cancel();
+						final int yaw = wrapper.get(Type.BYTE, 0);
+
+						hologram.setHeadYaw(yaw * 360f / 256);
+					}
+				});
 			}
 		});
 
@@ -218,6 +290,8 @@ public class EntityPackets {
 					final EntityTracker1_7_6_10 tracker = wrapper.user().get(EntityTracker1_7_6_10.class);
 					if (tracker.getEntityReplacementMap().containsKey(entityId)) {
 						tracker.updateMetadata(entityId, metadataList);
+						wrapper.cancel();
+						return;
 					}
 					if (tracker.getEntityMap().containsKey(entityId)) {
 						protocol.getMetadataRewriter().transform(tracker.getEntityMap().get(entityId), metadataList);

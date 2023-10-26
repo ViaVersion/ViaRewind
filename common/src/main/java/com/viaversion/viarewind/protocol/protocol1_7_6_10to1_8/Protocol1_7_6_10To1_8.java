@@ -131,7 +131,7 @@ public class Protocol1_7_6_10To1_8 extends AbstractProtocol<ClientboundPackets1_
 	@Override
 	public void init(UserConnection userConnection) {
 		userConnection.put(new InventoryTracker(userConnection));
-		userConnection.put(new EntityTracker1_7_6_10(userConnection));
+		userConnection.put(new EntityTracker1_7_6_10(userConnection, metadataRewriter));
 		userConnection.put(new PlayerSessionStorage(userConnection));
 		userConnection.put(new GameProfileStorage(userConnection));
 		userConnection.put(new Scoreboard(userConnection));
@@ -139,7 +139,7 @@ public class Protocol1_7_6_10To1_8 extends AbstractProtocol<ClientboundPackets1_
 		userConnection.put(new WorldBorderEmulator(userConnection));
 
 		if (!userConnection.has(ClientWorld.class)) {
-			userConnection.put(new ClientWorld(userConnection));
+			userConnection.put(new ClientWorld());
 		}
 	}
 

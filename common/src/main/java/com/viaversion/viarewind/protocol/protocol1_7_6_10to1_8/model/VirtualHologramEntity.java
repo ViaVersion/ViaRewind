@@ -123,9 +123,35 @@ public class VirtualHologramEntity {
 		if (entityIds == null) return;
 
 		if (currentState == State.ZOMBIE) {
-			updateZombieLocation();
+			teleportEntity(entityId, locX, locY, locZ, yaw, pitch);
+
+			final PacketWrapper entityHeadLook = PacketWrapper.create(ClientboundPackets1_7_2_5.ENTITY_HEAD_LOOK, user);
+
+			entityHeadLook.write(Type.INT, entityId);
+			entityHeadLook.write(Type.BYTE, (byte) ((headYaw / 360f) * 256));
+
+			PacketUtil.sendPacket(entityHeadLook, Protocol1_7_6_10To1_8.class, true, true);
 		} else if (currentState == State.HOLOGRAM) {
-			updateHologramLocation(remount);
+			if (remount) {
+				PacketWrapper detach = PacketWrapper.create(ClientboundPackets1_7_2_5.ATTACH_ENTITY, null, user);
+				detach.write(Type.INT, entityIds[1]);
+				detach.write(Type.INT, -1);
+				detach.write(Type.BOOLEAN, false);
+				PacketUtil.sendPacket(detach, Protocol1_7_6_10To1_8.class, true, true);
+			}
+
+			// Don't ask me where this offset is coming from
+			teleportEntity(entityIds[0], locX, (locY + (marker ? 54.85 : small ? 56 : 57) - 0.16), locZ, 0, 0); // Skull
+
+			if (remount) {
+				teleportEntity(entityIds[1], locX, locY + 56.75, locZ, 0, 0); // Horse
+
+				PacketWrapper attach = PacketWrapper.create(ClientboundPackets1_7_2_5.ATTACH_ENTITY, null, user);
+				attach.write(Type.INT, entityIds[1]);
+				attach.write(Type.INT, entityIds[0]);
+				attach.write(Type.BOOLEAN, false);
+				PacketUtil.sendPacket(attach, Protocol1_7_6_10To1_8.class, true, true);
+			}
 		}
 	}
 
@@ -140,15 +166,6 @@ public class VirtualHologramEntity {
 		entityTeleport.write(Type.BYTE, (byte) ((pitch / 360f) * 256)); // pitch
 
 		PacketUtil.sendPacket(entityTeleport, Protocol1_7_6_10To1_8.class, true, true);
-	}
-
-	protected void updateHeadYaw(final int entityId, final float headYaw) {
-		final PacketWrapper entityHeadLook = PacketWrapper.create(ClientboundPackets1_7_2_5.ENTITY_HEAD_LOOK, user);
-
-		entityHeadLook.write(Type.INT, entityId);
-		entityHeadLook.write(Type.BYTE, (byte) ((headYaw / 360f) * 256));
-
-		PacketUtil.sendPacket(entityHeadLook, Protocol1_7_6_10To1_8.class, true, true);
 	}
 
 	protected void spawnEntity(final int entityId, final int type, final double locX, final double locY, final double locZ) {
@@ -168,34 +185,6 @@ public class VirtualHologramEntity {
 		spawnMob.write(Types1_7_6_10.METADATA_LIST, new ArrayList<>()); // metadata
 
 		PacketUtil.sendPacket(spawnMob, Protocol1_7_6_10To1_8.class, true, true);
-	}
-
-	private void updateZombieLocation() {
-		teleportEntity(entityId, locX, locY, locZ, yaw, pitch);
-		updateHeadYaw(entityId, headYaw);
-	}
-
-	private void updateHologramLocation(boolean remount) {
-		if (remount) {
-			PacketWrapper detach = PacketWrapper.create(ClientboundPackets1_7_2_5.ATTACH_ENTITY, null, user);
-			detach.write(Type.INT, entityIds[1]);
-			detach.write(Type.INT, -1);
-			detach.write(Type.BOOLEAN, false);
-			PacketUtil.sendPacket(detach, Protocol1_7_6_10To1_8.class, true, true);
-		}
-
-		// Don't ask me where this offset is coming from
-		teleportEntity(entityIds[0], locX, (locY + (marker ? 54.85 : small ? 56 : 57)), locZ, 0, 0); // Skull
-
-		if (remount) {
-			teleportEntity(entityIds[1], locX, locY + 56.75, locZ, 0, 0); // Horse
-
-			PacketWrapper attach = PacketWrapper.create(ClientboundPackets1_7_2_5.ATTACH_ENTITY, null, user);
-			attach.write(Type.INT, entityIds[1]);
-			attach.write(Type.INT, entityIds[0]);
-			attach.write(Type.BOOLEAN, false);
-			PacketUtil.sendPacket(attach, Protocol1_7_6_10To1_8.class, true, true);
-		}
 	}
 
 	public void updateMetadata() {
@@ -232,9 +221,9 @@ public class VirtualHologramEntity {
 		metadataPacket.write(Type.INT, entityIds[1]);
 
 		List<Metadata> metadataList = new ArrayList<>();
-		metadataList.add(new Metadata(12, MetaType1_7_6_10.Int, -1700000));
-		metadataList.add(new Metadata(10, MetaType1_7_6_10.String, name));
-		metadataList.add(new Metadata(11, MetaType1_7_6_10.Byte, (byte) 1));
+		metadataList.add(new Metadata(MetaIndex1_7_6_10To1_8.ENTITY_AGEABLE_AGE.getIndex(), MetaType1_7_6_10.Int, -1700000));
+		metadataList.add(new Metadata(MetaIndex1_7_6_10To1_8.ENTITY_LIVING_NAME_TAG.getIndex(), MetaType1_7_6_10.String, name));
+		metadataList.add(new Metadata(MetaIndex1_7_6_10To1_8.ENTITY_LIVING_NAME_TAG_VISIBILITY.getIndex(), MetaType1_7_6_10.Byte, (byte) 1));
 
 		metadataPacket.write(Types1_7_6_10.METADATA_LIST, metadataList);
 	}
@@ -243,54 +232,39 @@ public class VirtualHologramEntity {
 		if (entityIds != null) deleteEntity();
 
 		if (currentState == State.ZOMBIE) {
-			spawnZombie();
+			spawnEntity(entityId, 54, locX, locY, locZ);
+
+			entityIds = new int[]{entityId};
 		} else if (currentState == State.HOLOGRAM) {
-			spawnHologram();
+			int[] entityIds = {entityId, additionalEntityId()};
+
+			PacketWrapper spawnSkull = PacketWrapper.create(ClientboundPackets1_7_2_5.SPAWN_ENTITY, null, user);
+			spawnSkull.write(Type.VAR_INT, entityIds[0]);
+			spawnSkull.write(Type.BYTE, (byte) 66);
+			spawnSkull.write(Type.INT, (int) (locX * 32.0));
+			spawnSkull.write(Type.INT, (int) (locY * 32.0));
+			spawnSkull.write(Type.INT, (int) (locZ * 32.0));
+			spawnSkull.write(Type.BYTE, (byte) 0);
+			spawnSkull.write(Type.BYTE, (byte) 0);
+			spawnSkull.write(Type.INT, 0);
+			PacketUtil.sendPacket(spawnSkull, Protocol1_7_6_10To1_8.class, true, true);
+
+			spawnEntity(entityIds[1], 100, locX, locY, locZ); // Horse
+
+			this.entityIds = entityIds;
 		}
 
 		updateMetadata();
 		updateLocation(true);
 	}
 
-	private void spawnZombie() {
-		spawnEntity(entityId, 54, locX, locY, locZ);
-
-		entityIds = new int[]{entityId};
-	}
-
-	private void spawnHologram() {
-		int[] entityIds = {entityId, additionalEntityId()};
-
-		PacketWrapper spawnSkull = PacketWrapper.create(ClientboundPackets1_7_2_5.SPAWN_ENTITY, null, user);
-		spawnSkull.write(Type.VAR_INT, entityIds[0]);
-		spawnSkull.write(Type.BYTE, (byte) 66);
-		spawnSkull.write(Type.INT, (int) (locX * 32.0));
-		spawnSkull.write(Type.INT, (int) (locY * 32.0));
-		spawnSkull.write(Type.INT, (int) (locZ * 32.0));
-		spawnSkull.write(Type.BYTE, (byte) 0);
-		spawnSkull.write(Type.BYTE, (byte) 0);
-		spawnSkull.write(Type.INT, 0);
-		PacketUtil.sendPacket(spawnSkull, Protocol1_7_6_10To1_8.class, true, true);
-
-		spawnEntity(entityIds[1], 100, locX, locY, locZ); // Horse
-
-		this.entityIds = entityIds;
-	}
-
 	private int additionalEntityId() {
 		return Integer.MAX_VALUE - 16000 - entityId;
 	}
 
-	public AABB getBoundingBox() {
-		double w = this.small ? 0.25 : 0.5;
-		double h = this.small ? 0.9875 : 1.975;
-		Vector3d min = new Vector3d(this.locX - w / 2, this.locY, this.locZ - w / 2);
-		Vector3d max = new Vector3d(this.locX + w / 2, this.locY + h, this.locZ + w / 2);
-		return new AABB(min, max);
-	}
-
 	public void deleteEntity() {
 		if (entityIds == null) return;
+
 		PacketWrapper despawn = PacketWrapper.create(ClientboundPackets1_7_2_5.DESTROY_ENTITIES, null, user);
 		despawn.write(Type.BYTE, (byte) entityIds.length);
 		for (int id : entityIds) {
