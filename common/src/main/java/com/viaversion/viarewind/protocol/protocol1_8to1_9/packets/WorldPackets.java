@@ -169,10 +169,12 @@ public class WorldPackets {
 			@Override
 			public void register() {
 				handler(packetWrapper -> {
-					int chunkX = packetWrapper.read(Type.INT);
-					int chunkZ = packetWrapper.read(Type.INT);
-					ClientWorld world = packetWrapper.user().get(ClientWorld.class);
-					packetWrapper.write(new ChunkType1_8(world), new BaseChunk(chunkX, chunkZ, true, false, 0, new ChunkSection[16], null, new ArrayList<>()));
+					final Environment environment = packetWrapper.user().get(ClientWorld.class).getEnvironment();
+
+					final int chunkX = packetWrapper.read(Type.INT);
+					final int chunkZ = packetWrapper.read(Type.INT);
+
+					packetWrapper.write(ChunkType1_8.forEnvironment(environment), new BaseChunk(chunkX, chunkZ, true, false, 0, new ChunkSection[16], null, new ArrayList<>()));
 				});
 			}
 		});
@@ -182,9 +184,9 @@ public class WorldPackets {
 			@Override
 			public void register() {
 				handler(packetWrapper -> {
-					ClientWorld world = packetWrapper.user().get(ClientWorld.class);
+					final Environment environment = packetWrapper.user().get(ClientWorld.class).getEnvironment();
 
-					Chunk chunk = packetWrapper.read(new ChunkType1_9_1(world));
+					Chunk chunk = packetWrapper.read(ChunkType1_9_1.forEnvironment(environment));
 
 					for (ChunkSection section : chunk.getSections()) {
 						if (section == null) continue;
@@ -197,7 +199,7 @@ public class WorldPackets {
 					}
 
 					if (chunk.isFullChunk() && chunk.getBitmask() == 0) {  //This would be an unload packet for 1.8 clients. Just set one air section
-						boolean skylight = world.getEnvironment() == Environment.NORMAL;
+						boolean skylight = environment == Environment.NORMAL;
 						ChunkSection[] sections = new ChunkSection[16];
 						ChunkSection section = new ChunkSectionImpl(true);
 						sections[0] = section;
@@ -206,7 +208,7 @@ public class WorldPackets {
 						chunk = new BaseChunk(chunk.getX(), chunk.getZ(), true, false, 1, sections, chunk.getBiomeData(), chunk.getBlockEntities());
 					}
 
-					packetWrapper.write(new ChunkType1_8(world), chunk);
+					packetWrapper.write(ChunkType1_8.forEnvironment(environment), chunk);
 
 					final UserConnection user = packetWrapper.user();
 					chunk.getBlockEntities().forEach(nbt -> {

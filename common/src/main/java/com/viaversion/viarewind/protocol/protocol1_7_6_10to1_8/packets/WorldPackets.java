@@ -20,8 +20,8 @@ package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.packets;
 
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.WorldBorderEmulator;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.chunk.Chunk1_7_6_10Type;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.chunk.ChunkBulk1_7_6_10Type;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.chunk.ChunkType1_7_6;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.chunk.BulkChunkType1_7_6;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.model.ParticleIndex1_7_6_10;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
 import com.viaversion.viarewind.utils.ChatUtil;
@@ -33,7 +33,7 @@ import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.types.CustomByteType;
+import com.viaversion.viaversion.api.type.types.FixedByteArrayType;
 import com.viaversion.viaversion.api.type.types.chunk.BulkChunkType1_8;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_8;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
@@ -56,10 +56,10 @@ public class WorldPackets {
 	public static void register(Protocol1_7_6_10To1_8 protocol) {
 		protocol.registerClientbound(ClientboundPackets1_8.CHUNK_DATA, wrapper -> {
 			final ClientWorld world = wrapper.user().get(ClientWorld.class);
-			final Chunk chunk = wrapper.read(new ChunkType1_8(world));
+			final Chunk chunk = wrapper.read(ChunkType1_8.forEnvironment(world.getEnvironment()));
 			rewriteBlockIds(protocol, chunk);
 
-			wrapper.write(new Chunk1_7_6_10Type(world), chunk);
+			wrapper.write(ChunkType1_7_6.TYPE, chunk);
 		});
 
 		protocol.registerClientbound(ClientboundPackets1_8.MULTI_BLOCK_CHANGE, new PacketHandlers() {
@@ -116,14 +116,12 @@ public class WorldPackets {
 		});
 
 		protocol.registerClientbound(ClientboundPackets1_8.MAP_BULK_CHUNK, wrapper -> {
-			final ClientWorld world = wrapper.user().get(ClientWorld.class);
-
-			final Chunk[] chunks = wrapper.read(new BulkChunkType1_8(world));
+			final Chunk[] chunks = wrapper.read(BulkChunkType1_8.TYPE);
 			for (Chunk chunk : chunks) {
 				rewriteBlockIds(protocol, chunk);
 			}
 
-			wrapper.write(new ChunkBulk1_7_6_10Type(world), chunks);
+			wrapper.write(BulkChunkType1_7_6.TYPE, chunks);
 		});
 
 		protocol.registerClientbound(ClientboundPackets1_8.EFFECT, new PacketHandlers() {
@@ -237,7 +235,7 @@ public class WorldPackets {
 							final PacketWrapper mapData = PacketWrapper.create(ClientboundPackets1_8.MAP_DATA, wrapper.user());
 							mapData.write(Type.VAR_INT, id); // map id
 							mapData.write(Type.SHORT, (short) columnData.length); // data length
-							mapData.write(new CustomByteType(columnData.length), columnData); // data
+							mapData.write(new FixedByteArrayType(columnData.length), columnData); // data
 
 							mapData.send(Protocol1_7_6_10To1_8.class, true);
 						}
@@ -255,7 +253,7 @@ public class WorldPackets {
 						final PacketWrapper mapData = PacketWrapper.create(ClientboundPackets1_8.MAP_DATA, wrapper.user());
 						mapData.write(Type.VAR_INT, id); // map id
 						mapData.write(Type.SHORT, (short) iconData.length); // data length
-						mapData.write(new CustomByteType(iconData.length), iconData); // data
+						mapData.write(new FixedByteArrayType(iconData.length), iconData); // data
 
 						mapData.send(Protocol1_7_6_10To1_8.class, true);
 					}
@@ -264,7 +262,7 @@ public class WorldPackets {
 					final PacketWrapper mapData = PacketWrapper.create(ClientboundPackets1_8.MAP_DATA, wrapper.user());
 					mapData.write(Type.VAR_INT, id); // map id
 					mapData.write(Type.SHORT, (short) 2); // data length
-					mapData.write(new CustomByteType(2), new byte[]{ 2, scale }); // data
+					mapData.write(new FixedByteArrayType(2), new byte[]{ 2, scale }); // data
 
 					mapData.send(Protocol1_7_6_10To1_8.class, true);
 				});
