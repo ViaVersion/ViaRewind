@@ -32,7 +32,6 @@ public class TitleCooldownVisualization implements CooldownVisualization {
 	private static final int ACTION_HIDE = 3;
 
 	private void sendTitle(String titleText, String subTitleText, int fadeIn, int stay, int fadeOut) throws Exception {
-		sendTitle(titleText);
 		sendTitlePacket(
 			ACTION_SET_TITLE,
 			packet -> packet.write(Type.COMPONENT, new JsonPrimitive(titleText))
@@ -49,13 +48,6 @@ public class TitleCooldownVisualization implements CooldownVisualization {
 				packet.write(Type.INT, fadeOut);
 			}
 		);
-	}
-
-	private void sendTitle(String titleText) throws Exception {
-		PacketWrapper titlePacket = PacketWrapper.create(ClientboundPackets1_8.TITLE, user);
-		titlePacket.write(Type.VAR_INT, 0); // Action - set title
-		titlePacket.write(Type.COMPONENT, new JsonPrimitive(titleText));
-		titlePacket.scheduleSend(Protocol1_8To1_9.class);
 	}
 
 	private void sendTitlePacket(int action, Consumer<PacketWrapper> writer) throws Exception {
