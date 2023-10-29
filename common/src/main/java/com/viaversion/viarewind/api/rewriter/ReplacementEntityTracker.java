@@ -57,15 +57,11 @@ public class ReplacementEntityTracker extends StoredObject implements ClientEnti
 		return ENTITY_REPLACEMENTS.containsKey(type);
 	}
 
-	public void updateMetadata(final int entityId, final List<Metadata> metadata) {
+	public void updateMetadata(final int entityId, final List<Metadata> metadata) throws Exception {
 		final String name = ENTITY_REPLACEMENTS.get(entityMap.get(entityId)).value();
 
 		metadata.add(new Metadata(MetaIndex1_7_6_10To1_8.ENTITY_LIVING_NAME_TAG_VISIBILITY.getNewIndex(), MetaType1_7_6_10.Byte, (byte) 1)); // TODO: Make this definable for 1.8 -> 1.9 ?
 		metadata.add(new Metadata(MetaIndex1_7_6_10To1_8.ENTITY_LIVING_NAME_TAG.getNewIndex(), MetaType1_7_6_10.String, name));
-	}
-
-	public void setPlayerId(int playerId) {
-		this.playerId = playerId;
 	}
 
 	@Override

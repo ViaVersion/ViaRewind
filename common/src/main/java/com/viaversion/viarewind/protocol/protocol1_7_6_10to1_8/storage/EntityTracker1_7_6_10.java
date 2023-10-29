@@ -50,7 +50,7 @@ public class EntityTracker1_7_6_10 extends ReplacementEntityTracker {
 	}
 
 	@Override
-	public void updateMetadata(int entityId, List<Metadata> metadata) {
+	public void updateMetadata(int entityId, List<Metadata> metadata) throws Exception {
 		if (virtualHologramMap.containsKey(entityId)) {
 			virtualHologramMap.get(entityId).updateMetadata(metadata);
 			return;
@@ -84,12 +84,6 @@ public class EntityTracker1_7_6_10 extends ReplacementEntityTracker {
 			this.spectatingPlayerId = entityId;
 		}
 		super.setClientEntityId(entityId);
-	}
-
-	@Override
-	public void setPlayerId(int playerId) {
-		super.setPlayerId(playerId);
-		this.spectatingPlayerId = playerId;
 	}
 
 	public void addPlayer(final Integer entityId, final UUID uuid) {
@@ -134,6 +128,7 @@ public class EntityTracker1_7_6_10 extends ReplacementEntityTracker {
 	public void setPassenger(int vehicleId, int passengerId) {
 		if (vehicleId == this.spectatingPlayerId && this.spectatingPlayerId != this.getPlayerId()) {
 			startSneaking();
+			setSpectating(this.getPlayerId());
 		}
 
 		if (vehicleId == -1) {
