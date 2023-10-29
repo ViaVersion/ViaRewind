@@ -18,6 +18,7 @@
 
 package com.viaversion.viarewind.protocol.protocol1_8to1_9.storage;
 
+import com.viaversion.viarewind.ViaRewind;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.cooldown.CooldownVisualization;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.cooldown.CooldownVisualization.Factory;
 import com.viaversion.viarewind.utils.Tickable;
@@ -27,6 +28,7 @@ import com.viaversion.viaversion.util.Pair;
 
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.logging.Level;
 
 public class Cooldown extends StoredObject implements Tickable {
 
@@ -54,12 +56,20 @@ public class Cooldown extends StoredObject implements Tickable {
 		if (current == null) {
 			current = visualizationFactory.create(getUser());
 		}
-		current.show(getCooldown());
+		try {
+			current.show(getCooldown());
+		} catch (Exception exception) {
+			ViaRewind.getPlatform().getLogger().log(Level.WARNING, "Unable to show cooldown visualization", exception);
+		}
 	}
 
 	private void endCurrentVisualization() {
 		if (current != null) {
-			current.hide();
+			try {
+				current.hide();
+			} catch (Exception exception) {
+				ViaRewind.getPlatform().getLogger().log(Level.WARNING, "Unable to hide cooldown visualization", exception);
+			}
 			current = null;
 		}
 	}

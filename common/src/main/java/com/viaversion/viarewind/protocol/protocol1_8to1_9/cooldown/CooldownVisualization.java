@@ -5,9 +5,9 @@ import com.viaversion.viarewind.api.ViaRewindConfig.CooldownIndicator;
 import com.viaversion.viaversion.api.connection.UserConnection;
 
 public interface CooldownVisualization {
-	void show(double progress);
+	void show(double progress) throws Exception;
 
-	void hide();
+	void hide() throws Exception;
 
 
 	int MAX_PROGRESS_TEXT_LENGTH = 10;
