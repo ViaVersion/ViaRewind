@@ -210,7 +210,7 @@ public class PlayerPackets {
 						Item[] equipment = new Item[4];
 						if (gameMode == 3) {
 							GameProfileStorage.GameProfile profile = wrapper.user().get(GameProfileStorage.class).get(myId);
-							equipment[3] = profile.getSkull();
+							equipment[3] = profile == null ? null : profile.getSkull();
 						} else {
 							for (int i = 0; i < equipment.length; i++) {
 								equipment[i] = playerSession.getPlayerEquipment(myId, i);

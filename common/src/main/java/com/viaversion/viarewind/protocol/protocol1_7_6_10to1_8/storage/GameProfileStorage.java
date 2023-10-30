@@ -43,14 +43,6 @@ public class GameProfileStorage extends StoredObject {
 		return gameProfile;
 	}
 
-	public void putProperty(UUID uuid, Property property) {
-		properties.computeIfAbsent(uuid, profile -> new GameProfile(uuid, null)).properties.add(property);
-	}
-
-	public void putProperty(UUID uuid, String name, String value, String signature) {
-		putProperty(uuid, new Property(name, value, signature));
-	}
-
 	public GameProfile get(UUID uuid) {
 		return properties.get(uuid);
 	}
