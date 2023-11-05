@@ -19,146 +19,59 @@
 package com.viaversion.viarewind.protocol.protocol1_8to1_9.storage;
 
 import com.viaversion.viarewind.ViaRewind;
-import com.viaversion.viarewind.api.ViaRewindConfig;
-import com.viaversion.viarewind.protocol.protocol1_8to1_9.Protocol1_8To1_9;
-import com.viaversion.viarewind.utils.PacketUtil;
+import com.viaversion.viarewind.protocol.protocol1_8to1_9.cooldown.CooldownVisualization;
+import com.viaversion.viarewind.protocol.protocol1_8to1_9.cooldown.CooldownVisualization.Factory;
 import com.viaversion.viarewind.utils.Tickable;
 import com.viaversion.viaversion.api.connection.StoredObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.libs.gson.JsonPrimitive;
-import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
-import com.viaversion.viaversion.protocols.protocol1_9to1_8.ClientboundPackets1_9;
 import com.viaversion.viaversion.util.Pair;
 
 import java.util.ArrayList;
-import java.util.UUID;
+import java.util.Objects;
+import java.util.logging.Level;
 
 public class Cooldown extends StoredObject implements Tickable {
 
 	private double attackSpeed = 4.0;
 	private long lastHit = 0;
-	private final ViaRewindConfig.CooldownIndicator cooldownIndicator;
-	private UUID bossUUID;
-	private boolean lastSend;
+	private CooldownVisualization.Factory visualizationFactory = CooldownVisualization.Factory.fromConfiguration();
+	private CooldownVisualization current;
 
 	public Cooldown(final UserConnection user) {
 		super(user);
-
-		ViaRewindConfig.CooldownIndicator indicator;
-		try {
-			indicator = ViaRewind.getConfig().getCooldownIndicator();
-		} catch (IllegalArgumentException e) {
-			ViaRewind.getPlatform().getLogger().warning("Invalid cooldown-indicator setting");
-			indicator = ViaRewindConfig.CooldownIndicator.DISABLED;
-		}
-
-		this.cooldownIndicator = indicator;
 	}
 
 	@Override
 	public void tick() {
 		if (!hasCooldown()) {
-			if (lastSend) {
-				hide();
-				lastSend = false;
-			}
+			endCurrentVisualization();
 			return;
 		}
-
 		BlockPlaceDestroyTracker tracker = getUser().get(BlockPlaceDestroyTracker.class);
 		if (tracker.isMining()) {
 			lastHit = 0;
-			if (lastSend) {
-				hide();
-				lastSend = false;
-			}
+			endCurrentVisualization();
 			return;
 		}
-
-		showCooldown();
-		lastSend = true;
-	}
-
-	private void showCooldown() {
-		if (cooldownIndicator == ViaRewindConfig.CooldownIndicator.TITLE) {
-			sendTitle("", getTitle(), 0, 2, 5);
-		} else if (cooldownIndicator == ViaRewindConfig.CooldownIndicator.ACTION_BAR) {
-			sendActionBar(getTitle());
-		} else if (cooldownIndicator == ViaRewindConfig.CooldownIndicator.BOSS_BAR) {
-			sendBossBar((float) getCooldown());
+		if (current == null) {
+			current = visualizationFactory.create(getUser());
+		}
+		try {
+			current.show(getCooldown());
+		} catch (Exception exception) {
+			ViaRewind.getPlatform().getLogger().log(Level.WARNING, "Unable to show cooldown visualization", exception);
 		}
 	}
 
-	private void hide() {
-		if (cooldownIndicator == ViaRewindConfig.CooldownIndicator.ACTION_BAR) {
-			sendActionBar("§r");
-		} else if (cooldownIndicator == ViaRewindConfig.CooldownIndicator.TITLE) {
-			hideTitle();
-		} else if (cooldownIndicator == ViaRewindConfig.CooldownIndicator.BOSS_BAR) {
-			hideBossBar();
+	private void endCurrentVisualization() {
+		if (current != null) {
+			try {
+				current.hide();
+			} catch (Exception exception) {
+				ViaRewind.getPlatform().getLogger().log(Level.WARNING, "Unable to hide cooldown visualization", exception);
+			}
+			current = null;
 		}
-	}
-
-	private void hideBossBar() {
-		if (bossUUID == null) return;
-		PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_9.BOSSBAR, null, getUser());
-		wrapper.write(Type.UUID, bossUUID);
-		wrapper.write(Type.VAR_INT, 1);
-		PacketUtil.sendPacket(wrapper, Protocol1_8To1_9.class, false, true);
-		bossUUID = null;
-	}
-
-	private void sendBossBar(float cooldown) {
-		PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_9.BOSSBAR, getUser());
-		if (bossUUID == null) {
-			bossUUID = UUID.randomUUID();
-			wrapper.write(Type.UUID, bossUUID);
-			wrapper.write(Type.VAR_INT, 0);
-			wrapper.write(Type.COMPONENT, new JsonPrimitive(" "));
-			wrapper.write(Type.FLOAT, cooldown);
-			wrapper.write(Type.VAR_INT, 0);
-			wrapper.write(Type.VAR_INT, 0);
-			wrapper.write(Type.UNSIGNED_BYTE, (short) 0);
-		} else {
-			wrapper.write(Type.UUID, bossUUID);
-			wrapper.write(Type.VAR_INT, 2);
-			wrapper.write(Type.FLOAT, cooldown);
-		}
-		PacketUtil.sendPacket(wrapper, Protocol1_8To1_9.class, false, true);
-	}
-
-	private void hideTitle() {
-		PacketWrapper hide = PacketWrapper.create(ClientboundPackets1_8.TITLE, null, getUser());
-		hide.write(Type.VAR_INT, 3);
-		PacketUtil.sendPacket(hide, Protocol1_8To1_9.class);
-	}
-
-	private void sendTitle(String title, String subTitle, int fadeIn, int stay, int fadeOut) {
-		PacketWrapper timePacket = PacketWrapper.create(ClientboundPackets1_8.TITLE, null, getUser());
-		timePacket.write(Type.VAR_INT, 2);
-		timePacket.write(Type.INT, fadeIn);
-		timePacket.write(Type.INT, stay);
-		timePacket.write(Type.INT, fadeOut);
-		PacketWrapper titlePacket = PacketWrapper.create(ClientboundPackets1_8.TITLE, getUser());
-		titlePacket.write(Type.VAR_INT, 0);
-		titlePacket.write(Type.COMPONENT, new JsonPrimitive(title));
-		PacketWrapper subtitlePacket = PacketWrapper.create(ClientboundPackets1_8.TITLE, getUser());
-		subtitlePacket.write(Type.VAR_INT, 1);
-		subtitlePacket.write(Type.COMPONENT, new JsonPrimitive(subTitle));
-
-		PacketUtil.sendPacket(titlePacket, Protocol1_8To1_9.class);
-		PacketUtil.sendPacket(subtitlePacket, Protocol1_8To1_9.class);
-		PacketUtil.sendPacket(timePacket, Protocol1_8To1_9.class);
-	}
-
-	private void sendActionBar(String bar) {
-		PacketWrapper actionBarPacket = PacketWrapper.create(ClientboundPackets1_8.CHAT_MESSAGE, getUser());
-		actionBarPacket.write(Type.COMPONENT, new JsonPrimitive(bar));
-		actionBarPacket.write(Type.BYTE, (byte) 2);
-
-		PacketUtil.sendPacket(actionBarPacket, Protocol1_8To1_9.class);
 	}
 
 	public boolean hasCooldown() {
@@ -175,21 +88,6 @@ public class Cooldown extends StoredObject implements Tickable {
 	private double restrain(double x, double a, double b) {
 		if (x < a) return a;
 		return Math.min(x, b);
-	}
-
-	private final static int max = 10;
-
-	private String getTitle() {
-		String symbol = cooldownIndicator == ViaRewindConfig.CooldownIndicator.ACTION_BAR ? "■" : "˙";
-
-		double cooldown = getCooldown();
-		int green = (int) Math.floor(((double) max) * cooldown);
-		int grey = max - green;
-		StringBuilder builder = new StringBuilder("§8");
-		while (green-- > 0) builder.append(symbol);
-		builder.append("§7");
-		while (grey-- > 0) builder.append(symbol);
-		return builder.toString();
 	}
 
 	public double getAttackSpeed() {
@@ -228,5 +126,9 @@ public class Cooldown extends StoredObject implements Tickable {
 
 	public void setLastHit(long lastHit) {
 		this.lastHit = lastHit;
+	}
+
+	public void setVisualizationFactory(Factory visualizationFactory) {
+		this.visualizationFactory = Objects.requireNonNull(visualizationFactory, "visualizationFactory");
 	}
 }
