@@ -27,6 +27,10 @@ import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.*;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
 import com.viaversion.viarewind.utils.ChatUtil;
 import com.viaversion.viarewind.utils.PacketUtil;
+import com.viaversion.viarewind.utils.math.AABB;
+import com.viaversion.viarewind.utils.math.Ray3d;
+import com.viaversion.viarewind.utils.math.RayTracing;
+import com.viaversion.viarewind.utils.math.Vector3d;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.Environment;
 import com.viaversion.viaversion.api.minecraft.Position;
@@ -548,30 +552,37 @@ public class PlayerPackets {
 			public void register() {
 				map(Type.INT, Type.VAR_INT);
 				map(Type.BYTE, Type.VAR_INT);
-				handler(packetWrapper -> {
-					// TODO | Fix Armor Stands
-//					int mode = packetWrapper.get(Type.VAR_INT, 1);
-//					if (mode != 0) return;
-//					int entityId = packetWrapper.get(Type.VAR_INT, 0);
-//					EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-//					EntityModel replacement = tracker.getEntityReplacement(entityId);
-//					if (!(replacement instanceof ArmorStandModel)) return;
-//					ArmorStandModel armorStand = (ArmorStandModel) replacement;
-//					AABB boundingBox = armorStand.getBoundingBox();
-//					PlayerPositionTracker playerPositionTracker = packetWrapper.user().get(PlayerPositionTracker.class);
-//					Vector3d pos = new Vector3d(playerPositionTracker.getPosX(), playerPositionTracker.getPosY() + 1.8, playerPositionTracker.getPosZ());
-//					double yaw = Math.toRadians(playerPositionTracker.getYaw());
-//					double pitch = Math.toRadians(playerPositionTracker.getPitch());
-//					Vector3d dir = new Vector3d(-Math.cos(pitch) * Math.sin(yaw), -Math.sin(pitch), Math.cos(pitch) * Math.cos(yaw));
-//					Ray3d ray = new Ray3d(pos, dir);
-//					Vector3d intersection = RayTracing.trace(ray, boundingBox, 5.0);
-//					if (intersection == null) return;
-//					intersection.substract(boundingBox.getMin());
-//					mode = 2;
-//					packetWrapper.set(Type.VAR_INT, 1, mode);
-//					packetWrapper.write(Type.FLOAT, (float) intersection.getX());
-//					packetWrapper.write(Type.FLOAT, (float) intersection.getY());
-//					packetWrapper.write(Type.FLOAT, (float) intersection.getZ());
+				handler(wrapper -> {
+					int mode = wrapper.get(Type.VAR_INT, 1);
+					if (mode != 0) {
+						return;
+					}
+					final int entityId = wrapper.get(Type.VAR_INT, 0);
+					final EntityTracker1_7_6_10 tracker = wrapper.user().get(EntityTracker1_7_6_10.class);
+					final PlayerSessionStorage position = wrapper.user().get(PlayerSessionStorage.class);
+
+					if (tracker.getVirtualHologramMap().containsKey(entityId)) {
+						final AABB boundingBox = tracker.getVirtualHologramMap().get(entityId).getBoundingBox();
+
+						Vector3d pos = new Vector3d(position.getPosX(), position.getPosY() + 1.8, position.getPosZ());
+						double yaw = Math.toRadians(position.yaw);
+						double pitch = Math.toRadians(position.pitch);
+
+						Vector3d dir = new Vector3d(-Math.cos(pitch) * Math.sin(yaw), -Math.sin(pitch), Math.cos(pitch) * Math.cos(yaw));
+						Ray3d ray = new Ray3d(pos, dir);
+						Vector3d intersection = RayTracing.trace(ray, boundingBox, 5.0);
+
+						if (intersection == null) {
+							return;
+						}
+						intersection.substract(boundingBox.getMin());
+
+						mode = 2;
+						wrapper.set(Type.VAR_INT, 1, mode);
+						wrapper.write(Type.FLOAT, (float) intersection.getX());
+						wrapper.write(Type.FLOAT, (float) intersection.getY());
+						wrapper.write(Type.FLOAT, (float) intersection.getZ());
+					}
 				});
 			}
 		});

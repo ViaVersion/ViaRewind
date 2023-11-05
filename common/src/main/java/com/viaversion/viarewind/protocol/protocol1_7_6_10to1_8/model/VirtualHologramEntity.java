@@ -24,6 +24,8 @@ import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.rewriter.Metadata
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.metadata.MetaType1_7_6_10;
 import com.viaversion.viarewind.utils.PacketUtil;
+import com.viaversion.viarewind.utils.math.AABB;
+import com.viaversion.viarewind.utils.math.Vector3d;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
@@ -278,6 +280,16 @@ public class VirtualHologramEntity {
 
 		updateMetadata();
 		updateLocation(true);
+	}
+
+	public AABB getBoundingBox() {
+		final double width = this.small ? 0.25 : 0.5;
+		final double height = this.small ? 0.9875 : 1.975;
+
+		final Vector3d min = new Vector3d(this.locX - width / 2, this.locY, this.locZ - width / 2);
+		final Vector3d max = new Vector3d(this.locX + width / 2, this.locY + height, this.locZ + width / 2);
+
+		return new AABB(min, max);
 	}
 
 	private int additionalEntityId() {
