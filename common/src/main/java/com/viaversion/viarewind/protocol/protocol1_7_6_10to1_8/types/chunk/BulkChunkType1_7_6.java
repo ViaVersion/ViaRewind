@@ -1,6 +1,7 @@
 package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.chunk;
 
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
+import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.util.Pair;
 import io.netty.buffer.ByteBuf;
@@ -55,7 +56,18 @@ public class BulkChunkType1_7_6 extends Type<Chunk[]> {
 
 		byteBuf.writeShort(chunkCount);
 		byteBuf.writeInt(compressedSize);
-		byteBuf.writeBoolean(true); // hasSkyLight
+
+		boolean skyLight = false;
+		for (Chunk chunk : chunks) {
+			for (ChunkSection section : chunk.getSections()) {
+				if (section != null && section.getLight().hasSkyLight()) {
+					skyLight = true;
+					break;
+				}
+			}
+		}
+
+		byteBuf.writeBoolean(skyLight); // hasSkyLight
 		byteBuf.writeBytes(compressedData, 0, compressedSize);
 
 		for (int i = 0; i < chunkCount; i++) {
