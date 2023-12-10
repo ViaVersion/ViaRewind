@@ -20,9 +20,10 @@ package com.viaversion.viarewind.protocol.protocol1_8to1_9.metadata;
 
 import com.viaversion.viarewind.ViaRewind;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.Protocol1_8To1_9;
+import com.viaversion.viarewind.protocol.protocol1_8to1_9.storage.EntityTracker;
 import com.viaversion.viaversion.api.minecraft.EulerAngle;
 import com.viaversion.viaversion.api.minecraft.Vector;
-import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10.EntityType;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_8;
@@ -39,13 +40,34 @@ public class MetadataRewriter {
 		this.protocol = protocol;
 	}
 
-	public void transform(EntityTypes1_10.EntityType type, List<Metadata> list) {
+	public void transform(EntityTracker tracker, int entityId, List<Metadata> list) {
+		transform(tracker, entityId, list, tracker.getClientEntityTypes().get(entityId));
+	}
+
+	private static final byte HAND_ACTIVE_BIT = 0;
+	private static final byte STATUS_USE_BIT = 4;
+
+	public void transform(EntityTracker tracker, int entityId, List<Metadata> list, EntityType entityType) {
+		for (Metadata metadata : list) {
+			if (metadata.id() == MetaIndex.ENTITY_STATUS.getIndex()) {
+				tracker.getStatusInformation().put(entityId, (Byte) metadata.getValue());
+			}
+		}
 		for (Metadata entry : new ArrayList<>(list)) {
-			MetaIndex metaIndex = MetaIndex1_8to1_9.searchIndex(type, entry.id());
+			MetaIndex metaIndex = MetaIndex1_8to1_9.searchIndex(entityType, entry.id());
 			try {
 				if (metaIndex != null) {
 					if (metaIndex.getOldType() == MetaType1_8.NonExistent || metaIndex.getNewType() == null) {
 						list.remove(entry);
+						if (metaIndex == MetaIndex.PLAYER_HAND) {
+							byte status = tracker.getStatusInformation().getOrDefault(entityId, (byte) 0);
+							if ((((byte) entry.value()) & 1 << HAND_ACTIVE_BIT) != 0) {
+								status = (byte) (status | 1 << STATUS_USE_BIT);
+							} else {
+								status = (byte) (status & ~(1 << STATUS_USE_BIT));
+							}
+							list.add(new Metadata(MetaIndex.ENTITY_STATUS.getIndex(), MetaType1_8.Byte, status));
+						}
 						continue;
 					}
 					Object value = entry.getValue();
