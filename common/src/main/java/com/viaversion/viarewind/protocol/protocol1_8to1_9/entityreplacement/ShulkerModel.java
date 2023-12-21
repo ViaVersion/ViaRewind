@@ -20,6 +20,7 @@ package com.viaversion.viarewind.protocol.protocol1_8to1_9.entityreplacement;
 
 import com.viaversion.viarewind.protocol.protocol1_7_2_5to1_7_6_10.ClientboundPackets1_7_2_5;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.Protocol1_8To1_9;
+import com.viaversion.viarewind.protocol.protocol1_8to1_9.storage.EntityTracker;
 import com.viaversion.viarewind.utils.PacketUtil;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
@@ -92,7 +93,7 @@ public class ShulkerModel extends EntityModel1_8To1_9 {
 		}
 		metadataList.add(new Metadata(11, MetaType1_9.VarInt, 2));
 
-		getProtocol().getMetadataRewriter().transform(EntityTypes1_10.EntityType.MAGMA_CUBE, metadataList);
+		getProtocol().getMetadataRewriter().transform(user.get(EntityTracker.class), entityId, metadataList, EntityTypes1_10.EntityType.MAGMA_CUBE);
 
 		metadataPacket.write(Types1_8.METADATA_LIST, metadataList);
 
