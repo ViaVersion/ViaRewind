@@ -28,6 +28,7 @@ import com.viaversion.viarewind.api.minecraft.EntityModel;
 import com.viaversion.viarewind.utils.PacketUtil;
 import com.viaversion.viaversion.api.minecraft.Vector;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10.EntityType;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
@@ -289,7 +290,7 @@ public class EntityPackets {
 					int entityId = wrapper.get(Type.VAR_INT, 0);
 					EntityTracker tracker = wrapper.user().get(EntityTracker.class);
 					if (tracker.getClientEntityTypes().containsKey(entityId)) {
-						protocol.getMetadataRewriter().transform(tracker.getClientEntityTypes().get(entityId), metadataList);
+						protocol.getMetadataRewriter().transform(tracker, entityId, metadataList);
 						if (metadataList.isEmpty()) wrapper.cancel();
 					} else {
 						tracker.addMetadataToBuffer(entityId, metadataList);
