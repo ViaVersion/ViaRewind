@@ -81,7 +81,7 @@ public class Windows extends StoredObject {
 			append(new StringComponent(amount + " " + TextFormatting.DARK_RED)).
 			append(new TranslationComponent("item.blazePowder.name", TextFormatting.DARK_RED));
 
-		openWindow.write(Type.COMPONENT, TextComponentSerializer.LATEST.serializeJson(title));
+		openWindow.write(Type.COMPONENT, TextComponentSerializer.V1_8.serializeJson(title));
 		openWindow.write(Type.UNSIGNED_BYTE, (short) 420);
 		PacketUtil.sendPacket(openWindow, Protocol1_8To1_9.class);
 
