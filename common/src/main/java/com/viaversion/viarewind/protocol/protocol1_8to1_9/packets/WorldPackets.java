@@ -141,29 +141,6 @@ public class WorldPackets {
 			}
 		});
 
-		//Explosion
-		protocol.registerClientbound(ClientboundPackets1_9.EXPLOSION, new PacketHandlers() {
-			@Override
-			public void register() {
-				map(Type.FLOAT);
-				map(Type.FLOAT);
-				map(Type.FLOAT);
-				map(Type.FLOAT);
-				handler(packetWrapper -> {
-					int count = packetWrapper.read(Type.INT);
-					packetWrapper.write(Type.INT, count);
-					for (int i = 0; i < count; i++) {
-						packetWrapper.passthrough(Type.UNSIGNED_BYTE);
-						packetWrapper.passthrough(Type.UNSIGNED_BYTE);
-						packetWrapper.passthrough(Type.UNSIGNED_BYTE);
-					}
-				});
-				map(Type.FLOAT);
-				map(Type.FLOAT);
-				map(Type.FLOAT);
-			}
-		});
-
 		//Unload Chunk
 		protocol.registerClientbound(ClientboundPackets1_9.UNLOAD_CHUNK, ClientboundPackets1_8.CHUNK_DATA, new PacketHandlers() {
 			@Override
