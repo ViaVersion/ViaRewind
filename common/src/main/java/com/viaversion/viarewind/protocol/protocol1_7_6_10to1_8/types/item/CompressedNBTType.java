@@ -44,7 +44,7 @@ public class CompressedNBTType extends Type<CompoundTag> {
 		ByteBuf compressed = buffer.readSlice(length);
 
 		try (GZIPInputStream gzipStream = new GZIPInputStream(new ByteBufInputStream(compressed))) {
-			return NBTIO.reader(CompoundTag.class).read(gzipStream);
+			return NBTIO.reader(CompoundTag.class).named().read(gzipStream);
 		}
 	}
 
@@ -58,7 +58,7 @@ public class CompressedNBTType extends Type<CompoundTag> {
 		ByteBuf compressedBuf = buffer.alloc().buffer();
 		try {
 			try (GZIPOutputStream gzipStream = new GZIPOutputStream(new ByteBufOutputStream(compressedBuf))) {
-				NBTIO.writer().write(gzipStream, nbt);
+				NBTIO.writer().named().write(gzipStream, nbt);
 			}
 
 			buffer.writeShort(compressedBuf.readableBytes());
