@@ -19,8 +19,8 @@
 package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.item;
 
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.libs.opennbt.NBTIO;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.CompoundTag;
+import com.viaversion.viaversion.libs.opennbt.tag.io.NBTIO;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.ByteBufOutputStream;
@@ -44,7 +44,7 @@ public class CompressedNBTType extends Type<CompoundTag> {
 		ByteBuf compressed = buffer.readSlice(length);
 
 		try (GZIPInputStream gzipStream = new GZIPInputStream(new ByteBufInputStream(compressed))) {
-			return NBTIO.readTag(gzipStream);
+			return NBTIO.reader(CompoundTag.class).read(gzipStream);
 		}
 	}
 
@@ -58,7 +58,7 @@ public class CompressedNBTType extends Type<CompoundTag> {
 		ByteBuf compressedBuf = buffer.alloc().buffer();
 		try {
 			try (GZIPOutputStream gzipStream = new GZIPOutputStream(new ByteBufOutputStream(compressedBuf))) {
-				NBTIO.writeTag(gzipStream, nbt);
+				NBTIO.writer().write(gzipStream, nbt);
 			}
 
 			buffer.writeShort(compressedBuf.readableBytes());
