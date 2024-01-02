@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaRewind - https://github.com/ViaVersion/ViaRewind
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2018-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,9 +26,11 @@ import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.libs.kyori.adventure.text.Component;
-import com.viaversion.viaversion.libs.kyori.adventure.text.format.NamedTextColor;
-import com.viaversion.viaversion.libs.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
+import com.viaversion.viaversion.libs.mcstructs.core.TextFormatting;
+import com.viaversion.viaversion.libs.mcstructs.text.ATextComponent;
+import com.viaversion.viaversion.libs.mcstructs.text.components.StringComponent;
+import com.viaversion.viaversion.libs.mcstructs.text.components.TranslationComponent;
+import com.viaversion.viaversion.libs.mcstructs.text.serializer.TextComponentSerializer;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
 
 import java.util.HashMap;
@@ -64,17 +66,22 @@ public class Windows extends StoredObject {
 	}
 
 	public static void updateBrewingStand(UserConnection user, Item blazePowder, short windowId) {
-		if (blazePowder != null && blazePowder.identifier() != 377) return;
+		if (blazePowder != null && blazePowder.identifier() != 377) {
+			return;
+		}
 		int amount = blazePowder == null ? 0 : blazePowder.amount();
+
 		PacketWrapper openWindow = PacketWrapper.create(ClientboundPackets1_8.OPEN_WINDOW, user);
 		openWindow.write(Type.UNSIGNED_BYTE, windowId);
 		openWindow.write(Type.STRING, "minecraft:brewing_stand");
-		Component title = Component.empty()
-				.append(Component.translatable("container.brewing"))
-				.append(Component.text(": ", NamedTextColor.DARK_GRAY))
-				.append(Component.text(amount + " ", NamedTextColor.DARK_RED))
-				.append(Component.translatable("item.blazePowder.name", NamedTextColor.DARK_RED));
-		openWindow.write(Type.COMPONENT, GsonComponentSerializer.colorDownsamplingGson().serializeToTree(title));
+
+		ATextComponent title = new StringComponent().
+			append(new TranslationComponent("container.brewing")).
+			append(new StringComponent(": " + TextFormatting.DARK_GRAY)).
+			append(new StringComponent(amount + " " + TextFormatting.DARK_RED)).
+			append(new TranslationComponent("item.blazePowder.name", TextFormatting.DARK_RED));
+
+		openWindow.write(Type.COMPONENT, TextComponentSerializer.V1_8.serializeJson(title));
 		openWindow.write(Type.UNSIGNED_BYTE, (short) 420);
 		PacketUtil.sendPacket(openWindow, Protocol1_8To1_9.class);
 

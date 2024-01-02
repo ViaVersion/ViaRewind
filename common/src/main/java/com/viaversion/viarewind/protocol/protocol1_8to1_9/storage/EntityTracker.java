@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaRewind - https://github.com/ViaVersion/ViaRewind
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2018-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.entity.ClientEntityIdChangeListener;
 import com.viaversion.viaversion.api.minecraft.Vector;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10.EntityType;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
@@ -43,6 +44,7 @@ public class EntityTracker extends StoredObject implements ClientEntityIdChangeL
 	private final Map<Integer, List<Metadata>> metadataBuffer = new ConcurrentHashMap<>();
 	private final Map<Integer, EntityModel> entityReplacements = new ConcurrentHashMap<>();
 	private final Map<Integer, Vector> entityOffsets = new ConcurrentHashMap<>();
+	private final Map<Integer, Byte> statusInformation = new ConcurrentHashMap<>();
 	private int playerId;
 	private int playerGamemode = 0;
 
@@ -163,7 +165,7 @@ public class EntityTracker extends StoredObject implements ClientEntityIdChangeL
 			PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_8.ENTITY_METADATA, this.getUser());
 			wrapper.write(Type.VAR_INT, entityId);
 			wrapper.write(Types1_8.METADATA_LIST, this.metadataBuffer.get(entityId));
-			protocol.getMetadataRewriter().transform(this.getClientEntityTypes().get(entityId), this.metadataBuffer.get(entityId));
+			protocol.getMetadataRewriter().transform(this, entityId, this.metadataBuffer.get(entityId));
 			if (!this.metadataBuffer.get(entityId).isEmpty()) {
 				try {
 					wrapper.send(Protocol1_8To1_9.class);
@@ -181,5 +183,9 @@ public class EntityTracker extends StoredObject implements ClientEntityIdChangeL
 		clientEntityTypes.remove(this.playerId);
 		this.playerId = playerEntityId;
 		clientEntityTypes.put(this.playerId, EntityTypes1_10.EntityType.ENTITY_HUMAN);
+	}
+
+	public Map<Integer, Byte> getStatusInformation() {
+		return statusInformation;
 	}
 }

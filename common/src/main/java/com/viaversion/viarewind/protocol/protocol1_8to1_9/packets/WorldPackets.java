@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaRewind - https://github.com/ViaVersion/ViaRewind
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2018-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -138,29 +138,6 @@ public class WorldPackets {
 				map(Type.INT);
 				map(Type.FLOAT);
 				map(Type.UNSIGNED_BYTE);
-			}
-		});
-
-		//Explosion
-		protocol.registerClientbound(ClientboundPackets1_9.EXPLOSION, new PacketHandlers() {
-			@Override
-			public void register() {
-				map(Type.FLOAT);
-				map(Type.FLOAT);
-				map(Type.FLOAT);
-				map(Type.FLOAT);
-				handler(packetWrapper -> {
-					int count = packetWrapper.read(Type.INT);
-					packetWrapper.write(Type.INT, count);
-					for (int i = 0; i < count; i++) {
-						packetWrapper.passthrough(Type.UNSIGNED_BYTE);
-						packetWrapper.passthrough(Type.UNSIGNED_BYTE);
-						packetWrapper.passthrough(Type.UNSIGNED_BYTE);
-					}
-				});
-				map(Type.FLOAT);
-				map(Type.FLOAT);
-				map(Type.FLOAT);
 			}
 		});
 

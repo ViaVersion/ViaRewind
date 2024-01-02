@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaRewind - https://github.com/ViaVersion/ViaRewind
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2018-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,12 +40,12 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.libs.gson.JsonElement;
-import com.viaversion.viaversion.libs.gson.JsonParser;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.CompoundTag;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.ListTag;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.StringTag;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
 import com.viaversion.viaversion.api.minecraft.ClientWorld;
+import com.viaversion.viaversion.util.ComponentUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.Unpooled;
@@ -790,9 +790,9 @@ public class PlayerPackets {
 					int z = packetWrapper.read(Type.INT);
 					packetWrapper.write(Type.POSITION1_8, new Position(x, y, z));
 					for (int i = 0; i < 4; i++) {
-						String line = packetWrapper.read(Type.STRING);
-						line = ChatUtil.legacyToJson(line);
-						packetWrapper.write(Type.COMPONENT, JsonParser.parseString(line));
+						final String line = packetWrapper.read(Type.STRING);
+
+						packetWrapper.write(Type.COMPONENT, ComponentUtil.legacyToJson(line));
 					}
 				});
 			}
@@ -897,7 +897,7 @@ public class PlayerPackets {
 								for (int i = 0; i < pages.size(); i++) {
 									StringTag page = pages.get(i);
 									String value = page.getValue();
-									value = ChatUtil.legacyToJson(value);
+									value = ComponentUtil.legacyToJsonString(value);
 									page.setValue(value);
 								}
 							}

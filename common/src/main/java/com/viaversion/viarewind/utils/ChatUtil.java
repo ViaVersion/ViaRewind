@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaRewind - https://github.com/ViaVersion/ViaRewind
- * Copyright (C) 2016-2023 ViaVersion and contributors
+ * Copyright (C) 2018-2024 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,11 +23,9 @@ import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.libs.gson.JsonElement;
 import com.viaversion.viaversion.libs.gson.JsonObject;
 import com.viaversion.viaversion.libs.gson.JsonParser;
-import com.viaversion.viaversion.libs.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
-import com.viaversion.viaversion.libs.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.ChatRewriter;
 import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
 import com.viaversion.viaversion.rewriter.ComponentRewriter;
+import com.viaversion.viaversion.util.ComponentUtil;
 
 import java.util.logging.Level;
 import java.util.regex.Pattern;
@@ -62,7 +60,7 @@ public class ChatUtil {
 		} else {
 			try {
 				LEGACY_REWRITER.processText(component);
-				String legacy = LegacyComponentSerializer.legacySection().serialize(ChatRewriter.HOVER_GSON_SERIALIZER.deserializeFromTree(component));
+				String legacy = ComponentUtil.jsonToLegacy(component);
 				while (legacy.startsWith("§f")) legacy = legacy.substring(2);
 				return legacy;
 			} catch (Exception ex) {
@@ -70,11 +68,6 @@ public class ChatUtil {
 			}
 			return "";
 		}
-	}
-
-	public static String legacyToJson(String legacy) {
-		if (legacy == null) return "";
-		return GsonComponentSerializer.gson().serialize(LegacyComponentSerializer.legacySection().deserialize(legacy));
 	}
 
 	public static String removeUnusedColor(String legacy, char last) {
