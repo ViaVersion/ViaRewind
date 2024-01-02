@@ -18,10 +18,9 @@
 
 package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types;
 
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.item.CompressedNBTType;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.item.NBTType;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.item.ItemArrayType;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.item.ItemType;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.item.NBTType;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.metadata.MetadataListType;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.metadata.MetadataType;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.primitive.ByteIntArrayType;
@@ -45,16 +44,13 @@ public class Types1_7_6_10 {
 	public final static Type<Position> BYTE_POSITION = new PositionUYType<>(Type.BYTE, value -> (byte) value);
 	public final static Type<Position> U_BYTE_POSITION = new PositionUYType<>(Type.UNSIGNED_BYTE, value -> (short) value);
 
-	// Uncompressed Items
-	public final static Type<CompoundTag> NBT = new NBTType();
-	public final static Type<Item> ITEM = new ItemType(false);
-
-	// Compressed Items
-	public final static Type<CompoundTag> COMPRESSED_NBT = new CompressedNBTType();
-	public final static Type<Item> COMPRESSED_NBT_ITEM = new ItemType(true);
-	public final static Type<Item[]> COMPRESSED_NBT_ITEM_ARRAY = new ItemArrayType(true);
+	// Items
+	public final static Type<CompoundTag> COMPRESSED_NBT = new NBTType();
+	public final static Type<Item> COMPRESSED_NBT_ITEM = new ItemType();
+	public final static Type<Item[]> COMPRESSED_NBT_ITEM_ARRAY = new ItemArrayType();
 
 	// Metadata
 	public final static Type<Metadata> METADATA = new MetadataType();
 	public final static Type<List<Metadata>> METADATA_LIST = new MetadataListType();
+
 }

@@ -24,11 +24,9 @@ import com.viaversion.viaversion.api.type.Type;
 import io.netty.buffer.ByteBuf;
 
 public class ItemArrayType extends Type<Item[]> {
-	private final boolean compressed;
 
-	public ItemArrayType(boolean compressed) {
+	public ItemArrayType() {
 		super(Item[].class);
-		this.compressed = compressed;
 	}
 
 	@Override
@@ -37,7 +35,7 @@ public class ItemArrayType extends Type<Item[]> {
 		Item[] items = new Item[amount];
 
 		for (int i = 0; i < amount; ++i) {
-			items[i] = (compressed ? Types1_7_6_10.COMPRESSED_NBT_ITEM : Types1_7_6_10.ITEM).read(buffer);
+			items[i] = Types1_7_6_10.COMPRESSED_NBT_ITEM.read(buffer);
 		}
 		return items;
 	}
@@ -46,7 +44,7 @@ public class ItemArrayType extends Type<Item[]> {
 	public void write(ByteBuf buffer, Item[] items) throws Exception {
 		Type.SHORT.writePrimitive(buffer, (short) items.length);
 		for (Item item : items) {
-			(compressed ? Types1_7_6_10.COMPRESSED_NBT_ITEM : Types1_7_6_10.ITEM).write(buffer, item);
+			Types1_7_6_10.COMPRESSED_NBT_ITEM.write(buffer, item);
 		}
 	}
 }

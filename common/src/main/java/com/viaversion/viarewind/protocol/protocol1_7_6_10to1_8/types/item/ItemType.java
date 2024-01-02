@@ -25,11 +25,9 @@ import com.viaversion.viaversion.api.type.Type;
 import io.netty.buffer.ByteBuf;
 
 public class ItemType extends Type<Item> {
-	private final boolean compressed;
 
-	public ItemType(boolean compressed) {
+	public ItemType() {
 		super(Item.class);
-		this.compressed = compressed;
 	}
 
 	@Override
@@ -42,7 +40,7 @@ public class ItemType extends Type<Item> {
 		item.setIdentifier(id);
 		item.setAmount(buffer.readByte());
 		item.setData(buffer.readShort());
-		item.setTag((compressed ? Types1_7_6_10.COMPRESSED_NBT : Types1_7_6_10.NBT).read(buffer));
+		item.setTag(Types1_7_6_10.COMPRESSED_NBT.read(buffer));
 		return item;
 	}
 
@@ -54,7 +52,7 @@ public class ItemType extends Type<Item> {
 			buffer.writeShort(item.identifier());
 			buffer.writeByte(item.amount());
 			buffer.writeShort(item.data());
-			(compressed ? Types1_7_6_10.COMPRESSED_NBT : Types1_7_6_10.NBT).write(buffer, item.tag());
+			Types1_7_6_10.COMPRESSED_NBT.write(buffer, item.tag());
 		}
 	}
 }
