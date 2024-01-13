@@ -19,13 +19,15 @@
 package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.item;
 
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.libs.opennbt.NBTIO;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.CompoundTag;
+import com.viaversion.viaversion.libs.opennbt.tag.io.NBTIO;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.ByteBufOutputStream;
 
-import java.io.*;
+import java.io.IOException;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 public class NBTType extends Type<CompoundTag> {
 	public NBTType() {
@@ -33,40 +35,36 @@ public class NBTType extends Type<CompoundTag> {
 	}
 
 	@Override
-	public CompoundTag read(ByteBuf buffer) {
+	public CompoundTag read(ByteBuf buffer) throws IOException {
 		short length = buffer.readShort();
-		if (length < 0) {
+		if (length <= 0) {
 			return null;
 		}
-		ByteBufInputStream byteBufInputStream = new ByteBufInputStream(buffer);
-		DataInputStream dataInputStream = new DataInputStream(byteBufInputStream);
-		try {
-			return NBTIO.readTag((DataInput) dataInputStream);
-		} catch (Throwable throwable) {
-			throwable.printStackTrace();
-		} finally {
-			try {
-				dataInputStream.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+
+		ByteBuf compressed = buffer.readSlice(length);
+
+		try (GZIPInputStream gzipStream = new GZIPInputStream(new ByteBufInputStream(compressed))) {
+			return NBTIO.reader(CompoundTag.class).named().read(gzipStream);
 		}
-		return null;
 	}
 
 	@Override
 	public void write(ByteBuf buffer, CompoundTag nbt) throws Exception {
 		if (nbt == null) {
 			buffer.writeShort(-1);
-		} else {
-			ByteBuf buf = buffer.alloc().buffer();
-			ByteBufOutputStream byteBufStream = new ByteBufOutputStream(buf);
-			DataOutputStream dataOutputStream = new DataOutputStream(byteBufStream);
-			NBTIO.writeTag((DataOutput) dataOutputStream, nbt);
-			dataOutputStream.close();
-			buffer.writeShort(buf.readableBytes());
-			buffer.writeBytes(buf);
-			buf.release();
+			return;
+		}
+
+		ByteBuf compressedBuf = buffer.alloc().buffer();
+		try {
+			try (GZIPOutputStream gzipStream = new GZIPOutputStream(new ByteBufOutputStream(compressedBuf))) {
+				NBTIO.writer().named().write(gzipStream, nbt);
+			}
+
+			buffer.writeShort(compressedBuf.readableBytes());
+			buffer.writeBytes(compressedBuf);
+		} finally {
+			compressedBuf.release();
 		}
 	}
 }

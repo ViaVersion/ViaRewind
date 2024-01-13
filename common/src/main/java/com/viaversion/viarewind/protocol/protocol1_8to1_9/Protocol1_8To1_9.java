@@ -97,7 +97,9 @@ public class Protocol1_8To1_9 extends AbstractProtocol<ClientboundPackets1_9, Cl
 		userConnection.put(new Cooldown(userConnection));
 		userConnection.put(new BlockPlaceDestroyTracker(userConnection));
 		userConnection.put(new BossBarStorage(userConnection));
-		userConnection.put(new ClientWorld(userConnection));
+		if (!userConnection.has(ClientWorld.class)) {
+			userConnection.put(new ClientWorld());
+		}
 	}
 
 	@Override

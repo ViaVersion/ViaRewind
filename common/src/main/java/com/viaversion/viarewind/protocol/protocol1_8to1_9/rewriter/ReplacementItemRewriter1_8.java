@@ -170,7 +170,7 @@ public class ReplacementItemRewriter1_8 extends ReplacementItemRewriter<Protocol
 		}
 
 		if (tag.contains("AttributeModifiers")) {
-			viaVersionTag.put("AttributeModifiers", tag.get("AttributeModifiers").clone());
+			viaVersionTag.put("AttributeModifiers", tag.get("AttributeModifiers").copy());
 		}
 
 		if (item.identifier() == 383 && item.data() == 0) {
@@ -281,7 +281,7 @@ public class ReplacementItemRewriter1_8 extends ReplacementItemRewriter<Protocol
 		if (viaVersionTag.contains("noDisplay")) tag.remove("display");
 
 		if (viaVersionTag.contains("Unbreakable")) {
-			tag.put("Unbreakable", viaVersionTag.get("Unbreakable").clone());
+			tag.put("Unbreakable", viaVersionTag.get("Unbreakable").copy());
 		}
 
 		if (viaVersionTag.contains("displayName")) {
