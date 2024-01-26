@@ -78,6 +78,7 @@ public enum MetaIndex1_7_6_10To1_8 {
 	SPIDER_CLIMBING(EntityTypes1_10.EntityType.SPIDER, 16, MetaType1_7_6_10.Byte, MetaType1_8.Byte),
 	CREEPER_STATE(EntityTypes1_10.EntityType.CREEPER, 16, MetaType1_7_6_10.Byte, MetaType1_8.Byte),
 	CREEPER_POWERED(EntityTypes1_10.EntityType.CREEPER, 17, MetaType1_7_6_10.Byte, MetaType1_8.Byte),
+	CREEPER_IGNITED(EntityTypes1_10.EntityType.CREEPER, 18, MetaType1_7_6_10.Byte, MetaType1_8.Byte),
 	GHAST_STATE(EntityTypes1_10.EntityType.GHAST, 16, MetaType1_7_6_10.Byte, MetaType1_8.Byte),
 	GHAST_IS_POWERED(EntityTypes1_10.EntityType.GHAST, 17, MetaType1_7_6_10.NonExistent, MetaType1_8.Byte),
 	SLIME_SIZE(EntityTypes1_10.EntityType.SLIME, 16, MetaType1_7_6_10.Byte, MetaType1_8.Byte),
