@@ -3,7 +3,7 @@
   "id": "viarewind",
   "name": "ViaRewind",
   "version": "${version}",
-  "description": "Allows 1.7/1.8 Minecraft clients to connect to a newer server version.",
+  "description": "ViaVersion addon to allow 1.8.x and 1.7.x clients on newer server versions.",
   "license": "GPL-3.0",
   "contact": {
     "homepage": "https://viaversion.com/rewind",
