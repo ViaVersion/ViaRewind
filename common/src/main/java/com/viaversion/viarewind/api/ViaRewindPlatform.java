@@ -52,7 +52,7 @@ public interface ViaRewindPlatform {
 
 		final ProtocolManager protocolManager = Via.getManager().getProtocolManager();
 
-		protocolManager.registerProtocol(new Protocol1_7_2_5To1_7_6_10(), ProtocolVersion.v1_7_2, ProtocolVersion.v1_7_6);
+		protocolManager.registerProtocol(new Protocol1_7_2_5To1_7_6_10(), ProtocolVersion.v1_7_1, ProtocolVersion.v1_7_6);
 		protocolManager.registerProtocol(new Protocol1_7_6_10To1_8(), ProtocolVersion.v1_7_6, ProtocolVersion.v1_8);
 		protocolManager.registerProtocol(new Protocol1_8To1_9(), ProtocolVersion.v1_8, ProtocolVersion.v1_9);
 	}
