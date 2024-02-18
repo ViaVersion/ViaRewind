@@ -23,15 +23,25 @@ import com.viaversion.viarewind.fabric.util.LoggerWrapper;
 import net.fabricmc.loader.api.FabricLoader;
 import org.apache.logging.log4j.LogManager;
 
+import java.io.File;
+import java.nio.file.Path;
 import java.util.logging.Logger;
 
 public class ViaFabricAddon implements ViaRewindPlatform, Runnable {
     private final Logger logger = new LoggerWrapper(LogManager.getLogger("ViaRewind"));
+	private File configDir;
 
     @Override
     public void run() {
-        this.init(FabricLoader.getInstance().getConfigDir().resolve("ViaRewind").resolve("config.yml").toFile());
+		final Path configDirPath = FabricLoader.getInstance().getConfigDir().resolve("ViaRewind");
+		this.configDir = configDirPath.toFile();
+		this.init(new File(getDataFolder(), "config.yml"));
     }
+
+	@Override
+	public File getDataFolder() {
+		return this.configDir;
+	}
 
 	@Override
 	public Logger getLogger() {

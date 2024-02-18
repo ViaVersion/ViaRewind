@@ -63,4 +63,11 @@ public interface ViaRewindPlatform {
 	 * @return the logger
 	 */
 	Logger getLogger();
+
+	/**
+	 * Returns ViaRewind's data folder.
+	 *
+	 * @return data folder
+	 */
+	File getDataFolder();
 }

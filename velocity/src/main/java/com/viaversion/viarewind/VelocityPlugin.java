@@ -52,12 +52,17 @@ public class VelocityPlugin implements ViaRewindPlatform {
 
 	@Inject
 	@DataDirectory
-	private Path configDir;
+	private Path configPath;
 
 	@Subscribe(order = PostOrder.LATE)
 	public void onProxyStart(ProxyInitializeEvent e) {
 		this.logger = new LoggerWrapper(loggerSlf4j);
-		Via.getManager().addEnableListener(() -> this.init(new File(configDir.toFile(), "config.yml")));
+		Via.getManager().addEnableListener(() -> this.init(new File(getDataFolder(), "config.yml")));
+	}
+
+	@Override
+	public File getDataFolder() {
+		return configPath.toFile();
 	}
 
 	@Override

@@ -42,12 +42,17 @@ public class SpongePlugin implements ViaRewindPlatform {
 
 	@Inject
 	@ConfigDir(sharedRoot = false)
-	private Path configDir;
+	private Path configPath;
 
 	@Listener(order = Order.LATE)
 	public void loadPlugin(ConstructPluginEvent e) {
 		this.logger = new LoggerWrapper(loggerSlf4j);
-		Via.getManager().addEnableListener(() -> this.init(new File(configDir.toFile(), "config.yml")));
+		Via.getManager().addEnableListener(() -> this.init(new File(getDataFolder(), "config.yml")));
+	}
+
+	@Override
+	public File getDataFolder() {
+		return configPath.toFile();
 	}
 
 	@Override
