@@ -22,8 +22,10 @@ import com.viaversion.viarewind.ViaRewind;
 import com.viaversion.viarewind.api.rewriter.ReplacementEntityTracker;
 import com.viaversion.viarewind.protocol.protocol1_7_2_5to1_7_6_10.ServerboundPackets1_7_2_5;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.metadata.MetaIndex1_7_6_10To1_8;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.model.VirtualHologramEntity;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.metadata.MetadataRewriter;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.metadata.MetaType1_7_6_10;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
@@ -94,6 +96,12 @@ public class EntityTracker1_7_6_10 extends ReplacementEntityTracker {
 		super.clear();
 
 		vehicleMap.clear();
+	}
+
+	@Override
+	public void generateMetadata(List<Metadata> metadata, String name) {
+		metadata.add(new Metadata(MetaIndex1_7_6_10To1_8.ENTITY_LIVING_NAME_TAG_VISIBILITY.getNewIndex(), MetaType1_7_6_10.Byte, (byte) 1));
+		metadata.add(new Metadata(MetaIndex1_7_6_10To1_8.ENTITY_LIVING_NAME_TAG.getNewIndex(), MetaType1_7_6_10.String, name));
 	}
 
 	@Override

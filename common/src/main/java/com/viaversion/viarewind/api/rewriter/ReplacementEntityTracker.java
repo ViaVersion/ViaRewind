@@ -32,7 +32,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ReplacementEntityTracker extends StoredObject implements ClientEntityIdChangeListener {
+public abstract class ReplacementEntityTracker extends StoredObject implements ClientEntityIdChangeListener {
 	private final Map<EntityTypes1_10.EntityType, Pair<EntityTypes1_10.EntityType, String>> ENTITY_REPLACEMENTS = new HashMap<>();
 
 	private final Map<Integer, EntityTypes1_10.EntityType> entityMap = new HashMap<>();
@@ -75,11 +75,17 @@ public class ReplacementEntityTracker extends StoredObject implements ClientEnti
 		return ENTITY_REPLACEMENTS.containsKey(type);
 	}
 
+	/**
+	 * Generates the metadata for settings the entity name and visibility for the entity.
+	 *
+	 * @param metadata The list of metadata to add to
+	 * @param name     The name of the entity
+	 */
+	public abstract void generateMetadata(final List<Metadata> metadata, final String name);
+
 	public void updateMetadata(final int entityId, final List<Metadata> metadata) throws Exception {
 		final String name = ENTITY_REPLACEMENTS.get(entityMap.get(entityId)).value();
-
-		metadata.add(new Metadata(MetaIndex1_7_6_10To1_8.ENTITY_LIVING_NAME_TAG_VISIBILITY.getNewIndex(), MetaType1_7_6_10.Byte, (byte) 1)); // TODO: Make this definable for 1.8 -> 1.9 ?
-		metadata.add(new Metadata(MetaIndex1_7_6_10To1_8.ENTITY_LIVING_NAME_TAG.getNewIndex(), MetaType1_7_6_10.String, name));
+		generateMetadata(metadata, name);
 	}
 
 	@Override
