@@ -24,6 +24,7 @@ import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.EntityTra
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.GameProfileStorage;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.PlayerSessionStorage;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
+import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
@@ -213,7 +214,7 @@ public class EntityPackets {
 					final EntityTracker1_7_6_10 tracker = wrapper.user().get(EntityTracker1_7_6_10.class);
 
 					final int entityId = wrapper.get(Type.INT, 0);
-					final EntityTypes1_10.EntityType type = tracker.getEntityMap().get(entityId);
+					final EntityType type = tracker.getEntityMap().get(entityId);
 
 					if (type == EntityTypes1_10.EntityType.MINECART_ABSTRACT) { // TODO | Realign all entities?
 						int y = wrapper.get(Type.INT, 2);

@@ -19,6 +19,7 @@
 package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.metadata;
 
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.metadata.MetaType1_7_6_10;
+import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_8;
 import com.viaversion.viaversion.util.Pair;
@@ -139,8 +140,8 @@ public enum MetaIndex1_7_6_10To1_8 {
 		this.newType = newType;
 	}
 
-	private static Optional<MetaIndex1_7_6_10To1_8> getIndex(EntityTypes1_10.EntityType type, int index) {
-		Pair<EntityTypes1_10.EntityType, Integer> pair = new Pair<>(type, index);
+	private static Optional<MetaIndex1_7_6_10To1_8> getIndex(EntityType type, int index) {
+		Pair<EntityType, Integer> pair = new Pair<>(type, index);
 		if (metadataRewrites.containsKey(pair)) {
 			return Optional.of(metadataRewrites.get(pair));
 		}
@@ -168,8 +169,8 @@ public enum MetaIndex1_7_6_10To1_8 {
 		return index;
 	}
 
-	public static MetaIndex1_7_6_10To1_8 searchIndex(EntityTypes1_10.EntityType type, int index) {
-		EntityTypes1_10.EntityType currentType = type;
+	public static MetaIndex1_7_6_10To1_8 searchIndex(EntityType type, int index) {
+		EntityType currentType = type;
 		do {
 			Optional<MetaIndex1_7_6_10To1_8> optMeta = getIndex(currentType, index);
 
