@@ -40,20 +40,29 @@ dependencies {
     compileOnly "com.google.guava:guava:${project.guava_version}"
 }
 
-archivesBaseName = project.maven_name
-group = project.maven_group
-version = project.maven_version
+base {
+    archivesName = project.maven_name
+    group = project.maven_group
+    version = project.maven_version
+    description = "ViaVersion addon to allow 1.8.x and 1.7.x clients on newer server versions."
+}
 
 java.sourceCompatibility = JavaVersion.VERSION_1_8
 
 tasks {
     // Variable replacements
     processResources {
-        inputs.property "version", project.version
+        inputs.properties(
+                "version": project.version,
+                "description": project.description
+        )
 
         for (final def file in ["plugin.yml", "bungee.yml", "META-INF/sponge_plugins.json", "fabric.mod.json"]) {
             filesMatching(file) {
-                expand "version": version
+                expand(
+                        "version": version,
+                        "description": description
+                )
             }
         }
     }

@@ -40,7 +40,8 @@
     {
       "id": "viarewind",
       "name": "ViaRewind",
-      "entrypoint": "com.viaversion.viarewind.SpongePlugin"
+      "entrypoint": "com.viaversion.viarewind.SpongePlugin",
+      "description": "${description}"
     }
   ]
 }
