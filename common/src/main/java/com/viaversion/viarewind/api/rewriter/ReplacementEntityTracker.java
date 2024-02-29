@@ -21,7 +21,9 @@ package com.viaversion.viarewind.api.rewriter;
 import com.viaversion.viaversion.api.connection.StoredObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.entity.ClientEntityIdChangeListener;
+import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
+import com.viaversion.viaversion.api.minecraft.metadata.MetaType;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.util.Pair;
@@ -31,21 +33,34 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class ReplacementEntityTracker extends StoredObject implements ClientEntityIdChangeListener {
-	private final Map<EntityTypes1_10.EntityType, Pair<EntityTypes1_10.EntityType, String>> ENTITY_REPLACEMENTS = new HashMap<>();
+	private final Map<EntityType, Pair<EntityType, String>> ENTITY_REPLACEMENTS = new HashMap<>();
 
-	private final Map<Integer, EntityTypes1_10.EntityType> entityMap = new HashMap<>();
-	private final Map<Integer, EntityTypes1_10.EntityType> entityReplacementMap = new HashMap<>();
+	private final Map<Integer, EntityType> entityMap = new HashMap<>();
+	private final Map<Integer, EntityType> entityReplacementMap = new HashMap<>();
 
 	private int playerId = -1;
 
 	private final ProtocolVersion version;
 
-	public ReplacementEntityTracker(UserConnection user, final ProtocolVersion version) {
-		super(user);
-		this.version = version;
+	private final int displayNameVisibilityIndex;
+	private final MetaType displayNameVisibilityType;
+	private final int displayNameIndex;
+	private final MetaType displayNameType;
+
+	public ReplacementEntityTracker(UserConnection user, ProtocolVersion version, MetaType displayNameVisibilityType, MetaType displayNameType) {
+		this(user, version, 3, displayNameVisibilityType, 2, displayNameType);
 	}
 
-	public void registerEntity(final EntityTypes1_10.EntityType oldType, final EntityTypes1_10.EntityType newType, final String name) {
+	public ReplacementEntityTracker(UserConnection user, ProtocolVersion version, int displayNameVisibilityIndex, MetaType displayNameVisibilityType, int displayNameIndex, MetaType displayNameType) {
+		super(user);
+		this.version = version;
+		this.displayNameVisibilityIndex = displayNameVisibilityIndex;
+		this.displayNameVisibilityType = displayNameVisibilityType;
+		this.displayNameIndex = displayNameIndex;
+		this.displayNameType = displayNameType;
+	}
+
+	public void registerEntity(final EntityType oldType, final EntityType newType, final String name) {
 		ENTITY_REPLACEMENTS.put(oldType, new Pair<>(newType, this.version.getName() + " " + name));
 	}
 
@@ -73,17 +88,10 @@ public abstract class ReplacementEntityTracker extends StoredObject implements C
 		return ENTITY_REPLACEMENTS.containsKey(type);
 	}
 
-	/**
-	 * Generates the metadata for settings the entity name and visibility for the entity.
-	 *
-	 * @param metadata The list of metadata to add to
-	 * @param name     The name of the entity
-	 */
-	public abstract void generateMetadata(final List<Metadata> metadata, final String name);
-
 	public void updateMetadata(final int entityId, final List<Metadata> metadata) throws Exception {
 		final String name = ENTITY_REPLACEMENTS.get(entityMap.get(entityId)).value();
-		generateMetadata(metadata, name);
+		metadata.add(new Metadata(this.displayNameVisibilityIndex, this.displayNameVisibilityType, (byte) 1));
+		metadata.add(new Metadata(this.displayNameIndex, this.displayNameType, name));
 	}
 
 	@Override
@@ -94,11 +102,11 @@ public abstract class ReplacementEntityTracker extends StoredObject implements C
 		this.playerId = entityId;
 	}
 
-	public Map<Integer, EntityTypes1_10.EntityType> getEntityMap() {
+	public Map<Integer, EntityType> getEntityMap() {
 		return entityMap;
 	}
 
-	public Map<Integer, EntityTypes1_10.EntityType> getEntityReplacementMap() {
+	public Map<Integer, EntityType> getEntityReplacementMap() {
 		return entityReplacementMap;
 	}
 

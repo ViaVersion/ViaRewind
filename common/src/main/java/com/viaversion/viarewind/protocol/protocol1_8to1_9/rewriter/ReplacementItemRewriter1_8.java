@@ -19,8 +19,8 @@
 package com.viaversion.viarewind.protocol.protocol1_8to1_9.rewriter;
 
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.Protocol1_8To1_9;
-import com.viaversion.viarewind.api.rewriter.item.Replacement;
-import com.viaversion.viarewind.api.rewriter.item.ReplacementItemRewriter;
+import com.viaversion.viarewind.api.rewriter.Replacement;
+import com.viaversion.viarewind.api.rewriter.ReplacementItemRewriter;
 import com.viaversion.viarewind.utils.Enchantments;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;

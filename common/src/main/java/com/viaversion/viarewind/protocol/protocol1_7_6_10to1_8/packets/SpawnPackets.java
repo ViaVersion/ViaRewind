@@ -24,7 +24,7 @@ import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.model.VirtualHolo
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.GameProfileStorage;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.EntityTracker1_7_6_10;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
-import com.viaversion.viarewind.api.rewriter.item.Replacement;
+import com.viaversion.viarewind.api.rewriter.Replacement;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;

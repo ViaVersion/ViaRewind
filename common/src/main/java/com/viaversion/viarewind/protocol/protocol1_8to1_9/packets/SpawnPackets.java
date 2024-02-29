@@ -24,7 +24,7 @@ import com.viaversion.viarewind.protocol.protocol1_8to1_9.entityreplacement.Shul
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.entityreplacement.ShulkerModel;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.storage.EntityTracker;
 import com.viaversion.viarewind.api.minecraft.EntityModel;
-import com.viaversion.viarewind.api.rewriter.item.Replacement;
+import com.viaversion.viarewind.api.rewriter.Replacement;
 import com.viaversion.viarewind.utils.PacketUtil;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
