@@ -52,16 +52,11 @@ java.sourceCompatibility = JavaVersion.VERSION_1_8
 tasks {
     // Variable replacements
     processResources {
-        inputs.properties(
-                "version": project.version,
-                "description": project.description
-        )
-
         for (final def file in ["plugin.yml", "bungee.yml", "META-INF/sponge_plugins.json", "fabric.mod.json"]) {
             filesMatching(file) {
                 expand(
-                        "version": version,
-                        "description": description
+                        "version": project.version,
+                        "description": project.description
                 )
             }
         }

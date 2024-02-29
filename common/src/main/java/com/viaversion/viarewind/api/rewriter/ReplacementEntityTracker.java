@@ -18,8 +18,6 @@
 
 package com.viaversion.viarewind.api.rewriter;
 
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.metadata.MetaIndex1_7_6_10To1_8;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.metadata.MetaType1_7_6_10;
 import com.viaversion.viaversion.api.connection.StoredObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.entity.ClientEntityIdChangeListener;
