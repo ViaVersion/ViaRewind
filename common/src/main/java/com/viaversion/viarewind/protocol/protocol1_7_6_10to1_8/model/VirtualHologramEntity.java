@@ -36,6 +36,7 @@ import com.viaversion.viaversion.api.type.Type;
 import java.util.ArrayList;
 import java.util.List;
 
+// Close this class file while you still can, because it's about to get ugly
 public class VirtualHologramEntity {
 	private final List<Metadata> metadataTracker = new ArrayList<>();
 	private double locX, locY, locZ;
@@ -46,7 +47,6 @@ public class VirtualHologramEntity {
 
 	private int[] entityIds = null;
 	private State currentState = null;
-	private boolean invisible = false;
 	private String name = null;
 	private float yaw, pitch;
 	private float headYaw;
@@ -123,7 +123,7 @@ public class VirtualHologramEntity {
 				armorStandFlags = ((Number) metadata.getValue()).byteValue();
 			}
 		}
-		invisible = (flags & 0x20) != 0;
+		final boolean invisible = (flags & 0x20) != 0;
 		small = (armorStandFlags & 0x01) != 0;
 		marker = (armorStandFlags & 0x10) != 0;
 
