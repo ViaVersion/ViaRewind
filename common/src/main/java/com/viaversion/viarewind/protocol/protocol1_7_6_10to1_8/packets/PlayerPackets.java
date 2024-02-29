@@ -403,7 +403,7 @@ public class PlayerPackets {
 				map(Type.STRING);
 				handler(packetWrapper -> {
 					String channel = packetWrapper.get(Type.STRING, 0);
-					if (channel.equalsIgnoreCase("MC|TrList")) {
+					if (channel.equals("MC|TrList")) {
 						packetWrapper.passthrough(Type.INT);  //Window Id
 
 						int size;
@@ -430,7 +430,7 @@ public class PlayerPackets {
 							packetWrapper.read(Type.INT); //Uses
 							packetWrapper.read(Type.INT); //Max Uses
 						}
-					} else if (channel.equalsIgnoreCase("MC|Brand")) {
+					} else if (channel.equals("MC|Brand")) {
 						packetWrapper.write(Type.REMAINING_BYTES, packetWrapper.read(Type.STRING).getBytes(StandardCharsets.UTF_8));
 					}
 
