@@ -28,5 +28,12 @@
   },
   "recommends": {
     "viabackwards": "*"
+  },
+  "custom": {
+    "modmenu:api": true,
+    "modmenu": {
+      "badges": [ "library" ],
+      "parent": "viafabric"
+    }
   }
 }
