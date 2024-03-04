@@ -3,7 +3,7 @@
   "id": "viarewind",
   "name": "ViaRewind",
   "version": "${version}",
-  "description": "ViaVersion addon to allow 1.8.x and 1.7.x clients on newer server versions.",
+  "description": "${description}",
   "license": "GPL-3.0",
   "contact": {
     "homepage": "https://viaversion.com/rewind",
@@ -28,5 +28,12 @@
   },
   "recommends": {
     "viabackwards": "*"
+  },
+  "custom": {
+    "modmenu:api": true,
+    "modmenu": {
+      "badges": [ "library" ],
+      "parent": "viafabric"
+    }
   }
 }

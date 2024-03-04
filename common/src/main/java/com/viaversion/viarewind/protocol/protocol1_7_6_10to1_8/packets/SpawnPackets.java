@@ -24,7 +24,7 @@ import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.model.VirtualHolo
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.GameProfileStorage;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.EntityTracker1_7_6_10;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
-import com.viaversion.viarewind.api.rewriter.item.Replacement;
+import com.viaversion.viarewind.api.rewriter.Replacement;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
@@ -250,17 +250,30 @@ public class SpawnPackets {
 			public void register() {
 				map(Type.VAR_INT); // entity id
 				map(Type.STRING); // title
-				handler(wrapper -> {
-					final Position position = wrapper.read(Type.POSITION1_8);
-
-					wrapper.write(Type.INT, position.x());
-					wrapper.write(Type.INT, position.y());
-					wrapper.write(Type.INT, position.z());
-				});
+				map(Type.POSITION1_8, Types1_7_6_10.INT_POSITION); // position
 				map(Type.UNSIGNED_BYTE, Type.INT); // rotation
 				handler(wrapper -> {
-					final EntityTracker1_7_6_10 tracker = wrapper.user().get(EntityTracker1_7_6_10.class);
+					final Position position = wrapper.get(Types1_7_6_10.INT_POSITION, 0);
+					final int rotation = wrapper.get(Type.INT, 0);
+					int modX = 0;
+					int modZ = 0;
+					switch (rotation) {
+						case 0:
+							modZ = -1;
+							break;
+						case 1:
+							modX = 1;
+							break;
+						case 2:
+							modZ = 1;
+							break;
+						case 3:
+							modX = -1;
+							break;
+					}
+					wrapper.set(Types1_7_6_10.INT_POSITION, 0, new Position(position.x() + modX, position.y(), position.z() + modZ));
 
+					final EntityTracker1_7_6_10 tracker = wrapper.user().get(EntityTracker1_7_6_10.class);
 					tracker.addEntity(wrapper.get(Type.VAR_INT, 0), EntityTypes1_10.EntityType.PAINTING);
 				});
 			}

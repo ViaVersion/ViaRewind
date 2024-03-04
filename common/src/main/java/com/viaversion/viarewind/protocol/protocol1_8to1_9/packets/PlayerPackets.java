@@ -86,7 +86,7 @@ public class PlayerPackets {
 				map(Type.STRING);
 				handler(packetWrapper -> {
 					String channel = packetWrapper.get(Type.STRING, 0);
-					if (channel.equalsIgnoreCase("MC|TrList")) {
+					if (channel.equals("MC|TrList")) {
 						packetWrapper.passthrough(Type.INT);  //Window Id
 
 						int size;
@@ -111,7 +111,7 @@ public class PlayerPackets {
 							packetWrapper.passthrough(Type.INT); //Uses
 							packetWrapper.passthrough(Type.INT); //Max Uses
 						}
-					} else if (channel.equalsIgnoreCase("MC|BOpen")) {
+					} else if (channel.equals("MC|BOpen")) {
 						packetWrapper.read(Type.VAR_INT);
 					}
 				});
@@ -601,7 +601,7 @@ public class PlayerPackets {
 				map(Type.STRING);
 				handler(packetWrapper -> {
 					String channel = packetWrapper.get(Type.STRING, 0);
-					if (channel.equalsIgnoreCase("MC|BEdit") || channel.equalsIgnoreCase("MC|BSign")) {
+					if (channel.equals("MC|BEdit") || channel.equals("MC|BSign")) {
 						Item book = packetWrapper.passthrough(Type.ITEM);
 						book.setIdentifier(386);
 						CompoundTag tag = book.tag();
@@ -622,7 +622,7 @@ public class PlayerPackets {
 								page.setValue(value);
 							}
 						}
-					} else if (channel.equalsIgnoreCase("MC|AdvCdm")) {
+					} else if (channel.equals("MC|AdvCdm")) {
 						packetWrapper.set(Type.STRING, 0, channel = "MC|AdvCmd");
 					}
 				});

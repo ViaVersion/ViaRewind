@@ -22,7 +22,7 @@ import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10T
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.WorldBorderEmulator;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.chunk.ChunkType1_7_6;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.chunk.BulkChunkType1_7_6;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.model.ParticleIndex1_7_6_10;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.rewriter.ParticleIndex1_7_6_10;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
 import com.viaversion.viarewind.utils.ChatUtil;
 import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
@@ -164,7 +164,8 @@ public class WorldPackets {
 						if (id >= 256 && id <= 422 || id >= 2256 && id <= 2267) {  //item
 							particle = ParticleIndex1_7_6_10.ICON_CRACK;
 						} else if (id >= 0 && id <= 164 || id >= 170 && id <= 175) {
-							if (particle == ParticleIndex1_7_6_10.ICON_CRACK) particle = ParticleIndex1_7_6_10.BLOCK_CRACK;
+							if (particle == ParticleIndex1_7_6_10.ICON_CRACK)
+								particle = ParticleIndex1_7_6_10.BLOCK_CRACK;
 						} else {
 							wrapper.cancel();
 							return;
@@ -262,7 +263,7 @@ public class WorldPackets {
 					final PacketWrapper mapData = PacketWrapper.create(ClientboundPackets1_8.MAP_DATA, wrapper.user());
 					mapData.write(Type.VAR_INT, id); // map id
 					mapData.write(Type.SHORT, (short) 2); // data length
-					mapData.write(new FixedByteArrayType(2), new byte[]{ 2, scale }); // data
+					mapData.write(new FixedByteArrayType(2), new byte[]{2, scale}); // data
 
 					mapData.send(Protocol1_7_6_10To1_8.class, true);
 				});

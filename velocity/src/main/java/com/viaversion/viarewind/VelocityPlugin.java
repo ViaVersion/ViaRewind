@@ -35,17 +35,18 @@ import java.nio.file.Path;
 import java.util.logging.Logger;
 
 @Plugin(id = "viarewind",
-		name = "ViaRewind",
-		version = ViaRewindPlatform.VERSION,
-		authors = {"Gerrygames", "FlorianMichael/EnZaXD", "creeper123123321"},
-		dependencies = {
-			@Dependency(id = "viaversion"),
-			@Dependency(id = "viabackwards", optional = true)
-		},
-		url = "https://viaversion.com/rewind"
+	name = "ViaRewind",
+	version = ViaRewindPlatform.VERSION,
+	authors = {"Gerrygames", "FlorianMichael/EnZaXD", "creeper123123321"},
+	description = "ViaVersion addon to allow 1.8.x and 1.7.x clients on newer server versions.",
+	dependencies = {
+		@Dependency(id = "viaversion"),
+		@Dependency(id = "viabackwards", optional = true)
+	},
+	url = "https://viaversion.com/rewind"
 )
 public class VelocityPlugin implements ViaRewindPlatform {
-    private Logger logger;
+	private Logger logger;
 
 	@Inject
 	private org.slf4j.Logger loggerSlf4j;

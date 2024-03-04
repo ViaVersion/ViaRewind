@@ -20,7 +20,8 @@ package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.model;
 
 import com.viaversion.viarewind.protocol.protocol1_7_2_5to1_7_6_10.ClientboundPackets1_7_2_5;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.rewriter.MetadataRewriter;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.metadata.MetaIndex1_7_6_10To1_8;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.metadata.MetadataRewriter;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.metadata.MetaType1_7_6_10;
 import com.viaversion.viarewind.utils.PacketUtil;
@@ -36,6 +37,7 @@ import com.viaversion.viaversion.api.type.Type;
 import java.util.ArrayList;
 import java.util.List;
 
+// Close this class file while you still can, because it's about to get ugly
 public class VirtualHologramEntity {
 	private final List<Metadata> metadataTracker = new ArrayList<>();
 	private double locX, locY, locZ;
@@ -46,7 +48,6 @@ public class VirtualHologramEntity {
 
 	private int[] entityIds = null;
 	private State currentState = null;
-	private boolean invisible = false;
 	private String name = null;
 	private float yaw, pitch;
 	private float headYaw;
@@ -123,7 +124,7 @@ public class VirtualHologramEntity {
 				armorStandFlags = ((Number) metadata.getValue()).byteValue();
 			}
 		}
-		invisible = (flags & 0x20) != 0;
+		final boolean invisible = (flags & 0x20) != 0;
 		small = (armorStandFlags & 0x01) != 0;
 		marker = (armorStandFlags & 0x10) != 0;
 

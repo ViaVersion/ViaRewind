@@ -23,7 +23,8 @@ import com.viaversion.viarewind.api.rewriter.ReplacementEntityTracker;
 import com.viaversion.viarewind.protocol.protocol1_7_2_5to1_7_6_10.ServerboundPackets1_7_2_5;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.model.VirtualHologramEntity;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.rewriter.MetadataRewriter;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.metadata.MetadataRewriter;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.metadata.MetaType1_7_6_10;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
@@ -52,7 +53,7 @@ public class EntityTracker1_7_6_10 extends ReplacementEntityTracker {
 	public int spectatingPlayerId = -1;
 
 	public EntityTracker1_7_6_10(UserConnection user, final MetadataRewriter metadataRewriter) {
-		super(user, ProtocolVersion.v1_8);
+		super(user, ProtocolVersion.v1_8, MetaType1_7_6_10.Byte, MetaType1_7_6_10.String);
 		this.metadataRewriter = metadataRewriter;
 
 		registerEntity(EntityTypes1_10.EntityType.GUARDIAN, EntityTypes1_10.EntityType.SQUID, "Guardian");

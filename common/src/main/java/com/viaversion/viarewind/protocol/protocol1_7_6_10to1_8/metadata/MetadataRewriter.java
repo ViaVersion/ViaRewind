@@ -16,13 +16,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.rewriter;
+package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.metadata;
 
 import com.viaversion.viarewind.ViaRewind;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.model.MetaIndex1_7_6_10To1_8;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.metadata.MetaType1_7_6_10;
-import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
+import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_8;
@@ -40,7 +39,7 @@ public class MetadataRewriter {
 		this.protocol = protocol;
 	}
 
-	public void transform(EntityTypes1_10.EntityType type, List<Metadata> list) {
+	public void transform(EntityType type, List<Metadata> list) {
 		for (Metadata entry : new ArrayList<>(list)) {
 			final MetaIndex1_7_6_10To1_8 metaIndex = MetaIndex1_7_6_10To1_8.searchIndex(type, entry.id());
 			try {

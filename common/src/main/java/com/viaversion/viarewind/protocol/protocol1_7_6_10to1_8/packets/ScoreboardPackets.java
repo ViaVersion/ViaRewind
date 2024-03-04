@@ -34,10 +34,6 @@ import java.util.Optional;
 public class ScoreboardPackets {
 
 	public static void register(Protocol1_7_6_10To1_8 protocol) {
-
-		/*  OUTGOING  */
-
-		//Scoreboard Objective
 		protocol.registerClientbound(ClientboundPackets1_8.SCOREBOARD_OBJECTIVE, new PacketHandlers() {
 			@Override
 			public void register() {
@@ -95,7 +91,6 @@ public class ScoreboardPackets {
 			}
 		});
 
-		//Update Score
 		protocol.registerClientbound(ClientboundPackets1_8.UPDATE_SCORE, new PacketHandlers() {
 			@Override
 			public void register() {
@@ -225,30 +220,29 @@ public class ScoreboardPackets {
 						String[] entries = packetWrapper.read(Type.STRING_ARRAY);
 						List<String> entryList = new ArrayList<>();
 
-						for (int i = 0; i < entries.length; i++) {
-							String entry = entries[i];
-							String username = packetWrapper.user().getProtocolInfo().getUsername();
+                        for (String entry : entries) {
+                            String username = packetWrapper.user().getProtocolInfo().getUsername();
 
-							if (mode == 4) {
-								if (!scoreboard.isPlayerInTeam(entry, team)) continue;
-								scoreboard.removePlayerFromTeam(entry, team);
-								if (entry.equals(username)) {
-									PacketWrapper sidebarPacket = packetWrapper.create(0x3D);
-									sidebarPacket.write(Type.BYTE, (byte) 1);
-									sidebarPacket.write(Type.STRING, scoreboard.getColorIndependentSidebar() == null ? "" : scoreboard.getColorIndependentSidebar());
-									PacketUtil.sendPacket(sidebarPacket, Protocol1_7_6_10To1_8.class);
-								}
-							} else {
-								scoreboard.addPlayerToTeam(entry, team);
-								if (entry.equals(username) && scoreboard.getColorDependentSidebar().containsKey(color)) {
-									PacketWrapper displayObjective = packetWrapper.create(0x3D);
-									displayObjective.write(Type.BYTE, (byte) 1);
-									displayObjective.write(Type.STRING, scoreboard.getColorDependentSidebar().get(color));
-									PacketUtil.sendPacket(displayObjective, Protocol1_7_6_10To1_8.class);
-								}
-							}
-							entryList.add(entry);
-						}
+                            if (mode == 4) {
+                                if (!scoreboard.isPlayerInTeam(entry, team)) continue;
+                                scoreboard.removePlayerFromTeam(entry, team);
+                                if (entry.equals(username)) {
+                                    PacketWrapper sidebarPacket = packetWrapper.create(0x3D);
+                                    sidebarPacket.write(Type.BYTE, (byte) 1);
+                                    sidebarPacket.write(Type.STRING, scoreboard.getColorIndependentSidebar() == null ? "" : scoreboard.getColorIndependentSidebar());
+                                    PacketUtil.sendPacket(sidebarPacket, Protocol1_7_6_10To1_8.class);
+                                }
+                            } else {
+                                scoreboard.addPlayerToTeam(entry, team);
+                                if (entry.equals(username) && scoreboard.getColorDependentSidebar().containsKey(color)) {
+                                    PacketWrapper displayObjective = packetWrapper.create(0x3D);
+                                    displayObjective.write(Type.BYTE, (byte) 1);
+                                    displayObjective.write(Type.STRING, scoreboard.getColorDependentSidebar().get(color));
+                                    PacketUtil.sendPacket(displayObjective, Protocol1_7_6_10To1_8.class);
+                                }
+                            }
+                            entryList.add(entry);
+                        }
 
 						packetWrapper.write(Type.SHORT, (short) entryList.size());
 						for (String entry : entryList) {
