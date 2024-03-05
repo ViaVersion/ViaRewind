@@ -23,6 +23,7 @@ import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.rewriter.ItemRewriter;
+import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.libs.fastutil.ints.Int2ObjectMap;
 import com.viaversion.viaversion.libs.fastutil.ints.Int2ObjectOpenHashMap;
 
@@ -111,5 +112,29 @@ public abstract class ReplacementItemRewriter<T extends AbstractProtocol<?, ?, ?
 	@Override
 	public T protocol() {
 		return this.protocol;
+	}
+
+	/*
+	ViaRewind protocols don't need this
+	 */
+
+	@Override
+	public Type<Item> itemType() {
+		return null;
+	}
+
+	@Override
+	public Type<Item[]> itemArrayType() {
+		return null;
+	}
+
+	@Override
+	public Type<Item> mappedItemType() {
+		return itemType();
+	}
+
+	@Override
+	public Type<Item[]> mappedItemArrayType() {
+		return itemArrayType();
 	}
 }
