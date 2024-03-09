@@ -113,28 +113,4 @@ public abstract class ReplacementItemRewriter<T extends AbstractProtocol<?, ?, ?
 	public T protocol() {
 		return this.protocol;
 	}
-
-	/*
-	ViaRewind protocols don't need this
-	 */
-
-	@Override
-	public Type<Item> itemType() {
-		return null;
-	}
-
-	@Override
-	public Type<Item[]> itemArrayType() {
-		return null;
-	}
-
-	@Override
-	public Type<Item> mappedItemType() {
-		return itemType();
-	}
-
-	@Override
-	public Type<Item[]> mappedItemArrayType() {
-		return itemArrayType();
-	}
 }
