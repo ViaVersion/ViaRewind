@@ -143,11 +143,11 @@ public class ReplacementItemRewriter1_7_6_10 extends ReplacementItemRewriter<Pro
 		}
 
 		if (tag.contains("ench") || tag.contains("StoredEnchantments")) {
-			ListTag enchTag = tag.contains("ench") ? tag.get("ench") : tag.get("StoredEnchantments");
+			ListTag<CompoundTag> enchTag = tag.contains("ench") ? tag.getListTag("ench", CompoundTag.class) : tag.getListTag("StoredEnchantments", CompoundTag.class);
 			List<Tag> lore = new ArrayList<>();
-			for (Tag ench : new ArrayList<>(enchTag.getValue())) {
-				short id = ((NumberTag) ((CompoundTag) ench).get("id")).asShort();
-				short lvl = ((NumberTag) ((CompoundTag) ench).get("lvl")).asShort();
+			for (CompoundTag ench : new ArrayList<>(enchTag.getValue())) {
+				short id = ((NumberTag) ench.get("id")).asShort();
+				short lvl = ((NumberTag) ench.get("lvl")).asShort();
 				String s;
 				if (id == 8) {
 					s = "§r§7Depth Strider ";
@@ -171,8 +171,8 @@ public class ReplacementItemRewriter1_7_6_10 extends ReplacementItemRewriter<Pro
 		}
 
 		if (item.identifier() == 387 && tag.contains("pages")) {
-			ListTag pages = tag.get("pages");
-			ListTag oldPages = new ListTag(StringTag.class);
+			ListTag<StringTag> pages = tag.getListTag("pages", StringTag.class);
+			ListTag<StringTag> oldPages = new ListTag<>(StringTag.class);
 			viaRewindTag.put("pages", oldPages);
 
 			for (int i = 0; i < pages.size(); i++) {

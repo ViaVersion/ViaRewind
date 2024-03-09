@@ -893,7 +893,7 @@ public class PlayerPackets {
 							Item book = packetWrapper.read(Types1_7_6_10.COMPRESSED_NBT_ITEM);
 							CompoundTag tag = book.tag();
 							if (tag != null && tag.contains("pages")) {
-								ListTag pages = tag.get("pages");
+								ListTag<StringTag> pages = tag.getListTag("pages", StringTag.class);
 								for (int i = 0; i < pages.size(); i++) {
 									StringTag page = pages.get(i);
 									String value = page.getValue();

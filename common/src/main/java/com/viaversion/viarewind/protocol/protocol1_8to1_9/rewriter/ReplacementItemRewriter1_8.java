@@ -124,11 +124,11 @@ public class ReplacementItemRewriter1_8 extends ReplacementItemRewriter<Protocol
 		}
 
 		if (tag.contains("ench") || tag.contains("StoredEnchantments")) {
-			ListTag enchTag = tag.contains("ench") ? tag.get("ench") : tag.get("StoredEnchantments");
+			ListTag<CompoundTag> enchTag = tag.contains("ench") ? tag.getListTag("ench", CompoundTag.class) : tag.getListTag("StoredEnchantments", CompoundTag.class);
 			List<Tag> lore = new ArrayList<>();
-			for (Tag ench : new ArrayList<>(enchTag.getValue())) {
-				short id = ((NumberTag) ((CompoundTag) ench).get("id")).asShort();
-				short lvl = ((NumberTag) ((CompoundTag) ench).get("lvl")).asShort();
+			for (CompoundTag ench : new ArrayList<>(enchTag.getValue())) {
+				short id = ((NumberTag) ench.get("id")).asShort();
+				short lvl = ((NumberTag) ench.get("lvl")).asShort();
 				String s;
 				if (id == 70) {
 					s = "§r§7Mending ";
@@ -222,10 +222,10 @@ public class ReplacementItemRewriter1_8 extends ReplacementItemRewriter<Protocol
 		}
 
 		if (tag.contains("AttributeModifiers")) {
-			ListTag attributes = tag.get("AttributeModifiers");
+			ListTag<CompoundTag> attributes = tag.getListTag("AttributeModifiers", CompoundTag.class);
 			for (int i = 0; i < attributes.size(); i++) {
 				CompoundTag attribute = attributes.get(i);
-				String name = (String) attribute.get("AttributeName").getValue();
+				String name = attribute.getStringTag("AttributeName").getValue();
 				if (!Protocol1_8To1_9.VALID_ATTRIBUTES.contains(name)) {
 					attributes.remove(attribute);
 					i--;

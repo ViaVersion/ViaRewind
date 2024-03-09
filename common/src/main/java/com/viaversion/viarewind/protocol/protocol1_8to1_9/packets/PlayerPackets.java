@@ -606,7 +606,7 @@ public class PlayerPackets {
 						book.setIdentifier(386);
 						CompoundTag tag = book.tag();
 						if (tag.contains("pages")) {
-							ListTag pages = tag.get("pages");
+							ListTag<StringTag> pages = tag.getListTag("pages", StringTag.class);
 							if (pages.size() > ViaRewind.getConfig().getMaxBookPages()) {
 								packetWrapper.user().disconnect("Too many book pages");
 								return;
