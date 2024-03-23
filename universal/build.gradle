@@ -122,40 +122,46 @@ if (!isRelease || isMainBranch) { // Only publish releases from the main branch
 
     hangarPublish {
         publications.register("plugin") {
-            version.set(suffixedVersion)
-            id.set("ViaRewind")
-            channel.set(isRelease ? "Release" : isMainBranch ? "Snapshot" : "Alpha")
-            changelog.set(changelogContent)
-            apiKey.set(System.getenv("HANGAR_TOKEN"))
+            version = suffixedVersion
+            id = "ViaRewind"
+            channel = isRelease ? "Release" : isMainBranch ? "Snapshot" : "Alpha"
+            changelog = changelogContent
+            apiKey = System.getenv("HANGAR_TOKEN")
             platforms {
                 paper {
-                    jar.set(shadowJar.archiveFile)
+                    jar = tasks.shadowJar.flatMap { it.archiveFile }
                     platformVersions.set([property('mcVersionRange') as String])
-                    dependencies.hangar("ViaVersion") {
-                        required.set(true)
-                    }
-                    dependencies.hangar("ViaBackwards") {
-                        required.set(false)
+                    dependencies {
+                        hangar("ViaVersion") {
+                            required = true
+                        }
+                        hangar("ViaBackwards") {
+                            required = false
+                        }
                     }
                 }
                 velocity {
-                    jar.set(shadowJar.archiveFile)
+                    jar = tasks.shadowJar.flatMap { it.archiveFile }
                     platformVersions.set([property("velocityVersion") as String])
-                    dependencies.hangar("ViaVersion") {
-                        required.set(true)
-                    }
-                    dependencies.hangar("ViaBackwards") {
-                        required.set(false)
+                    dependencies {
+                        hangar("ViaVersion") {
+                            required = true
+                        }
+                        hangar("ViaBackwards") {
+                            required = false
+                        }
                     }
                 }
                 waterfall {
-                    jar.set(shadowJar.archiveFile)
+                    jar = tasks.shadowJar.flatMap { it.archiveFile }
                     platformVersions.set([property("waterfallVersion") as String])
-                    dependencies.hangar("ViaVersion") {
-                        required.set(true)
-                    }
-                    dependencies.hangar("ViaBackwards") {
-                        required.set(false)
+                    dependencies {
+                        hangar("ViaVersion") {
+                            required = true
+                        }
+                        hangar("ViaBackwards") {
+                            required = false
+                        }
                     }
                 }
             }
