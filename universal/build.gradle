@@ -129,8 +129,8 @@ if (!isRelease || isMainBranch) { // Only publish releases from the main branch
             apiKey = System.getenv("HANGAR_TOKEN")
             platforms {
                 paper {
-                    jar = tasks.shadowJar.flatMap { it.archiveFile }
-                    platformVersions.set([property('mcVersionRange') as String])
+                    jar = shadowJar.archiveFile
+                    platformVersions = [property('mcVersionRange') as String]
                     dependencies {
                         hangar("ViaVersion") {
                             required = true
@@ -141,8 +141,8 @@ if (!isRelease || isMainBranch) { // Only publish releases from the main branch
                     }
                 }
                 velocity {
-                    jar = tasks.shadowJar.flatMap { it.archiveFile }
-                    platformVersions.set([property("velocityVersion") as String])
+                    jar = shadowJar.archiveFile
+                    platformVersions = [property("velocityVersion") as String]
                     dependencies {
                         hangar("ViaVersion") {
                             required = true
@@ -153,8 +153,8 @@ if (!isRelease || isMainBranch) { // Only publish releases from the main branch
                     }
                 }
                 waterfall {
-                    jar = tasks.shadowJar.flatMap { it.archiveFile }
-                    platformVersions.set([property("waterfallVersion") as String])
+                    jar = shadowJar.archiveFile
+                    platformVersions = [property("waterfallVersion") as String]
                     dependencies {
                         hangar("ViaVersion") {
                             required = true
