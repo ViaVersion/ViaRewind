@@ -2,7 +2,7 @@ import io.papermc.hangarpublishplugin.model.Platforms
 
 plugins {
     id "com.github.johnrengelman.shadow" version "8.1.1"
-    id "io.papermc.hangar-publish-plugin" version "0.1.0"
+    id "io.papermc.hangar-publish-plugin" version "0.1.2"
     id "com.modrinth.minotaur" version "2.+"
     id "java-library"
     id "maven-publish"
@@ -130,7 +130,7 @@ if (!isRelease || isMainBranch) { // Only publish releases from the main branch
             changelog.set(changelogContent)
             apiKey.set(System.getenv("HANGAR_TOKEN"))
             platforms {
-                register(Platforms.PAPER) {
+                paper {
                     jar.set(shadowJar.archiveFile)
                     platformVersions.set([property('mcVersionRange') as String])
                     dependencies.hangar("ViaVersion") {
@@ -140,7 +140,7 @@ if (!isRelease || isMainBranch) { // Only publish releases from the main branch
                         required.set(false)
                     }
                 }
-                register(Platforms.VELOCITY) {
+                velocity {
                     jar.set(shadowJar.archiveFile)
                     platformVersions.set([property("velocityVersion") as String])
                     dependencies.hangar("ViaVersion") {
@@ -150,7 +150,7 @@ if (!isRelease || isMainBranch) { // Only publish releases from the main branch
                         required.set(false)
                     }
                 }
-                register(Platforms.WATERFALL) {
+                waterfall {
                     jar.set(shadowJar.archiveFile)
                     platformVersions.set([property("waterfallVersion") as String])
                     dependencies.hangar("ViaVersion") {
