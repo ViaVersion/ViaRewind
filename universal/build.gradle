@@ -114,7 +114,6 @@ if (!isRelease || isMainBranch) { // Only publish releases from the main branch
         detectLoaders.set(false)
         dependencies {
             optional.project("viafabric")
-            optional.project("viafabricplus")
             optional.project("viaversion")
             optional.project("viabackwards")
         }
@@ -128,7 +127,7 @@ if (!isRelease || isMainBranch) { // Only publish releases from the main branch
             changelog = changelogContent
             apiKey = System.getenv("HANGAR_TOKEN")
             platforms {
-                paper {
+                PAPER {
                     jar = shadowJar.archiveFile
                     platformVersions = [property('mcVersionRange') as String]
                     dependencies {
@@ -140,7 +139,7 @@ if (!isRelease || isMainBranch) { // Only publish releases from the main branch
                         }
                     }
                 }
-                velocity {
+                VELOCITY {
                     jar = shadowJar.archiveFile
                     platformVersions = [property("velocityVersion") as String]
                     dependencies {
@@ -152,7 +151,7 @@ if (!isRelease || isMainBranch) { // Only publish releases from the main branch
                         }
                     }
                 }
-                waterfall {
+                WATERFALL {
                     jar = shadowJar.archiveFile
                     platformVersions = [property("waterfallVersion") as String]
                     dependencies {
