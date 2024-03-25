@@ -13,7 +13,7 @@ sourceSets {
     main {
         classTokenReplacer {
             property("\${version}", rootProject.maven_version)
-            property("\${impl_version}", "git-${project.name}-${rootProject.maven_version}:${project.latestCommitHash()}")
+            property("\${impl_version}", "git-ViaRewind-${rootProject.maven_version}:${project.latestCommitHash()}")
         }
     }
 }

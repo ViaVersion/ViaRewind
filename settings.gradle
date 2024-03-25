@@ -1,16 +1,23 @@
-include "viarewind-universal"
-include "viarewind-common"
-include "viarewind-bukkit"
-include "viarewind-bungee"
-include "viarewind-fabric"
-include "viarewind-sponge"
-include "viarewind-velocity"
+import java.util.function.Consumer
 
-project(":viarewind-universal").projectDir = file("universal")
-project(":viarewind-common").projectDir = file("common")
-project(":viarewind-bukkit").projectDir = file("bukkit")
-project(":viarewind-bungee").projectDir = file("bungee")
-project(":viarewind-fabric").projectDir = file("fabric")
-project(":viarewind-sponge").projectDir = file("sponge")
-project(":viarewind-velocity").projectDir = file("velocity")
+setupViaSubproject("common")
+setupViaSubproject("bukkit")
+setupViaSubproject("bungee")
+setupViaSubproject("fabric")
+setupViaSubproject("sponge")
+setupViaSubproject("velocity")
 
+setupSubproject("viaversion", project -> {
+    project.projectDir = file("universal")
+})
+
+void setupViaSubproject(String name) {
+    setupSubproject("viarewind-" + name, project -> {
+        project.projectDir = file(name)
+    })
+}
+
+void setupSubproject(String name, Consumer<ProjectDescriptor> block) {
+    include name
+    block.accept(project(":" + name))
+}
