@@ -11,10 +11,6 @@ Runs on 1.9-latest servers or 1.8 clients and lower.
 
 **Depending on the platform and version, this also requires [ViaVersion](https://modrinth.com/mod/viaversion) and [ViaBackwards](https://modrinth.com/mod/viabackwards).**
 
-Support Status
--
-While ViaRewind will keep getting updates to function with changes to ViaVersion or ViaBackwards, it will likely not receive many bug fixes or additional features anymore.
-
 Releases / Dev Builds
 -
 Dev builds for **all** of our projects are on our Jenkins server:
