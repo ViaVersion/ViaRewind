@@ -23,7 +23,7 @@ import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10T
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.WorldBorderEmulator;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.chunk.ChunkType1_7_6;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.chunk.BulkChunkType1_7_6;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.rewriter.ParticleIndex1_7_6_10;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.metadata.ParticleIndex1_7_6_10;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
 import com.viaversion.viarewind.utils.ChatUtil;
 import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
