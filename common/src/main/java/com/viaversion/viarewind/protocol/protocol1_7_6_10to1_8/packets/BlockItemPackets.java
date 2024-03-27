@@ -4,7 +4,6 @@ import com.viaversion.viabackwards.api.rewriters.LegacyEnchantmentRewriter;
 import com.viaversion.viarewind.api.rewriter.VRBlockItemRewriter;
 import com.viaversion.viarewind.protocol.protocol1_7_2_5to1_7_6_10.ServerboundPackets1_7_2_5;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.model.FurnaceData;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.GameProfileStorage;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.InventoryTracker;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.PlayerSessionStorage;
@@ -169,7 +168,8 @@ public class BlockItemPackets extends VRBlockItemRewriter<ClientboundPackets1_8,
 					short progress = wrapper.get(Type.SHORT, 1);
 
 					if (windowType == 2) { // Furnace
-						final FurnaceData furnace = windowTracker.getFurnaceData().computeIfAbsent(windowId, x -> new FurnaceData());
+						// TODO | Proper methods (getOrCreate)=
+						final InventoryTracker.FurnaceData furnace = windowTracker.getFurnaceData().computeIfAbsent(windowId, x -> new InventoryTracker.FurnaceData());
 						if (progressBarId == 0 || progressBarId == 1) {
 							if (progressBarId == 0) {
 								furnace.fuelLeft = progress;

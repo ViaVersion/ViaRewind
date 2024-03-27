@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@Deprecated
 public class MetadataRewriter {
 	private final Protocol1_8To1_9 protocol;
 

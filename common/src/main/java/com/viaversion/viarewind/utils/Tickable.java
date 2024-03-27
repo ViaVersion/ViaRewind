@@ -18,6 +18,7 @@
 
 package com.viaversion.viarewind.utils;
 
+@Deprecated
 public interface Tickable {
 	void tick();
 }

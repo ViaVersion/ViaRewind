@@ -20,6 +20,7 @@ package com.viaversion.viarewind.protocol.protocol1_8to1_9.sound;
 
 import java.util.HashMap;
 
+@Deprecated // Move into nbt file
 public class SoundRemapper {
 	private final static HashMap<Integer, String> sounds1_9 = new HashMap<>();
 	private final static HashMap<String, String> sound1_9to1_8 = new HashMap<>();

@@ -23,6 +23,7 @@ import com.viaversion.viaversion.protocols.protocol1_9to1_8.ItemRewriter;
 import java.util.HashMap;
 import java.util.Map;
 
+// TODO | Check if this is correct???
 public class PotionMappings {
 	public final static Map<String, String> POTION_NAME_INDEX = new HashMap<>();
 	public final static Map<String, Integer> POTION_NAME_TO_ID = new HashMap<>();

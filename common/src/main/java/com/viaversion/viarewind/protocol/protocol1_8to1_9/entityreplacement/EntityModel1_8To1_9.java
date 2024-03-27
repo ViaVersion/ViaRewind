@@ -32,6 +32,7 @@ import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
 import java.util.ArrayList;
 import java.util.List;
 
+@Deprecated
 public abstract class EntityModel1_8To1_9 extends EntityModel<Protocol1_8To1_9> {
 
 	public EntityModel1_8To1_9(UserConnection user, Protocol1_8To1_9 protocol) {

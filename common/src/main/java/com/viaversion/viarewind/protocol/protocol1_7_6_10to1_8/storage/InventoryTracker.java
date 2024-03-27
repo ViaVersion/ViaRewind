@@ -18,14 +18,11 @@
 
 package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage;
 
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.model.FurnaceData;
 import com.viaversion.viaversion.api.connection.StoredObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.item.Item;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 public class InventoryTracker extends StoredObject {
 	public final static Map<String, Integer> WINDOW_TYPE_REGISTRY = new HashMap<>();
@@ -76,4 +73,13 @@ public class InventoryTracker extends StoredObject {
 	public HashMap<Short, FurnaceData> getFurnaceData() {
 		return furnaceData;
 	}
+
+	public static class FurnaceData {
+
+		public short fuelLeft = 0;
+		public short maxFuel = 0;
+		public short progress = 0;
+		public short maxProgress = 200;
+	}
+
 }

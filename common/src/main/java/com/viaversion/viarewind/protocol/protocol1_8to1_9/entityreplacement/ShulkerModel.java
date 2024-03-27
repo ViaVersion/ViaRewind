@@ -34,6 +34,7 @@ import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
 import java.util.ArrayList;
 import java.util.List;
 
+@Deprecated
 public class ShulkerModel extends EntityModel1_8To1_9 {
 	private final int entityId;
 	private final List<Metadata> datawatcher = new ArrayList<>();

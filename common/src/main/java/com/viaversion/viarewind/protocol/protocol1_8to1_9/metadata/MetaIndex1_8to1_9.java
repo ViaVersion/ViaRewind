@@ -25,6 +25,7 @@ import com.viaversion.viaversion.util.Pair;
 import java.util.HashMap;
 import java.util.Optional;
 
+@Deprecated
 public class MetaIndex1_8to1_9 {
 
 	private final static HashMap<Pair<EntityTypes1_10.EntityType, Integer>, MetaIndex> metadataRewrites = new HashMap<>();

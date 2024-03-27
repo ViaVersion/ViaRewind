@@ -24,9 +24,7 @@ import com.viaversion.viaversion.api.protocol.Protocol;
 
 import java.util.List;
 
-/**
- * Represents a model that is replacing an entity on the client side (e.g. armor stand)
- */
+@Deprecated
 public abstract class EntityModel<T extends Protocol<?, ?, ?, ?>> {
 
 	protected final UserConnection user;

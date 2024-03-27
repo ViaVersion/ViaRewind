@@ -20,6 +20,7 @@ package com.viaversion.viarewind.utils;
 
 import com.viaversion.viaversion.api.Via;
 
+@Deprecated
 public class Ticker {
 	private static boolean init = false;
 

@@ -22,6 +22,7 @@ import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.exception.CancelException;
 
+@Deprecated
 public class PacketUtil {
 
 	public static void sendToServer(PacketWrapper packet, Class<? extends Protocol> packetProtocol) {

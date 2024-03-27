@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.metadata;
+package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.data;
 
 import com.viaversion.viarewind.ViaRewind;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
-@SuppressWarnings({"deprecation"})
+@Deprecated // TODO move into entity rewriter
 public class MetadataRewriter {
 
 	private final Protocol1_7_6_10To1_8 protocol;
