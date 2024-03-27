@@ -1,6 +1,6 @@
 package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.packets;
 
-import com.viaversion.viabackwards.api.rewriters.EnchantmentRewriter;
+import com.viaversion.viabackwards.api.rewriters.LegacyEnchantmentRewriter;
 import com.viaversion.viarewind.api.rewriter.VRBlockItemRewriter;
 import com.viaversion.viarewind.protocol.protocol1_7_2_5to1_7_6_10.ServerboundPackets1_7_2_5;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
@@ -17,11 +17,11 @@ import com.viaversion.viaversion.libs.gson.JsonElement;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.*;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 public class BlockItemPackets extends VRBlockItemRewriter<ClientboundPackets1_8, ServerboundPackets1_7_2_5, Protocol1_7_6_10To1_8> {
+
+	private LegacyEnchantmentRewriter enchantmentRewriter;
 
 	public BlockItemPackets(Protocol1_7_6_10To1_8 protocol) {
 		super(protocol, "1.8");
@@ -260,6 +260,12 @@ public class BlockItemPackets extends VRBlockItemRewriter<ClientboundPackets1_8,
 	}
 
 	@Override
+	protected void registerRewrites() {
+		enchantmentRewriter = new LegacyEnchantmentRewriter(getNbtTagName());
+		enchantmentRewriter.registerEnchantment(8, "§r§7Depth Strider");
+	}
+
+	@Override
 	public Item handleItemToClient(Item item) {
 		if (item == null) return null;
 		super.handleItemToClient(item);
@@ -269,41 +275,11 @@ public class BlockItemPackets extends VRBlockItemRewriter<ClientboundPackets1_8,
 			item.setTag(tag = new CompoundTag());
 		}
 
-		if (tag.contains("ench") || tag.contains("StoredEnchantments")) {
-			final String key = tag.contains("ench") ? "ench" : "StoredEnchantments";
-			final ListTag<CompoundTag> enchantments = tag.getListTag(key, CompoundTag.class);
-			if (enchantments != null) {
-				final List<StringTag> lore = new ArrayList<>();
-				for (CompoundTag enchantment : enchantments.copy()) {
-					final NumberTag id = enchantment.getNumberTag("id");
-					if (id == null) continue;
-					final NumberTag lvl = enchantment.getNumberTag("lvl");
-					if (lvl == null) continue;
-
-					final short newId = id.asShort();
-					final short newLvl = lvl.asShort();
-
-					if (newId == 8) {
-						enchantments.remove(enchantment);
-						final String loreContent = "§r§7Depth Strider " + EnchantmentRewriter.getRomanNumber(newLvl); // TODO check default value (fallback)
-						lore.add(new StringTag(loreContent));
-					}
-				}
-
-				if (!lore.isEmpty()) {
-					CompoundTag displayTag = tag.getCompoundTag("display");
-					if (displayTag == null) {
-						tag.put("display", displayTag = new CompoundTag());
-						tag.put(getNbtTagName() + "|noDisplay", new ByteTag());
-					}
-					ListTag<StringTag> loreTag = displayTag.getListTag("Lore", StringTag.class);
-					if (loreTag == null) {
-						displayTag.put("Lore", loreTag = new ListTag<>(StringTag.class));
-					}
-					lore.addAll(loreTag.getValue());
-					loreTag.setValue(lore);
-				}	
-			}
+		if (tag.getListTag("ench") != null) {
+			enchantmentRewriter.rewriteEnchantmentsToClient(tag, false);
+		}
+		if (tag.getListTag("StoredEnchantments") != null) {
+			enchantmentRewriter.rewriteEnchantmentsToClient(tag, true);
 		}
 		
 		if (item.identifier() == 387) {
@@ -329,11 +305,15 @@ public class BlockItemPackets extends VRBlockItemRewriter<ClientboundPackets1_8,
 
 		final CompoundTag tag = item.tag();
 		if (tag == null) return item;
-		
-		if (tag.contains(getNbtTagName() + "|noDisplay")) {
-			tag.remove("display");
+
+
+		if (tag.getListTag(getNbtTagName() + "|ench") != null) {
+			enchantmentRewriter.rewriteEnchantmentsToServer(tag, false);
 		}
-		
+		if (tag.getListTag(getNbtTagName() + "|StoredEnchantments") != null) {
+			enchantmentRewriter.rewriteEnchantmentsToServer(tag, true);
+		}
+
 		if (item.identifier() == 387) {
 			final ListTag<StringTag> oldPages = tag.get(getNbtTagName() + "|pages");
 			if (oldPages != null) {
