@@ -36,6 +36,7 @@ repositories {
 
 dependencies {
     compileOnly "com.viaversion:viaversion:${project.viaversion_version}"
+    compileOnly "com.viaversion:viabackwards:${project.viabackwards_version}"
     compileOnly "io.netty:netty-all:${project.netty_version}"
     compileOnly "com.google.guava:guava:${project.guava_version}"
 }

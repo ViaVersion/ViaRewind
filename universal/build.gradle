@@ -113,9 +113,9 @@ if (!isRelease || isMainBranch) { // Only publish releases from the main branch
         autoAddDependsOn.set(false)
         detectLoaders.set(false)
         dependencies {
+            required.project("viaversion")
+            required.project("viabackwards")
             optional.project("viafabric")
-            optional.project("viaversion")
-            optional.project("viabackwards")
         }
     }
 
@@ -135,7 +135,7 @@ if (!isRelease || isMainBranch) { // Only publish releases from the main branch
                             required = true
                         }
                         hangar("ViaBackwards") {
-                            required = false
+                            required = true
                         }
                     }
                 }
@@ -147,7 +147,7 @@ if (!isRelease || isMainBranch) { // Only publish releases from the main branch
                             required = true
                         }
                         hangar("ViaBackwards") {
-                            required = false
+                            required = true
                         }
                     }
                 }
@@ -159,7 +159,7 @@ if (!isRelease || isMainBranch) { // Only publish releases from the main branch
                             required = true
                         }
                         hangar("ViaBackwards") {
-                            required = false
+                            required = true
                         }
                     }
                 }

@@ -13,8 +13,8 @@
   "icon": "assets/viarewind/textures/squarelogo.png",
   "environment": "*",
   "authors": [
-    "Gerrygames",
     "FlorianMichael/EnZaXD",
+    "Gerrygames",
     "creeper123123321"
   ],
   "entrypoints": {
@@ -24,9 +24,7 @@
   },
   "depends": {
     "fabricloader": ">=0.14.0",
-    "viafabric": ">=0.4.10"
-  },
-  "recommends": {
+    "viafabric": ">=0.4.10",
     "viabackwards": "*"
   },
   "custom": {

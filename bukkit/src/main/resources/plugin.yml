@@ -1,11 +1,10 @@
 name: ViaRewind
 main: com.viaversion.viarewind.BukkitPlugin
-authors: [Gerrygames, FlorianMichael/EnZaXD, creeper123321123]
+authors: [FlorianMichael/EnZaXD, Gerrygames, creeper123321123]
 version: ${version}
 description: ${description}
 website: https://viaversion.com/rewind
 api-version: 1.13
 folia-supported: true
 load: STARTUP
-depend: [ViaVersion]
-softdepend: [ViaBackwards]
+depend: [ViaVersion, ViaBackwards]

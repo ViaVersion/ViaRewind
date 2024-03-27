@@ -13,11 +13,11 @@
     },
     "contributors": [
       {
-        "name": "Gerrygames",
+        "name": "FlorianMichael/EnZaXD",
         "description": "Author"
       },
       {
-        "name": "FlorianMichael/EnZaXD",
+        "name": "Gerrygames",
         "description": "Author"
       },
       {
@@ -32,7 +32,11 @@
       },
       {
         "id": "viaversion",
-        "version": "[4.2.0,)"
+        "version": "[4.9.0,)"
+      },
+      {
+        "id": "viabackwards",
+        "version": "[4.9.0,)"
       }
     ]
   },
