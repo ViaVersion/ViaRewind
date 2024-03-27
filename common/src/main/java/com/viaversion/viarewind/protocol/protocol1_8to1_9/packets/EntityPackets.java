@@ -426,7 +426,7 @@ public class EntityPackets {
 					int removed = 0;
 					for (int i = 0; i < size; i++) {
 						String key = packetWrapper.read(Type.STRING);
-						boolean skip = !Protocol1_8To1_9.VALID_ATTRIBUTES.contains(key);
+						boolean skip = !protocol.getItemRewriter().VALID_ATTRIBUTES.contains(key);
 						double value = packetWrapper.read(Type.DOUBLE);
 						int modifierSize = packetWrapper.read(Type.VAR_INT);
 						if (!skip) {

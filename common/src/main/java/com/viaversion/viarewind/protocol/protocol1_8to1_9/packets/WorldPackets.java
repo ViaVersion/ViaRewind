@@ -86,38 +86,6 @@ public class WorldPackets {
 			}
 		});
 
-		//Block Change
-		protocol.registerClientbound(ClientboundPackets1_9.BLOCK_CHANGE, new PacketHandlers() {
-			@Override
-			public void register() {
-				map(Type.POSITION1_8);
-				map(Type.VAR_INT);
-				handler(packetWrapper -> {
-					int combined = packetWrapper.get(Type.VAR_INT, 0);
-					int replacedCombined = protocol.getItemRewriter().replace(combined);
-					packetWrapper.set(Type.VAR_INT, 0, replacedCombined);
-				});
-			}
-		});
-
-		//Server Difficulty
-
-		//Multi Block Change
-		protocol.registerClientbound(ClientboundPackets1_9.MULTI_BLOCK_CHANGE, new PacketHandlers() {
-			@Override
-			public void register() {
-				map(Type.INT);
-				map(Type.INT);
-				map(Type.BLOCK_CHANGE_RECORD_ARRAY);
-				handler(packetWrapper -> {
-					for (BlockChangeRecord record : packetWrapper.get(Type.BLOCK_CHANGE_RECORD_ARRAY, 0)) {
-						int replacedCombined = protocol.getItemRewriter().replace(record.getBlockId());
-						record.setBlockId(replacedCombined);
-					}
-				});
-			}
-		});
-
 		//Named Sound Effect
 		protocol.registerClientbound(ClientboundPackets1_9.NAMED_SOUND, new PacketHandlers() {
 			@Override
@@ -170,7 +138,7 @@ public class WorldPackets {
 						DataPalette palette = section.palette(PaletteType.BLOCKS);
 						for (int i = 0; i < palette.size(); i++) {
 							int block = palette.idByIndex(i);
-							int replacedBlock = protocol.getItemRewriter().replace(block);
+							int replacedBlock = protocol.getItemRewriter().handleBlockId(block); // TODO | Cleanup this code using blockEntityHandler
 							palette.setIdByIndex(i, replacedBlock);
 						}
 					}
@@ -246,7 +214,7 @@ public class WorldPackets {
 					}
 					packetWrapper.set(Type.INT, 0, id);
 					if (id == 2001) {
-						int replacedBlock = protocol.getItemRewriter().replace(packetWrapper.get(Type.INT, 1));
+						int replacedBlock = protocol.getItemRewriter().handleBlockId(packetWrapper.get(Type.INT, 1));
 						packetWrapper.set(Type.INT, 1, replacedBlock);
 					}
 				});

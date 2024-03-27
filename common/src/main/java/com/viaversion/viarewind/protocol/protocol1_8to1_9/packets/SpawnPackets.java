@@ -18,6 +18,7 @@
 
 package com.viaversion.viarewind.protocol.protocol1_8to1_9.packets;
 
+import com.viaversion.viabackwards.utils.Block;
 import com.viaversion.viarewind.ViaRewind;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.Protocol1_8To1_9;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.entityreplacement.ShulkerBulletModel;
@@ -97,9 +98,9 @@ public class SpawnPackets {
 					if (type.is(EntityTypes1_10.EntityType.FALLING_BLOCK)) {
 						int blockId = data & 0xFFF;
 						int blockData = data >> 12 & 0xF;
-						Replacement replace = protocol.getItemRewriter().replace(blockId, blockData);
+						Block replace = protocol.getItemRewriter().handleBlock(blockId, blockData);
 						if (replace != null) {
-							packetWrapper.set(Type.INT, 3, replace.getId() | replace.replaceData(data) << 12);
+							packetWrapper.set(Type.INT, 3, replace.getId() | replace.getData() << 12);
 						}
 					}
 

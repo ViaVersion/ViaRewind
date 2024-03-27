@@ -306,7 +306,6 @@ public class BlockItemPackets extends VRBlockItemRewriter<ClientboundPackets1_8,
 		final CompoundTag tag = item.tag();
 		if (tag == null) return item;
 
-
 		if (tag.getListTag(getNbtTagName() + "|ench") != null) {
 			enchantmentRewriter.rewriteEnchantmentsToServer(tag, false);
 		}
