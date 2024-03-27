@@ -18,22 +18,20 @@
 
 package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8;
 
+import com.viaversion.viabackwards.api.BackwardsProtocol;
 import com.viaversion.viarewind.ViaRewind;
-import com.viaversion.viarewind.api.rewriter.ReplacementItemRewriter;
 import com.viaversion.viarewind.protocol.protocol1_7_2_5to1_7_6_10.ClientboundPackets1_7_2_5;
 import com.viaversion.viarewind.protocol.protocol1_7_2_5to1_7_6_10.ServerboundPackets1_7_2_5;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.metadata.MetadataRewriter;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.packets.*;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.provider.CompressionHandlerProvider;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.provider.compression.TrackingCompressionHandlerProvider;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.rewriter.ReplacementItemRewriter1_7_6_10;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.*;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.task.WorldBorderUpdateTask;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.platform.providers.ViaProviders;
-import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.Direction;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
@@ -46,9 +44,9 @@ import com.viaversion.viaversion.protocols.protocol1_8.ServerboundPackets1_8;
 
 import java.util.concurrent.TimeUnit;
 
-public class Protocol1_7_6_10To1_8 extends AbstractProtocol<ClientboundPackets1_8, ClientboundPackets1_7_2_5, ServerboundPackets1_8, ServerboundPackets1_7_2_5> {
+public class Protocol1_7_6_10To1_8 extends BackwardsProtocol<ClientboundPackets1_8, ClientboundPackets1_7_2_5, ServerboundPackets1_8, ServerboundPackets1_7_2_5> {
 
-	private final ReplacementItemRewriter<Protocol1_7_6_10To1_8> itemRewriter = new ReplacementItemRewriter1_7_6_10(this);
+	private final BlockItemPackets itemRewriter = new BlockItemPackets(this);
 	private final MetadataRewriter metadataRewriter = new MetadataRewriter(this);
 
 	public Protocol1_7_6_10To1_8() {
@@ -60,7 +58,6 @@ public class Protocol1_7_6_10To1_8 extends AbstractProtocol<ClientboundPackets1_
 		itemRewriter.register();
 
 		EntityPackets.register(this);
-		InventoryPackets.register(this);
 		PlayerPackets.register(this);
 		ScoreboardPackets.register(this);
 		SpawnPackets.register(this);
@@ -141,7 +138,7 @@ public class Protocol1_7_6_10To1_8 extends AbstractProtocol<ClientboundPackets1_
 	}
 
 	@Override
-	public ReplacementItemRewriter<Protocol1_7_6_10To1_8> getItemRewriter() {
+	public BlockItemPackets getItemRewriter() {
 		return itemRewriter;
 	}
 

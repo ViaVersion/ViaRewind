@@ -18,6 +18,7 @@
 
 package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.packets;
 
+import com.viaversion.viabackwards.utils.Block;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.WorldBorderEmulator;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.chunk.ChunkType1_7_6;
@@ -27,9 +28,6 @@ import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_
 import com.viaversion.viarewind.utils.ChatUtil;
 import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
-import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
-import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
-import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
@@ -42,24 +40,27 @@ import com.viaversion.viaversion.util.ChatColorUtil;
 
 public class WorldPackets {
 
-	private static void rewriteBlockIds(final Protocol1_7_6_10To1_8 protocol, final Chunk chunk) {
-		for (ChunkSection section : chunk.getSections()) {
-			if (section == null) continue;
-			final DataPalette palette = section.palette(PaletteType.BLOCKS);
-
-			for (int i = 0; i < palette.size(); i++) {
-				palette.setIdByIndex(i, protocol.getItemRewriter().replace(palette.idByIndex(i)));
-			}
-		}
-	}
-
 	public static void register(Protocol1_7_6_10To1_8 protocol) {
 		protocol.registerClientbound(ClientboundPackets1_8.CHUNK_DATA, wrapper -> {
 			final ClientWorld world = wrapper.user().get(ClientWorld.class);
 			final Chunk chunk = wrapper.read(ChunkType1_8.forEnvironment(world.getEnvironment()));
-			rewriteBlockIds(protocol, chunk);
+			protocol.getItemRewriter().handleChunk(chunk);
 
 			wrapper.write(ChunkType1_7_6.TYPE, chunk);
+		});
+
+		protocol.registerClientbound(ClientboundPackets1_8.BLOCK_CHANGE, new PacketHandlers() {
+			@Override
+			protected void register() {
+				map(Type.POSITION1_8, Types1_7_6_10.U_BYTE_POSITION); // position
+				handler(wrapper -> {
+					int data = wrapper.read(Type.VAR_INT); // block data
+					data = protocol.getItemRewriter().handleBlockId(data);
+
+					wrapper.write(Type.VAR_INT, Block.getId(data)); // block id
+					wrapper.write(Type.UNSIGNED_BYTE, (short) Block.getData(data)); // block data
+				});
+			}
 		});
 
 		protocol.registerClientbound(ClientboundPackets1_8.MULTI_BLOCK_CHANGE, new PacketHandlers() {
@@ -76,22 +77,8 @@ public class WorldPackets {
 
 					for (BlockChangeRecord record : records) {
 						wrapper.write(Type.SHORT, (short) (record.getSectionX() << 12 | record.getSectionZ() << 8 | record.getY())); // position
-						wrapper.write(Type.SHORT, (short) protocol.getItemRewriter().replace(record.getBlockId())); // block id
+						wrapper.write(Type.SHORT, (short) protocol.getItemRewriter().handleBlockId(record.getBlockId())); // block id
 					}
-				});
-			}
-		});
-
-		protocol.registerClientbound(ClientboundPackets1_8.BLOCK_CHANGE, new PacketHandlers() {
-			@Override
-			protected void register() {
-				map(Type.POSITION1_8, Types1_7_6_10.U_BYTE_POSITION); // position
-				handler(wrapper -> {
-					int data = wrapper.read(Type.VAR_INT); // block data
-					data = protocol.getItemRewriter().replace(data);
-
-					wrapper.write(Type.VAR_INT, data >> 4); // block id
-					wrapper.write(Type.UNSIGNED_BYTE, (short) (data & 0xF)); // block data
 				});
 			}
 		});
@@ -118,7 +105,7 @@ public class WorldPackets {
 		protocol.registerClientbound(ClientboundPackets1_8.MAP_BULK_CHUNK, wrapper -> {
 			final Chunk[] chunks = wrapper.read(BulkChunkType1_8.TYPE);
 			for (Chunk chunk : chunks) {
-				rewriteBlockIds(protocol, chunk);
+				protocol.getItemRewriter().handleChunk(chunk);
 			}
 
 			wrapper.write(BulkChunkType1_7_6.TYPE, chunks);

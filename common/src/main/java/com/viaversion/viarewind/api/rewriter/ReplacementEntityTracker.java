@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Deprecated
 public abstract class ReplacementEntityTracker extends StoredObject implements ClientEntityIdChangeListener {
 	private final Map<EntityType, Pair<EntityType, String>> ENTITY_REPLACEMENTS = new HashMap<>();
 

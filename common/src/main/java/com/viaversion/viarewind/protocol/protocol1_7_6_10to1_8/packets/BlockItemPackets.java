@@ -1,25 +1,9 @@
-/*
- * This file is part of ViaRewind - https://github.com/ViaVersion/ViaRewind
- * Copyright (C) 2018-2024 ViaVersion and contributors
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.packets;
 
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
+import com.viaversion.viabackwards.api.rewriters.EnchantmentRewriter;
+import com.viaversion.viarewind.api.rewriter.VRBlockItemRewriter;
 import com.viaversion.viarewind.protocol.protocol1_7_2_5to1_7_6_10.ServerboundPackets1_7_2_5;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.model.FurnaceData;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.GameProfileStorage;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.InventoryTracker;
@@ -30,13 +14,21 @@ import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.libs.gson.JsonElement;
+import com.viaversion.viaversion.libs.opennbt.tag.builtin.*;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
-public class InventoryPackets {
+public class BlockItemPackets extends VRBlockItemRewriter<ClientboundPackets1_8, ServerboundPackets1_7_2_5, Protocol1_7_6_10To1_8> {
 
-	public static void register(Protocol1_7_6_10To1_8 protocol) {
+	public BlockItemPackets(Protocol1_7_6_10To1_8 protocol) {
+		super(protocol, "1.8");
+	}
+
+	@Override
+	protected void registerPackets() {
 		protocol.registerClientbound(ClientboundPackets1_8.OPEN_WINDOW, wrapper -> {
 			final InventoryTracker windowTracker = wrapper.user().get(InventoryTracker.class);
 
@@ -91,7 +83,7 @@ public class InventoryPackets {
 				// remap item
 				handler(wrapper -> {
 					final Item item = wrapper.get(Types1_7_6_10.COMPRESSED_NBT_ITEM, 0);
-					protocol.getItemRewriter().handleItemToClient(item);
+					handleItemToClient(item);
 
 					wrapper.set(Types1_7_6_10.COMPRESSED_NBT_ITEM, 0, item);
 				});
@@ -131,7 +123,7 @@ public class InventoryPackets {
 						System.arraycopy(old, 2, items, 1, old.length - 3);
 					}
 					for (int i = 0; i < items.length; i++) {
-						items[i] = protocol.getItemRewriter().handleItemToClient(items[i]);
+						items[i] = handleItemToClient(items[i]);
 					}
 					wrapper.write(Types1_7_6_10.COMPRESSED_NBT_ITEM_ARRAY, items); // items
 				});
@@ -245,7 +237,7 @@ public class InventoryPackets {
 				// remap item
 				handler(wrapper -> {
 					final Item item = wrapper.get(Type.ITEM1_8, 0);
-					protocol.getItemRewriter().handleItemToServer(item);
+					handleItemToServer(item);
 					wrapper.set(Type.ITEM1_8, 0, item);
 				});
 			}
@@ -260,10 +252,96 @@ public class InventoryPackets {
 				// remap item
 				handler(wrapper -> {
 					final Item item = wrapper.get(Type.ITEM1_8, 0);
-					protocol.getItemRewriter().handleItemToServer(item);
+					handleItemToServer(item);
 					wrapper.set(Type.ITEM1_8, 0, item);
 				});
 			}
 		});
+	}
+
+	@Override
+	public Item handleItemToClient(Item item) {
+		if (item == null) return null;
+		super.handleItemToClient(item);
+
+		CompoundTag tag = item.tag();
+		if (tag == null) {
+			item.setTag(tag = new CompoundTag());
+		}
+
+		if (tag.contains("ench") || tag.contains("StoredEnchantments")) {
+			final String key = tag.contains("ench") ? "ench" : "StoredEnchantments";
+			final ListTag<CompoundTag> enchantments = tag.getListTag(key, CompoundTag.class);
+			if (enchantments != null) {
+				final List<StringTag> lore = new ArrayList<>();
+				for (CompoundTag enchantment : enchantments.copy()) {
+					final NumberTag id = enchantment.getNumberTag("id");
+					if (id == null) continue;
+					final NumberTag lvl = enchantment.getNumberTag("lvl");
+					if (lvl == null) continue;
+
+					final short newId = id.asShort();
+					final short newLvl = lvl.asShort();
+
+					if (newId == 8) {
+						enchantments.remove(enchantment);
+						final String loreContent = "§r§7Depth Strider " + EnchantmentRewriter.getRomanNumber(newLvl); // TODO check default value (fallback)
+						lore.add(new StringTag(loreContent));
+					}
+				}
+
+				if (!lore.isEmpty()) {
+					CompoundTag displayTag = tag.getCompoundTag("display");
+					if (displayTag == null) {
+						tag.put("display", displayTag = new CompoundTag());
+						tag.put(getNbtTagName() + "|noDisplay", new ByteTag());
+					}
+					ListTag<StringTag> loreTag = displayTag.getListTag("Lore", StringTag.class);
+					if (loreTag == null) {
+						displayTag.put("Lore", loreTag = new ListTag<>(StringTag.class));
+					}
+					lore.addAll(loreTag.getValue());
+					loreTag.setValue(lore);
+				}	
+			}
+		}
+		
+		if (item.identifier() == 387) {
+			final ListTag<StringTag> pages = tag.getListTag("pages", StringTag.class);
+			if (pages == null) return item;
+			
+			final ListTag<StringTag> oldPages = new ListTag<>(StringTag.class);
+			tag.put(getNbtTagName() + "|pages", oldPages);
+
+			for (StringTag page : pages) {
+				final String value = page.getValue();
+				oldPages.add(new StringTag(value));
+				page.setValue(ChatUtil.jsonToLegacy(value));
+			}
+		}
+		return item;
+	}
+
+	@Override
+	public Item handleItemToServer(Item item) {
+		if (item == null) return null;
+		super.handleItemToServer(item);
+
+		final CompoundTag tag = item.tag();
+		if (tag == null) return item;
+		
+		if (tag.contains(getNbtTagName() + "|noDisplay")) {
+			tag.remove("display");
+		}
+		
+		if (item.identifier() == 387) {
+			final ListTag<StringTag> oldPages = tag.get(getNbtTagName() + "|pages");
+			if (oldPages != null) {
+				tag.remove("pages");
+				tag.put("pages", oldPages);
+			}
+		}
+		
+		return item;
 	}
 }

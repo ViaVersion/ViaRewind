@@ -18,13 +18,13 @@
 
 package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.packets;
 
+import com.viaversion.viabackwards.utils.Block;
 import com.viaversion.viarewind.protocol.protocol1_7_2_5to1_7_6_10.ClientboundPackets1_7_2_5;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.model.VirtualHologramEntity;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.GameProfileStorage;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.EntityTracker1_7_6_10;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
-import com.viaversion.viarewind.api.rewriter.Replacement;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
@@ -169,10 +169,10 @@ public class SpawnPackets {
 					if (type != null && type.isOrHasParent(EntityTypes1_10.EntityType.FALLING_BLOCK)) {
 						int blockId = data & 0xFFF;
 						int blockData = data >> 12 & 0xF;
-						final Replacement replace = protocol.getItemRewriter().replace(blockId, blockData);
+						final Block replace = protocol.getItemRewriter().handleBlock(blockId, blockData);
 						if (replace != null) {
 							blockId = replace.getId();
-							blockData = replace.replaceData(blockData);
+							blockData = replace.getData();
 						}
 						wrapper.set(Type.INT, 3, data = (blockId | blockData << 16));
 					}
