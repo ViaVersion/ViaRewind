@@ -261,7 +261,7 @@ public class BlockItemPackets extends VRBlockItemRewriter<ClientboundPackets1_8,
 
 	@Override
 	protected void registerRewrites() {
-		enchantmentRewriter = new LegacyEnchantmentRewriter(getNbtTagName());
+		enchantmentRewriter = new LegacyEnchantmentRewriter(getNbtTagName(), false);
 		enchantmentRewriter.registerEnchantment(8, "§7Depth Strider");
 	}
 
