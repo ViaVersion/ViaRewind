@@ -210,8 +210,8 @@ public class BlockItemPackets extends VRBlockItemRewriter<ClientboundPackets1_9,
 	@Override
 	protected void registerRewrites() {
 		enchantmentRewriter = new LegacyEnchantmentRewriter(getNbtTagName());
-		enchantmentRewriter.registerEnchantment(9, "§r§7Frost Walker");
-		enchantmentRewriter.registerEnchantment(70, "§r§7Mending");
+		enchantmentRewriter.registerEnchantment(9, "§7Frost Walker");
+		enchantmentRewriter.registerEnchantment(70, "§7Mending");
 	}
 
 	@Override
