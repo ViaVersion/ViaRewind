@@ -43,7 +43,7 @@ import com.viaversion.viaversion.protocols.protocol1_9to1_8.ClientboundPackets1_
 import java.util.ArrayList;
 import java.util.UUID;
 
-public class PlayerPackets {
+public class PlayerPackets1_9 {
 
 	public static void register(final Protocol1_8To1_9 protocol) {
 

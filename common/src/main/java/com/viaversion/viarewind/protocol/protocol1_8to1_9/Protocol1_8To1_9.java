@@ -38,7 +38,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class Protocol1_8To1_9 extends BackwardsProtocol<ClientboundPackets1_9, ClientboundPackets1_8, ServerboundPackets1_9, ServerboundPackets1_8> {
 
-	private final BlockItemPackets itemRewriter = new BlockItemPackets(this);
+	private final BlockItemPackets1_9 itemRewriter = new BlockItemPackets1_9(this);
 	private final MetadataRewriter metadataRewriter = new MetadataRewriter(this);
 
 	public Queue<PacketWrapper> animationsToSend = new ConcurrentLinkedQueue<>();
@@ -64,11 +64,11 @@ public class Protocol1_8To1_9 extends BackwardsProtocol<ClientboundPackets1_9, C
 	protected void registerPackets() {
 		itemRewriter.register();
 
-		EntityPackets.register(this);
-		PlayerPackets.register(this);
-		ScoreboardPackets.register(this);
-		SpawnPackets.register(this);
-		WorldPackets.register(this);
+		EntityPackets1_9.register(this);
+		PlayerPackets1_9.register(this);
+		ScoreboardPackets1_9.register(this);
+		SpawnPackets1_9.register(this);
+		WorldPackets1_9.register(this);
 	}
 
 	@Override
@@ -88,7 +88,7 @@ public class Protocol1_8To1_9 extends BackwardsProtocol<ClientboundPackets1_9, C
 	}
 
 	@Override
-	public BlockItemPackets getItemRewriter() {
+	public BlockItemPackets1_9 getItemRewriter() {
 		return itemRewriter;
 	}
 

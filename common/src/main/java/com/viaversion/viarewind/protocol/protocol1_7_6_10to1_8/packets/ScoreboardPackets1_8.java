@@ -31,7 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class ScoreboardPackets {
+public class ScoreboardPackets1_8 {
 
 	public static void register(Protocol1_7_6_10To1_8 protocol) {
 		protocol.registerClientbound(ClientboundPackets1_8.SCOREBOARD_OBJECTIVE, new PacketHandlers() {

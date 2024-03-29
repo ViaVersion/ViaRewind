@@ -20,7 +20,7 @@ package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.packets;
 
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.model.VirtualHologramEntity;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.EntityTracker1_7_6_10;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.EntityTracker1_8;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.GameProfileStorage;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.PlayerSessionStorage;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
@@ -36,7 +36,7 @@ import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
 import java.util.List;
 import java.util.UUID;
 
-public class EntityPackets {
+public class EntityPackets1_8 {
 
 	public static void register(Protocol1_7_6_10To1_8 protocol) {
 		protocol.registerClientbound(ClientboundPackets1_8.ENTITY_EQUIPMENT, new PacketHandlers() {
@@ -55,7 +55,7 @@ public class EntityPackets {
 
 				handler(wrapper -> {
 					final short slot = wrapper.get(Type.SHORT, 0);
-					final UUID uuid = wrapper.user().get(EntityTracker1_7_6_10.class).getPlayerUUID(wrapper.get(Type.INT, 0));
+					final UUID uuid = wrapper.user().get(EntityTracker1_8.class).getPlayerUUID(wrapper.get(Type.INT, 0));
 					if (uuid == null) return;
 
 					final Item item = wrapper.get(Types1_7_6_10.COMPRESSED_NBT_ITEM, 0);
@@ -84,7 +84,7 @@ public class EntityPackets {
 				map(Type.VAR_INT, Type.INT); // collected entity id
 				map(Type.VAR_INT, Type.INT); // collector entity id
 
-				handler(wrapper -> wrapper.user().get(EntityTracker1_7_6_10.class).removeEntity(wrapper.get(Type.INT, 0)));
+				handler(wrapper -> wrapper.user().get(EntityTracker1_8.class).removeEntity(wrapper.get(Type.INT, 0)));
 			}
 		});
 
@@ -105,7 +105,7 @@ public class EntityPackets {
 				map(Type.VAR_INT_ARRAY_PRIMITIVE, Types1_7_6_10.BYTE_INT_ARRAY); // entity ids
 
 				handler(wrapper -> {
-					final EntityTracker1_7_6_10 tracker = wrapper.user().get(EntityTracker1_7_6_10.class);
+					final EntityTracker1_8 tracker = wrapper.user().get(EntityTracker1_8.class);
 
 					for (int entityId : wrapper.get(Types1_7_6_10.BYTE_INT_ARRAY, 0)) {
 						tracker.removeEntity(entityId);
@@ -131,7 +131,7 @@ public class EntityPackets {
 				read(Type.BOOLEAN); // on ground
 
 				handler(wrapper -> {
-					final EntityTracker1_7_6_10 tracker = wrapper.user().get(EntityTracker1_7_6_10.class);
+					final EntityTracker1_8 tracker = wrapper.user().get(EntityTracker1_8.class);
 
 					final VirtualHologramEntity hologram = tracker.getVirtualHologramMap().get(wrapper.get(Type.INT, 0));
 					if (hologram != null) {
@@ -155,7 +155,7 @@ public class EntityPackets {
 				read(Type.BOOLEAN); // on ground
 
 				handler(wrapper -> {
-					final EntityTracker1_7_6_10 tracker = wrapper.user().get(EntityTracker1_7_6_10.class);
+					final EntityTracker1_8 tracker = wrapper.user().get(EntityTracker1_8.class);
 
 					final VirtualHologramEntity hologram = tracker.getVirtualHologramMap().get(wrapper.get(Type.INT, 0));
 					if (hologram != null) {
@@ -181,7 +181,7 @@ public class EntityPackets {
 				read(Type.BOOLEAN); // on ground
 
 				handler(wrapper -> {
-					final EntityTracker1_7_6_10 tracker = wrapper.user().get(EntityTracker1_7_6_10.class);
+					final EntityTracker1_8 tracker = wrapper.user().get(EntityTracker1_8.class);
 
 					final VirtualHologramEntity hologram = tracker.getVirtualHologramMap().get(wrapper.get(Type.INT, 0));
 					if (hologram != null) {
@@ -211,7 +211,7 @@ public class EntityPackets {
 				map(Type.BYTE); // pitch
 				read(Type.BOOLEAN); // on ground
 				handler(wrapper -> {
-					final EntityTracker1_7_6_10 tracker = wrapper.user().get(EntityTracker1_7_6_10.class);
+					final EntityTracker1_8 tracker = wrapper.user().get(EntityTracker1_8.class);
 
 					final int entityId = wrapper.get(Type.INT, 0);
 					final EntityType type = tracker.getEntityMap().get(entityId);
@@ -246,7 +246,7 @@ public class EntityPackets {
 				map(Type.BYTE); // head yaw
 
 				handler(wrapper -> {
-					final EntityTracker1_7_6_10 tracker = wrapper.user().get(EntityTracker1_7_6_10.class);
+					final EntityTracker1_8 tracker = wrapper.user().get(EntityTracker1_8.class);
 
 					final VirtualHologramEntity hologram = tracker.getVirtualHologramMap().get(wrapper.get(Type.INT, 0));
 					if (hologram != null) {
@@ -268,7 +268,7 @@ public class EntityPackets {
 				handler(packetWrapper -> {
 					final boolean leash = packetWrapper.get(Type.BOOLEAN, 0);
 					if (!leash) {
-						final EntityTracker1_7_6_10 tracker = packetWrapper.user().get(EntityTracker1_7_6_10.class);
+						final EntityTracker1_8 tracker = packetWrapper.user().get(EntityTracker1_8.class);
 
 						final int passenger = packetWrapper.get(Type.INT, 0);
 						final int vehicle = packetWrapper.get(Type.INT, 1);
@@ -288,7 +288,7 @@ public class EntityPackets {
 					final int entityId = wrapper.get(Type.INT, 0);
 					final List<Metadata> metadataList = wrapper.get(Types1_7_6_10.METADATA_LIST, 0);
 
-					final EntityTracker1_7_6_10 tracker = wrapper.user().get(EntityTracker1_7_6_10.class);
+					final EntityTracker1_8 tracker = wrapper.user().get(EntityTracker1_8.class);
 					if (tracker.getEntityReplacementMap().containsKey(entityId)) {
 						tracker.updateMetadata(entityId, metadataList);
 						wrapper.cancel();
@@ -331,7 +331,7 @@ public class EntityPackets {
 				map(Type.VAR_INT, Type.INT); // entity id
 				handler(wrapper -> {
 					final int entityId = wrapper.get(Type.INT, 0);
-					if (wrapper.user().get(EntityTracker1_7_6_10.class).getEntityReplacementMap().containsKey(entityId)) {
+					if (wrapper.user().get(EntityTracker1_8.class).getEntityReplacementMap().containsKey(entityId)) {
 						wrapper.cancel();
 						return;
 					}

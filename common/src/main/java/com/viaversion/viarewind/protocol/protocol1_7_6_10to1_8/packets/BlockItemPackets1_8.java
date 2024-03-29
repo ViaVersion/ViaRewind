@@ -18,11 +18,11 @@ import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
 
 import java.util.UUID;
 
-public class BlockItemPackets extends VRBlockItemRewriter<ClientboundPackets1_8, ServerboundPackets1_7_2_5, Protocol1_7_6_10To1_8> {
+public class BlockItemPackets1_8 extends VRBlockItemRewriter<ClientboundPackets1_8, ServerboundPackets1_7_2_5, Protocol1_7_6_10To1_8> {
 
 	private LegacyEnchantmentRewriter enchantmentRewriter;
 
-	public BlockItemPackets(Protocol1_7_6_10To1_8 protocol) {
+	public BlockItemPackets1_8(Protocol1_7_6_10To1_8 protocol) {
 		super(protocol, "1.8");
 	}
 

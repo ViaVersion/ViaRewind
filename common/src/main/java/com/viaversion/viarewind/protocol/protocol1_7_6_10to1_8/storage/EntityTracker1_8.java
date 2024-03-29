@@ -40,7 +40,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
-public class EntityTracker1_7_6_10 extends ReplacementEntityTracker {
+public class EntityTracker1_8 extends ReplacementEntityTracker {
 
 	protected final MetadataRewriter metadataRewriter;
 
@@ -52,7 +52,7 @@ public class EntityTracker1_7_6_10 extends ReplacementEntityTracker {
 
 	public int spectatingPlayerId = -1;
 
-	public EntityTracker1_7_6_10(UserConnection user, final MetadataRewriter metadataRewriter) {
+	public EntityTracker1_8(UserConnection user, final MetadataRewriter metadataRewriter) {
 		super(user, ProtocolVersion.v1_8, MetaType1_7_6_10.Byte, MetaType1_7_6_10.String);
 		this.metadataRewriter = metadataRewriter;
 

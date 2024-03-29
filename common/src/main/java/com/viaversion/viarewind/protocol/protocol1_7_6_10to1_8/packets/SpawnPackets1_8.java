@@ -23,7 +23,7 @@ import com.viaversion.viarewind.protocol.protocol1_7_2_5to1_7_6_10.ClientboundPa
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.model.VirtualHologramEntity;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.GameProfileStorage;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.EntityTracker1_7_6_10;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.EntityTracker1_8;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
@@ -37,7 +37,7 @@ import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
 import java.util.List;
 import java.util.UUID;
 
-public class SpawnPackets {
+public class SpawnPackets1_8 {
 
 	public static void register(Protocol1_7_6_10To1_8 protocol) {
 		protocol.registerClientbound(ClientboundPackets1_8.SPAWN_PLAYER, new PacketHandlers() {
@@ -67,7 +67,7 @@ public class SpawnPackets {
 
 					final int entityId = wrapper.get(Type.VAR_INT, 0);
 
-					final EntityTracker1_7_6_10 tracker = wrapper.user().get(EntityTracker1_7_6_10.class);
+					final EntityTracker1_8 tracker = wrapper.user().get(EntityTracker1_8.class);
 					if (gameProfile != null && gameProfile.gamemode == 3) { // Spectator mode
 						for (short i = 0; i < 5; i++) {
 							final PacketWrapper entityEquipment = PacketWrapper.create(ClientboundPackets1_7_2_5.ENTITY_EQUIPMENT, wrapper.user());
@@ -95,7 +95,7 @@ public class SpawnPackets {
 					wrapper.set(Types1_7_6_10.METADATA_LIST, 0, metadata);
 				});
 				handler(wrapper -> {
-					final EntityTracker1_7_6_10 tracker = wrapper.user().get(EntityTracker1_7_6_10.class);
+					final EntityTracker1_8 tracker = wrapper.user().get(EntityTracker1_8.class);
 
 					tracker.addEntity(wrapper.get(Type.VAR_INT, 0), EntityTypes1_10.EntityType.PLAYER);
 				});
@@ -115,7 +115,7 @@ public class SpawnPackets {
 				map(Type.INT); // data
 
 				handler(wrapper -> {
-					final EntityTracker1_7_6_10 tracker = wrapper.user().get(EntityTracker1_7_6_10.class);
+					final EntityTracker1_8 tracker = wrapper.user().get(EntityTracker1_8.class);
 
 					final EntityTypes1_10.EntityType type = EntityTypes1_10.getTypeFromId(wrapper.get(Type.BYTE, 0), true);
 					final int entityId = wrapper.get(Type.VAR_INT, 0);
@@ -202,7 +202,7 @@ public class SpawnPackets {
 				map(Type.SHORT); // velocity z
 				map(Types1_8.METADATA_LIST, Types1_7_6_10.METADATA_LIST); // metadata
 				handler(wrapper -> {
-					final EntityTracker1_7_6_10 tracker = wrapper.user().get(EntityTracker1_7_6_10.class);
+					final EntityTracker1_8 tracker = wrapper.user().get(EntityTracker1_8.class);
 					final short typeId = wrapper.get(Type.UNSIGNED_BYTE, 0);
 					if (typeId == 255 || typeId == -1) {
 						wrapper.cancel();
@@ -273,7 +273,7 @@ public class SpawnPackets {
 					}
 					wrapper.set(Types1_7_6_10.INT_POSITION, 0, new Position(position.x() + modX, position.y(), position.z() + modZ));
 
-					final EntityTracker1_7_6_10 tracker = wrapper.user().get(EntityTracker1_7_6_10.class);
+					final EntityTracker1_8 tracker = wrapper.user().get(EntityTracker1_8.class);
 					tracker.addEntity(wrapper.get(Type.VAR_INT, 0), EntityTypes1_10.EntityType.PAINTING);
 				});
 			}
@@ -288,7 +288,7 @@ public class SpawnPackets {
 				map(Type.INT); // z
 				map(Type.SHORT); // count
 				handler(wrapper -> {
-					final EntityTracker1_7_6_10 tracker = wrapper.user().get(EntityTracker1_7_6_10.class);
+					final EntityTracker1_8 tracker = wrapper.user().get(EntityTracker1_8.class);
 
 					tracker.addEntity(wrapper.get(Type.VAR_INT, 0), EntityTypes1_10.EntityType.EXPERIENCE_ORB);
 				});
@@ -304,7 +304,7 @@ public class SpawnPackets {
 				map(Type.INT); // y
 				map(Type.INT); // z
 				handler(wrapper -> {
-					final EntityTracker1_7_6_10 tracker = wrapper.user().get(EntityTracker1_7_6_10.class);
+					final EntityTracker1_8 tracker = wrapper.user().get(EntityTracker1_8.class);
 
 					tracker.addEntity(wrapper.get(Type.VAR_INT, 0), EntityTypes1_10.EntityType.LIGHTNING);
 				});

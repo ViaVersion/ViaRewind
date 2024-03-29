@@ -46,7 +46,7 @@ import java.util.concurrent.TimeUnit;
 
 public class Protocol1_7_6_10To1_8 extends BackwardsProtocol<ClientboundPackets1_8, ClientboundPackets1_7_2_5, ServerboundPackets1_8, ServerboundPackets1_7_2_5> {
 
-	private final BlockItemPackets itemRewriter = new BlockItemPackets(this);
+	private final BlockItemPackets1_8 itemRewriter = new BlockItemPackets1_8(this);
 	private final MetadataRewriter metadataRewriter = new MetadataRewriter(this);
 
 	public Protocol1_7_6_10To1_8() {
@@ -57,11 +57,11 @@ public class Protocol1_7_6_10To1_8 extends BackwardsProtocol<ClientboundPackets1
 	protected void registerPackets() {
 		itemRewriter.register();
 
-		EntityPackets.register(this);
-		PlayerPackets.register(this);
-		ScoreboardPackets.register(this);
-		SpawnPackets.register(this);
-		WorldPackets.register(this);
+		EntityPackets1_8.register(this);
+		PlayerPackets1_8.register(this);
+		ScoreboardPackets1_8.register(this);
+		SpawnPackets1_8.register(this);
+		WorldPackets1_8.register(this);
 
 		this.registerClientbound(State.LOGIN, ClientboundLoginPackets.HELLO.getId(), ClientboundLoginPackets.HELLO.getId(), new PacketHandlers() {
 			@Override
@@ -116,7 +116,7 @@ public class Protocol1_7_6_10To1_8 extends BackwardsProtocol<ClientboundPackets1
 	@Override
 	public void init(UserConnection userConnection) {
 		userConnection.put(new InventoryTracker(userConnection));
-		userConnection.put(new EntityTracker1_7_6_10(userConnection, metadataRewriter));
+		userConnection.put(new EntityTracker1_8(userConnection, metadataRewriter));
 		userConnection.put(new PlayerSessionStorage(userConnection));
 		userConnection.put(new GameProfileStorage(userConnection));
 		userConnection.put(new Scoreboard(userConnection));
@@ -138,7 +138,7 @@ public class Protocol1_7_6_10To1_8 extends BackwardsProtocol<ClientboundPackets1
 	}
 
 	@Override
-	public BlockItemPackets getItemRewriter() {
+	public BlockItemPackets1_8 getItemRewriter() {
 		return itemRewriter;
 	}
 

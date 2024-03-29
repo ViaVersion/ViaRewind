@@ -26,7 +26,7 @@ import com.viaversion.viaversion.protocols.protocol1_8.ServerboundPackets1_8;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ClientboundPackets1_9;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ServerboundPackets1_9;
 
-public class ScoreboardPackets {
+public class ScoreboardPackets1_9 {
 
 	public static void register(Protocol<ClientboundPackets1_9, ClientboundPackets1_8,
 			ServerboundPackets1_9, ServerboundPackets1_8> protocol) {

@@ -37,7 +37,7 @@ import com.viaversion.viaversion.protocols.protocol1_9to1_8.ClientboundPackets1_
 
 import java.util.List;
 
-public class SpawnPackets {
+public class SpawnPackets1_9 {
 
 	public static void register(Protocol1_8To1_9 protocol) {
 		protocol.registerClientbound(ClientboundPackets1_9.SPAWN_ENTITY, new PacketHandlers() {

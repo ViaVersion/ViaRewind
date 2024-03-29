@@ -24,7 +24,6 @@ import com.viaversion.viarewind.protocol.protocol1_8to1_9.sound.Effect;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.sound.SoundRemapper;
 import com.viaversion.viarewind.utils.PacketUtil;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
 import com.viaversion.viaversion.api.minecraft.Environment;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.chunks.BaseChunk;
@@ -46,7 +45,7 @@ import com.viaversion.viaversion.protocols.protocol1_9to1_8.ClientboundPackets1_
 
 import java.util.ArrayList;
 
-public class WorldPackets {
+public class WorldPackets1_9 {
 
 	public static void register(Protocol1_8To1_9 protocol) {
 		protocol.registerClientbound(ClientboundPackets1_9.BLOCK_ENTITY_DATA, new PacketHandlers() {

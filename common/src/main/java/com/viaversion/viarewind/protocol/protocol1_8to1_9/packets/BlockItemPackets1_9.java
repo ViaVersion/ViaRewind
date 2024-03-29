@@ -38,13 +38,13 @@ import java.util.Set;
 
 import static com.viaversion.viaversion.protocols.protocol1_9to1_8.ItemRewriter.potionNameFromDamage;
 
-public class BlockItemPackets extends VRBlockItemRewriter<ClientboundPackets1_9, ServerboundPackets1_8, Protocol1_8To1_9> {
+public class BlockItemPackets1_9 extends VRBlockItemRewriter<ClientboundPackets1_9, ServerboundPackets1_8, Protocol1_8To1_9> {
 
 	public final Set<String> VALID_ATTRIBUTES = new HashSet<>();
 
 	private LegacyEnchantmentRewriter enchantmentRewriter;
 
-	public BlockItemPackets(Protocol1_8To1_9 protocol) {
+	public BlockItemPackets1_9(Protocol1_8To1_9 protocol) {
 		super(protocol, "1.9");
 
 		VALID_ATTRIBUTES.add("generic.maxHealth");

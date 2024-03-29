@@ -54,7 +54,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.UUID;
 
-public class PlayerPackets {
+public class PlayerPackets1_8 {
 
 	public static void register(Protocol1_7_6_10To1_8 protocol) {
 		protocol.registerClientbound(ClientboundPackets1_8.JOIN_GAME, new PacketHandlers() {
@@ -75,7 +75,7 @@ public class PlayerPackets {
 						}
 					}
 
-					final EntityTracker1_7_6_10 tracker = wrapper.user().get(EntityTracker1_7_6_10.class);
+					final EntityTracker1_8 tracker = wrapper.user().get(EntityTracker1_8.class);
 					tracker.setClientEntityId(wrapper.get(Type.INT, 0));
 					tracker.addPlayer(wrapper.get(Type.INT, 0), wrapper.user().getProtocolInfo().getUuid());
 
@@ -136,7 +136,7 @@ public class PlayerPackets {
 					final ClientWorld world = wrapper.user().get(ClientWorld.class);
 					final Environment dimension = Environment.getEnvironmentById(wrapper.get(Type.INT, 0));
 
-					final EntityTracker1_7_6_10 tracker = wrapper.user().get(EntityTracker1_7_6_10.class);
+					final EntityTracker1_8 tracker = wrapper.user().get(EntityTracker1_8.class);
 					if (world.getEnvironment() != dimension) {
 						world.setEnvironment(dimension.id());
 
@@ -182,7 +182,7 @@ public class PlayerPackets {
 
 					wrapper.write(Type.BOOLEAN, playerSession.onGround);
 
-					final EntityTracker1_7_6_10 tracker = wrapper.user().get(EntityTracker1_7_6_10.class);
+					final EntityTracker1_8 tracker = wrapper.user().get(EntityTracker1_8.class);
 					if (tracker.spectatingPlayerId != tracker.getPlayerId()) {
 						wrapper.cancel();
 					}
@@ -291,7 +291,7 @@ public class PlayerPackets {
 							if (gameProfile == null || gameProfile.gamemode == gamemode) continue;
 
 							if (gamemode == 3 || gameProfile.gamemode == 3) {
-								EntityTracker1_7_6_10 tracker = packetWrapper.user().get(EntityTracker1_7_6_10.class);
+								EntityTracker1_8 tracker = packetWrapper.user().get(EntityTracker1_8.class);
 								int entityId = tracker.getPlayerEntityId(uuid);
 								boolean isOwnPlayer = entityId == tracker.getPlayerId();
 								if (entityId != -1) {
@@ -455,7 +455,7 @@ public class PlayerPackets {
 				handler(packetWrapper -> {
 					packetWrapper.cancel();
 
-					EntityTracker1_7_6_10 tracker = packetWrapper.user().get(EntityTracker1_7_6_10.class);
+					EntityTracker1_8 tracker = packetWrapper.user().get(EntityTracker1_8.class);
 
 					int entityId = packetWrapper.read(Type.VAR_INT);
 					int spectating = tracker.spectatingPlayerId;
@@ -558,7 +558,7 @@ public class PlayerPackets {
 						return;
 					}
 					final int entityId = wrapper.get(Type.VAR_INT, 0);
-					final EntityTracker1_7_6_10 tracker = wrapper.user().get(EntityTracker1_7_6_10.class);
+					final EntityTracker1_8 tracker = wrapper.user().get(EntityTracker1_8.class);
 					final PlayerSessionStorage position = wrapper.user().get(PlayerSessionStorage.class);
 
 					if (tracker.getVirtualHologramMap().containsKey(entityId)) {
@@ -762,7 +762,7 @@ public class PlayerPackets {
 					packetWrapper.write(Type.UNSIGNED_BYTE, flags);
 
 					if (unmount) {
-						EntityTracker1_7_6_10 tracker = packetWrapper.user().get(EntityTracker1_7_6_10.class);
+						EntityTracker1_8 tracker = packetWrapper.user().get(EntityTracker1_8.class);
 						if (tracker.spectatingPlayerId != tracker.getPlayerId()) {
 							PacketWrapper sneakPacket = PacketWrapper.create(0x0B, null, packetWrapper.user());
 							sneakPacket.write(Type.VAR_INT, tracker.getPlayerId());

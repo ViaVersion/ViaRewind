@@ -38,7 +38,7 @@ import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
 import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.util.ChatColorUtil;
 
-public class WorldPackets {
+public class WorldPackets1_8 {
 
 	public static void register(Protocol1_7_6_10To1_8 protocol) {
 		protocol.registerClientbound(ClientboundPackets1_8.CHUNK_DATA, wrapper -> {
