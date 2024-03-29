@@ -64,6 +64,11 @@ public class ViaRewindConfig extends Config implements com.viaversion.viarewind.
 	}
 
 	@Override
+	public boolean alwaysShowOriginalMobName() {
+		return getBoolean("always-show-original-mob-name", true);
+	}
+
+	@Override
 	public String getWorldBorderParticle() {
 		return getString("world-border-particle", "fireworksSpark");
 	}

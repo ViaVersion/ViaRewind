@@ -24,6 +24,9 @@ max-book-page-length: 5000
 # Whether to emulate the 1.8+ world border for 1.7.x clients
 emulate-world-border: true
 #
+# Always shows a mapped mob's original name, and not only when hovering over it with the cursor.
+always-show-original-mob-name: true
+#
 # The particle to show the world border for the 1.8+ world border for 1.7.x clients
 # see https://wiki.vg/index.php?title=Protocol&oldid=7368#Particle_2
 world-border-particle: 'fireworksSpark'

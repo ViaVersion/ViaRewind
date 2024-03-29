@@ -78,6 +78,13 @@ public interface ViaRewindConfig extends Config {
 	boolean isEmulateWorldBorder();
 
 	/**
+	 * Always shows the original mob's name instead of only when hovering over them with the cursor.
+	 *
+	 * @return true if enabled
+	 */
+	boolean alwaysShowOriginalMobName();
+
+	/**
 	 * The particle to show the world border for the 1.8+ world border for 1.7.x clients
 	 *
 	 * @return the particle name (see <a href="https://wiki.vg/index.php?title=Protocol&oldid=7368#Particle_2">Particle registry for Packet</a>)
