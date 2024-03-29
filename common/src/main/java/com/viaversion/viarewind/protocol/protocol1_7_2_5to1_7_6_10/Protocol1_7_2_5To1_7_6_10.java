@@ -32,9 +32,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Protocol1_7_2_5To1_7_6_10 extends AbstractProtocol<ClientboundPackets1_7_2_5, ClientboundPackets1_7_2_5, ServerboundPackets1_7_2_5, ServerboundPackets1_7_2_5> {
+
 	public final static ValueTransformer<String, String> REMOVE_DASHES = new ValueTransformer<String, String>(Type.STRING) {
 		@Override
-		public String transform(PacketWrapper packetWrapper, String s) {
+		public String transform(PacketWrapper wrapper, String s) {
 			return s.replace("-", "");
 		}
 	};
@@ -59,12 +60,12 @@ public class Protocol1_7_2_5To1_7_6_10 extends AbstractProtocol<ClientboundPacke
 				map(Type.VAR_INT); // entity id
 				map(Type.STRING, REMOVE_DASHES); // uuid
 				map(Type.STRING); // name
-				handler(packetWrapper -> { // delete data introduced in 1.7.6
-					final int size = packetWrapper.read(Type.VAR_INT); // data count
+				handler(wrapper -> { // delete data introduced in 1.7.6
+					final int size = wrapper.read(Type.VAR_INT); // data count
 					for (int i = 0; i < size; i++) {
-						packetWrapper.read(Type.STRING); // data name
-						packetWrapper.read(Type.STRING); // data value
-						packetWrapper.read(Type.STRING); // data signature
+						wrapper.read(Type.STRING); // data name
+						wrapper.read(Type.STRING); // data value
+						wrapper.read(Type.STRING); // data signature
 					}
 				});
 				map(Type.INT); // x
@@ -72,7 +73,7 @@ public class Protocol1_7_2_5To1_7_6_10 extends AbstractProtocol<ClientboundPacke
 				map(Type.INT); // z
 				map(Type.BYTE); // yaw
 				map(Type.BYTE); // pitch
- 				map(Type.SHORT); // item in hand
+				map(Type.SHORT); // item in hand
 				map(Types1_7_6_10.METADATA_LIST); // metadata
 			}
 		});
@@ -82,29 +83,29 @@ public class Protocol1_7_2_5To1_7_6_10 extends AbstractProtocol<ClientboundPacke
 			public void register() {
 				map(Type.STRING); // team name
 				map(Type.BYTE); // mode
-				handler(packetWrapper -> {
-					byte mode = packetWrapper.get(Type.BYTE, 0);
+				handler(wrapper -> {
+					final byte mode = wrapper.get(Type.BYTE, 0);
 					if (mode == 0 || mode == 2) { // team is created or information is updated
-						packetWrapper.passthrough(Type.STRING); // team display name
-						packetWrapper.passthrough(Type.STRING); // team prefix
-						packetWrapper.passthrough(Type.STRING); // team suffix
-						packetWrapper.passthrough(Type.BYTE); // friendly fire
+						wrapper.passthrough(Type.STRING); // team display name
+						wrapper.passthrough(Type.STRING); // team prefix
+						wrapper.passthrough(Type.STRING); // team suffix
+						wrapper.passthrough(Type.BYTE); // friendly fire
 					}
 					if (mode == 0 || mode == 3 || mode == 4) { // team is created, player is added or player is removed
 						List<String> entryList = new ArrayList<>();
-						final int size = packetWrapper.read(Type.SHORT);
+						final int size = wrapper.read(Type.SHORT);
 						for (int i = 0; i < size; i++) {
-							entryList.add(packetWrapper.read(Type.STRING));
+							entryList.add(wrapper.read(Type.STRING));
 						}
 
 						entryList = entryList.stream()
-								.map(it -> it.length() > 16 ? it.substring(0, 16) : it) // trim to 16 characters
-								.distinct() // remove duplicates
-								.collect(Collectors.toList());
+							.map(it -> it.length() > 16 ? it.substring(0, 16) : it) // trim to 16 characters
+							.distinct() // remove duplicates
+							.collect(Collectors.toList());
 
-						packetWrapper.write(Type.SHORT, (short) entryList.size());
+						wrapper.write(Type.SHORT, (short) entryList.size());
 						for (String entry : entryList) {
-							packetWrapper.write(Type.STRING, entry);
+							wrapper.write(Type.STRING, entry);
 						}
 					}
 				});
