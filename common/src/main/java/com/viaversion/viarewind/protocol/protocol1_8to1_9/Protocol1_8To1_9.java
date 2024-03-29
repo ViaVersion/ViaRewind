@@ -19,7 +19,7 @@
 package com.viaversion.viarewind.protocol.protocol1_8to1_9;
 
 import com.viaversion.viabackwards.api.BackwardsProtocol;
-import com.viaversion.viarewind.protocol.protocol1_8to1_9.metadata.MetadataRewriter;
+import com.viaversion.viarewind.protocol.protocol1_8to1_9.metadata.MetadataRewriter1_8To1_9;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.packets.*;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.storage.*;
 import com.viaversion.viarewind.utils.Ticker;
@@ -39,7 +39,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class Protocol1_8To1_9 extends BackwardsProtocol<ClientboundPackets1_9, ClientboundPackets1_8, ServerboundPackets1_9, ServerboundPackets1_8> {
 
 	private final BlockItemPackets1_9 itemRewriter = new BlockItemPackets1_9(this);
-	private final MetadataRewriter metadataRewriter = new MetadataRewriter(this);
+	private final MetadataRewriter1_8To1_9 metadataRewriter = new MetadataRewriter1_8To1_9(this);
 
 	public Queue<PacketWrapper> animationsToSend = new ConcurrentLinkedQueue<>();
 
@@ -72,19 +72,19 @@ public class Protocol1_8To1_9 extends BackwardsProtocol<ClientboundPackets1_9, C
 	}
 
 	@Override
-	public void init(UserConnection userConnection) {
+	public void init(UserConnection connection) {
 		Ticker.init();
-
-		userConnection.put(new Windows(userConnection));
-		userConnection.put(new EntityTracker(userConnection, this));
-		userConnection.put(new Levitation(userConnection));
-		userConnection.put(new PlayerPosition(userConnection));
-		userConnection.put(new Cooldown(userConnection));
-		userConnection.put(new BlockPlaceDestroyTracker(userConnection));
-		userConnection.put(new BossBarStorage(userConnection));
-		if (!userConnection.has(ClientWorld.class)) {
-			userConnection.put(new ClientWorld());
+		if (!connection.has(ClientWorld.class)) {
+			connection.put(new ClientWorld());
 		}
+		connection.addEntityTracker(this.getClass(), new EntityTracker1_9(connection));
+
+		connection.put(new Windows(connection));
+		connection.put(new Levitation(connection));
+		connection.put(new PlayerPosition(connection));
+		connection.put(new Cooldown(connection));
+		connection.put(new BlockPlaceDestroyTracker(connection));
+		connection.put(new BossBarStorage(connection));
 	}
 
 	@Override
@@ -92,7 +92,7 @@ public class Protocol1_8To1_9 extends BackwardsProtocol<ClientboundPackets1_9, C
 		return itemRewriter;
 	}
 
-	public MetadataRewriter getMetadataRewriter() {
+	public MetadataRewriter1_8To1_9 getMetadataRewriter() {
 		return metadataRewriter;
 	}
 }

@@ -20,10 +20,9 @@ package com.viaversion.viarewind.protocol.protocol1_8to1_9.packets;
 
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.Protocol1_8To1_9;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.storage.Cooldown;
-import com.viaversion.viarewind.protocol.protocol1_8to1_9.storage.EntityTracker;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.storage.Levitation;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.storage.PlayerPosition;
-import com.viaversion.viarewind.protocol.protocol1_8to1_9.util.RelativeMoveUtil;
+import com.viaversion.viarewind.utils.math.RelativeMoveUtil;
 import com.viaversion.viarewind.api.minecraft.EntityModel;
 import com.viaversion.viarewind.utils.PacketUtil;
 import com.viaversion.viaversion.api.minecraft.Vector;

@@ -224,12 +224,7 @@ public class BlockItemPackets1_9 extends VRBlockItemRewriter<ClientboundPackets1
 			item.setTag(tag = new CompoundTag());
 		}
 
-		if (tag.getListTag("ench") != null) {
-			enchantmentRewriter.rewriteEnchantmentsToClient(tag, false);
-		}
-		if (tag.getListTag("StoredEnchantments") != null) {
-			enchantmentRewriter.rewriteEnchantmentsToClient(tag, true);
-		}
+		enchantmentRewriter.handleToClient(item);
 
 		CompoundTag displayTag = tag.get("display");
 		if (item.data() != 0 && tag.contains("Unbreakable")) {
@@ -324,12 +319,8 @@ public class BlockItemPackets1_9 extends VRBlockItemRewriter<ClientboundPackets1
 		if (tag == null) {
 			item.setTag(tag = new CompoundTag());
 		}
-		if (tag.getListTag(getNbtTagName() + "|ench") != null) {
-			enchantmentRewriter.rewriteEnchantmentsToServer(tag, false);
-		}
-		if (tag.getListTag(getNbtTagName() + "|StoredEnchantments") != null) {
-			enchantmentRewriter.rewriteEnchantmentsToServer(tag, true);
-		}
+
+		enchantmentRewriter.handleToServer(item);
 
 		if (item.identifier() == 383 && item.data() != 0) { // Spawn eggs
 			if (!tag.contains("EntityTag") && ItemRewriter.ENTITY_ID_TO_NAME.containsKey((int) item.data())) {

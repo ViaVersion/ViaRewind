@@ -274,13 +274,7 @@ public class BlockItemPackets1_8 extends VRBlockItemRewriter<ClientboundPackets1
 		if (tag == null) {
 			item.setTag(tag = new CompoundTag());
 		}
-
-		if (tag.getListTag("ench") != null) {
-			enchantmentRewriter.rewriteEnchantmentsToClient(tag, false);
-		}
-		if (tag.getListTag("StoredEnchantments") != null) {
-			enchantmentRewriter.rewriteEnchantmentsToClient(tag, true);
-		}
+		enchantmentRewriter.handleToClient(item);
 		
 		if (item.identifier() == 387) {
 			final ListTag<StringTag> pages = tag.getListTag("pages", StringTag.class);
@@ -306,12 +300,7 @@ public class BlockItemPackets1_8 extends VRBlockItemRewriter<ClientboundPackets1
 		final CompoundTag tag = item.tag();
 		if (tag == null) return item;
 
-		if (tag.getListTag(getNbtTagName() + "|ench") != null) {
-			enchantmentRewriter.rewriteEnchantmentsToServer(tag, false);
-		}
-		if (tag.getListTag(getNbtTagName() + "|StoredEnchantments") != null) {
-			enchantmentRewriter.rewriteEnchantmentsToServer(tag, true);
-		}
+		enchantmentRewriter.handleToServer(item);
 
 		if (item.identifier() == 387) {
 			final ListTag<StringTag> oldPages = tag.get(getNbtTagName() + "|pages");
