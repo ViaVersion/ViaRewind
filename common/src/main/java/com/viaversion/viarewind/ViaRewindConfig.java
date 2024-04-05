@@ -74,12 +74,12 @@ public class ViaRewindConfig extends Config implements com.viaversion.viarewind.
         return getClass().getClassLoader().getResource("assets/viarewind/config.yml");
     }
 
-	@Override
-	public InputStream getDefaultConfigInputStream() {
-		return getClass().getClassLoader().getResourceAsStream("assets/viarewind/config.yml");
-	}
+    @Override
+    public InputStream getDefaultConfigInputStream() {
+        return getClass().getClassLoader().getResourceAsStream("assets/viarewind/config.yml");
+    }
 
-	@Override
+    @Override
     protected void handleConfig(Map<String, Object> map) {
 
     }
