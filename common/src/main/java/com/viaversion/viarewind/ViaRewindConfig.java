@@ -21,6 +21,7 @@ package com.viaversion.viarewind;
 import com.viaversion.viaversion.util.Config;
 
 import java.io.File;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.Collections;
 import java.util.List;
@@ -71,6 +72,11 @@ public class ViaRewindConfig extends Config implements com.viaversion.viarewind.
 	@Override
     public URL getDefaultConfigURL() {
         return getClass().getClassLoader().getResource("assets/viarewind/config.yml");
+    }
+
+    @Override
+    public InputStream getDefaultConfigInputStream() {
+        return getClass().getClassLoader().getResourceAsStream("assets/viarewind/config.yml");
     }
 
     @Override
