@@ -7,7 +7,7 @@ setupViaSubproject("fabric")
 setupViaSubproject("sponge")
 setupViaSubproject("velocity")
 
-setupSubproject("viaversion", project -> {
+setupSubproject("viarewind", project -> {
     project.projectDir = file("universal")
 })
 
