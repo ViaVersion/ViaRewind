@@ -113,7 +113,7 @@ public class MetadataRewriter {
 							entry.setValue(value);
 							break;
 						case Boolean:
-							if (metaIndex == MetaIndex.AGEABLE_AGE) entry.setValue((byte) ((Boolean) value ? -1 : 0));
+							if (metaIndex == MetaIndex.AGEABLE_CREATURE_AGE) entry.setValue((byte) ((Boolean) value ? -1 : 0));
 							else entry.setValue((byte) ((Boolean) value ? 1 : 0));
 							break;
 						case Slot:
