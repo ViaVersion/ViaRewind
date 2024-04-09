@@ -21,9 +21,8 @@ package com.viaversion.viarewind.protocol.protocol1_8to1_9.packets;
 import com.viaversion.viabackwards.utils.Block;
 import com.viaversion.viarewind.ViaRewind;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.Protocol1_8To1_9;
-import com.viaversion.viarewind.protocol.protocol1_8to1_9.entityreplacement.ShulkerBulletModel;
-import com.viaversion.viarewind.protocol.protocol1_8to1_9.entityreplacement.ShulkerModel;
 import com.viaversion.viarewind.api.minecraft.EntityModel;
+import com.viaversion.viarewind.protocol.protocol1_8to1_9.storage.EntityTracker1_9;
 import com.viaversion.viarewind.utils.PacketUtil;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
@@ -55,7 +54,7 @@ public class SpawnPackets1_9 {
 				handler(packetWrapper -> {
 					final int entityId = packetWrapper.get(Type.VAR_INT, 0);
 					final int typeId = packetWrapper.get(Type.BYTE, 0);
-					EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
+					EntityTracker1_9 tracker = packetWrapper.user().getEntityTracker(Protocol1_8To1_9.class);
 					final EntityTypes1_10.EntityType type = EntityTypes1_10.getTypeFromId(typeId, true);
 
 					//cancel AREA_EFFECT_CLOUD = 3, SPECTRAL_ARROW = 91, DRAGON_FIREBALL = 93
@@ -80,12 +79,6 @@ public class SpawnPackets1_9 {
 						packetWrapper.set(Type.BYTE, 1, yaw);
 						y += 10;
 						packetWrapper.set(Type.INT, 1, y);
-					} else if (type.is(EntityTypes1_10.EntityType.SHULKER_BULLET)) {
-						packetWrapper.cancel();
-						ShulkerBulletModel shulkerBulletReplacement = new ShulkerBulletModel(packetWrapper.user(), protocol, entityId);
-						shulkerBulletReplacement.updateReplacementPosition(x / 32.0, y / 32.0, z / 32.0);
-						tracker.addEntityReplacement(shulkerBulletReplacement);
-						return;
 					}
 
 					int data = packetWrapper.get(Type.INT, 3);
@@ -119,8 +112,7 @@ public class SpawnPackets1_9 {
 						PacketUtil.sendPacket(velocityPacket, Protocol1_8To1_9.class);
 					}
 
-					tracker.getClientEntityTypes().put(entityId, type);
-					tracker.sendMetadataBuffer(entityId);
+//					tracker.getClientEntityTypes().put(entityId, type);
 				});
 			}
 		});
@@ -136,9 +128,8 @@ public class SpawnPackets1_9 {
 				map(Type.SHORT);
 				handler(packetWrapper -> {
 					int entityId = packetWrapper.get(Type.VAR_INT, 0);
-					EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-					tracker.getClientEntityTypes().put(entityId, EntityTypes1_10.EntityType.EXPERIENCE_ORB);
-					tracker.sendMetadataBuffer(entityId);
+//					EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
+//					tracker.getClientEntityTypes().put(entityId, EntityTypes1_10.EntityType.EXPERIENCE_ORB);
 				});
 			}
 		});
@@ -154,9 +145,8 @@ public class SpawnPackets1_9 {
 				map(Type.DOUBLE, Protocol1_8To1_9.TO_OLD_INT);
 				handler(packetWrapper -> {
 					int entityId = packetWrapper.get(Type.VAR_INT, 0);
-					EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-					tracker.getClientEntityTypes().put(entityId, EntityTypes1_10.EntityType.LIGHTNING);
-					tracker.sendMetadataBuffer(entityId);
+//					EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
+//					tracker.getClientEntityTypes().put(entityId, EntityTypes1_10.EntityType.LIGHTNING);
 				});
 			}
 		});
@@ -188,37 +178,28 @@ public class SpawnPackets1_9 {
 					byte yaw = packetWrapper.get(Type.BYTE, 0);
 					byte headYaw = packetWrapper.get(Type.BYTE, 2);
 
-					if (typeId == 69) {
-						packetWrapper.cancel();
-						EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-						ShulkerModel shulkerReplacement = new ShulkerModel(packetWrapper.user(), protocol, entityId);
-						shulkerReplacement.updateReplacementPosition(x / 32.0, y / 32.0, z / 32.0);
-						shulkerReplacement.setYawPitch(yaw * 360f / 256, pitch * 360f / 256);
-						shulkerReplacement.setHeadYaw(headYaw * 360f / 256);
-						tracker.addEntityReplacement(shulkerReplacement);
-					} else if (typeId == -1 || typeId == 255) {
+					if (typeId == -1 || typeId == 255) {
 						packetWrapper.cancel();
 					}
 				});
 				handler(packetWrapper -> {
 					int entityId = packetWrapper.get(Type.VAR_INT, 0);
 					int typeId = packetWrapper.get(Type.UNSIGNED_BYTE, 0);
-					EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-					tracker.getClientEntityTypes().put(entityId, EntityTypes1_10.getTypeFromId(typeId, false));
-					tracker.sendMetadataBuffer(entityId);
+//					EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
+//					tracker.getClientEntityTypes().put(entityId, EntityTypes1_10.getTypeFromId(typeId, false));
 				});
 				handler(wrapper -> {
 					List<Metadata> metadataList = wrapper.get(Types1_8.METADATA_LIST, 0);
 					int entityId = wrapper.get(Type.VAR_INT, 0);
-					EntityTracker tracker = wrapper.user().get(EntityTracker.class);
-					EntityModel replacement;
-					if ((replacement = tracker.getEntityReplacement(entityId)) != null) {
-						replacement.updateMetadata(metadataList);
-					} else if (tracker.getClientEntityTypes().containsKey(entityId)) {
-						protocol.getMetadataRewriter().transform(tracker, entityId, metadataList);
-					} else {
-						wrapper.cancel();
-					}
+//					EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+//					EntityModel replacement;
+//					if ((replacement = tracker.getEntityReplacement(entityId)) != null) {
+//						replacement.updateMetadata(metadataList);
+//					} else if (tracker.getClientEntityTypes().containsKey(entityId)) {
+//						protocol.getMetadataRewriter().transform(tracker, entityId, metadataList);
+//					} else {
+//						wrapper.cancel();
+//					}
 				});
 			}
 		});
@@ -234,9 +215,8 @@ public class SpawnPackets1_9 {
 				map(Type.BYTE, Type.UNSIGNED_BYTE);
 				handler(packetWrapper -> {
 					int entityId = packetWrapper.get(Type.VAR_INT, 0);
-					EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-					tracker.getClientEntityTypes().put(entityId, EntityTypes1_10.EntityType.PAINTING);
-					tracker.sendMetadataBuffer(entityId);
+//					EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
+//					tracker.getClientEntityTypes().put(entityId, EntityTypes1_10.EntityType.PAINTING);
 				});
 			}
 		});
@@ -257,13 +237,12 @@ public class SpawnPackets1_9 {
 				this.handler(wrapper -> {
 					int entityId = wrapper.get(Type.VAR_INT, 0);
 					List<Metadata> metadataList = wrapper.get(Types1_8.METADATA_LIST, 0);
-					protocol.getMetadataRewriter().transform(wrapper.user().get(EntityTracker.class), entityId, metadataList, EntityTypes1_10.EntityType.PLAYER);
+//					protocol.getMetadataRewriter().transform(wrapper.user().get(EntityTracker.class), entityId, metadataList, EntityTypes1_10.EntityType.PLAYER);
 				});
 				handler(packetWrapper -> {
 					int entityId = packetWrapper.get(Type.VAR_INT, 0);
-					EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
-					tracker.getClientEntityTypes().put(entityId, EntityTypes1_10.EntityType.PLAYER);
-					tracker.sendMetadataBuffer(entityId);
+//					EntityTracker tracker = packetWrapper.user().get(EntityTracker.class);
+//					tracker.getClientEntityTypes().put(entityId, EntityTypes1_10.EntityType.PLAYER);
 				});
 			}
 		});

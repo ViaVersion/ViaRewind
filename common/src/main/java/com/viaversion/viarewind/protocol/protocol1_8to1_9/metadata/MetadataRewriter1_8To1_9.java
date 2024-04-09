@@ -45,8 +45,11 @@ public class MetadataRewriter1_8To1_9 extends VREntityRewriter<ClientboundPacket
 
 	@Override
 	protected void registerRewrites() {
-		mapEntityTypeWithData(EntityType.SHULKER, EntityType.)
+		// Handle new entities
+		mapEntityTypeWithData(EntityType.SHULKER, EntityType.MAGMA_CUBE);
+		mapEntityTypeWithData(EntityType.SHULKER_BULLET, EntityType.WITCH);
 
+		// Metadata rewrite
 		filter().handler(this::handleMetadata);
 	}
 
