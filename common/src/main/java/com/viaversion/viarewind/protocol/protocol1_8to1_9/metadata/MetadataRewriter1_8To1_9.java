@@ -64,7 +64,7 @@ public class MetadataRewriter1_8To1_9 extends VREntityRewriter<ClientboundPacket
 			event.cancel();
 			return;
 		}
-		if (metaIndex.getOldType() == MetaType1_8.NonExistent || metaIndex.getNewType() == null) {
+		if (metaIndex.getOldType() == null || metaIndex.getNewType() == null) {
 			if (metaIndex == MetaIndex.PLAYER_HAND) { // Player eating/aiming/drinking
 				int status = tracker.getStatus().getOrDefault(event.entityId(), 0);
 				if ((((byte) metadata.value()) & 1 << HAND_ACTIVE_BIT) != 0) {
@@ -122,7 +122,7 @@ public class MetadataRewriter1_8To1_9 extends VREntityRewriter<ClientboundPacket
 				break;
             case Boolean:
 				final boolean bool = (Boolean) value;
-				if (metaIndex == MetaIndex.AGEABLE_AGE) {
+				if (metaIndex == MetaIndex.AGEABLE_CREATURE_AGE) {
 					metadata.setValue((byte) (bool ? -1 : 0));
 				} else {
 					metadata.setValue((byte) (bool ? 1 : 0));
