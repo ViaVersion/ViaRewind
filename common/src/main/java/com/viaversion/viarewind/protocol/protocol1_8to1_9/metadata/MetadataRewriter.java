@@ -57,7 +57,7 @@ public class MetadataRewriter {
 			MetaIndex metaIndex = MetaIndex1_8to1_9.searchIndex(entityType, entry.id());
 			try {
 				if (metaIndex != null) {
-					if (metaIndex.getOldType() == MetaType1_8.NonExistent || metaIndex.getNewType() == null) {
+					if (metaIndex.getOldType() == null || metaIndex.getNewType() == null) {
 						list.remove(entry);
 						if (metaIndex == MetaIndex.PLAYER_HAND) {
 							byte status = tracker.getStatusInformation().getOrDefault(entityId, (byte) 0);

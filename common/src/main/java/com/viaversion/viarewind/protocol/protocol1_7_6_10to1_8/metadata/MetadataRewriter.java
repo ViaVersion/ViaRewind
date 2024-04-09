@@ -48,7 +48,7 @@ public class MetadataRewriter {
 					list.remove(entry);
 					continue;
 				}
-				if (metaIndex.getOldType() == MetaType1_7_6_10.NonExistent) {
+				if (metaIndex.getOldType() == null) {
 					list.remove(entry);
 					continue;
 				}
