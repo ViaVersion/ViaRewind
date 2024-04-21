@@ -49,7 +49,7 @@ public class EntityPackets {
 				// remap item
 				handler(wrapper -> {
 					final Item item = wrapper.get(Types1_7_6_10.COMPRESSED_NBT_ITEM, 0);
-					protocol.getItemRewriter().handleItemToClient(item);
+					protocol.getItemRewriter().handleItemToClient(wrapper.user(), item);
 					wrapper.set(Types1_7_6_10.COMPRESSED_NBT_ITEM, 0, item);
 				});
 
@@ -295,7 +295,7 @@ public class EntityPackets {
 						return;
 					}
 					if (tracker.getEntityMap().containsKey(entityId)) {
-						protocol.getMetadataRewriter().transform(tracker.getEntityMap().get(entityId), metadataList);
+						protocol.getMetadataRewriter().transform(wrapper.user(), tracker.getEntityMap().get(entityId), metadataList);
 						if (metadataList.isEmpty()) {
 							wrapper.cancel();
 						}

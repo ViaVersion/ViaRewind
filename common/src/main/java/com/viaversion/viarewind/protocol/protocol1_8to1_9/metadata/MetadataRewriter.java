@@ -117,7 +117,7 @@ public class MetadataRewriter {
 							else entry.setValue((byte) ((Boolean) value ? 1 : 0));
 							break;
 						case Slot:
-							entry.setValue(protocol.getItemRewriter().handleItemToClient((Item) value));
+							entry.setValue(protocol.getItemRewriter().handleItemToClient(tracker.getUser(), (Item) value));
 							break;
 						case Position:
 							Vector vector = (Vector) value;

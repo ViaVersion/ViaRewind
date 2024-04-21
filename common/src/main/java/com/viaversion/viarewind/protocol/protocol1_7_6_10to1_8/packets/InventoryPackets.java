@@ -91,7 +91,7 @@ public class InventoryPackets {
 				// remap item
 				handler(wrapper -> {
 					final Item item = wrapper.get(Types1_7_6_10.COMPRESSED_NBT_ITEM, 0);
-					protocol.getItemRewriter().handleItemToClient(item);
+					protocol.getItemRewriter().handleItemToClient(wrapper.user(), item);
 
 					wrapper.set(Types1_7_6_10.COMPRESSED_NBT_ITEM, 0, item);
 				});
@@ -131,7 +131,7 @@ public class InventoryPackets {
 						System.arraycopy(old, 2, items, 1, old.length - 3);
 					}
 					for (int i = 0; i < items.length; i++) {
-						items[i] = protocol.getItemRewriter().handleItemToClient(items[i]);
+						items[i] = protocol.getItemRewriter().handleItemToClient(wrapper.user(), items[i]);
 					}
 					wrapper.write(Types1_7_6_10.COMPRESSED_NBT_ITEM_ARRAY, items); // items
 				});
@@ -245,7 +245,7 @@ public class InventoryPackets {
 				// remap item
 				handler(wrapper -> {
 					final Item item = wrapper.get(Type.ITEM1_8, 0);
-					protocol.getItemRewriter().handleItemToServer(item);
+					protocol.getItemRewriter().handleItemToServer(wrapper.user(), item);
 					wrapper.set(Type.ITEM1_8, 0, item);
 				});
 			}
@@ -260,7 +260,7 @@ public class InventoryPackets {
 				// remap item
 				handler(wrapper -> {
 					final Item item = wrapper.get(Type.ITEM1_8, 0);
-					protocol.getItemRewriter().handleItemToServer(item);
+					protocol.getItemRewriter().handleItemToServer(wrapper.user(), item);
 					wrapper.set(Type.ITEM1_8, 0, item);
 				});
 			}

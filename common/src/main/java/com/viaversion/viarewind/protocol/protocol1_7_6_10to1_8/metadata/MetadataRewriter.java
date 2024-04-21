@@ -21,6 +21,7 @@ package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.metadata;
 import com.viaversion.viarewind.ViaRewind;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.metadata.MetaType1_7_6_10;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
@@ -39,7 +40,7 @@ public class MetadataRewriter {
 		this.protocol = protocol;
 	}
 
-	public void transform(EntityType type, List<Metadata> list) {
+	public void transform(UserConnection connection, EntityType type, List<Metadata> list) {
 		for (Metadata entry : new ArrayList<>(list)) {
 			final MetaIndex1_7_6_10To1_8 metaIndex = MetaIndex1_7_6_10To1_8.searchIndex(type, entry.id());
 			try {
@@ -93,7 +94,7 @@ public class MetadataRewriter {
 						}
 						break;
 					case Slot:
-						entry.setValue(protocol.getItemRewriter().handleItemToClient((Item) value));
+						entry.setValue(protocol.getItemRewriter().handleItemToClient(connection, (Item) value));
 						break;
 					case Float:
 					case String:

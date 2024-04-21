@@ -237,7 +237,7 @@ public class VirtualHologramEntity {
 			metadataList.add(new Metadata(metadata.id(), metadata.metaType(), metadata.getValue()));
 		}
 		if (small) metadataList.add(new Metadata(12, MetaType1_8.Byte, (byte) 1));
-		metadataRewriter.transform(EntityTypes1_10.EntityType.ZOMBIE, metadataList);
+		metadataRewriter.transform(metadataPacket.user(), EntityTypes1_10.EntityType.ZOMBIE, metadataList);
 
 		metadataPacket.write(Types1_7_6_10.METADATA_LIST, metadataList);
 	}

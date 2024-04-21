@@ -80,7 +80,7 @@ public class InventoryPackets {
 					short windowId = packetWrapper.get(Type.UNSIGNED_BYTE, 0);
 					Item[] items = packetWrapper.read(Type.ITEM1_8_SHORT_ARRAY);
 					for (int i = 0; i < items.length; i++) {
-						items[i] = protocol.getItemRewriter().handleItemToClient(items[i]);
+						items[i] = protocol.getItemRewriter().handleItemToClient(packetWrapper.user(), items[i]);
 					}
 					if (windowId == 0 && items.length == 46) {
 						Item[] old = items;
@@ -112,7 +112,7 @@ public class InventoryPackets {
 				map(Type.SHORT);
 				map(Type.ITEM1_8);
 				handler(packetWrapper -> {
-					packetWrapper.set(Type.ITEM1_8, 0, protocol.getItemRewriter().handleItemToClient(packetWrapper.get(Type.ITEM1_8, 0)));
+					packetWrapper.set(Type.ITEM1_8, 0, protocol.getItemRewriter().handleItemToClient(packetWrapper.user(), packetWrapper.get(Type.ITEM1_8, 0)));
 					byte windowId = packetWrapper.get(Type.UNSIGNED_BYTE, 0).byteValue();
 					short slot = packetWrapper.get(Type.SHORT, 0);
 					if (windowId == 0 && slot == 45) {
@@ -159,7 +159,7 @@ public class InventoryPackets {
 				map(Type.SHORT);
 				map(Type.BYTE, Type.VAR_INT);
 				map(Type.ITEM1_8);
-				handler(packetWrapper -> packetWrapper.set(Type.ITEM1_8, 0, protocol.getItemRewriter().handleItemToServer(packetWrapper.get(Type.ITEM1_8, 0))));
+				handler(packetWrapper -> packetWrapper.set(Type.ITEM1_8, 0, protocol.getItemRewriter().handleItemToServer(packetWrapper.user(), packetWrapper.get(Type.ITEM1_8, 0))));
 				handler(packetWrapper -> {
 					short windowId = packetWrapper.get(Type.UNSIGNED_BYTE, 0);
 					Windows windows = packetWrapper.user().get(Windows.class);
@@ -180,7 +180,7 @@ public class InventoryPackets {
 			public void register() {
 				map(Type.SHORT);
 				map(Type.ITEM1_8);
-				handler(packetWrapper -> packetWrapper.set(Type.ITEM1_8, 0, protocol.getItemRewriter().handleItemToServer(packetWrapper.get(Type.ITEM1_8, 0))));
+				handler(packetWrapper -> packetWrapper.set(Type.ITEM1_8, 0, protocol.getItemRewriter().handleItemToServer(packetWrapper.user(), packetWrapper.get(Type.ITEM1_8, 0))));
 			}
 		});
 	}

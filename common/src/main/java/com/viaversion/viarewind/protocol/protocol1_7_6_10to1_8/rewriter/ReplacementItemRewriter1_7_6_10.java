@@ -23,6 +23,7 @@ import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10T
 import com.viaversion.viarewind.api.rewriter.Replacement;
 import com.viaversion.viarewind.utils.ChatUtil;
 import com.viaversion.viarewind.utils.Enchantments;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.*;
@@ -119,7 +120,7 @@ public class ReplacementItemRewriter1_7_6_10 extends ReplacementItemRewriter<Pro
 	}
 
 	@Override
-	public Item handleItemToClient(Item item) {
+	public Item handleItemToClient(UserConnection connection, Item item) {
 		if (item == null) return null;
 
 		CompoundTag tag = item.tag();
@@ -195,7 +196,7 @@ public class ReplacementItemRewriter1_7_6_10 extends ReplacementItemRewriter<Pro
 	}
 
 	@Override
-	public Item handleItemToServer(Item item) {
+	public Item handleItemToServer(UserConnection connection, Item item) {
 		if (item == null) return null;
 
 		CompoundTag tag = item.tag();
