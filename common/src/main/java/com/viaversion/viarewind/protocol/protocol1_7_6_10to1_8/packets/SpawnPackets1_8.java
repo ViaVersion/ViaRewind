@@ -90,7 +90,7 @@ public class SpawnPackets1_8 {
 				map(Types1_8.METADATA_LIST, Types1_7_6_10.METADATA_LIST); // metadata
 				handler(wrapper -> {
 					final List<Metadata> metadata = wrapper.get(Types1_7_6_10.METADATA_LIST, 0);
-					protocol.getMetadataRewriter().transform(EntityTypes1_10.EntityType.PLAYER, metadata);
+					protocol.getMetadataRewriter().transform(wrapper.user(), EntityTypes1_10.EntityType.PLAYER, metadata);
 
 					wrapper.set(Types1_7_6_10.METADATA_LIST, 0, metadata);
 				});
@@ -231,7 +231,7 @@ public class SpawnPackets1_8 {
 						tracker.updateMetadata(entityId, metadataList); // Track and remap hologram <-> zombie metadata
 						wrapper.cancel();
 					} else {
-						protocol.getMetadataRewriter().transform(type, metadataList);
+						protocol.getMetadataRewriter().transform(wrapper.user(), type, metadataList);
 
 						tracker.addEntity(entityId, type);
 						if (tracker.isReplaced(type)) {

@@ -1,14 +1,33 @@
+/*
+ * This file is part of ViaRewind - https://github.com/ViaVersion/ViaRewind
+ * Copyright (C) 2018-2024 ViaVersion and contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.packets;
 
 import com.viaversion.viabackwards.api.rewriters.LegacyEnchantmentRewriter;
 import com.viaversion.viarewind.api.rewriter.VRBlockItemRewriter;
 import com.viaversion.viarewind.protocol.protocol1_7_2_5to1_7_6_10.ServerboundPackets1_7_2_5;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.model.FurnaceData;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.GameProfileStorage;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.InventoryTracker;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.PlayerSessionStorage;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
 import com.viaversion.viarewind.utils.ChatUtil;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
@@ -82,7 +101,7 @@ public class BlockItemPackets1_8 extends VRBlockItemRewriter<ClientboundPackets1
 				// remap item
 				handler(wrapper -> {
 					final Item item = wrapper.get(Types1_7_6_10.COMPRESSED_NBT_ITEM, 0);
-					handleItemToClient(item);
+					handleItemToClient(wrapper.user(), item);
 
 					wrapper.set(Types1_7_6_10.COMPRESSED_NBT_ITEM, 0, item);
 				});
@@ -122,7 +141,7 @@ public class BlockItemPackets1_8 extends VRBlockItemRewriter<ClientboundPackets1
 						System.arraycopy(old, 2, items, 1, old.length - 3);
 					}
 					for (int i = 0; i < items.length; i++) {
-						items[i] = handleItemToClient(items[i]);
+						items[i] = handleItemToClient(wrapper.user(), items[i]);
 					}
 					wrapper.write(Types1_7_6_10.COMPRESSED_NBT_ITEM_ARRAY, items); // items
 				});
@@ -237,7 +256,7 @@ public class BlockItemPackets1_8 extends VRBlockItemRewriter<ClientboundPackets1
 				// remap item
 				handler(wrapper -> {
 					final Item item = wrapper.get(Type.ITEM1_8, 0);
-					handleItemToServer(item);
+					handleItemToServer(wrapper.user(), item);
 					wrapper.set(Type.ITEM1_8, 0, item);
 				});
 			}
@@ -252,7 +271,7 @@ public class BlockItemPackets1_8 extends VRBlockItemRewriter<ClientboundPackets1
 				// remap item
 				handler(wrapper -> {
 					final Item item = wrapper.get(Type.ITEM1_8, 0);
-					handleItemToServer(item);
+					handleItemToServer(wrapper.user(), item);
 					wrapper.set(Type.ITEM1_8, 0, item);
 				});
 			}
@@ -266,7 +285,7 @@ public class BlockItemPackets1_8 extends VRBlockItemRewriter<ClientboundPackets1
 	}
 
 	@Override
-	public Item handleItemToClient(Item item) {
+	public Item handleItemToClient(UserConnection connection, Item item) {
 		if (item == null) return null;
 		super.handleItemToClient(item);
 
@@ -275,11 +294,11 @@ public class BlockItemPackets1_8 extends VRBlockItemRewriter<ClientboundPackets1
 			item.setTag(tag = new CompoundTag());
 		}
 		enchantmentRewriter.handleToClient(item);
-		
+
 		if (item.identifier() == 387) {
 			final ListTag<StringTag> pages = tag.getListTag("pages", StringTag.class);
 			if (pages == null) return item;
-			
+
 			final ListTag<StringTag> oldPages = new ListTag<>(StringTag.class);
 			tag.put(getNbtTagName() + "|pages", oldPages);
 
@@ -293,7 +312,7 @@ public class BlockItemPackets1_8 extends VRBlockItemRewriter<ClientboundPackets1
 	}
 
 	@Override
-	public Item handleItemToServer(Item item) {
+	public Item handleItemToServer(UserConnection connection, Item item) {
 		if (item == null) return null;
 		super.handleItemToServer(item);
 
@@ -309,7 +328,7 @@ public class BlockItemPackets1_8 extends VRBlockItemRewriter<ClientboundPackets1
 				tag.put("pages", oldPages);
 			}
 		}
-		
+
 		return item;
 	}
 }

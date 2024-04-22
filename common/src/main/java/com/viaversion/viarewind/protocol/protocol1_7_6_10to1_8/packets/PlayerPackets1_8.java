@@ -414,15 +414,15 @@ public class PlayerPackets1_8 {
 						}
 
 						for (int i = 0; i < size; i++) {
-							Item item = protocol.getItemRewriter().handleItemToClient(packetWrapper.read(Type.ITEM1_8));
+							Item item = protocol.getItemRewriter().handleItemToClient(packetWrapper.user(), packetWrapper.read(Type.ITEM1_8));
 							packetWrapper.write(Types1_7_6_10.COMPRESSED_NBT_ITEM, item); //Buy Item 1
 
-							item = protocol.getItemRewriter().handleItemToClient(packetWrapper.read(Type.ITEM1_8));
+							item = protocol.getItemRewriter().handleItemToClient(packetWrapper.user(), packetWrapper.read(Type.ITEM1_8));
 							packetWrapper.write(Types1_7_6_10.COMPRESSED_NBT_ITEM, item); //Buy Item 3
 
 							boolean has3Items = packetWrapper.passthrough(Type.BOOLEAN);
 							if (has3Items) {
-								item = protocol.getItemRewriter().handleItemToClient(packetWrapper.read(Type.ITEM1_8));
+								item = protocol.getItemRewriter().handleItemToClient(packetWrapper.user(), packetWrapper.read(Type.ITEM1_8));
 								packetWrapper.write(Types1_7_6_10.COMPRESSED_NBT_ITEM, item); //Buy Item 2
 							}
 
@@ -686,7 +686,7 @@ public class PlayerPackets1_8 {
 
 					packetWrapper.passthrough(Type.BYTE);  //Direction
 					Item item = packetWrapper.read(Types1_7_6_10.COMPRESSED_NBT_ITEM);
-					item = protocol.getItemRewriter().handleItemToServer(item);
+					item = protocol.getItemRewriter().handleItemToServer(packetWrapper.user(), item);
 					packetWrapper.write(Type.ITEM1_8, item);
 
 					for (int i = 0; i < 3; i++) {
