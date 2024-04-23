@@ -31,7 +31,7 @@ import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
 import java.util.logging.Level;
 
 public class WorldBorderUpdateTask implements Runnable {
-	public final static int VIEW_DISTANCE = 16;
+	public static final int VIEW_DISTANCE = 16;
 
 	@Override
 	public void run() {

@@ -20,7 +20,6 @@ package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage;
 
 import com.viaversion.viarewind.protocol.protocol1_7_2_5to1_7_6_10.ClientboundPackets1_7_2_5;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
-import com.viaversion.viarewind.utils.PacketUtil;
 import com.viaversion.viaversion.api.connection.StoredObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
@@ -112,7 +111,7 @@ public class Scoreboard extends StoredObject {
 		return objectives.contains(name);
 	}
 
-	public String sendTeamForScore(String score) {
+	public String sendTeamForScore(String score) throws Exception {
 		if (score.length() <= 16) return score;
 		if (scoreTeams.containsKey(score)) return scoreTeams.get(score).name;
 		int l = 16;
@@ -143,12 +142,12 @@ public class Scoreboard extends StoredObject {
 		teamPacket.write(Type.BYTE, (byte) 0);
 		teamPacket.write(Type.SHORT, (short) 1);
 		teamPacket.write(Type.STRING, name);
-		PacketUtil.sendPacket(teamPacket, Protocol1_7_6_10To1_8.class, true, true);
+		teamPacket.send(Protocol1_7_6_10To1_8.class);
 
 		return name;
 	}
 
-	public String removeTeamForScore(String score) {
+	public String removeTeamForScore(String score) throws Exception {
 		ScoreTeam scoreTeam = scoreTeams.remove(score);
 		if (scoreTeam == null) return score;
 		scoreTeamNames.remove(scoreTeam.name);
@@ -156,7 +155,7 @@ public class Scoreboard extends StoredObject {
 		PacketWrapper teamPacket = PacketWrapper.create(ClientboundPackets1_7_2_5.TEAMS, getUser());
 		teamPacket.write(Type.STRING, scoreTeam.name);
 		teamPacket.write(Type.BYTE, (byte) 1);
-		PacketUtil.sendPacket(teamPacket, Protocol1_7_6_10To1_8.class, true, true);
+		teamPacket.send(Protocol1_7_6_10To1_8.class);
 
 		return scoreTeam.name;
 	}

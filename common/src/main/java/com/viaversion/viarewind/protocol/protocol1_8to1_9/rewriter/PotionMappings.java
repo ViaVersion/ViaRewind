@@ -25,8 +25,8 @@ import java.util.Map;
 
 // TODO | Check if this is correct???
 public class PotionMappings {
-	public final static Map<String, String> POTION_NAME_INDEX = new HashMap<>();
-	public final static Map<String, Integer> POTION_NAME_TO_ID = new HashMap<>();
+	public static final Map<String, String> POTION_NAME_INDEX = new HashMap<>();
+	public static final Map<String, Integer> POTION_NAME_TO_ID = new HashMap<>();
 
 	static {
 		POTION_NAME_TO_ID.putAll(ItemRewriter.POTION_NAME_TO_ID);

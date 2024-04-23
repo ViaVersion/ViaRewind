@@ -18,6 +18,7 @@
 
 package com.viaversion.viarewind.protocol.protocol1_8to1_9.bossbar;
 
+import com.viaversion.viarewind.ViaRewind;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.Protocol1_8To1_9;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.legacy.bossbar.BossBar;
@@ -29,9 +30,9 @@ import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_8;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_8;
-import com.viaversion.viarewind.utils.PacketUtil;
 
 import java.util.*;
+import java.util.logging.Level;
 
 public class WitherBossBar implements BossBar {
 	private static int highestId = Integer.MAX_VALUE - 10000;
@@ -61,7 +62,13 @@ public class WitherBossBar implements BossBar {
 	@Override
 	public BossBar setTitle(String title) {
 		this.title = title;
-		if (this.visible) updateMetadata();
+		if (this.visible) {
+			try {
+				updateMetadata();
+			} catch (Exception e) {
+				ViaRewind.getPlatform().getLogger().log(Level.SEVERE, "Failed to update wither boss bar title", e);
+			}
+		}
 		return this;
 	}
 
@@ -73,8 +80,16 @@ public class WitherBossBar implements BossBar {
 	@Override
 	public BossBar setHealth(float health) {
 		this.health = health;
-		if (this.health <= 0) this.health = 0.0001f;
-		if (this.visible) updateMetadata();
+		if (this.health <= 0) {
+			this.health = 0.0001f;
+		}
+		if (this.visible) {
+			try {
+				updateMetadata();
+			} catch (Exception e) {
+				ViaRewind.getPlatform().getLogger().log(Level.SEVERE, "Failed to update wither boss bar health", e);
+			}
+		}
 		return this;
 	}
 
@@ -147,7 +162,11 @@ public class WitherBossBar implements BossBar {
 	public BossBar show() {
 		if (!this.visible) {
 			this.visible = true;
-			spawnWither();
+			try {
+				spawnWither();
+			} catch (Exception e) {
+				ViaRewind.getPlatform().getLogger().log(Level.SEVERE, "Failed to spawn wither boss bar", e);
+			}
 		}
 		return this;
 	}
@@ -156,7 +175,11 @@ public class WitherBossBar implements BossBar {
 	public BossBar hide() {
 		if (this.visible) {
 			this.visible = false;
-			despawnWither();
+			try {
+				despawnWither();
+			} catch (Exception e) {
+				ViaRewind.getPlatform().getLogger().log(Level.SEVERE, "Failed to despawn wither boss bar", e);
+			}
 		}
 		return this;
 	}
@@ -171,26 +194,26 @@ public class WitherBossBar implements BossBar {
 		return this.uuid;
 	}
 
-	public void setLocation(double x, double y, double z) {
+	public void setLocation(double x, double y, double z) throws Exception {
 		locX = x;
 		locY = y;
 		locZ = z;
 		updateLocation();
 	}
 
-	private void spawnWither() {
-		PacketWrapper packetWrapper = PacketWrapper.create(0x0F, null, this.connection);
-		packetWrapper.write(Type.VAR_INT, entityId);
-		packetWrapper.write(Type.UNSIGNED_BYTE, (short) 64);
-		packetWrapper.write(Type.INT, (int) (locX * 32d));
-		packetWrapper.write(Type.INT, (int) (locY * 32d));
-		packetWrapper.write(Type.INT, (int) (locZ * 32d));
-		packetWrapper.write(Type.BYTE, (byte) 0);
-		packetWrapper.write(Type.BYTE, (byte) 0);
-		packetWrapper.write(Type.BYTE, (byte) 0);
-		packetWrapper.write(Type.SHORT, (short) 0);
-		packetWrapper.write(Type.SHORT, (short) 0);
-		packetWrapper.write(Type.SHORT, (short) 0);
+	private void spawnWither() throws Exception {
+		PacketWrapper wrapper = PacketWrapper.create(0x0F, null, this.connection);
+		wrapper.write(Type.VAR_INT, entityId);
+		wrapper.write(Type.UNSIGNED_BYTE, (short) 64);
+		wrapper.write(Type.INT, (int) (locX * 32d));
+		wrapper.write(Type.INT, (int) (locY * 32d));
+		wrapper.write(Type.INT, (int) (locZ * 32d));
+		wrapper.write(Type.BYTE, (byte) 0);
+		wrapper.write(Type.BYTE, (byte) 0);
+		wrapper.write(Type.BYTE, (byte) 0);
+		wrapper.write(Type.SHORT, (short) 0);
+		wrapper.write(Type.SHORT, (short) 0);
+		wrapper.write(Type.SHORT, (short) 0);
 
 		List<Metadata> metadata = new ArrayList<>();
 		metadata.add(new Metadata(0, MetaType1_8.Byte, (byte) 0x20));
@@ -198,45 +221,45 @@ public class WitherBossBar implements BossBar {
 		metadata.add(new Metadata(3, MetaType1_8.Byte, (byte) 1));
 		metadata.add(new Metadata(6, MetaType1_8.Float, health * 300f));
 
-		packetWrapper.write(Types1_8.METADATA_LIST, metadata);
+		wrapper.write(Types1_8.METADATA_LIST, metadata);
 
-		PacketUtil.sendPacket(packetWrapper, Protocol1_8To1_9.class, true, false);
+		wrapper.scheduleSend(Protocol1_8To1_9.class);
 	}
 
-	private void updateLocation() {
-		PacketWrapper packetWrapper = PacketWrapper.create(0x18, null, this.connection);
-		packetWrapper.write(Type.VAR_INT, entityId);
-		packetWrapper.write(Type.INT, (int) (locX * 32d));
-		packetWrapper.write(Type.INT, (int) (locY * 32d));
-		packetWrapper.write(Type.INT, (int) (locZ * 32d));
-		packetWrapper.write(Type.BYTE, (byte) 0);
-		packetWrapper.write(Type.BYTE, (byte) 0);
-		packetWrapper.write(Type.BOOLEAN, false);
+	private void updateLocation() throws Exception {
+		PacketWrapper wrapper = PacketWrapper.create(0x18, null, this.connection);
+		wrapper.write(Type.VAR_INT, entityId);
+		wrapper.write(Type.INT, (int) (locX * 32d));
+		wrapper.write(Type.INT, (int) (locY * 32d));
+		wrapper.write(Type.INT, (int) (locZ * 32d));
+		wrapper.write(Type.BYTE, (byte) 0);
+		wrapper.write(Type.BYTE, (byte) 0);
+		wrapper.write(Type.BOOLEAN, false);
 
-		PacketUtil.sendPacket(packetWrapper, Protocol1_8To1_9.class, true, false);
+		wrapper.scheduleSend(Protocol1_8To1_9.class);
 	}
 
-	private void updateMetadata() {
-		PacketWrapper packetWrapper = PacketWrapper.create(0x1C, null, this.connection);
-		packetWrapper.write(Type.VAR_INT, entityId);
+	private void updateMetadata() throws Exception {
+		PacketWrapper wrapper = PacketWrapper.create(0x1C, null, this.connection);
+		wrapper.write(Type.VAR_INT, entityId);
 
 		List<Metadata> metadata = new ArrayList<>();
 		metadata.add(new Metadata(2, MetaType1_8.String, title));
 		metadata.add(new Metadata(6, MetaType1_8.Float, health * 300f));
 
-		packetWrapper.write(Types1_8.METADATA_LIST, metadata);
+		wrapper.write(Types1_8.METADATA_LIST, metadata);
 
-		PacketUtil.sendPacket(packetWrapper, Protocol1_8To1_9.class, true, false);
+		wrapper.scheduleSend(Protocol1_8To1_9.class);
 	}
 
-	private void despawnWither() {
-		PacketWrapper packetWrapper = PacketWrapper.create(0x13, null, this.connection);
-		packetWrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[]{entityId});
+	private void despawnWither() throws Exception {
+		PacketWrapper wrapper = PacketWrapper.create(0x13, null, this.connection);
+		wrapper.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[]{entityId});
 
-		PacketUtil.sendPacket(packetWrapper, Protocol1_8To1_9.class, true, false);
+		wrapper.scheduleSend(Protocol1_8To1_9.class);
 	}
 
-	public void setPlayerLocation(double posX, double posY, double posZ, float yaw, float pitch) {
+	public void setPlayerLocation(double posX, double posY, double posZ, float yaw, float pitch) throws Exception {
 		double yawR = Math.toRadians(yaw);
 		double pitchR = Math.toRadians(pitch);
 

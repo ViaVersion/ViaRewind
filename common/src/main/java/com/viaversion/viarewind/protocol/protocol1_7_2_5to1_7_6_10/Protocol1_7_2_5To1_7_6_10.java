@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 
 public class Protocol1_7_2_5To1_7_6_10 extends AbstractProtocol<ClientboundPackets1_7_2_5, ClientboundPackets1_7_2_5, ServerboundPackets1_7_2_5, ServerboundPackets1_7_2_5> {
 
-	public final static ValueTransformer<String, String> REMOVE_DASHES = new ValueTransformer<String, String>(Type.STRING) {
+	public static final ValueTransformer<String, String> REMOVE_DASHES = new ValueTransformer<String, String>(Type.STRING) {
 		@Override
 		public String transform(PacketWrapper wrapper, String s) {
 			return s.replace("-", "");

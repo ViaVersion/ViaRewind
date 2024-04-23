@@ -19,8 +19,7 @@ public class VRBlockItemRewriter<C extends ClientboundPacketType, S extends Serv
 	}
 
 	@Override
-	public String getNbtTagName() {
-		return "VR|" + protocolName;
+	public String nbtTagName() {
+		return "VR|" + protocol.getClass().getSimpleName();
 	}
-
 }

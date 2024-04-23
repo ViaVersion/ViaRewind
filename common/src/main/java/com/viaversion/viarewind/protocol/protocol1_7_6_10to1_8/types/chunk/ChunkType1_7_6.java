@@ -30,7 +30,7 @@ import java.util.zip.Deflater;
 
 public class ChunkType1_7_6 extends Type<Chunk> {
 
-	public final static ChunkType1_7_6 TYPE = new ChunkType1_7_6();
+	public static final ChunkType1_7_6 TYPE = new ChunkType1_7_6();
 
 	public ChunkType1_7_6() {
 		super(Chunk.class);

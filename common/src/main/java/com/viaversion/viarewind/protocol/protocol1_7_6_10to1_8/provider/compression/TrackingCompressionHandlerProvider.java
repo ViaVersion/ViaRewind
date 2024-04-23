@@ -27,8 +27,8 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelPipeline;
 
 public class TrackingCompressionHandlerProvider extends CompressionHandlerProvider {
-	public final static String COMPRESS_HANDLER_NAME = "compress";
-	public final static String DECOMPRESS_HANDLER_NAME = "decompress";
+	public static final String COMPRESS_HANDLER_NAME = "compress";
+	public static final String DECOMPRESS_HANDLER_NAME = "decompress";
 
 	@Override
 	public void onHandleLoginCompressionPacket(UserConnection user, int threshold) {

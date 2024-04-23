@@ -19,12 +19,18 @@
 package com.viaversion.viarewind.protocol.protocol1_8to1_9;
 
 import com.viaversion.viabackwards.api.BackwardsProtocol;
+import com.viaversion.viabackwards.api.data.BackwardsMappings;
+import com.viaversion.viarewind.api.data.RewindMappings;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.metadata.MetadataRewriter1_8To1_9;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.packets.*;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.storage.*;
-import com.viaversion.viarewind.utils.Ticker;
+import com.viaversion.viarewind.protocol.protocol1_8to1_9.task.LevitationUpdateTask;
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.platform.providers.ViaProviders;
+import com.viaversion.viaversion.api.protocol.packet.Direction;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.ValueTransformer;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
@@ -35,21 +41,24 @@ import com.viaversion.viaversion.protocols.protocol1_9to1_8.ServerboundPackets1_
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.TimeUnit;
 
 public class Protocol1_8To1_9 extends BackwardsProtocol<ClientboundPackets1_9, ClientboundPackets1_8, ServerboundPackets1_9, ServerboundPackets1_8> {
+
+	public static final RewindMappings MAPPINGS = new RewindMappings("1.9.4", "1.8");
 
 	private final BlockItemPackets1_9 itemRewriter = new BlockItemPackets1_9(this);
 	private final MetadataRewriter1_8To1_9 metadataRewriter = new MetadataRewriter1_8To1_9(this);
 
 	public Queue<PacketWrapper> animationsToSend = new ConcurrentLinkedQueue<>();
 
-	public final static ValueTransformer<Double, Integer> TO_OLD_INT = new ValueTransformer<Double, Integer>(Type.INT) {
+	public static final ValueTransformer<Double, Integer> TO_OLD_INT = new ValueTransformer<Double, Integer>(Type.INT) {
 		@Override
 		public Integer transform(PacketWrapper wrapper, Double inputValue) {
 			return (int) (inputValue * 32.0D);
 		}
 	};
-	public final static ValueTransformer<Float, Byte> DEGREES_TO_ANGLE = new ValueTransformer<Float, Byte>(Type.BYTE) {
+	public static final ValueTransformer<Float, Byte> DEGREES_TO_ANGLE = new ValueTransformer<Float, Byte>(Type.BYTE) {
 		@Override
 		public Byte transform(PacketWrapper packetWrapper, Float degrees) {
 			return (byte) ((degrees / 360F) * 256);
@@ -62,29 +71,55 @@ public class Protocol1_8To1_9 extends BackwardsProtocol<ClientboundPackets1_9, C
 
 	@Override
 	protected void registerPackets() {
+		metadataRewriter.register();
 		itemRewriter.register();
 
 		EntityPackets1_9.register(this);
 		PlayerPackets1_9.register(this);
-		ScoreboardPackets1_9.register(this);
-		SpawnPackets1_9.register(this);
 		WorldPackets1_9.register(this);
 	}
 
 	@Override
 	public void init(UserConnection connection) {
-		Ticker.init();
+		connection.addEntityTracker(this.getClass(), new EntityTracker1_9(connection));
+
+		connection.put(new WindowTracker(connection));
+		connection.put(new LevitationStorage());
+		connection.put(new PlayerPositionTracker(connection));
+		connection.put(new CooldownStorage(connection));
+		connection.put(new BlockPlaceDestroyTracker());
+		connection.put(new BossBarStorage(connection));
+
 		if (!connection.has(ClientWorld.class)) {
 			connection.put(new ClientWorld());
 		}
-		connection.addEntityTracker(this.getClass(), new EntityTracker1_9(connection));
+	}
 
-		connection.put(new Windows(connection));
-		connection.put(new Levitation(connection));
-		connection.put(new PlayerPosition(connection));
-		connection.put(new Cooldown(connection));
-		connection.put(new BlockPlaceDestroyTracker(connection));
-		connection.put(new BossBarStorage(connection));
+	@Override
+	public void transform(Direction direction, State state, PacketWrapper packetWrapper) throws Exception {
+//		if (direction == Direction.CLIENTBOUND) {
+//			if (packetWrapper.getId() == ClientboundPackets1_9.ENTITY_HEAD_LOOK.getId() || packetWrapper.getId() == ClientboundPackets1_9.ENTITY_PROPERTIES.getId()
+//				|| packetWrapper.getId() == ClientboundPackets1_9.ENTITY_EQUIPMENT.getId() || packetWrapper.getId() == ClientboundPackets1_9.SPAWN_MOB.getId()) {
+//				packetWrapper.cancel();
+//				System.out.println("Cancelled " + packetWrapper.getPacketType());
+//			} else {
+//				System.out.println(packetWrapper);
+//			}
+//		}
+		super.transform(direction, state, packetWrapper);
+		if (packetWrapper.getPacketType() == ClientboundPackets1_8.ENTITY_METADATA) {
+			System.out.println(packetWrapper);
+		}
+	}
+
+	@Override
+	public void register(ViaProviders providers) {
+		Via.getManager().getScheduler().scheduleRepeating(new LevitationUpdateTask(), 0L, 50L, TimeUnit.MILLISECONDS);
+	}
+
+	@Override
+	public RewindMappings getMappingData() {
+		return MAPPINGS;
 	}
 
 	@Override
@@ -92,7 +127,13 @@ public class Protocol1_8To1_9 extends BackwardsProtocol<ClientboundPackets1_9, C
 		return itemRewriter;
 	}
 
-	public MetadataRewriter1_8To1_9 getMetadataRewriter() {
+	@Override
+	public MetadataRewriter1_8To1_9 getEntityRewriter() {
 		return metadataRewriter;
+	}
+
+	@Override
+	public boolean hasMappingDataToLoad() {
+		return true;
 	}
 }

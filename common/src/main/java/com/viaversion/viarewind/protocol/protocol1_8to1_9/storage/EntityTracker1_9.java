@@ -15,10 +15,8 @@ public class EntityTracker1_9 extends EntityTrackerBase {
 	private final Int2ObjectMap<Vector> offsets = new Int2ObjectOpenHashMap<>();
 	private final Int2IntMap status = new Int2IntOpenHashMap();
 
-	private int clientEntityGameMode;
-
 	public EntityTracker1_9(UserConnection connection) {
-		super(connection, EntityTypes1_10.EntityType.PLAYER);
+		super(connection, EntityTypes1_10.EntityType.ENTITY_HUMAN);
 	}
 
 	@Override
@@ -44,7 +42,7 @@ public class EntityTracker1_9 extends EntityTrackerBase {
 		offsets.put(id, offset);
 	}
 
-	public List<Integer> getPassengers(final int id) {
+	public IntList getPassengers(final int id) {
 		return vehicles.getOrDefault(id, new IntArrayList());
 	}
 
@@ -66,19 +64,7 @@ public class EntityTracker1_9 extends EntityTrackerBase {
 		return -1;
 	}
 
-	public boolean isPassenger(final int vehicle, final int passenger) {
-		return vehicles.containsKey(vehicle) && vehicles.get(vehicle).contains(passenger);
-	}
-
 	public Int2IntMap getStatus() {
 		return status;
-	}
-
-	public int getClientEntityGameMode() {
-		return clientEntityGameMode;
-	}
-
-	public void setClientEntityGameMode(int clientEntityGameMode) {
-		this.clientEntityGameMode = clientEntityGameMode;
 	}
 }

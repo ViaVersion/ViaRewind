@@ -36,21 +36,21 @@ import java.util.List;
 public class Types1_7_6_10 {
 
 	// Primitives
-	public final static Type<int[]> BYTE_INT_ARRAY = new ByteIntArrayType(); // Integer array with byte as length indicator
+	public static final Type<int[]> BYTE_INT_ARRAY = new ByteIntArrayType(); // Integer array with byte as length indicator
 
 	// Positions /shrug
-	public final static Type<Position> SHORT_POSITION = new PositionUYType<>(Type.SHORT, value -> (short) value);
-	public final static Type<Position> INT_POSITION = new PositionUYType<>(Type.INT, value -> value);
-	public final static Type<Position> BYTE_POSITION = new PositionUYType<>(Type.BYTE, value -> (byte) value);
-	public final static Type<Position> U_BYTE_POSITION = new PositionUYType<>(Type.UNSIGNED_BYTE, value -> (short) value);
+	public static final Type<Position> SHORT_POSITION = new PositionUYType<>(Type.SHORT, value -> (short) value);
+	public static final Type<Position> INT_POSITION = new PositionUYType<>(Type.INT, value -> value);
+	public static final Type<Position> BYTE_POSITION = new PositionUYType<>(Type.BYTE, value -> (byte) value);
+	public static final Type<Position> U_BYTE_POSITION = new PositionUYType<>(Type.UNSIGNED_BYTE, value -> (short) value);
 
 	// Items
-	public final static Type<CompoundTag> COMPRESSED_NBT = new NBTType();
-	public final static Type<Item> COMPRESSED_NBT_ITEM = new ItemType();
-	public final static Type<Item[]> COMPRESSED_NBT_ITEM_ARRAY = new ItemArrayType();
+	public static final Type<CompoundTag> COMPRESSED_NBT = new NBTType();
+	public static final Type<Item> COMPRESSED_NBT_ITEM = new ItemType();
+	public static final Type<Item[]> COMPRESSED_NBT_ITEM_ARRAY = new ItemArrayType();
 
 	// Metadata
-	public final static Type<Metadata> METADATA = new MetadataType();
-	public final static Type<List<Metadata>> METADATA_LIST = new MetadataListType();
+	public static final Type<Metadata> METADATA = new MetadataType();
+	public static final Type<List<Metadata>> METADATA_LIST = new MetadataListType();
 
 }

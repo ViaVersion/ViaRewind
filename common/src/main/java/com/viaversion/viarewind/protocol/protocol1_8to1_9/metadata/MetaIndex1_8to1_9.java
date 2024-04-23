@@ -28,7 +28,7 @@ import java.util.Optional;
 
 public class MetaIndex1_8to1_9 {
 
-	private final static HashMap<Pair<EntityTypes1_10.EntityType, Integer>, MetaIndex> metadataRewrites = new HashMap<>();
+	private static final HashMap<Pair<EntityTypes1_10.EntityType, Integer>, MetaIndex> metadataRewrites = new HashMap<>();
 
 	static {
 		for (MetaIndex index : MetaIndex.values()) {

@@ -21,7 +21,7 @@ package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.packets;
 import com.viaversion.viabackwards.api.rewriters.LegacyEnchantmentRewriter;
 import com.viaversion.viarewind.api.rewriter.VRBlockItemRewriter;
 import com.viaversion.viarewind.protocol.protocol1_7_2_5to1_7_6_10.ServerboundPackets1_7_2_5;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.model.FurnaceData;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.GameProfileStorage;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.InventoryTracker;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.PlayerSessionStorage;
@@ -57,7 +57,7 @@ public class BlockItemPackets1_8 extends VRBlockItemRewriter<ClientboundPackets1
 			wrapper.write(Type.UNSIGNED_BYTE, windowTypeId); // window type id
 
 			final JsonElement titleComponent = wrapper.read(Type.COMPONENT); // Title
-			String title = ChatUtil.jsonToLegacy(titleComponent);
+			String title = ChatUtil.jsonToLegacy(wrapper.user(), titleComponent);
 			title = ChatUtil.removeUnusedColor(title, '8');
 			if (title.length() > 32) {
 				title = title.substring(0, 32);
@@ -268,26 +268,21 @@ public class BlockItemPackets1_8 extends VRBlockItemRewriter<ClientboundPackets1
 				map(Type.SHORT); // slot
 				map(Types1_7_6_10.COMPRESSED_NBT_ITEM, Type.ITEM1_8); // item
 
-				// remap item
-				handler(wrapper -> {
-					final Item item = wrapper.get(Type.ITEM1_8, 0);
-					handleItemToServer(wrapper.user(), item);
-					wrapper.set(Type.ITEM1_8, 0, item);
-				});
+				handler(wrapper -> handleItemToServer(wrapper.user(), wrapper.get(Type.ITEM1_8, 0)));
 			}
 		});
 	}
 
 	@Override
 	protected void registerRewrites() {
-		enchantmentRewriter = new LegacyEnchantmentRewriter(getNbtTagName(), false);
+		enchantmentRewriter = new LegacyEnchantmentRewriter(nbtTagName(), false);
 		enchantmentRewriter.registerEnchantment(8, "§7Depth Strider");
 	}
 
 	@Override
 	public Item handleItemToClient(UserConnection connection, Item item) {
 		if (item == null) return null;
-		super.handleItemToClient(item);
+		super.handleItemToClient(connection, item);
 
 		CompoundTag tag = item.tag();
 		if (tag == null) {
@@ -300,12 +295,12 @@ public class BlockItemPackets1_8 extends VRBlockItemRewriter<ClientboundPackets1
 			if (pages == null) return item;
 
 			final ListTag<StringTag> oldPages = new ListTag<>(StringTag.class);
-			tag.put(getNbtTagName() + "|pages", oldPages);
+			tag.put(nbtTagName() + "|pages", oldPages);
 
 			for (StringTag page : pages) {
 				final String value = page.getValue();
 				oldPages.add(new StringTag(value));
-				page.setValue(ChatUtil.jsonToLegacy(value));
+				page.setValue(ChatUtil.jsonToLegacy(connection, value));
 			}
 		}
 		return item;
@@ -314,7 +309,7 @@ public class BlockItemPackets1_8 extends VRBlockItemRewriter<ClientboundPackets1
 	@Override
 	public Item handleItemToServer(UserConnection connection, Item item) {
 		if (item == null) return null;
-		super.handleItemToServer(item);
+		super.handleItemToServer(connection, item);
 
 		final CompoundTag tag = item.tag();
 		if (tag == null) return item;
@@ -322,7 +317,7 @@ public class BlockItemPackets1_8 extends VRBlockItemRewriter<ClientboundPackets1
 		enchantmentRewriter.handleToServer(item);
 
 		if (item.identifier() == 387) {
-			final ListTag<StringTag> oldPages = tag.get(getNbtTagName() + "|pages");
+			final ListTag<StringTag> oldPages = tag.get(nbtTagName() + "|pages");
 			if (oldPages != null) {
 				tag.remove("pages");
 				tag.put("pages", oldPages);

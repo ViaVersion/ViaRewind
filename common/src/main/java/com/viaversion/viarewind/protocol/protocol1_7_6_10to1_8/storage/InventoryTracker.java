@@ -25,7 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class InventoryTracker extends StoredObject {
-	public final static Map<String, Integer> WINDOW_TYPE_REGISTRY = new HashMap<>();
+	public static final Map<String, Integer> WINDOW_TYPE_REGISTRY = new HashMap<>();
 
 	static {
 		WINDOW_TYPE_REGISTRY.put("minecraft:container", 0);

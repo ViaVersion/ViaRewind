@@ -18,7 +18,6 @@
 
 package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.packets;
 
-import com.viaversion.viabackwards.utils.Block;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.WorldBorderEmulator;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.chunk.ChunkType1_7_6;
@@ -37,6 +36,7 @@ import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_8;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
 import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.util.ChatColorUtil;
+import com.viaversion.viaversion.util.IdAndData;
 
 public class WorldPackets1_8 {
 
@@ -57,8 +57,8 @@ public class WorldPackets1_8 {
 					int data = wrapper.read(Type.VAR_INT); // block data
 					data = protocol.getItemRewriter().handleBlockId(data);
 
-					wrapper.write(Type.VAR_INT, Block.getId(data)); // block id
-					wrapper.write(Type.UNSIGNED_BYTE, (short) Block.getData(data)); // block data
+					wrapper.write(Type.VAR_INT, IdAndData.getId(data)); // block id
+					wrapper.write(Type.UNSIGNED_BYTE, (short) IdAndData.getData(data)); // block data
 				});
 			}
 		});
@@ -172,7 +172,7 @@ public class WorldPackets1_8 {
 				handler(wrapper -> {
 					for (int i = 0; i < 4; i++) {
 						String line = wrapper.read(Type.STRING);
-						line = ChatUtil.jsonToLegacy(line);
+						line = ChatUtil.jsonToLegacy(wrapper.user(), line);
 						line = ChatUtil.removeUnusedColor(line, '0');
 
 						if (line.length() > 15) {

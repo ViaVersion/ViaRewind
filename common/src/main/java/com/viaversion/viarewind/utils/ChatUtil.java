@@ -19,6 +19,7 @@
 package com.viaversion.viarewind.utils;
 
 import com.viaversion.viarewind.ViaRewind;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.libs.gson.JsonElement;
 import com.viaversion.viaversion.libs.gson.JsonObject;
@@ -30,9 +31,10 @@ import com.viaversion.viaversion.util.ComponentUtil;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
 
+@Deprecated
 public class ChatUtil {
-	private final static Pattern UNUSED_COLOR_PATTERN = Pattern.compile("(?>(?>§[0-fk-or])*(§r|\\Z))|(?>(?>§[0-f])*(§[0-f]))");
-	private final static ComponentRewriter<ClientboundPacketType> LEGACY_REWRITER = new ComponentRewriter<ClientboundPacketType>(null, ComponentRewriter.ReadType.JSON) {
+	private static final Pattern UNUSED_COLOR_PATTERN = Pattern.compile("(?>(?>§[0-fk-or])*(§r|\\Z))|(?>(?>§[0-f])*(§[0-f]))");
+	private static final ComponentRewriter<ClientboundPacketType> LEGACY_REWRITER = new ComponentRewriter<ClientboundPacketType>(null, ComponentRewriter.ReadType.JSON) {
 		@Override
 		protected void handleTranslate(JsonObject object, String translate) {
 			String text = Protocol1_13To1_12_2.MAPPINGS.getMojangTranslation().get(translate);
@@ -42,24 +44,24 @@ public class ChatUtil {
 		}
 	};
 
-	public static String jsonToLegacy(String json) {
+	public static String jsonToLegacy(UserConnection connection, String json) {
 		if (json == null || json.equals("null") || json.isEmpty()) return "";
 		try {
-			return jsonToLegacy(JsonParser.parseString(json));
+			return jsonToLegacy(connection, JsonParser.parseString(json));
 		} catch (Exception e) {
 			ViaRewind.getPlatform().getLogger().log(Level.WARNING, "Could not convert component to legacy text: " + json, e);
 		}
 		return "";
 	}
 
-	public static String jsonToLegacy(JsonElement component) {
+	public static String jsonToLegacy(UserConnection connection, JsonElement component) {
 		if (component.isJsonNull() || component.isJsonArray() && component.getAsJsonArray().isEmpty() || component.isJsonObject() && component.getAsJsonObject().isEmpty()) {
 			return "";
 		} else if (component.isJsonPrimitive()) {
 			return component.getAsString();
 		} else {
 			try {
-				LEGACY_REWRITER.processText(component);
+				LEGACY_REWRITER.processText(connection, component);
 				String legacy = ComponentUtil.jsonToLegacy(component);
 				while (legacy.startsWith("§f")) legacy = legacy.substring(2);
 				return legacy;

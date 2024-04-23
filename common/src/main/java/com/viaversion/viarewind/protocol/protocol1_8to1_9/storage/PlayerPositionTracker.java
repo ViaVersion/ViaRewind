@@ -21,13 +21,13 @@ package com.viaversion.viarewind.protocol.protocol1_8to1_9.storage;
 import com.viaversion.viaversion.api.connection.StoredObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 
-public class PlayerPosition extends StoredObject {
+public class PlayerPositionTracker extends StoredObject {
 	private double posX, posY, posZ;
 	private float yaw, pitch;
 	private boolean onGround;
 	private int confirmId = -1;
 
-	public PlayerPosition(UserConnection user) {
+	public PlayerPositionTracker(UserConnection user) {
 		super(user);
 	}
 
@@ -95,8 +95,8 @@ public class PlayerPosition extends StoredObject {
 
 	public boolean equals(final Object o) {
 		if (o == this) return true;
-		if (!(o instanceof PlayerPosition)) return false;
-		final PlayerPosition other = (PlayerPosition) o;
+		if (!(o instanceof PlayerPositionTracker)) return false;
+		final PlayerPositionTracker other = (PlayerPositionTracker) o;
 		if (!other.canEqual(this)) return false;
 		if (Double.compare(this.getPosX(), other.getPosX()) != 0) return false;
 		if (Double.compare(this.getPosY(), other.getPosY()) != 0) return false;
@@ -108,7 +108,7 @@ public class PlayerPosition extends StoredObject {
 	}
 
 	protected boolean canEqual(final Object other) {
-		return other instanceof PlayerPosition;
+		return other instanceof PlayerPositionTracker;
 	}
 
 	public int hashCode() {

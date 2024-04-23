@@ -22,10 +22,12 @@ import com.viaversion.viabackwards.api.rewriters.LegacyEnchantmentRewriter;
 import com.viaversion.viarewind.api.rewriter.VRBlockItemRewriter;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.Protocol1_8To1_9;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.rewriter.PotionMappings;
-import com.viaversion.viarewind.protocol.protocol1_8to1_9.storage.Windows;
+import com.viaversion.viarewind.protocol.protocol1_8to1_9.storage.WindowTracker;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.libs.gson.JsonElement;
 import com.viaversion.viaversion.libs.gson.JsonParser;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.*;
 import com.viaversion.viaversion.protocols.protocol1_8.ServerboundPackets1_8;
@@ -60,164 +62,119 @@ public class BlockItemPackets1_9 extends VRBlockItemRewriter<ClientboundPackets1
 	protected void registerPackets() {
 		registerBlockChange(ClientboundPackets1_9.BLOCK_CHANGE);
 		registerMultiBlockChange(ClientboundPackets1_9.MULTI_BLOCK_CHANGE);
+		registerCreativeInvAction(ServerboundPackets1_8.CREATIVE_INVENTORY_ACTION);
 
-		protocol.registerClientbound(ClientboundPackets1_9.CLOSE_WINDOW, new PacketHandlers() {
-			@Override
-			public void register() {
-				map(Type.UNSIGNED_BYTE);
-				handler(packetWrapper -> {
-					short windowsId = packetWrapper.get(Type.UNSIGNED_BYTE, 0);
-					packetWrapper.user().get(Windows.class).remove(windowsId);
-				});
+		protocol.registerClientbound(ClientboundPackets1_9.CLOSE_WINDOW, wrapper -> {
+			final short windowId = wrapper.passthrough(Type.UNSIGNED_BYTE);
+			wrapper.user().get(WindowTracker.class).remove(windowId);
+		});
+
+		protocol.registerClientbound(ClientboundPackets1_9.OPEN_WINDOW, wrapper -> {
+			final short windowId = wrapper.passthrough(Type.UNSIGNED_BYTE);
+			final String windowType = wrapper.passthrough(Type.STRING);
+			final JsonElement windowTitle = wrapper.passthrough(Type.COMPONENT);
+
+			wrapper.user().get(WindowTracker.class).put(windowId, windowType);
+
+			// TODO check
+			if (windowType.equalsIgnoreCase("minecraft:shulker_box")) {
+				wrapper.set(Type.STRING, 0, "minecraft:container");
+			}
+			if (windowTitle.toString().equalsIgnoreCase("{\"translate\":\"container.shulkerBox\"}")) {
+				wrapper.set(Type.COMPONENT, 0, JsonParser.parseString("{\"text\":\"Shulker Box\"}"));
 			}
 		});
 
-		protocol.registerClientbound(ClientboundPackets1_9.OPEN_WINDOW, new PacketHandlers() {
-			@Override
-			public void register() {
-				map(Type.UNSIGNED_BYTE);
-				map(Type.STRING);
-				map(Type.COMPONENT);
-				map(Type.UNSIGNED_BYTE);
-				handler(packetWrapper -> {
-					String type = packetWrapper.get(Type.STRING, 0);
-					if (type.equals("EntityHorse")) packetWrapper.passthrough(Type.INT);
-				});
-				handler(packetWrapper -> {
-					short windowId = packetWrapper.get(Type.UNSIGNED_BYTE, 0);
-					String windowType = packetWrapper.get(Type.STRING, 0);
-					packetWrapper.user().get(Windows.class).put(windowId, windowType);
-				});
-				handler(packetWrapper -> {
-					String type = packetWrapper.get(Type.STRING, 0);
-					if (type.equalsIgnoreCase("minecraft:shulker_box")) {
-						packetWrapper.set(Type.STRING, 0, type = "minecraft:container");
-					}
-					String name = packetWrapper.get(Type.COMPONENT, 0).toString();
-					if (name.equalsIgnoreCase("{\"translate\":\"container.shulkerBox\"}")) {
-						packetWrapper.set(Type.COMPONENT, 0, JsonParser.parseString("{\"text\":\"Shulker Box\"}"));
-					}
-				});
+		protocol.registerClientbound(ClientboundPackets1_9.WINDOW_ITEMS, wrapper -> {
+			final short windowId = wrapper.passthrough(Type.UNSIGNED_BYTE);
+
+			Item[] items = wrapper.passthrough(Type.ITEM1_8_SHORT_ARRAY);
+			for (int i = 0; i < items.length; i++) {
+				items[i] = handleItemToClient(wrapper.user(), items[i]);
+			}
+
+			if (windowId == 0 && items.length == 46) {
+				Item[] old = items;
+				items = new Item[45];
+				System.arraycopy(old, 0, items, 0, 45);
+			} else {
+				final String type = wrapper.user().get(WindowTracker.class).get(windowId);
+				if (type != null && type.equalsIgnoreCase("minecraft:brewing_stand")) {
+					System.arraycopy(items, 0, wrapper.user().get(WindowTracker.class).getBrewingItems(windowId), 0, 4);
+					WindowTracker.updateBrewingStand(wrapper.user(), items[4], windowId);
+					Item[] old = items;
+					items = new Item[old.length - 1];
+					System.arraycopy(old, 0, items, 0, 4);
+					System.arraycopy(old, 5, items, 4, old.length - 5);
+				}
 			}
 		});
 
-		protocol.registerClientbound(ClientboundPackets1_9.WINDOW_ITEMS, new PacketHandlers() {
-			@Override
-			public void register() {
-				map(Type.UNSIGNED_BYTE);
-				handler(packetWrapper -> {
-					short windowId = packetWrapper.get(Type.UNSIGNED_BYTE, 0);
-					Item[] items = packetWrapper.read(Type.ITEM1_8_SHORT_ARRAY);
-					for (int i = 0; i < items.length; i++) {
-						items[i] = handleItemToClient(items[i]);
-					}
-					if (windowId == 0 && items.length == 46) {
-						Item[] old = items;
-						items = new Item[45];
-						System.arraycopy(old, 0, items, 0, 45);
-					} else {
-						String type = packetWrapper.user().get(Windows.class).get(windowId);
-						if (type != null && type.equalsIgnoreCase("minecraft:brewing_stand")) {
-							System.arraycopy(items, 0, packetWrapper.user().get(Windows.class).getBrewingItems(windowId), 0, 4);
-							Windows.updateBrewingStand(packetWrapper.user(), items[4], windowId);
-							Item[] old = items;
-							items = new Item[old.length - 1];
-							System.arraycopy(old, 0, items, 0, 4);
-							System.arraycopy(old, 5, items, 4, old.length - 5);
-						}
-					}
-					packetWrapper.write(Type.ITEM1_8_SHORT_ARRAY, items);
-				});
+		protocol.registerClientbound(ClientboundPackets1_9.SET_SLOT, wrapper -> {
+			final byte windowId = wrapper.passthrough(Type.UNSIGNED_BYTE).byteValue();
+			final short slot = wrapper.passthrough(Type.SHORT);
+			final Item item = wrapper.passthrough(Type.ITEM1_8);
+
+			handleItemToClient(wrapper.user(), item);
+			if (windowId == 0 && slot == 45) {
+				wrapper.cancel();
+				return;
+			}
+			final WindowTracker windowTracker = wrapper.user().get(WindowTracker.class);
+			final String windowType = windowTracker.get(windowId);
+			if (windowType != null && windowType.equalsIgnoreCase("minecraft:brewing_stand")) {
+				if (slot > 4) {
+					wrapper.set(Type.SHORT, 0, (short) (slot - 1));
+				} else if (slot == 4) {
+					wrapper.cancel();
+					WindowTracker.updateBrewingStand(wrapper.user(), wrapper.get(Type.ITEM1_8, 0), windowId);
+				} else {
+					windowTracker.getBrewingItems(windowId)[slot] = wrapper.get(Type.ITEM1_8, 0);
+				}
 			}
 		});
 
-		protocol.registerClientbound(ClientboundPackets1_9.SET_SLOT, new PacketHandlers() {
-			@Override
-			public void register() {
-				map(Type.UNSIGNED_BYTE);
-				map(Type.SHORT);
-				map(Type.ITEM1_8);
-				handler(packetWrapper -> {
-					packetWrapper.set(Type.ITEM1_8, 0, handleItemToClient(packetWrapper.get(Type.ITEM1_8, 0)));
-					byte windowId = packetWrapper.get(Type.UNSIGNED_BYTE, 0).byteValue();
-					short slot = packetWrapper.get(Type.SHORT, 0);
-					if (windowId == 0 && slot == 45) {
-						packetWrapper.cancel();
-						return;
-					}
-					String type = packetWrapper.user().get(Windows.class).get(windowId);
-					if (type == null) return;
-					if (type.equalsIgnoreCase("minecraft:brewing_stand")) {
-						if (slot > 4) {
-							packetWrapper.set(Type.SHORT, 0, slot -= 1);
-						} else if (slot == 4) {
-							packetWrapper.cancel();
-							Windows.updateBrewingStand(packetWrapper.user(), packetWrapper.get(Type.ITEM1_8, 0), windowId);
-						} else {
-							packetWrapper.user().get(Windows.class).getBrewingItems(windowId)[slot] = packetWrapper.get(Type.ITEM1_8, 0);
-						}
-					}
-				});
-			}
-		});
-
-		protocol.registerServerbound(ServerboundPackets1_8.CLOSE_WINDOW, new PacketHandlers() {
-			@Override
-			public void register() {
-				map(Type.UNSIGNED_BYTE);
-				handler(packetWrapper -> {
-					short windowsId = packetWrapper.get(Type.UNSIGNED_BYTE, 0);
-					packetWrapper.user().get(Windows.class).remove(windowsId);
-				});
-			}
+		protocol.registerServerbound(ServerboundPackets1_8.CLOSE_WINDOW, wrapper -> {
+			final short windowId = wrapper.passthrough(Type.UNSIGNED_BYTE);
+			wrapper.user().get(WindowTracker.class).remove(windowId);
 		});
 
 		protocol.registerServerbound(ServerboundPackets1_8.CLICK_WINDOW, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Type.UNSIGNED_BYTE);
-				map(Type.SHORT);
-				map(Type.BYTE);
-				map(Type.SHORT);
-				map(Type.BYTE, Type.VAR_INT);
-				map(Type.ITEM1_8);
-				handler(packetWrapper -> packetWrapper.set(Type.ITEM1_8, 0, handleItemToServer(packetWrapper.get(Type.ITEM1_8, 0))));
-				handler(packetWrapper -> {
-					short windowId = packetWrapper.get(Type.UNSIGNED_BYTE, 0);
-					Windows windows = packetWrapper.user().get(Windows.class);
-					String type = windows.get(windowId);
-					if (type == null) return;
-					if (type.equalsIgnoreCase("minecraft:brewing_stand")) {
-						short slot = packetWrapper.get(Type.SHORT, 0);
+				map(Type.UNSIGNED_BYTE); // Window id
+				map(Type.SHORT); // Slot
+				map(Type.BYTE); // Button
+				map(Type.SHORT); // Action number
+				map(Type.BYTE, Type.VAR_INT); // Mode
+				map(Type.ITEM1_8); // Clicked item
+				handler(wrapper -> handleItemToServer(wrapper.user(), wrapper.get(Type.ITEM1_8, 0)));
+				handler(wrapper -> {
+					final short windowId = wrapper.get(Type.UNSIGNED_BYTE, 0);
+					final String windowType = wrapper.user().get(WindowTracker.class).get(windowId);
+
+					if (windowType != null && windowType.equalsIgnoreCase("minecraft:brewing_stand")) {
+						final short slot = wrapper.get(Type.SHORT, 0);
 						if (slot > 3) {
-							packetWrapper.set(Type.SHORT, 0, slot += 1);
+							wrapper.set(Type.SHORT, 0, (short) (slot + 1));
 						}
 					}
 				});
-			}
-		});
-
-		protocol.registerServerbound(ServerboundPackets1_8.CREATIVE_INVENTORY_ACTION, new PacketHandlers() {
-			@Override
-			public void register() {
-				map(Type.SHORT);
-				map(Type.ITEM1_8);
-				handler(packetWrapper -> packetWrapper.set(Type.ITEM1_8, 0, handleItemToServer(packetWrapper.get(Type.ITEM1_8, 0))));
 			}
 		});
 	}
 
 	@Override
 	protected void registerRewrites() {
-		enchantmentRewriter = new LegacyEnchantmentRewriter(getNbtTagName());
+		enchantmentRewriter = new LegacyEnchantmentRewriter(nbtTagName());
 		enchantmentRewriter.registerEnchantment(9, "§7Frost Walker");
 		enchantmentRewriter.registerEnchantment(70, "§7Mending");
 	}
 
 	@Override
-	public Item handleItemToClient(Item item) {
+	public Item handleItemToClient(UserConnection connection, Item item) {
 		if (item == null) return null;
-		super.handleItemToClient(item);
+		super.handleItemToClient(connection, item);
 
 		CompoundTag tag = item.tag();
 		if (tag == null) {
@@ -230,12 +187,12 @@ public class BlockItemPackets1_9 extends VRBlockItemRewriter<ClientboundPackets1
 		if (item.data() != 0 && tag.contains("Unbreakable")) {
 			final ByteTag unbreakableTag = tag.get("Unbreakable");
 			if (unbreakableTag != null && unbreakableTag.asByte() != 0) {
-				tag.put(getNbtTagName() + "|Unbreakable", new ByteTag(unbreakableTag.asByte()));
+				tag.put(nbtTagName() + "|Unbreakable", new ByteTag(unbreakableTag.asByte()));
 				tag.remove("Unbreakable");
 
 				if (displayTag == null) { // Remove the display tag again if it was only added to emulate unbreakable
 					tag.put("display", displayTag = new CompoundTag());
-					tag.put(getNbtTagName() + "|noDisplay", new ByteTag());
+					tag.put(nbtTagName() + "|noDisplay", new ByteTag());
 				}
 
 				ListTag<StringTag> loreTag = displayTag.getListTag("Lore", StringTag.class);
@@ -257,7 +214,7 @@ public class BlockItemPackets1_9 extends VRBlockItemRewriter<ClientboundPackets1
 						data = ItemRewriter.ENTITY_NAME_TO_ID.get(id);
 					} else if (displayTag == null) {
 						tag.put("display", displayTag = new CompoundTag());
-						tag.put(getNbtTagName() + "|noDisplay", new ByteTag());
+						tag.put(nbtTagName() + "|noDisplay", new ByteTag());
 						displayTag.put("Name", new StringTag("§rSpawn " + id));
 					}
 				}
@@ -286,7 +243,7 @@ public class BlockItemPackets1_9 extends VRBlockItemRewriter<ClientboundPackets1
 				// Don't override custom name
 				if ((displayTag == null || !displayTag.contains("Name")) && PotionMappings.POTION_NAME_INDEX.containsKey(potionName)) {
 					tag.put("display", displayTag = new CompoundTag());
-					tag.put(getNbtTagName() + "|noDisplay", new ByteTag());
+					tag.put(nbtTagName() + "|noDisplay", new ByteTag());
 					displayTag.put("Name", new StringTag(PotionMappings.POTION_NAME_INDEX.get(potionName)));
 				}
 			}
@@ -300,7 +257,7 @@ public class BlockItemPackets1_9 extends VRBlockItemRewriter<ClientboundPackets1
 
 		final ListTag<CompoundTag> attributeModifiers = tag.getListTag("AttributeModifiers", CompoundTag.class);
 		if (attributeModifiers != null) {
-			tag.put(getNbtTagName() + "|AttributeModifiers", attributeModifiers.copy());
+			tag.put(nbtTagName() + "|AttributeModifiers", attributeModifiers.copy());
 			attributeModifiers.getValue().removeIf(entries -> {
 				final StringTag nameTag = entries.getStringTag("AttributeName");
 				return nameTag != null && !VALID_ATTRIBUTES.contains(nameTag.getValue());
@@ -311,9 +268,9 @@ public class BlockItemPackets1_9 extends VRBlockItemRewriter<ClientboundPackets1
 	}
 
 	@Override
-	public Item handleItemToServer(Item item) {
+	public Item handleItemToServer(UserConnection connection, Item item) {
 		if (item == null) return null;
-		super.handleItemToServer(item);
+		super.handleItemToServer(connection, item);
 
 		CompoundTag tag = item.tag();
 		if (tag == null) {
@@ -342,15 +299,15 @@ public class BlockItemPackets1_9 extends VRBlockItemRewriter<ClientboundPackets1
 			item.setData((short) 0);
 		}
 
-		final Tag noDisplayTag = tag.remove(getNbtTagName() + "|noDisplay");
+		final Tag noDisplayTag = tag.remove(nbtTagName() + "|noDisplay");
 		if (noDisplayTag != null) {
 			tag.remove("display");
 		}
-		final Tag unbreakableTag = tag.remove(getNbtTagName() + "|Unbreakable");
+		final Tag unbreakableTag = tag.remove(nbtTagName() + "|Unbreakable");
 		if (unbreakableTag != null) {
 			tag.put("Unbreakable", unbreakableTag);
 		}
-		final Tag attributeModifiersTag = tag.remove(getNbtTagName() + "|AttributeModifiers");
+		final Tag attributeModifiersTag = tag.remove(nbtTagName() + "|AttributeModifiers");
 		if (attributeModifiersTag != null) {
 			tag.put("AttributeModifiers", attributeModifiersTag);
 		}

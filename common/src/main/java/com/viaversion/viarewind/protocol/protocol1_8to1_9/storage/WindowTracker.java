@@ -19,7 +19,6 @@
 package com.viaversion.viarewind.protocol.protocol1_8to1_9.storage;
 
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.Protocol1_8To1_9;
-import com.viaversion.viarewind.utils.PacketUtil;
 import com.viaversion.viaversion.api.connection.StoredObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
@@ -35,11 +34,11 @@ import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
 
 import java.util.HashMap;
 
-public class Windows extends StoredObject {
+public class WindowTracker extends StoredObject {
 	private final HashMap<Short, String> types = new HashMap<>();
 	private final HashMap<Short, Item[]> brewingItems = new HashMap<>();
 
-	public Windows(UserConnection user) {
+	public WindowTracker(UserConnection user) {
 		super(user);
 	}
 
@@ -65,7 +64,7 @@ public class Windows extends StoredObject {
 		});
 	}
 
-	public static void updateBrewingStand(UserConnection user, Item blazePowder, short windowId) {
+	public static void updateBrewingStand(UserConnection user, Item blazePowder, short windowId) throws Exception {
 		if (blazePowder != null && blazePowder.identifier() != 377) {
 			return;
 		}
@@ -83,15 +82,15 @@ public class Windows extends StoredObject {
 
 		openWindow.write(Type.COMPONENT, TextComponentSerializer.V1_8.serializeJson(title));
 		openWindow.write(Type.UNSIGNED_BYTE, (short) 420);
-		PacketUtil.sendPacket(openWindow, Protocol1_8To1_9.class);
+		openWindow.scheduleSend(Protocol1_8To1_9.class);
 
-		Item[] items = user.get(Windows.class).getBrewingItems(windowId);
+		Item[] items = user.get(WindowTracker.class).getBrewingItems(windowId);
 		for (int i = 0; i < items.length; i++) {
 			PacketWrapper setSlot = PacketWrapper.create(ClientboundPackets1_8.SET_SLOT, user);
 			setSlot.write(Type.UNSIGNED_BYTE, windowId);
 			setSlot.write(Type.SHORT, (short) i);
 			setSlot.write(Type.ITEM1_8, items[i]);
-			PacketUtil.sendPacket(setSlot, Protocol1_8To1_9.class);
+			setSlot.scheduleSend(Protocol1_8To1_9.class);
 		}
 	}
 }

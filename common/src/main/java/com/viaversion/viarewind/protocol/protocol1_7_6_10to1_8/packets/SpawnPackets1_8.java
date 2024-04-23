@@ -18,7 +18,6 @@
 
 package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.packets;
 
-import com.viaversion.viabackwards.utils.Block;
 import com.viaversion.viarewind.protocol.protocol1_7_2_5to1_7_6_10.ClientboundPackets1_7_2_5;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.model.VirtualHologramEntity;
@@ -33,6 +32,7 @@ import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_8;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
+import com.viaversion.viaversion.util.IdAndData;
 
 import java.util.List;
 import java.util.UUID;
@@ -75,7 +75,7 @@ public class SpawnPackets1_8 {
 							entityEquipment.write(Type.SHORT, i);
 							entityEquipment.write(Types1_7_6_10.COMPRESSED_NBT_ITEM, i == 4 ? gameProfile.getSkull() : null);
 
-							entityEquipment.scheduleSend(Protocol1_7_6_10To1_8.class, true);
+							entityEquipment.scheduleSend(Protocol1_7_6_10To1_8.class);
 						}
 					}
 
@@ -169,7 +169,7 @@ public class SpawnPackets1_8 {
 					if (type != null && type.isOrHasParent(EntityTypes1_10.EntityType.FALLING_BLOCK)) {
 						int blockId = data & 0xFFF;
 						int blockData = data >> 12 & 0xF;
-						final Block replace = protocol.getItemRewriter().handleBlock(blockId, blockData);
+						final IdAndData replace = protocol.getItemRewriter().handleBlock(blockId, blockData);
 						if (replace != null) {
 							blockId = replace.getId();
 							blockData = replace.getData();

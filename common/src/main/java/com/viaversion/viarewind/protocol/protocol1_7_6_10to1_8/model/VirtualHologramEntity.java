@@ -24,7 +24,6 @@ import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.data.MetaIndex1_7
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.data.MetadataRewriter;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.metadata.MetaType1_7_6_10;
-import com.viaversion.viarewind.utils.PacketUtil;
 import com.viaversion.viarewind.utils.math.AABB;
 import com.viaversion.viarewind.utils.math.Vector3d;
 import com.viaversion.viaversion.api.connection.UserConnection;
@@ -61,7 +60,7 @@ public class VirtualHologramEntity {
 		this.entityId = entityId;
 	}
 
-	public void updateReplacementPosition(double x, double y, double z) {
+	public void updateReplacementPosition(double x, double y, double z) throws Exception {
 		if (x == this.locX && y == this.locY && z == this.locZ) {
 			return;
 		}
@@ -72,7 +71,7 @@ public class VirtualHologramEntity {
 		updateLocation(false);
 	}
 
-	public void handleOriginalMovementPacket(double x, double y, double z) {
+	public void handleOriginalMovementPacket(double x, double y, double z) throws Exception {
 		if (x == 0.0 && y == 0.0 && z == 0.0) {
 			return;
 		}
@@ -83,7 +82,7 @@ public class VirtualHologramEntity {
 		updateLocation(false);
 	}
 
-	public void setYawPitch(float yaw, float pitch) {
+	public void setYawPitch(float yaw, float pitch) throws Exception {
 		if (this.yaw == yaw || this.headYaw == yaw || this.pitch == pitch) {
 			return;
 		}
@@ -94,7 +93,7 @@ public class VirtualHologramEntity {
 		updateLocation(false);
 	}
 
-	public void setHeadYaw(float yaw) {
+	public void setHeadYaw(float yaw) throws Exception {
 		if (this.headYaw == yaw) {
 			return;
 		}
@@ -103,7 +102,7 @@ public class VirtualHologramEntity {
 		updateLocation(false);
 	}
 
-	public void updateMetadata(final List<Metadata> metadataList) {
+	public void updateMetadata(final List<Metadata> metadataList) throws Exception {
 		for (Metadata metadata : metadataList) {
 			metadataTracker.removeIf(m -> m.id() == metadata.id());
 			metadataTracker.add(metadata);
@@ -112,7 +111,7 @@ public class VirtualHologramEntity {
 		updateState();
 	}
 
-	public void updateState() {
+	public void updateState() throws Exception {
 		byte flags = 0;
 		byte armorStandFlags = 0;
 		for (Metadata metadata : metadataTracker) {
@@ -145,7 +144,7 @@ public class VirtualHologramEntity {
 		}
 	}
 
-	public void updateLocation(boolean remount) {
+	public void updateLocation(boolean remount) throws Exception {
 		if (entityIds == null) return;
 
 		if (currentState == State.ZOMBIE) {
@@ -156,14 +155,14 @@ public class VirtualHologramEntity {
 			entityHeadLook.write(Type.INT, entityId);
 			entityHeadLook.write(Type.BYTE, (byte) ((headYaw / 360f) * 256));
 
-			PacketUtil.sendPacket(entityHeadLook, Protocol1_7_6_10To1_8.class, true, true);
+			entityHeadLook.send(Protocol1_7_6_10To1_8.class);
 		} else if (currentState == State.HOLOGRAM) {
 			if (remount) {
 				PacketWrapper detach = PacketWrapper.create(ClientboundPackets1_7_2_5.ATTACH_ENTITY, null, user);
 				detach.write(Type.INT, entityIds[1]);
 				detach.write(Type.INT, -1);
 				detach.write(Type.BOOLEAN, false);
-				PacketUtil.sendPacket(detach, Protocol1_7_6_10To1_8.class, true, true);
+				detach.send(Protocol1_7_6_10To1_8.class);
 			}
 
 			// Don't ask me where this offset is coming from
@@ -176,12 +175,12 @@ public class VirtualHologramEntity {
 				attach.write(Type.INT, entityIds[1]);
 				attach.write(Type.INT, entityIds[0]);
 				attach.write(Type.BOOLEAN, false);
-				PacketUtil.sendPacket(attach, Protocol1_7_6_10To1_8.class, true, true);
+				attach.send(Protocol1_7_6_10To1_8.class);
 			}
 		}
 	}
 
-	protected void teleportEntity(final int entityId, final double x, final double y, final double z, final float yaw, final float pitch) {
+	protected void teleportEntity(final int entityId, final double x, final double y, final double z, final float yaw, final float pitch) throws Exception {
 		final PacketWrapper entityTeleport = PacketWrapper.create(ClientboundPackets1_7_2_5.ENTITY_TELEPORT, user);
 
 		entityTeleport.write(Type.INT, entityId); // entity id
@@ -191,10 +190,10 @@ public class VirtualHologramEntity {
 		entityTeleport.write(Type.BYTE, (byte) ((yaw / 360f) * 256)); // yaw
 		entityTeleport.write(Type.BYTE, (byte) ((pitch / 360f) * 256)); // pitch
 
-		PacketUtil.sendPacket(entityTeleport, Protocol1_7_6_10To1_8.class, true, true);
+		entityTeleport.send(Protocol1_7_6_10To1_8.class);
 	}
 
-	protected void spawnEntity(final int entityId, final int type, final double locX, final double locY, final double locZ) {
+	protected void spawnEntity(final int entityId, final int type, final double locX, final double locY, final double locZ) throws Exception {
 		final PacketWrapper spawnMob = PacketWrapper.create(ClientboundPackets1_7_2_5.SPAWN_MOB, null, user);
 
 		spawnMob.write(Type.VAR_INT, entityId); // entity id
@@ -210,10 +209,10 @@ public class VirtualHologramEntity {
 		spawnMob.write(Type.SHORT, (short) 0); // velocity z
 		spawnMob.write(Types1_7_6_10.METADATA_LIST, new ArrayList<>()); // metadata
 
-		PacketUtil.sendPacket(spawnMob, Protocol1_7_6_10To1_8.class, true, true);
+		spawnMob.send(Protocol1_7_6_10To1_8.class);
 	}
 
-	public void updateMetadata() {
+	public void updateMetadata() throws Exception {
 		if (entityIds == null) return;
 
 		PacketWrapper metadataPacket = PacketWrapper.create(ClientboundPackets1_7_2_5.ENTITY_METADATA, null, user);
@@ -226,7 +225,7 @@ public class VirtualHologramEntity {
 			return;
 		}
 
-		PacketUtil.sendPacket(metadataPacket, Protocol1_7_6_10To1_8.class, true, true);
+		metadataPacket.send(Protocol1_7_6_10To1_8.class);
 	}
 
 	private void writeZombieMeta(PacketWrapper metadataPacket) {
@@ -254,7 +253,7 @@ public class VirtualHologramEntity {
 		metadataPacket.write(Types1_7_6_10.METADATA_LIST, metadataList);
 	}
 
-	public void sendSpawnPacket() {
+	public void sendSpawnPacket() throws Exception {
 		if (entityIds != null) deleteEntity();
 
 		if (currentState == State.ZOMBIE) {
@@ -273,7 +272,7 @@ public class VirtualHologramEntity {
 			spawnSkull.write(Type.BYTE, (byte) 0);
 			spawnSkull.write(Type.BYTE, (byte) 0);
 			spawnSkull.write(Type.INT, 0);
-			PacketUtil.sendPacket(spawnSkull, Protocol1_7_6_10To1_8.class, true, true);
+			spawnSkull.send(Protocol1_7_6_10To1_8.class);
 
 			spawnEntity(entityIds[1], 100, locX, locY, locZ); // Horse
 
@@ -298,7 +297,7 @@ public class VirtualHologramEntity {
 		return Integer.MAX_VALUE - 16000 - entityId;
 	}
 
-	public void deleteEntity() {
+	public void deleteEntity() throws Exception {
 		if (entityIds == null) return;
 
 		PacketWrapper despawn = PacketWrapper.create(ClientboundPackets1_7_2_5.DESTROY_ENTITIES, null, user);
@@ -307,7 +306,7 @@ public class VirtualHologramEntity {
 			despawn.write(Type.INT, id);
 		}
 		entityIds = null;
-		PacketUtil.sendPacket(despawn, Protocol1_7_6_10To1_8.class, true, true);
+		despawn.send(Protocol1_7_6_10To1_8.class);
 	}
 
 	private enum State {

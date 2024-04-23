@@ -20,25 +20,24 @@ package com.viaversion.viarewind.protocol.protocol1_8to1_9.storage;
 
 import com.viaversion.viaversion.api.connection.StorableObject;
 
-public class BlockPlaceDestroyTracker implements StorableObject {
-	private long lastMining;
+public class LevitationStorage implements StorableObject {
 
-	public boolean isMining() {
-		long time = System.currentTimeMillis() - lastMining;
-		return time < 75;
+	private boolean active;
+	private int amplifier;
+
+	public boolean isActive() {
+		return active;
 	}
 
-	public void setMining() {
-		lastMining = System.currentTimeMillis();
+	public void setActive(boolean active) {
+		this.active = active;
 	}
 
-	public void updateMining() {
-		if (this.isMining()) {
-			lastMining = System.currentTimeMillis();
-		}
+	public int getAmplifier() {
+		return amplifier;
 	}
 
-	public void setLastMining(long lastMining) {
-		this.lastMining = lastMining;
+	public void setAmplifier(int amplifier) {
+		this.amplifier = amplifier;
 	}
 }

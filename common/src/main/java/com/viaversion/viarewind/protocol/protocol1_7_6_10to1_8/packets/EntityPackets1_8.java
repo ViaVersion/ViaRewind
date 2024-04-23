@@ -265,13 +265,13 @@ public class EntityPackets1_8 {
 				map(Type.INT); // riding entity id
 				map(Type.INT); // vehicle entity id
 				map(Type.BOOLEAN); // leash state
-				handler(packetWrapper -> {
-					final boolean leash = packetWrapper.get(Type.BOOLEAN, 0);
+				handler(wrapper -> {
+					final boolean leash = wrapper.get(Type.BOOLEAN, 0);
 					if (!leash) {
-						final EntityTracker1_8 tracker = packetWrapper.user().get(EntityTracker1_8.class);
+						final EntityTracker1_8 tracker = wrapper.user().get(EntityTracker1_8.class);
 
-						final int passenger = packetWrapper.get(Type.INT, 0);
-						final int vehicle = packetWrapper.get(Type.INT, 1);
+						final int passenger = wrapper.get(Type.INT, 0);
+						final int vehicle = wrapper.get(Type.INT, 1);
 
 						tracker.setPassenger(vehicle, passenger);
 					}

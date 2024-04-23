@@ -138,7 +138,7 @@ public class EntityTracker1_8 extends ReplacementEntityTracker {
 			entityAction.write(Type.VAR_INT, 0); // action id, start sneaking
 			entityAction.write(Type.VAR_INT, 0); // jump boost
 
-			entityAction.sendToServer(Protocol1_7_6_10To1_8.class, true);
+			entityAction.sendToServer(Protocol1_7_6_10To1_8.class);
 		} catch (Exception e) {
 			ViaRewind.getPlatform().getLogger().log(Level.SEVERE, "Failed to send sneak packet", e);
 		}

@@ -33,10 +33,10 @@ public class BossBarStorage extends StoredObject {
 		super(user);
 	}
 
-	public void add(UUID uuid, String title, float health) {
+	public void add(UUID uuid, String title, float health) throws Exception {
 		WitherBossBar bossBar = new WitherBossBar(this.getUser(), uuid, title, health);
-		PlayerPosition playerPosition = this.getUser().get(PlayerPosition.class);
-		bossBar.setPlayerLocation(playerPosition.getPosX(), playerPosition.getPosY(), playerPosition.getPosZ(), playerPosition.getYaw(), playerPosition.getPitch());
+		PlayerPositionTracker playerPositionTracker = this.getUser().get(PlayerPositionTracker.class);
+		bossBar.setPlayerLocation(playerPositionTracker.getPosX(), playerPositionTracker.getPosY(), playerPositionTracker.getPosZ(), playerPositionTracker.getYaw(), playerPositionTracker.getPitch());
 		bossBar.show();
 		bossBars.put(uuid, bossBar);
 	}
@@ -48,8 +48,14 @@ public class BossBarStorage extends StoredObject {
 	}
 
 	public void updateLocation() {
-		PlayerPosition playerPosition = this.getUser().get(PlayerPosition.class);
-		bossBars.values().forEach(bossBar -> bossBar.setPlayerLocation(playerPosition.getPosX(), playerPosition.getPosY(), playerPosition.getPosZ(), playerPosition.getYaw(), playerPosition.getPitch()));
+		PlayerPositionTracker playerPositionTracker = this.getUser().get(PlayerPositionTracker.class);
+		bossBars.values().forEach(bossBar -> {
+			try {
+				bossBar.setPlayerLocation(playerPositionTracker.getPosX(), playerPositionTracker.getPosY(), playerPositionTracker.getPosZ(), playerPositionTracker.getYaw(), playerPositionTracker.getPitch());
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		});
 	}
 
 	public void changeWorld() {

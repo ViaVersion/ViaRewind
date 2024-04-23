@@ -45,7 +45,6 @@ public interface ViaRewindPlatform {
 		ViaRewindConfig config = new ViaRewindConfig(configFile);
 		config.reload();
 		Via.getManager().getConfigurationProvider().register(config);
-
 		ViaRewind.init(this, config);
 
 		Via.getManager().getSubPlatforms().add(IMPL_VERSION);

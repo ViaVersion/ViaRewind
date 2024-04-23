@@ -26,18 +26,18 @@ import com.viaversion.viaversion.api.connection.StoredObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.util.Pair;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.logging.Level;
 
-public class Cooldown extends StoredObject implements Tickable {
+public class CooldownStorage extends StoredObject implements Tickable {
 
 	private double attackSpeed = 4.0;
 	private long lastHit = 0;
 	private CooldownVisualization.Factory visualizationFactory = CooldownVisualization.Factory.fromConfiguration();
 	private CooldownVisualization current;
 
-	public Cooldown(final UserConnection user) {
+	public CooldownStorage(final UserConnection user) {
 		super(user);
 	}
 
@@ -98,7 +98,7 @@ public class Cooldown extends StoredObject implements Tickable {
 		this.attackSpeed = attackSpeed;
 	}
 
-	public void setAttackSpeed(double base, ArrayList<Pair<Byte, Double>> modifiers) {
+	public void setAttackSpeed(double base, List<Pair<Byte, Double>> modifiers) {
 		attackSpeed = base;
 		for (int j = 0; j < modifiers.size(); j++) {
 			if (modifiers.get(j).key() == 0) {

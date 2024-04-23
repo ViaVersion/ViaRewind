@@ -22,7 +22,6 @@ import com.viaversion.viarewind.ViaRewind;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.Protocol1_8To1_9;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.sound.Effect;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.sound.SoundRemapper;
-import com.viaversion.viarewind.utils.PacketUtil;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.Environment;
 import com.viaversion.viaversion.api.minecraft.Position;
@@ -54,8 +53,8 @@ public class WorldPackets1_9 {
 				map(Type.POSITION1_8);
 				map(Type.UNSIGNED_BYTE);
 				map(Type.NAMED_COMPOUND_TAG);
-				handler(packetWrapper -> {
-					CompoundTag tag = packetWrapper.get(Type.NAMED_COMPOUND_TAG, 0);
+				handler(wrapper -> {
+					CompoundTag tag = wrapper.get(Type.NAMED_COMPOUND_TAG, 0);
 					if (tag != null && tag.contains("SpawnData")) {
 						CompoundTag spawnData = tag.get("SpawnData");
 						if (spawnData.contains("id")) {
@@ -68,7 +67,6 @@ public class WorldPackets1_9 {
 			}
 		});
 
-		//Block Action
 		protocol.registerClientbound(ClientboundPackets1_9.BLOCK_ACTION, new PacketHandlers() {
 			@Override
 			public void register() {
@@ -76,27 +74,26 @@ public class WorldPackets1_9 {
 				map(Type.UNSIGNED_BYTE);
 				map(Type.UNSIGNED_BYTE);
 				map(Type.VAR_INT);
-				handler(packetWrapper -> {
-					int block = packetWrapper.get(Type.VAR_INT, 0);
+				handler(wrapper -> {
+					int block = wrapper.get(Type.VAR_INT, 0);
 					if (block >= 219 && block <= 234) {
-						packetWrapper.set(Type.VAR_INT, 0, block = 130);
+						wrapper.set(Type.VAR_INT, 0, 130);
 					}
 				});
 			}
 		});
 
-		//Named Sound Effect
 		protocol.registerClientbound(ClientboundPackets1_9.NAMED_SOUND, new PacketHandlers() {
 			@Override
 			public void register() {
 				map(Type.STRING);
-				handler(packetWrapper -> {
-					String name = packetWrapper.get(Type.STRING, 0);
+				handler(wrapper -> {
+					String name = wrapper.get(Type.STRING, 0);
 					name = SoundRemapper.getOldName(name);
 					if (name == null) {
-						packetWrapper.cancel();
+						wrapper.cancel();
 					} else {
-						packetWrapper.set(Type.STRING, 0, name);
+						wrapper.set(Type.STRING, 0, name);
 					}
 				});
 				read(Type.VAR_INT);
@@ -108,36 +105,34 @@ public class WorldPackets1_9 {
 			}
 		});
 
-		//Unload Chunk
 		protocol.registerClientbound(ClientboundPackets1_9.UNLOAD_CHUNK, ClientboundPackets1_8.CHUNK_DATA, new PacketHandlers() {
 			@Override
 			public void register() {
-				handler(packetWrapper -> {
-					final Environment environment = packetWrapper.user().get(ClientWorld.class).getEnvironment();
+				handler(wrapper -> {
+					final Environment environment = wrapper.user().get(ClientWorld.class).getEnvironment();
 
-					final int chunkX = packetWrapper.read(Type.INT);
-					final int chunkZ = packetWrapper.read(Type.INT);
+					final int chunkX = wrapper.read(Type.INT);
+					final int chunkZ = wrapper.read(Type.INT);
 
-					packetWrapper.write(ChunkType1_8.forEnvironment(environment), new BaseChunk(chunkX, chunkZ, true, false, 0, new ChunkSection[16], null, new ArrayList<>()));
+					wrapper.write(ChunkType1_8.forEnvironment(environment), new BaseChunk(chunkX, chunkZ, true, false, 0, new ChunkSection[16], null, new ArrayList<>()));
 				});
 			}
 		});
 
-		//Chunk Data
 		protocol.registerClientbound(ClientboundPackets1_9.CHUNK_DATA, new PacketHandlers() {
 			@Override
 			public void register() {
-				handler(packetWrapper -> {
-					final Environment environment = packetWrapper.user().get(ClientWorld.class).getEnvironment();
+				handler(wrapper -> {
+					final Environment environment = wrapper.user().get(ClientWorld.class).getEnvironment();
 
-					Chunk chunk = packetWrapper.read(ChunkType1_9_1.forEnvironment(environment));
+					Chunk chunk = wrapper.read(ChunkType1_9_1.forEnvironment(environment));
 
 					for (ChunkSection section : chunk.getSections()) {
 						if (section == null) continue;
 						DataPalette palette = section.palette(PaletteType.BLOCKS);
 						for (int i = 0; i < palette.size(); i++) {
 							int block = palette.idByIndex(i);
-							int replacedBlock = protocol.getItemRewriter().handleBlockId(block); // TODO | Cleanup this code using blockEntityHandler
+							int replacedBlock = protocol.getItemRewriter().handleBlockId(block);
 							palette.setIdByIndex(i, replacedBlock);
 						}
 					}
@@ -152,9 +147,9 @@ public class WorldPackets1_9 {
 						chunk = new BaseChunk(chunk.getX(), chunk.getZ(), true, false, 1, sections, chunk.getBiomeData(), chunk.getBlockEntities());
 					}
 
-					packetWrapper.write(ChunkType1_8.forEnvironment(environment), chunk);
+					wrapper.write(ChunkType1_8.forEnvironment(environment), chunk);
 
-					final UserConnection user = packetWrapper.user();
+					final UserConnection user = wrapper.user();
 					chunk.getBlockEntities().forEach(nbt -> {
 						if (!nbt.contains("x") || !nbt.contains("y") || !nbt.contains("z") || !nbt.contains("id"))
 							return;
@@ -190,13 +185,16 @@ public class WorldPackets1_9 {
 						updateTileEntity.write(Type.UNSIGNED_BYTE, action);
 						updateTileEntity.write(Type.NBT, nbt);
 
-						PacketUtil.sendPacket(updateTileEntity, Protocol1_8To1_9.class, false, false);
+						try {
+							updateTileEntity.scheduleSend(Protocol1_8To1_9.class, false);
+						} catch (Exception e) {
+							ViaRewind.getPlatform().getLogger().warning("Error sending tile entity update packet: " + e.getMessage());
+						}
 					});
 				});
 			}
 		});
 
-		//Effect
 		protocol.registerClientbound(ClientboundPackets1_9.EFFECT, new PacketHandlers() {
 			@Override
 			public void register() {
@@ -204,47 +202,45 @@ public class WorldPackets1_9 {
 				map(Type.POSITION1_8);
 				map(Type.INT);
 				map(Type.BOOLEAN);
-				handler(packetWrapper -> {
-					int id = packetWrapper.get(Type.INT, 0);
+				handler(wrapper -> {
+					int id = wrapper.get(Type.INT, 0);
 					id = Effect.getOldId(id);
 					if (id == -1) {
-						packetWrapper.cancel();
+						wrapper.cancel();
 						return;
 					}
-					packetWrapper.set(Type.INT, 0, id);
+					wrapper.set(Type.INT, 0, id);
 					if (id == 2001) {
-						int replacedBlock = protocol.getItemRewriter().handleBlockId(packetWrapper.get(Type.INT, 1));
-						packetWrapper.set(Type.INT, 1, replacedBlock);
+						int replacedBlock = protocol.getItemRewriter().handleBlockId(wrapper.get(Type.INT, 1));
+						wrapper.set(Type.INT, 1, replacedBlock);
 					}
 				});
 			}
 		});
 
-		//Particle
 		protocol.registerClientbound(ClientboundPackets1_9.SPAWN_PARTICLE, new PacketHandlers() {
 			@Override
 			public void register() {
 				map(Type.INT);
-				handler(packetWrapper -> {
-					int type = packetWrapper.get(Type.INT, 0);
+				handler(wrapper -> {
+					int type = wrapper.get(Type.INT, 0);
 					if (type > 41 && !ViaRewind.getConfig().isReplaceParticles()) {
-						packetWrapper.cancel();
+						wrapper.cancel();
 						return;
 					}
 					if (type == 42) { // Dragon Breath
-						packetWrapper.set(Type.INT, 0, 24); // Portal
+						wrapper.set(Type.INT, 0, 24); // Portal
 					} else if (type == 43) { // End Rod
-						packetWrapper.set(Type.INT, 0, 3); // Firework Spark
+						wrapper.set(Type.INT, 0, 3); // Firework Spark
 					} else if (type == 44) { // Damage Indicator
-						packetWrapper.set(Type.INT, 0, 34); // Heart
+						wrapper.set(Type.INT, 0, 34); // Heart
 					} else if (type == 45) { // Sweep Attack
-						packetWrapper.set(Type.INT, 0, 1); // Large Explosion
+						wrapper.set(Type.INT, 0, 1); // Large Explosion
 					}
 				});
 			}
 		});
 
-		//Map
 		protocol.registerClientbound(ClientboundPackets1_9.MAP_DATA, new PacketHandlers() {
 			@Override
 			public void register() {
@@ -254,25 +250,19 @@ public class WorldPackets1_9 {
 			}
 		});
 
-		//Combat Event
-		//World Border
-		//Update Time
-		//Update Sign
-
-		//Sound Effects
 		protocol.registerClientbound(ClientboundPackets1_9.SOUND, ClientboundPackets1_8.NAMED_SOUND, new PacketHandlers() {
 			@Override
 			public void register() {
-				handler(packetWrapper -> {
-					int soundId = packetWrapper.read(Type.VAR_INT);
+				handler(wrapper -> {
+					int soundId = wrapper.read(Type.VAR_INT);
 					String sound = SoundRemapper.oldNameFromId(soundId);
 					if (sound == null) {
-						packetWrapper.cancel();
+						wrapper.cancel();
 					} else {
-						packetWrapper.write(Type.STRING, sound);
+						wrapper.write(Type.STRING, sound);
 					}
 				});
-				handler(packetWrapper -> packetWrapper.read(Type.VAR_INT));
+				handler(wrapper -> wrapper.read(Type.VAR_INT));
 				map(Type.INT);
 				map(Type.INT);
 				map(Type.INT);

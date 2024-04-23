@@ -21,7 +21,7 @@ package com.viaversion.viarewind.protocol.protocol1_8to1_9.sound;
 import java.util.HashMap;
 
 public class Effect {
-	private final static HashMap<Integer, Integer> effects = new HashMap<>();
+	private static final HashMap<Integer, Integer> effects = new HashMap<>();
 
 	public static int getOldId(int id) {
 		return effects.getOrDefault(id, id);
