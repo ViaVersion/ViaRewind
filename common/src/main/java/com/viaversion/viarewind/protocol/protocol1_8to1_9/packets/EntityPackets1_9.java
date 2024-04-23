@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.viaversion.viarewind.protocol.protocol1_8to1_9.packets;
 
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.Protocol1_8To1_9;
@@ -141,9 +140,9 @@ public class EntityPackets1_9 {
 					}
 					wrapper.write(Type.VAR_INT, vehicle);
 				});
-				map(Type.DOUBLE, Protocol1_8To1_9.TO_OLD_INT); // X
-				map(Type.DOUBLE, Protocol1_8To1_9.TO_OLD_INT); // Y
-				map(Type.DOUBLE, Protocol1_8To1_9.TO_OLD_INT); // Z
+				map(Type.DOUBLE, Protocol1_8To1_9.DOUBLE_TO_INT_TIMES_32); // X
+				map(Type.DOUBLE, Protocol1_8To1_9.DOUBLE_TO_INT_TIMES_32); // Y
+				map(Type.DOUBLE, Protocol1_8To1_9.DOUBLE_TO_INT_TIMES_32); // Z
 				map(Type.FLOAT, Protocol1_8To1_9.DEGREES_TO_ANGLE); // Yaw
 				map(Type.FLOAT, Protocol1_8To1_9.DEGREES_TO_ANGLE); // Pitch
 				handler(wrapper -> {
@@ -249,9 +248,9 @@ public class EntityPackets1_9 {
 			@Override
 			public void register() {
 				map(Type.VAR_INT); // Entity id
-				map(Type.DOUBLE, Protocol1_8To1_9.TO_OLD_INT); // X
-				map(Type.DOUBLE, Protocol1_8To1_9.TO_OLD_INT); // Y
-				map(Type.DOUBLE, Protocol1_8To1_9.TO_OLD_INT); // Z
+				map(Type.DOUBLE, Protocol1_8To1_9.DOUBLE_TO_INT_TIMES_32); // X
+				map(Type.DOUBLE, Protocol1_8To1_9.DOUBLE_TO_INT_TIMES_32); // Y
+				map(Type.DOUBLE, Protocol1_8To1_9.DOUBLE_TO_INT_TIMES_32); // Z
 				map(Type.BYTE); // Yaw
 				map(Type.BYTE); // Pitch
 				map(Type.BOOLEAN); // On ground

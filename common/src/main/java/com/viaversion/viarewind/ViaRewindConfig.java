@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.viaversion.viarewind;
 
 import com.viaversion.viaversion.util.Config;
@@ -29,49 +28,74 @@ import java.util.Map;
 
 public class ViaRewindConfig extends Config implements com.viaversion.viarewind.api.ViaRewindConfig {
 
+	private CooldownIndicator cooldownIndicator;
+	private boolean replaceAdventureMode;
+	private boolean replaceParticles;
+	private int maxBookPages;
+	private int maxBookPageSize;
+	private boolean emulateWorldBorder;
+	private boolean alwaysShowOriginalMobName;
+	private String worldBorderParticle;
+
     public ViaRewindConfig(File configFile) {
         super(configFile);
-		reload();
     }
 
-    @Override
+	@Override
+	public void reload() {
+		super.reload();
+		loadFields();
+	}
+
+	private void loadFields() {
+		cooldownIndicator = CooldownIndicator.valueOf(getString("cooldown-indicator", "TITLE").toUpperCase());
+		replaceAdventureMode = getBoolean("replace-adventure", false);
+		replaceParticles = getBoolean("replace-particles", false);
+		maxBookPages = getInt("max-book-pages", 100);
+		maxBookPageSize = getInt("max-book-page-length", 5000);
+		emulateWorldBorder = getBoolean("emulate-world-border", true);
+		alwaysShowOriginalMobName = getBoolean("always-show-original-mob-name", true);
+		worldBorderParticle = getString("world-border-particle", "fireworksSpark");
+	}
+
+	@Override
     public CooldownIndicator getCooldownIndicator() {
-        return CooldownIndicator.valueOf(getString("cooldown-indicator", "TITLE").toUpperCase());
+		return cooldownIndicator;
     }
 
     @Override
     public boolean isReplaceAdventureMode() {
-        return getBoolean("replace-adventure", false);
+		return replaceAdventureMode;
     }
 
     @Override
     public boolean isReplaceParticles() {
-        return getBoolean("replace-particles", false);
+		return replaceParticles;
     }
 
     @Override
     public int getMaxBookPages() {
-        return getInt("max-book-pages", 100);
+		return maxBookPages;
     }
 
     @Override
     public int getMaxBookPageSize() {
-        return getInt("max-book-page-length", 5000);
+		return maxBookPageSize;
     }
 
 	@Override
 	public boolean isEmulateWorldBorder() {
-		return getBoolean("emulate-world-border", true);
+		return emulateWorldBorder;
 	}
 
 	@Override
 	public boolean alwaysShowOriginalMobName() {
-		return getBoolean("always-show-original-mob-name", true);
+		return alwaysShowOriginalMobName;
 	}
 
 	@Override
 	public String getWorldBorderParticle() {
-		return getString("world-border-particle", "fireworksSpark");
+		return worldBorderParticle;
 	}
 
 	@Override
@@ -86,7 +110,6 @@ public class ViaRewindConfig extends Config implements com.viaversion.viarewind.
 
     @Override
     protected void handleConfig(Map<String, Object> map) {
-
     }
 
     @Override

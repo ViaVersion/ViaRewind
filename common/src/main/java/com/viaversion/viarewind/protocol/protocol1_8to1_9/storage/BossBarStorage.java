@@ -15,10 +15,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.viaversion.viarewind.protocol.protocol1_8to1_9.storage;
 
-import com.viaversion.viarewind.protocol.protocol1_8to1_9.bossbar.WitherBossBar;
+import com.viaversion.viarewind.protocol.protocol1_8to1_9.util.WitherBossBar;
 import com.viaversion.viaversion.api.connection.StoredObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 

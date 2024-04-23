@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.viaversion.viarewind.api;
 
 import com.viaversion.viarewind.ViaRewind;
@@ -45,14 +44,16 @@ public interface ViaRewindPlatform {
 		ViaRewindConfig config = new ViaRewindConfig(configFile);
 		config.reload();
 		Via.getManager().getConfigurationProvider().register(config);
+
 		ViaRewind.init(this, config);
 
 		Via.getManager().getSubPlatforms().add(IMPL_VERSION);
 
+		getLogger().info("Registering protocols...");
 		final ProtocolManager protocolManager = Via.getManager().getProtocolManager();
-
 		protocolManager.registerProtocol(new Protocol1_7_2_5To1_7_6_10(), ProtocolVersion.v1_7_2, ProtocolVersion.v1_7_6);
 		protocolManager.registerProtocol(new Protocol1_7_6_10To1_8(), ProtocolVersion.v1_7_6, ProtocolVersion.v1_8);
+
 		protocolManager.registerProtocol(new Protocol1_8To1_9(), ProtocolVersion.v1_8, ProtocolVersion.v1_9);
 	}
 

@@ -15,17 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-package com.viaversion.viarewind.protocol.protocol1_8to1_9.sound;
+package com.viaversion.viarewind.protocol.protocol1_8to1_9.data;
 
 import java.util.HashMap;
 
-public class Effect {
-	private static final HashMap<Integer, Integer> effects = new HashMap<>();
+public class EffectMappings {
 
-	public static int getOldId(int id) {
-		return effects.getOrDefault(id, id);
-	}
+	private static final HashMap<Integer, Integer> effects = new HashMap<>();
 
 	static {
 		effects.put(1003, 1002);
@@ -65,5 +61,9 @@ public class Effect {
 
 		effects.put(3000, -1);
 		effects.put(3001, -1);
+	}
+
+	public static int getOldId(int id) {
+		return effects.getOrDefault(id, id);
 	}
 }

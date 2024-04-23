@@ -15,8 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-package com.viaversion.viarewind.protocol.protocol1_8to1_9.rewriter;
+package com.viaversion.viarewind.protocol.protocol1_8to1_9.data;
 
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ItemRewriter;
 

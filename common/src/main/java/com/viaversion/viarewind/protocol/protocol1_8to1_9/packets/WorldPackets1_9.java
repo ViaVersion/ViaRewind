@@ -15,13 +15,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.viaversion.viarewind.protocol.protocol1_8to1_9.packets;
 
 import com.viaversion.viarewind.ViaRewind;
 import com.viaversion.viarewind.protocol.protocol1_8to1_9.Protocol1_8To1_9;
-import com.viaversion.viarewind.protocol.protocol1_8to1_9.sound.Effect;
-import com.viaversion.viarewind.protocol.protocol1_8to1_9.sound.SoundRemapper;
+import com.viaversion.viarewind.protocol.protocol1_8to1_9.data.EffectMappings;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.Environment;
 import com.viaversion.viaversion.api.minecraft.Position;
@@ -89,7 +87,7 @@ public class WorldPackets1_9 {
 				map(Type.STRING);
 				handler(wrapper -> {
 					String name = wrapper.get(Type.STRING, 0);
-					name = SoundRemapper.getOldName(name);
+					name = protocol.getMappingData().getMappedNamedSound(name);
 					if (name == null) {
 						wrapper.cancel();
 					} else {
@@ -204,7 +202,7 @@ public class WorldPackets1_9 {
 				map(Type.BOOLEAN);
 				handler(wrapper -> {
 					int id = wrapper.get(Type.INT, 0);
-					id = Effect.getOldId(id);
+					id = EffectMappings.getOldId(id);
 					if (id == -1) {
 						wrapper.cancel();
 						return;
@@ -254,15 +252,15 @@ public class WorldPackets1_9 {
 			@Override
 			public void register() {
 				handler(wrapper -> {
-					int soundId = wrapper.read(Type.VAR_INT);
-					String sound = SoundRemapper.oldNameFromId(soundId);
-					if (sound == null) {
+					final int soundId = wrapper.read(Type.VAR_INT);
+					final String soundName = protocol.getMappingData().soundName(soundId);
+					if (soundName == null) {
 						wrapper.cancel();
 					} else {
-						wrapper.write(Type.STRING, sound);
+						wrapper.write(Type.STRING, protocol.getMappingData().getMappedNamedSound(soundName));
 					}
 				});
-				handler(wrapper -> wrapper.read(Type.VAR_INT));
+				read(Type.VAR_INT);
 				map(Type.INT);
 				map(Type.INT);
 				map(Type.INT);

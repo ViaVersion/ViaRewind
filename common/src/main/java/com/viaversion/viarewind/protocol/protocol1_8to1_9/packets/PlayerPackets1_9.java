@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.viaversion.viarewind.protocol.protocol1_8to1_9.packets;
 
 import com.viaversion.viarewind.ViaRewind;
@@ -247,11 +246,7 @@ public class PlayerPackets1_9 {
 			public void register() {
 				map(Type.BOOLEAN);
 				handler(wrapper -> {
-					//Sending any queued animations.
-					PacketWrapper animation; // TODO move into storage :facepalm:
-					while ((animation = protocol.animationsToSend.poll()) != null) {
-						animation.sendToServer(Protocol1_8To1_9.class);
-					}
+					wrapper.user().get(PlayerPositionTracker.class).sendAnimations();
 
 					final EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_9.class);
 					if (tracker.isInsideVehicle(tracker.clientEntityId())) {
@@ -269,11 +264,7 @@ public class PlayerPackets1_9 {
 				map(Type.DOUBLE);
 				map(Type.BOOLEAN);
 				handler(wrapper -> {
-					//Sending any queued animations.
-					PacketWrapper animation; // TODO move into storage :facepalm:
-					while ((animation = protocol.animationsToSend.poll()) != null) {
-						animation.sendToServer(Protocol1_8To1_9.class);
-					}
+					wrapper.user().get(PlayerPositionTracker.class).sendAnimations();
 
 					PlayerPositionTracker pos = wrapper.user().get(PlayerPositionTracker.class);
 					if (pos.getConfirmId() != -1) return;
@@ -292,11 +283,7 @@ public class PlayerPackets1_9 {
 				map(Type.FLOAT);
 				map(Type.BOOLEAN);
 				handler(wrapper -> {
-					//Sending any queued animations.
-					PacketWrapper animation; // TODO move into storage :facepalm:
-					while ((animation = protocol.animationsToSend.poll()) != null) {
-						animation.sendToServer(Protocol1_8To1_9.class);
-					}
+					wrapper.user().get(PlayerPositionTracker.class).sendAnimations();
 
 					PlayerPositionTracker pos = wrapper.user().get(PlayerPositionTracker.class);
 					if (pos.getConfirmId() != -1) return;
@@ -318,11 +305,7 @@ public class PlayerPackets1_9 {
 				map(Type.FLOAT);
 				map(Type.BOOLEAN);
 				handler(wrapper -> {
-					//Sending any queued animations.
-					PacketWrapper animation; // TODO move into storage :facepalm:
-					while ((animation = protocol.animationsToSend.poll()) != null) {
-						animation.sendToServer(Protocol1_8To1_9.class);
-					}
+					wrapper.user().get(PlayerPositionTracker.class).sendAnimations();
 
 					double x = wrapper.get(Type.DOUBLE, 0);
 					double y = wrapper.get(Type.DOUBLE, 1);
@@ -419,11 +402,10 @@ public class PlayerPackets1_9 {
 					 * PacketPlayInFlying, if we queue it to be sent right before PacketPlayInFlying is processed,
 					 * we can be certain it will be sent after PacketPlayInUseEntity */
 					wrapper.cancel();
-					final PacketWrapper delayedPacket = PacketWrapper.create(0x1A,
-							null, wrapper.user());
+					final PacketWrapper delayedPacket = PacketWrapper.create(0x1A, null, wrapper.user());
 					delayedPacket.write(Type.VAR_INT, 0);  //Main Hand
 
-					protocol.animationsToSend.add(delayedPacket);
+					wrapper.user().get(PlayerPositionTracker.class).queueAnimation(delayedPacket);
 				});
 				handler(wrapper -> {
 					wrapper.user().get(BlockPlaceDestroyTracker.class).updateMining();
