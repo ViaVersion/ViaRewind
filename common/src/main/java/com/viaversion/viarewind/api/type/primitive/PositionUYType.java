@@ -15,35 +15,39 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.item;
+package com.viaversion.viarewind.api.type.primitive;
 
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
-import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.type.Type;
 import io.netty.buffer.ByteBuf;
 
-public class ItemArrayType extends Type<Item[]> {
+import java.util.function.IntFunction;
 
-	public ItemArrayType() {
-		super(Item[].class);
+public class PositionUYType<T extends Number> extends Type<Position> {
+
+	private final Type<T> yType;
+	private final IntFunction<T> toY;
+
+	public PositionUYType(final Type<T> yType, final IntFunction<T> toY) {
+		super(Position.class);
+
+		this.yType = yType;
+		this.toY = toY;
 	}
 
 	@Override
-	public Item[] read(ByteBuf buffer) throws Exception {
-		int amount = Type.SHORT.readPrimitive(buffer);
-		Item[] items = new Item[amount];
+	public Position read(ByteBuf buffer) throws Exception {
+		final int x = buffer.readInt();
+		final int y = yType.read(buffer).intValue();
+		final int z = buffer.readInt();
 
-		for (int i = 0; i < amount; ++i) {
-			items[i] = Types1_7_6_10.COMPRESSED_NBT_ITEM.read(buffer);
-		}
-		return items;
+		return new Position(x, y, z);
 	}
 
 	@Override
-	public void write(ByteBuf buffer, Item[] items) throws Exception {
-		Type.SHORT.writePrimitive(buffer, (short) items.length);
-		for (Item item : items) {
-			Types1_7_6_10.COMPRESSED_NBT_ITEM.write(buffer, item);
-		}
+	public void write(ByteBuf buffer, Position value) throws Exception {
+		buffer.writeInt(value.x());
+		yType.write(buffer, this.toY.apply(value.y()));
+		buffer.writeInt(value.z());
 	}
 }

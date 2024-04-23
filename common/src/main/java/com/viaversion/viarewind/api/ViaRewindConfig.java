@@ -89,4 +89,18 @@ public interface ViaRewindConfig extends Config {
 	 * @return the particle name (see <a href="https://wiki.vg/index.php?title=Protocol&oldid=7368#Particle_2">Particle registry for Packet</a>)
 	 */
 	String getWorldBorderParticle();
+
+	/**
+	 * If enabled, 1.8 players on 1.9+ servers can use /offhand to switch items between their main hand and offhand.
+	 *
+	 * @return true if enabled
+	 */
+	boolean isEnableOffhand();
+
+	/**
+	 * Allows to define the offhand command
+	 *
+	 * @return the offhand command
+	 */
+	String getOffhandCommand();
 }

@@ -24,7 +24,7 @@ import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10T
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.GameProfileStorage;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.InventoryTracker;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.PlayerSessionStorage;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
+import com.viaversion.viarewind.api.type.Types1_7_6_10;
 import com.viaversion.viarewind.utils.ChatUtil;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.item.Item;

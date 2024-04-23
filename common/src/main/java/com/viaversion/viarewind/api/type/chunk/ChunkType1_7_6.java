@@ -15,9 +15,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.chunk;
+package com.viaversion.viarewind.api.type.chunk;
 
-import com.viaversion.viarewind.api.minecraft.ExtendedBlockStorage;
+import com.viaversion.viarewind.utils.ExtendedBlockStorage;
 import com.viaversion.viaversion.api.minecraft.chunks.*;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.util.Pair;

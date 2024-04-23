@@ -15,9 +15,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.metadata;
+package com.viaversion.viarewind.api.type.metadata;
 
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
+import com.viaversion.viarewind.api.type.Types1_7_6_10;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.type.types.metadata.MetaListTypeTemplate;
 import io.netty.buffer.ByteBuf;

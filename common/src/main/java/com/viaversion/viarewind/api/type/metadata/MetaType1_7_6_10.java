@@ -15,39 +15,40 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.primitive;
+package com.viaversion.viarewind.api.type.metadata;
 
-import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viarewind.api.type.Types1_7_6_10;
+import com.viaversion.viaversion.api.minecraft.metadata.MetaType;
 import com.viaversion.viaversion.api.type.Type;
-import io.netty.buffer.ByteBuf;
 
-import java.util.function.IntFunction;
+public enum MetaType1_7_6_10 implements MetaType {
+	Byte(0, Type.BYTE),
+	Short(1, Type.SHORT),
+	Int(2, Type.INT),
+	Float(3, Type.FLOAT),
+	String(4, Type.STRING),
+	Slot(5, Types1_7_6_10.COMPRESSED_NBT_ITEM),
+	Position(6, Type.VECTOR);
 
-public class PositionUYType<T extends Number> extends Type<Position> {
+	private final int typeID;
+	private final Type<?> type;
 
-	private final Type<T> yType;
-	private final IntFunction<T> toY;
+	MetaType1_7_6_10(int typeID, Type<?> type) {
+		this.typeID = typeID;
+		this.type = type;
+	}
 
-	public PositionUYType(final Type<T> yType, final IntFunction<T> toY) {
-		super(Position.class);
-
-		this.yType = yType;
-		this.toY = toY;
+	public static MetaType1_7_6_10 byId(int id) {
+		return values()[id];
 	}
 
 	@Override
-	public Position read(ByteBuf buffer) throws Exception {
-		final int x = buffer.readInt();
-		final int y = yType.read(buffer).intValue();
-		final int z = buffer.readInt();
-
-		return new Position(x, y, z);
+	public int typeId() {
+		return this.typeID;
 	}
 
 	@Override
-	public void write(ByteBuf buffer, Position value) throws Exception {
-		buffer.writeInt(value.x());
-		yType.write(buffer, this.toY.apply(value.y()));
-		buffer.writeInt(value.z());
+	public Type<?> type() {
+		return this.type;
 	}
 }

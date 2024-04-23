@@ -23,7 +23,7 @@ import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10T
 import com.viaversion.viarewind.protocol.protocol1_7_2_5to1_7_6_10.ServerboundPackets1_7_2_5;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.provider.TitleRenderProvider;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.*;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
+import com.viaversion.viarewind.api.type.Types1_7_6_10;
 import com.viaversion.viarewind.utils.ChatUtil;
 import com.viaversion.viarewind.utils.math.AABB;
 import com.viaversion.viarewind.utils.math.Ray3d;

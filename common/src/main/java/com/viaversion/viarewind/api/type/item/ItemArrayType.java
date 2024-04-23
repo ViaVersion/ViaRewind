@@ -15,30 +15,35 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.metadata;
+package com.viaversion.viarewind.api.type.item;
 
-import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
-import com.viaversion.viaversion.api.type.types.metadata.MetaTypeTemplate;
+import com.viaversion.viarewind.api.type.Types1_7_6_10;
+import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.type.Type;
 import io.netty.buffer.ByteBuf;
 
-public class MetadataType extends MetaTypeTemplate {
-	@Override
-	public Metadata read(ByteBuf buffer) throws Exception {
-		byte item = buffer.readByte();
-		if (item == 127) {
-			return null;
-		} else {
-			int typeID = (item & 224) >> 5;
-			MetaType1_7_6_10 type = MetaType1_7_6_10.byId(typeID);
-			int id = item & 31;
-			return new Metadata(id, type, type.type().read(buffer));
-		}
+public class ItemArrayType extends Type<Item[]> {
+
+	public ItemArrayType() {
+		super(Item[].class);
 	}
 
 	@Override
-	public void write(ByteBuf buffer, Metadata meta) throws Exception {
-		int item = (meta.metaType().typeId() << 5 | meta.id() & 31) & 255;
-		buffer.writeByte(item);
-		meta.metaType().type().write(buffer, meta.getValue());
+	public Item[] read(ByteBuf buffer) throws Exception {
+		int amount = Type.SHORT.readPrimitive(buffer);
+		Item[] items = new Item[amount];
+
+		for (int i = 0; i < amount; ++i) {
+			items[i] = Types1_7_6_10.COMPRESSED_NBT_ITEM.read(buffer);
+		}
+		return items;
+	}
+
+	@Override
+	public void write(ByteBuf buffer, Item[] items) throws Exception {
+		Type.SHORT.writePrimitive(buffer, (short) items.length);
+		for (Item item : items) {
+			Types1_7_6_10.COMPRESSED_NBT_ITEM.write(buffer, item);
+		}
 	}
 }

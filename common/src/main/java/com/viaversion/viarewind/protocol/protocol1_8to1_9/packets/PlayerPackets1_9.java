@@ -31,12 +31,14 @@ import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.rewriter.ItemRewriter;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_8;
+import com.viaversion.viaversion.libs.gson.JsonElement;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.CompoundTag;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.ListTag;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.StringTag;
 import com.viaversion.viaversion.protocols.protocol1_8.ServerboundPackets1_8;
 import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.protocols.protocol1_9to1_8.ClientboundPackets1_9;
+import com.viaversion.viaversion.protocols.protocol1_9to1_8.ServerboundPackets1_9;
 
 import java.util.ArrayList;
 import java.util.UUID;
@@ -44,51 +46,45 @@ import java.util.UUID;
 public class PlayerPackets1_9 {
 
 	public static void register(final Protocol1_8To1_9 protocol) {
-		protocol.registerClientbound(ClientboundPackets1_9.BOSSBAR, null, new PacketHandlers() {
-			@Override
-			public void register() {
-				handler(wrapper -> {
-					wrapper.cancel();
+		protocol.registerClientbound(ClientboundPackets1_9.BOSSBAR, null, wrapper -> {
+			wrapper.cancel();
+			final BossBarStorage bossbar = wrapper.user().get(BossBarStorage.class);
 
-					UUID uuid = wrapper.read(Type.UUID);
-					int action = wrapper.read(Type.VAR_INT);
-					BossBarStorage bossBarStorage = wrapper.user().get(BossBarStorage.class);
-					if (action == 0) {
-						bossBarStorage.add(uuid, ChatUtil.jsonToLegacy(wrapper.user(), wrapper.read(Type.COMPONENT)), wrapper.read(Type.FLOAT));
-						wrapper.read(Type.VAR_INT);
-						wrapper.read(Type.VAR_INT);
-						wrapper.read(Type.UNSIGNED_BYTE);
-					} else if (action == 1) {
-						bossBarStorage.remove(uuid);
-					} else if (action == 2) {
-						bossBarStorage.updateHealth(uuid, wrapper.read(Type.FLOAT));
-					} else if (action == 3) {
-						String title = ChatUtil.jsonToLegacy(wrapper.user(), wrapper.read(Type.COMPONENT));
-						bossBarStorage.updateTitle(uuid, title);
-					}
-				});
+			final UUID uuid = wrapper.read(Type.UUID);
+			final int action = wrapper.read(Type.VAR_INT);
+			if (action == 0 /* add */) {
+				final JsonElement title = wrapper.read(Type.COMPONENT);
+				final float health = wrapper.read(Type.FLOAT);
+				wrapper.read(Type.VAR_INT); // Color
+				wrapper.read(Type.VAR_INT); // Division
+				wrapper.read(Type.UNSIGNED_BYTE); // Flags
+
+				bossbar.add(uuid, ChatUtil.jsonToLegacy(wrapper.user(), title), health);
+			} else if (action == 1 /* remove */) {
+				bossbar.remove(uuid);
+			} else if (action == 2 /* update health */) {
+				final float health = wrapper.read(Type.FLOAT);
+				bossbar.updateHealth(uuid, health);
+			} else if (action == 3 /* update title */) {
+				final JsonElement title = wrapper.read(Type.COMPONENT);
+				bossbar.updateTitle(uuid, ChatUtil.jsonToLegacy(wrapper.user(), title));
 			}
 		});
 
 		protocol.registerClientbound(ClientboundPackets1_9.TEAMS, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Type.STRING);
-				map(Type.BYTE);
+				map(Type.STRING); // Team name
+				map(Type.BYTE); // Mode
 				handler(wrapper -> {
-					byte mode = wrapper.get(Type.BYTE, 0);
-					if (mode == 0 || mode == 2) {
-						wrapper.passthrough(Type.STRING);  //Display Name
-						wrapper.passthrough(Type.STRING);  //Prefix
-						wrapper.passthrough(Type.STRING);  //Suffix
-						wrapper.passthrough(Type.BYTE);  //Friendly Flags
-						wrapper.passthrough(Type.STRING);  //Name Tag Visibility
-						wrapper.read(Type.STRING);  //Skip Collision Rule
-						wrapper.passthrough(Type.BYTE);  //Friendly Flags
-					}
-
-					if (mode == 0 || mode == 3 || mode == 4) {
-						wrapper.passthrough(Type.STRING_ARRAY);
+					final byte mode = wrapper.get(Type.BYTE, 0);
+					if (mode == 0 /* create team */ || mode == 2 /* update team info */) {
+						wrapper.passthrough(Type.STRING); // Display name
+						wrapper.passthrough(Type.STRING); // Prefix
+						wrapper.passthrough(Type.STRING); // Suffix
+						wrapper.passthrough(Type.BYTE); // Friendly fire
+						wrapper.passthrough(Type.STRING); // Name tag visibility
+						wrapper.read(Type.STRING); // Collision rule
 					}
 				});
 			}
@@ -99,11 +95,11 @@ public class PlayerPackets1_9 {
 		protocol.registerClientbound(ClientboundPackets1_9.PLUGIN_MESSAGE, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Type.STRING);
-				handler(wrapper -> {
-					String channel = wrapper.get(Type.STRING, 0);
+				map(Type.STRING); // Channel
+				handlerSoftFail(wrapper -> {
+					final String channel = wrapper.get(Type.STRING, 0);
 					if (channel.equals("MC|TrList")) {
-						wrapper.passthrough(Type.INT);  //Window Id
+						wrapper.passthrough(Type.INT); // Window id
 
 						int size;
 						if (wrapper.isReadable(Type.BYTE, 0)) {
@@ -115,12 +111,12 @@ public class PlayerPackets1_9 {
 						final ItemRewriter<?> itemRewriter = protocol.getItemRewriter();
 
 						for (int i = 0; i < size; i++) {
-							wrapper.write(Type.ITEM1_8, itemRewriter.handleItemToClient(wrapper.user(), wrapper.read(Type.ITEM1_8))); //Buy Item 1
-							wrapper.write(Type.ITEM1_8, itemRewriter.handleItemToClient(wrapper.user(), wrapper.read(Type.ITEM1_8))); //Buy Item 3
+							wrapper.write(Type.ITEM1_8, itemRewriter.handleItemToClient(wrapper.user(), wrapper.read(Type.ITEM1_8))); // Buy item 1
+							wrapper.write(Type.ITEM1_8, itemRewriter.handleItemToClient(wrapper.user(), wrapper.read(Type.ITEM1_8))); // Buy item 3
 
 							boolean has3Items = wrapper.passthrough(Type.BOOLEAN);
 							if (has3Items) {
-								wrapper.write(Type.ITEM1_8, itemRewriter.handleItemToClient(wrapper.user(), wrapper.read(Type.ITEM1_8))); //Buy Item 2
+								wrapper.write(Type.ITEM1_8, itemRewriter.handleItemToClient(wrapper.user(), wrapper.read(Type.ITEM1_8))); // Buy item 2
 							}
 
 							wrapper.passthrough(Type.BOOLEAN); //Unavailable
@@ -137,17 +133,16 @@ public class PlayerPackets1_9 {
 		protocol.registerClientbound(ClientboundPackets1_9.PLAYER_POSITION, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Type.DOUBLE);
-				map(Type.DOUBLE);
-				map(Type.DOUBLE);
-				map(Type.FLOAT);
-				map(Type.FLOAT);
-				map(Type.BYTE);
+				map(Type.DOUBLE); // X
+				map(Type.DOUBLE); // Feet y
+				map(Type.DOUBLE); // Z
+				map(Type.FLOAT); // Yaw
+				map(Type.FLOAT); // Pitch
+				map(Type.BYTE); // Relative arguments
 				handler(wrapper -> {
-					PlayerPositionTracker pos = wrapper.user().get(PlayerPositionTracker.class);
+					final PlayerPositionTracker pos = wrapper.user().get(PlayerPositionTracker.class);
 
-					int teleportId = wrapper.read(Type.VAR_INT);
-					pos.setConfirmId(teleportId);
+					pos.setConfirmId(wrapper.read(Type.VAR_INT));
 
 					byte flags = wrapper.get(Type.BYTE, 0);
 					double x = wrapper.get(Type.DOUBLE, 0);
@@ -191,13 +186,10 @@ public class PlayerPackets1_9 {
 		protocol.registerClientbound(ClientboundPackets1_9.RESPAWN, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Type.INT);
+				map(Type.INT); // Dimension
+				handler(wrapper -> wrapper.user().get(BossBarStorage.class).reset());
 				handler(wrapper -> {
-					wrapper.user().get(BossBarStorage.class).updateLocation();
-					wrapper.user().get(BossBarStorage.class).changeWorld();
-				});
-				handler(wrapper -> {
-					ClientWorld world = wrapper.user().get(ClientWorld.class);
+					final ClientWorld world = wrapper.user().get(ClientWorld.class);
 					world.setEnvironment(wrapper.get(Type.INT, 0));
 				});
 			}
@@ -206,12 +198,15 @@ public class PlayerPackets1_9 {
 		protocol.registerServerbound(ServerboundPackets1_8.CHAT_MESSAGE, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Type.STRING);
+				map(Type.STRING); // Message
 				handler(wrapper -> {
-					String msg = wrapper.get(Type.STRING, 0);
-					if (msg.toLowerCase().startsWith("/offhand")) {
+					if (!ViaRewind.getConfig().isEnableOffhand()) {
+						return;
+					}
+					final String msg = wrapper.get(Type.STRING, 0);
+					if (msg.toLowerCase().trim().startsWith(ViaRewind.getConfig().getOffhandCommand())) {
 						wrapper.cancel();
-						PacketWrapper swapItems = PacketWrapper.create(0x13, null, wrapper.user());
+						final PacketWrapper swapItems = PacketWrapper.create(ServerboundPackets1_9.PLAYER_DIGGING, wrapper.user());
 						swapItems.write(Type.VAR_INT, 6);
 						swapItems.write(Type.POSITION1_8, new Position(0, 0, 0));
 						swapItems.write(Type.BYTE, (byte) 255);
@@ -225,17 +220,17 @@ public class PlayerPackets1_9 {
 		protocol.registerServerbound(ServerboundPackets1_8.INTERACT_ENTITY, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Type.VAR_INT);
-				map(Type.VAR_INT);
+				map(Type.VAR_INT); // Target
+				map(Type.VAR_INT); // Type
 				handler(wrapper -> {
-					int type = wrapper.get(Type.VAR_INT, 1);
-					if (type == 2) {
-						wrapper.passthrough(Type.FLOAT);
-						wrapper.passthrough(Type.FLOAT);
-						wrapper.passthrough(Type.FLOAT);
+					final int type = wrapper.get(Type.VAR_INT, 1);
+					if (type == 2 /* attack */) {
+						wrapper.passthrough(Type.FLOAT); // Target x
+						wrapper.passthrough(Type.FLOAT); // Target y
+						wrapper.passthrough(Type.FLOAT); // Target z
 					}
-					if (type == 2 || type == 0) {
-						wrapper.write(Type.VAR_INT, 0);
+					if (type == 2 /* attack */ || type == 0 /* interact */) {
+						wrapper.write(Type.VAR_INT, 0); // Hand
 					}
 				});
 			}
@@ -244,7 +239,7 @@ public class PlayerPackets1_9 {
 		protocol.registerServerbound(ServerboundPackets1_8.PLAYER_MOVEMENT, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Type.BOOLEAN);
+				map(Type.BOOLEAN); // On ground
 				handler(wrapper -> {
 					wrapper.user().get(PlayerPositionTracker.class).sendAnimations();
 
@@ -259,17 +254,18 @@ public class PlayerPackets1_9 {
 		protocol.registerServerbound(ServerboundPackets1_8.PLAYER_POSITION, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Type.DOUBLE);
-				map(Type.DOUBLE);
-				map(Type.DOUBLE);
-				map(Type.BOOLEAN);
+				map(Type.DOUBLE); // X
+				map(Type.DOUBLE); // Feet y
+				map(Type.DOUBLE); // Z
+				map(Type.BOOLEAN); // On ground
 				handler(wrapper -> {
 					wrapper.user().get(PlayerPositionTracker.class).sendAnimations();
 
-					PlayerPositionTracker pos = wrapper.user().get(PlayerPositionTracker.class);
-					if (pos.getConfirmId() != -1) return;
-					pos.setPos(wrapper.get(Type.DOUBLE, 0), wrapper.get(Type.DOUBLE, 1),
-							wrapper.get(Type.DOUBLE, 2));
+					final PlayerPositionTracker pos = wrapper.user().get(PlayerPositionTracker.class);
+					if (pos.getConfirmId() != -1) {
+						return;
+					}
+					pos.setPos(wrapper.get(Type.DOUBLE, 0), wrapper.get(Type.DOUBLE, 1), wrapper.get(Type.DOUBLE, 2));
 					pos.setOnGround(wrapper.get(Type.BOOLEAN, 0));
 				});
 				handler(wrapper -> wrapper.user().get(BossBarStorage.class).updateLocation());

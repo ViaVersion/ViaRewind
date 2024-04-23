@@ -26,10 +26,16 @@ import java.util.Map;
 import java.util.UUID;
 
 public class BossBarStorage extends StoredObject {
+
 	private final Map<UUID, WitherBossBar> bossBars = new HashMap<>();
 
 	public BossBarStorage(UserConnection user) {
 		super(user);
+	}
+
+	public void reset() {
+		updateLocation();
+		changeWorld();
 	}
 
 	public void add(UUID uuid, String title, float health) throws Exception {

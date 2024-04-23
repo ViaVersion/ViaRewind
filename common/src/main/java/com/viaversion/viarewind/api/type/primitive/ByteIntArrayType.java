@@ -15,40 +15,30 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.metadata;
+package com.viaversion.viarewind.api.type.primitive;
 
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
-import com.viaversion.viaversion.api.minecraft.metadata.MetaType;
 import com.viaversion.viaversion.api.type.Type;
+import io.netty.buffer.ByteBuf;
 
-public enum MetaType1_7_6_10 implements MetaType {
-	Byte(0, Type.BYTE),
-	Short(1, Type.SHORT),
-	Int(2, Type.INT),
-	Float(3, Type.FLOAT),
-	String(4, Type.STRING),
-	Slot(5, Types1_7_6_10.COMPRESSED_NBT_ITEM),
-	Position(6, Type.VECTOR);
+public class ByteIntArrayType extends Type<int[]> {
 
-	private final int typeID;
-	private final Type<?> type;
-
-	MetaType1_7_6_10(int typeID, Type<?> type) {
-		this.typeID = typeID;
-		this.type = type;
-	}
-
-	public static MetaType1_7_6_10 byId(int id) {
-		return values()[id];
+	public ByteIntArrayType() {
+		super(int[].class);
 	}
 
 	@Override
-	public int typeId() {
-		return this.typeID;
+	public int[] read(ByteBuf byteBuf) throws Exception {
+		byte size = byteBuf.readByte();
+		int[] array = new int[size];
+		for (byte i = 0; i < size; i++) {
+			array[i] = byteBuf.readInt();
+		}
+		return array;
 	}
 
 	@Override
-	public Type<?> type() {
-		return this.type;
+	public void write(ByteBuf byteBuf, int[] array) throws Exception {
+		byteBuf.writeByte(array.length);
+		for (int i : array) byteBuf.writeInt(i);
 	}
 }

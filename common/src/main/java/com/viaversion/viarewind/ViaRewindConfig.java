@@ -36,6 +36,8 @@ public class ViaRewindConfig extends Config implements com.viaversion.viarewind.
 	private boolean emulateWorldBorder;
 	private boolean alwaysShowOriginalMobName;
 	private String worldBorderParticle;
+	private boolean enableOffhand;
+	private String offhandCommand;
 
     public ViaRewindConfig(File configFile) {
         super(configFile);
@@ -56,6 +58,8 @@ public class ViaRewindConfig extends Config implements com.viaversion.viarewind.
 		emulateWorldBorder = getBoolean("emulate-world-border", true);
 		alwaysShowOriginalMobName = getBoolean("always-show-original-mob-name", true);
 		worldBorderParticle = getString("world-border-particle", "fireworksSpark");
+		enableOffhand = getBoolean("enable-offhand", true);
+		offhandCommand = getString("offhand-command", "/offhand");
 	}
 
 	@Override
@@ -96,6 +100,16 @@ public class ViaRewindConfig extends Config implements com.viaversion.viarewind.
 	@Override
 	public String getWorldBorderParticle() {
 		return worldBorderParticle;
+	}
+
+	@Override
+	public boolean isEnableOffhand() {
+		return enableOffhand;
+	}
+
+	@Override
+	public String getOffhandCommand() {
+		return offhandCommand;
 	}
 
 	@Override

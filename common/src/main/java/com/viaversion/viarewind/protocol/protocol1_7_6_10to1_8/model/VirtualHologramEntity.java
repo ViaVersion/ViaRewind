@@ -21,8 +21,8 @@ import com.viaversion.viarewind.protocol.protocol1_7_2_5to1_7_6_10.ClientboundPa
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.data.MetaIndex1_7_6_10To1_8;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.data.MetadataRewriter;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.Types1_7_6_10;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.metadata.MetaType1_7_6_10;
+import com.viaversion.viarewind.api.type.Types1_7_6_10;
+import com.viaversion.viarewind.api.type.metadata.MetaType1_7_6_10;
 import com.viaversion.viarewind.utils.math.AABB;
 import com.viaversion.viarewind.utils.math.Vector3d;
 import com.viaversion.viaversion.api.connection.UserConnection;

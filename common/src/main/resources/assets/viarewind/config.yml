@@ -30,3 +30,9 @@ always-show-original-mob-name: true
 # The particle to show the world border for the 1.8+ world border for 1.7.x clients
 # see https://wiki.vg/index.php?title=Protocol&oldid=7368#Particle_2
 world-border-particle: 'fireworksSpark'
+#
+# If enabled, 1.8 players on 1.9+ servers can use /offhand to switch items between their main hand and offhand.
+enable-offhand: true
+#
+# Allows to define the offhand command
+offhand-command: '/offhand'

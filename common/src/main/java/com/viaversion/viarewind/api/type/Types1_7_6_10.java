@@ -15,15 +15,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types;
+package com.viaversion.viarewind.api.type;
 
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.item.NBTType;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.item.ItemArrayType;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.item.ItemType;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.metadata.MetadataListType;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.metadata.MetadataType;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.primitive.ByteIntArrayType;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.types.primitive.PositionUYType;
+import com.viaversion.viarewind.api.type.item.NBTType;
+import com.viaversion.viarewind.api.type.item.ItemArrayType;
+import com.viaversion.viarewind.api.type.item.ItemType;
+import com.viaversion.viarewind.api.type.metadata.MetadataListType;
+import com.viaversion.viarewind.api.type.metadata.MetadataType;
+import com.viaversion.viarewind.api.type.primitive.ByteIntArrayType;
+import com.viaversion.viarewind.api.type.primitive.PositionUYType;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
