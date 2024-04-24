@@ -15,18 +15,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.model;
+package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.emulation;
 
 import com.viaversion.viarewind.protocol.protocol1_7_2_5to1_7_6_10.ClientboundPackets1_7_2_5;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.data.MetaIndex1_7_6_10To1_8;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.data.MetadataRewriter;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.metadata.MetaIndex;
 import com.viaversion.viarewind.api.type.Types1_7_6_10;
 import com.viaversion.viarewind.api.type.metadata.MetaType1_7_6_10;
 import com.viaversion.viarewind.utils.math.AABB;
 import com.viaversion.viarewind.utils.math.Vector3d;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_8;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
@@ -35,14 +33,11 @@ import com.viaversion.viaversion.api.type.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-// Close this class file while you still can, because it's about to get ugly
-@Deprecated // TODO delete
 public class VirtualHologramEntity {
 	private final List<Metadata> metadataTracker = new ArrayList<>();
 	private double locX, locY, locZ;
 
 	private final UserConnection user;
-	private final MetadataRewriter metadataRewriter;
 	private final int entityId;
 
 	private int[] entityIds = null;
@@ -53,9 +48,8 @@ public class VirtualHologramEntity {
 	private boolean small = false;
 	private boolean marker = false;
 
-	public VirtualHologramEntity(final UserConnection user, final MetadataRewriter metadataRewriter, final int entityId) {
+	public VirtualHologramEntity(final UserConnection user, final int entityId) {
 		this.user = user;
-		this.metadataRewriter = metadataRewriter;
 		this.entityId = entityId;
 	}
 
@@ -236,7 +230,7 @@ public class VirtualHologramEntity {
 			metadataList.add(new Metadata(metadata.id(), metadata.metaType(), metadata.getValue()));
 		}
 		if (small) metadataList.add(new Metadata(12, MetaType1_8.Byte, (byte) 1));
-		metadataRewriter.transform(metadataPacket.user(), EntityTypes1_10.EntityType.ZOMBIE, metadataList);
+//		metadataRewriter.transform(metadataPacket.user(), EntityTypes1_10.EntityType.ZOMBIE, metadataList);
 
 		metadataPacket.write(Types1_7_6_10.METADATA_LIST, metadataList);
 	}
@@ -245,9 +239,9 @@ public class VirtualHologramEntity {
 		metadataPacket.write(Type.INT, entityIds[1]);
 
 		List<Metadata> metadataList = new ArrayList<>();
-		metadataList.add(new Metadata(MetaIndex1_7_6_10To1_8.ENTITY_AGEABLE_AGE.getIndex(), MetaType1_7_6_10.Int, -1700000));
-		metadataList.add(new Metadata(MetaIndex1_7_6_10To1_8.ENTITY_LIVING_NAME_TAG.getIndex(), MetaType1_7_6_10.String, name));
-		metadataList.add(new Metadata(MetaIndex1_7_6_10To1_8.ENTITY_LIVING_NAME_TAG_VISIBILITY.getIndex(), MetaType1_7_6_10.Byte, (byte) 1));
+		metadataList.add(new Metadata(MetaIndex.ENTITY_AGEABLE_AGE.getIndex(), MetaType1_7_6_10.Int, -1700000));
+		metadataList.add(new Metadata(MetaIndex.ENTITY_LIVING_NAME_TAG.getIndex(), MetaType1_7_6_10.String, name));
+		metadataList.add(new Metadata(MetaIndex.ENTITY_LIVING_NAME_TAG_VISIBILITY.getIndex(), MetaType1_7_6_10.Byte, (byte) 1));
 
 		metadataPacket.write(Types1_7_6_10.METADATA_LIST, metadataList);
 	}

@@ -27,9 +27,6 @@ import java.util.UUID;
 
 public class PlayerSessionStorage extends StoredObject {
 
-	// Player info
-	public int gameMode;
-
 	// Player abilities
 	public boolean sprinting, allowFly, flying, invincible, creative;
 	public float flySpeed, walkSpeed;
@@ -92,10 +89,6 @@ public class PlayerSessionStorage extends StoredObject {
 		}
 
 		items[slot] = equipment;
-	}
-
-	public boolean isSpectator() {
-		return gameMode == 3;
 	}
 
 	public Map<UUID, Item[]> getPlayerEquipment() {

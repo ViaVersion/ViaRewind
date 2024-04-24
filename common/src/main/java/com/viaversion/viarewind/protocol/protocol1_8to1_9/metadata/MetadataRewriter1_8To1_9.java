@@ -54,8 +54,8 @@ public class MetadataRewriter1_8To1_9 extends VREntityRewriter<ClientboundPacket
 
 	@Override
 	protected void registerPackets() {
+		registerJoinGame1_8(ClientboundPackets1_9.JOIN_GAME);
 		registerRemoveEntities(ClientboundPackets1_9.DESTROY_ENTITIES);
-		registerJoinGame1_8(ClientboundPackets1_9.JOIN_GAME, EntityType.ENTITY_HUMAN);
 		registerMetadataRewriter(ClientboundPackets1_9.ENTITY_METADATA, Types1_9.METADATA_LIST, Types1_8.METADATA_LIST);
 
 		protocol.registerClientbound(ClientboundPackets1_9.SPAWN_ENTITY, new PacketHandlers() {
@@ -210,7 +210,7 @@ public class MetadataRewriter1_8To1_9 extends VREntityRewriter<ClientboundPacket
 				create(Type.SHORT, (short) 0); // Current item
 				map(Types1_9.METADATA_LIST, Types1_8.METADATA_LIST); // Metadata
 
-				handler(getTrackerAndMetaHandler(Types1_9.METADATA_LIST, EntityTypes1_10.EntityType.PLAYER));
+				handler(getTrackerAndMetaHandler(Types1_8.METADATA_LIST, EntityTypes1_10.EntityType.PLAYER));
 			}
 		});
 	}

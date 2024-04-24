@@ -19,9 +19,10 @@ package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8;
 
 import com.viaversion.viabackwards.api.BackwardsProtocol;
 import com.viaversion.viarewind.ViaRewind;
+import com.viaversion.viarewind.api.data.RewindMappings;
 import com.viaversion.viarewind.protocol.protocol1_7_2_5to1_7_6_10.ClientboundPackets1_7_2_5;
 import com.viaversion.viarewind.protocol.protocol1_7_2_5to1_7_6_10.ServerboundPackets1_7_2_5;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.data.MetadataRewriter;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.metadata.MetadataRewriter1_7_6_10To1_8;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.packets.*;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.provider.CompressionHandlerProvider;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.provider.compression.TrackingCompressionHandlerProvider;
@@ -45,8 +46,10 @@ import java.util.concurrent.TimeUnit;
 
 public class Protocol1_7_6_10To1_8 extends BackwardsProtocol<ClientboundPackets1_8, ClientboundPackets1_7_2_5, ServerboundPackets1_8, ServerboundPackets1_7_2_5> {
 
+	public static final RewindMappings MAPPINGS = new RewindMappings("1.8", "1.7.10");
+
 	private final BlockItemPackets1_8 itemRewriter = new BlockItemPackets1_8(this);
-	private final MetadataRewriter metadataRewriter = new MetadataRewriter(this);
+	private final MetadataRewriter1_7_6_10To1_8 metadataRewriter = new MetadataRewriter1_7_6_10To1_8(this);
 
 	public Protocol1_7_6_10To1_8() {
 		super(ClientboundPackets1_8.class, ClientboundPackets1_7_2_5.class, ServerboundPackets1_8.class, ServerboundPackets1_7_2_5.class);
@@ -55,11 +58,11 @@ public class Protocol1_7_6_10To1_8 extends BackwardsProtocol<ClientboundPackets1
 	@Override
 	protected void registerPackets() {
 		itemRewriter.register();
+		metadataRewriter.register();
 
 		EntityPackets1_8.register(this);
 		PlayerPackets1_8.register(this);
 		ScoreboardPackets1_8.register(this);
-		SpawnPackets1_8.register(this);
 		WorldPackets1_8.register(this);
 
 		this.registerClientbound(State.LOGIN, ClientboundLoginPackets.HELLO.getId(), ClientboundLoginPackets.HELLO.getId(), new PacketHandlers() {
@@ -113,17 +116,18 @@ public class Protocol1_7_6_10To1_8 extends BackwardsProtocol<ClientboundPackets1
 	}
 
 	@Override
-	public void init(UserConnection userConnection) {
-		userConnection.put(new InventoryTracker(userConnection));
-		userConnection.put(new EntityTracker1_8(userConnection, metadataRewriter));
-		userConnection.put(new PlayerSessionStorage(userConnection));
-		userConnection.put(new GameProfileStorage(userConnection));
-		userConnection.put(new Scoreboard(userConnection));
-		userConnection.put(new CompressionStatusTracker(userConnection));
-		userConnection.put(new WorldBorderEmulator(userConnection));
+	public void init(UserConnection connection) {
+		connection.addEntityTracker(this.getClass(), new EntityTracker1_8(connection));
 
-		if (!userConnection.has(ClientWorld.class)) {
-			userConnection.put(new ClientWorld());
+		connection.put(new InventoryTracker(connection));
+		connection.put(new PlayerSessionStorage(connection));
+		connection.put(new GameProfileStorage(connection));
+		connection.put(new Scoreboard(connection));
+		connection.put(new CompressionStatusTracker(connection));
+		connection.put(new WorldBorderEmulator(connection));
+
+		if (!connection.has(ClientWorld.class)) {
+			connection.put(new ClientWorld());
 		}
 	}
 
@@ -137,11 +141,22 @@ public class Protocol1_7_6_10To1_8 extends BackwardsProtocol<ClientboundPackets1
 	}
 
 	@Override
+	public RewindMappings getMappingData() {
+		return MAPPINGS;
+	}
+
+	@Override
 	public BlockItemPackets1_8 getItemRewriter() {
 		return itemRewriter;
 	}
 
-	public MetadataRewriter getMetadataRewriter() {
+	@Override
+	public MetadataRewriter1_7_6_10To1_8 getEntityRewriter() {
 		return metadataRewriter;
+	}
+
+	@Override
+	public boolean hasMappingDataToLoad() {
+		return true;
 	}
 }

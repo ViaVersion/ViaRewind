@@ -20,11 +20,14 @@ package com.viaversion.viarewind.api.rewriter;
 import com.viaversion.viabackwards.api.BackwardsProtocol;
 import com.viaversion.viabackwards.api.rewriters.LegacyEntityRewriter;
 import com.viaversion.viarewind.ViaRewind;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.ClientWorld;
-import com.viaversion.viaversion.api.minecraft.entities.EntityType;
+import com.viaversion.viaversion.api.minecraft.metadata.MetaType;
 import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_8;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 
 public abstract class VREntityRewriter<C extends ClientboundPacketType, T extends BackwardsProtocol<C, ?, ?, ?>> extends LegacyEntityRewriter<C, T> {
 
@@ -32,15 +35,28 @@ public abstract class VREntityRewriter<C extends ClientboundPacketType, T extend
 		super(protocol, MetaType1_8.String, MetaType1_8.Byte);
 	}
 
-	protected void registerJoinGame1_8(final C packetType, final EntityType playerType) {
-		protocol.registerClientbound(packetType, wrapper -> {
-			final int entityId = wrapper.passthrough(Type.INT);
-			wrapper.passthrough(Type.UNSIGNED_BYTE); // Game mode
-			final byte dimension = wrapper.passthrough(Type.BYTE);
+	public VREntityRewriter(T protocol, MetaType displayType, MetaType displayVisibilityType) {
+		super(protocol, displayType, displayVisibilityType);
+	}
 
-			addTrackedEntity(wrapper, entityId, playerType);
-			wrapper.user().get(ClientWorld.class).setEnvironment(dimension);
+	protected void registerJoinGame1_8(final C packetType) {
+		protocol.registerClientbound(packetType, new PacketHandlers() {
+			@Override
+			protected void register() {
+				map(Type.INT); // Entity id
+				map(Type.UNSIGNED_BYTE); // Game mode
+				map(Type.BYTE); // Dimension
+				handler(playerTrackerHandler());
+				handler(wrapper -> wrapper.user().get(ClientWorld.class).setEnvironment(wrapper.get(Type.BYTE, 0)));
+			}
 		});
+	}
+
+	protected void untrackEntities(final UserConnection connection, final int[] entities) {
+		final EntityTrackerBase tracker = tracker(connection);
+		for (int entityId : entities) {
+			tracker.removeEntity(entityId);
+		}
 	}
 
 	@Override

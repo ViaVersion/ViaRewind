@@ -21,6 +21,7 @@ import com.viaversion.viabackwards.api.rewriters.LegacyEnchantmentRewriter;
 import com.viaversion.viarewind.api.rewriter.VRBlockItemRewriter;
 import com.viaversion.viarewind.protocol.protocol1_7_2_5to1_7_6_10.ServerboundPackets1_7_2_5;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.EntityTracker1_8;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.GameProfileStorage;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.InventoryTracker;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.PlayerSessionStorage;
@@ -114,9 +115,10 @@ public class BlockItemPackets1_8 extends VRBlockItemRewriter<ClientboundPackets1
 
 					final PlayerSessionStorage playerSession = wrapper.user().get(PlayerSessionStorage.class);
 					final Item item = wrapper.get(Types1_7_6_10.COMPRESSED_NBT_ITEM, 0);
-
 					playerSession.setPlayerEquipment(wrapper.user().getProtocolInfo().getUuid(), item, 8 - slot);
-					if (playerSession.isSpectator()) { // Spectator mode didn't exist in 1.7.10
+
+					final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(Protocol1_7_6_10To1_8.class);
+					if (tracker.isSpectator()) { // Spectator mode didn't exist in 1.7.10
 						wrapper.cancel();
 					}
 				});
@@ -149,17 +151,17 @@ public class BlockItemPackets1_8 extends VRBlockItemRewriter<ClientboundPackets1
 					final short windowId = wrapper.get(Type.UNSIGNED_BYTE, 0);
 					if (windowId != 0) return;
 
+					final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(Protocol1_7_6_10To1_8.class);
 					final UUID userId = wrapper.user().getProtocolInfo().getUuid();
-					final PlayerSessionStorage playerSession = wrapper.user().get(PlayerSessionStorage.class);
 
 					final Item[] items = wrapper.get(Types1_7_6_10.COMPRESSED_NBT_ITEM_ARRAY, 0);
 					for (int i = 5; i < 9; i++) {
-						playerSession.setPlayerEquipment(userId, items[i], 8 - i);
-						if (playerSession.isSpectator()) {
+						wrapper.user().get(PlayerSessionStorage.class).setPlayerEquipment(userId, items[i], 8 - i);
+						if (tracker.isSpectator()) {
 							items[i] = null;
 						}
 					}
-					if (playerSession.isSpectator()) {
+					if (tracker.isSpectator()) {
 						final GameProfileStorage.GameProfile profile = wrapper.user().get(GameProfileStorage.class).get(userId);
 						if (profile != null) {
 							items[5] = profile.getSkull();

@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.data;
+package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.metadata;
 
 import com.viaversion.viarewind.api.type.metadata.MetaType1_7_6_10;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
@@ -26,7 +26,7 @@ import com.viaversion.viaversion.util.Pair;
 import java.util.HashMap;
 import java.util.Optional;
 
-public enum MetaIndex1_7_6_10To1_8 {
+public enum MetaIndex {
 
 	ENTITY_FLAGS(EntityTypes1_10.EntityType.ENTITY, 0, MetaType1_7_6_10.Byte, MetaType1_8.Byte),
 	ENTITY_AIR(EntityTypes1_10.EntityType.ENTITY, 1, MetaType1_7_6_10.Short, MetaType1_8.Short),
@@ -140,10 +140,10 @@ public enum MetaIndex1_7_6_10To1_8 {
 
 	ENDER_CRYSTAL_HEALTH(EntityTypes1_10.EntityType.ENDER_CRYSTAL, 8, MetaType1_7_6_10.Int, 9, MetaType1_8.Int);
 
-	private static final HashMap<Pair<EntityTypes1_10.EntityType, Integer>, MetaIndex1_7_6_10To1_8> metadataRewrites = new HashMap<>();
+	private static final HashMap<Pair<EntityTypes1_10.EntityType, Integer>, MetaIndex> metadataRewrites = new HashMap<>();
 
 	static {
-		for (MetaIndex1_7_6_10To1_8 index : MetaIndex1_7_6_10To1_8.values()) {
+		for (MetaIndex index : MetaIndex.values()) {
 			metadataRewrites.put(new Pair<>(index.getClazz(), index.getNewIndex()), index);
 		}
 	}
@@ -154,7 +154,7 @@ public enum MetaIndex1_7_6_10To1_8 {
 	private final MetaType1_7_6_10 oldType;
 	private final int index;
 
-	MetaIndex1_7_6_10To1_8(EntityTypes1_10.EntityType type, int index, MetaType1_7_6_10 oldType, MetaType1_8 newType) {
+	MetaIndex(EntityTypes1_10.EntityType type, int index, MetaType1_7_6_10 oldType, MetaType1_8 newType) {
 		this.clazz = type;
 		this.index = index;
 		this.newIndex = index;
@@ -162,7 +162,7 @@ public enum MetaIndex1_7_6_10To1_8 {
 		this.newType = newType;
 	}
 
-	MetaIndex1_7_6_10To1_8(EntityTypes1_10.EntityType type, int index, MetaType1_7_6_10 oldType, int newIndex, MetaType1_8 newType) {
+	MetaIndex(EntityTypes1_10.EntityType type, int index, MetaType1_7_6_10 oldType, int newIndex, MetaType1_8 newType) {
 		this.clazz = type;
 		this.index = index;
 		this.oldType = oldType;
@@ -170,7 +170,7 @@ public enum MetaIndex1_7_6_10To1_8 {
 		this.newType = newType;
 	}
 
-	private static Optional<MetaIndex1_7_6_10To1_8> getIndex(EntityType type, int index) {
+	private static Optional<MetaIndex> getIndex(EntityType type, int index) {
 		Pair<EntityType, Integer> pair = new Pair<>(type, index);
 		if (metadataRewrites.containsKey(pair)) {
 			return Optional.of(metadataRewrites.get(pair));
@@ -199,10 +199,10 @@ public enum MetaIndex1_7_6_10To1_8 {
 		return index;
 	}
 
-	public static MetaIndex1_7_6_10To1_8 searchIndex(EntityType type, int index) {
+	public static MetaIndex searchIndex(EntityType type, int index) {
 		EntityType currentType = type;
 		do {
-			Optional<MetaIndex1_7_6_10To1_8> optMeta = getIndex(currentType, index);
+			Optional<MetaIndex> optMeta = getIndex(currentType, index);
 
 			if (optMeta.isPresent()) {
 				return optMeta.get();

@@ -55,37 +55,6 @@ import java.util.UUID;
 public class PlayerPackets1_8 {
 
 	public static void register(Protocol1_7_6_10To1_8 protocol) {
-		protocol.registerClientbound(ClientboundPackets1_8.JOIN_GAME, new PacketHandlers() {
-			@Override
-			public void register() {
-				map(Type.INT); // entity id
-				map(Type.UNSIGNED_BYTE);// game mode
-				map(Type.BYTE); // dimension
-				map(Type.UNSIGNED_BYTE); // difficulty
-				map(Type.UNSIGNED_BYTE); // max players
-				map(Type.STRING); // level type
-				read(Type.BOOLEAN); // reduced debug info
-
-				handler(wrapper -> {
-					if (ViaRewind.getConfig().isReplaceAdventureMode()) {
-						if (wrapper.get(Type.UNSIGNED_BYTE, 0) == 2) { // adventure
-							wrapper.set(Type.UNSIGNED_BYTE, 0, (short) 0); // survival
-						}
-					}
-
-					final EntityTracker1_8 tracker = wrapper.user().get(EntityTracker1_8.class);
-					tracker.setClientEntityId(wrapper.get(Type.INT, 0));
-					tracker.addPlayer(wrapper.get(Type.INT, 0), wrapper.user().getProtocolInfo().getUuid());
-
-					wrapper.user().get(PlayerSessionStorage.class).gameMode = wrapper.get(Type.UNSIGNED_BYTE, 0);
-					wrapper.user().get(ClientWorld.class).setEnvironment(wrapper.get(Type.BYTE, 0));
-
-					// Reset on Velocity server change
-					wrapper.user().put(new Scoreboard(wrapper.user()));
-				});
-			}
-		});
-
 		protocol.registerClientbound(ClientboundPackets1_8.CHAT_MESSAGE, new PacketHandlers() {
 			@Override
 			public void register() {
@@ -121,7 +90,6 @@ public class PlayerPackets1_8 {
 				map(Type.INT); // dimension
 				map(Type.UNSIGNED_BYTE); // difficulty
 				map(Type.UNSIGNED_BYTE); // game mode
-				map(Type.STRING); // level type
 				handler(wrapper -> {
 					if (ViaRewind.getConfig().isReplaceAdventureMode()) {
 						if (wrapper.get(Type.UNSIGNED_BYTE, 1) == 2) {
@@ -129,18 +97,17 @@ public class PlayerPackets1_8 {
 						}
 					}
 
-					wrapper.user().get(PlayerSessionStorage.class).gameMode = wrapper.get(Type.UNSIGNED_BYTE, 1);
+					final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(Protocol1_7_6_10To1_8.class);
+					tracker.setClientEntityGameMode(wrapper.get(Type.UNSIGNED_BYTE, 1));
 
-					final ClientWorld world = wrapper.user().get(ClientWorld.class);
 					final Environment dimension = Environment.getEnvironmentById(wrapper.get(Type.INT, 0));
 
-					final EntityTracker1_8 tracker = wrapper.user().get(EntityTracker1_8.class);
+					final ClientWorld world = wrapper.user().get(ClientWorld.class);
 					if (world.getEnvironment() != dimension) {
+						// Clear entities on dimension change and re-track player
 						world.setEnvironment(dimension.id());
-
-						// Reset on dimension change
-						tracker.clear();
-						tracker.getEntityMap().put(tracker.getPlayerId(), EntityTypes1_10.EntityType.ENTITY_HUMAN);
+						tracker.clearEntities();
+						tracker.addEntity(tracker.clientEntityId(), EntityTypes1_10.EntityType.PLAYER);
 					}
 				});
 			}
@@ -180,8 +147,8 @@ public class PlayerPackets1_8 {
 
 					wrapper.write(Type.BOOLEAN, playerSession.onGround);
 
-					final EntityTracker1_8 tracker = wrapper.user().get(EntityTracker1_8.class);
-					if (tracker.spectatingPlayerId != tracker.getPlayerId()) {
+					final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(Protocol1_7_6_10To1_8.class);
+					if (tracker.spectatingClientEntityId != tracker.clientEntityId()) {
 						wrapper.cancel();
 					}
 				});
@@ -206,8 +173,8 @@ public class PlayerPackets1_8 {
 					if (wrapper.get(Type.UNSIGNED_BYTE, 0) != 3) return; // Change game mode
 					int gameMode = wrapper.get(Type.FLOAT, 0).intValue();
 
-					final PlayerSessionStorage playerSession = wrapper.user().get(PlayerSessionStorage.class);
-					if (gameMode == 3 || playerSession.gameMode == 3) {
+					final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(Protocol1_7_6_10To1_8.class);
+					if (gameMode == 3 || tracker.isSpectator()) {
 						UUID myId = wrapper.user().getProtocolInfo().getUuid();
 						Item[] equipment = new Item[4];
 						if (gameMode == 3) {
@@ -215,7 +182,7 @@ public class PlayerPackets1_8 {
 							equipment[3] = profile == null ? null : profile.getSkull();
 						} else {
 							for (int i = 0; i < equipment.length; i++) {
-								equipment[i] = playerSession.getPlayerEquipment(myId, i);
+								equipment[i] =  wrapper.user().get(PlayerSessionStorage.class).getPlayerEquipment(myId, i);
 							}
 						}
 
@@ -232,7 +199,7 @@ public class PlayerPackets1_8 {
 						gameMode = 0;
 						wrapper.set(Type.FLOAT, 0, 0.0f);
 					}
-					wrapper.user().get(PlayerSessionStorage.class).gameMode = gameMode;
+					tracker.setClientEntityGameMode(gameMode);
 				});
 			}
 		});
@@ -289,9 +256,9 @@ public class PlayerPackets1_8 {
 							if (gameProfile == null || gameProfile.gamemode == gamemode) continue;
 
 							if (gamemode == 3 || gameProfile.gamemode == 3) {
-								EntityTracker1_8 tracker = wrapper.user().get(EntityTracker1_8.class);
+								EntityTracker1_8 tracker = wrapper.user().getEntityTracker(Protocol1_7_6_10To1_8.class);
 								int entityId = tracker.getPlayerEntityId(uuid);
-								boolean isOwnPlayer = entityId == tracker.getPlayerId();
+								boolean isOwnPlayer = entityId == tracker.clientEntityId();
 								if (entityId != -1) {
 									// Weirdly, PlayerEntity has only 4 slots instead of 5
 									Item[] equipment = new Item[isOwnPlayer ? 4 : 5];
@@ -446,19 +413,15 @@ public class PlayerPackets1_8 {
 			}
 		});
 
-		//Camera
 		protocol.registerClientbound(ClientboundPackets1_8.CAMERA, null, new PacketHandlers() {
 			@Override
 			public void register() {
 				handler(wrapper -> {
 					wrapper.cancel();
+					final int entityId = wrapper.read(Type.VAR_INT);
 
-					EntityTracker1_8 tracker = wrapper.user().get(EntityTracker1_8.class);
-
-					int entityId = wrapper.read(Type.VAR_INT);
-					int spectating = tracker.spectatingPlayerId;
-
-					if (spectating != entityId) {
+					final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(Protocol1_7_6_10To1_8.class);
+					if (tracker.spectatingClientEntityId != entityId) {
 						tracker.setSpectating(entityId);
 					}
 				});
@@ -519,16 +482,14 @@ public class PlayerPackets1_8 {
 			}
 		});
 
-		/*  INCOMING  */
-
 		protocol.registerServerbound(ServerboundPackets1_7_2_5.CHAT_MESSAGE, new PacketHandlers() {
 			@Override
 			public void register() {
 				map(Type.STRING);
 				handler(wrapper -> {
+					final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(Protocol1_7_6_10To1_8.class);
 					String msg = wrapper.get(Type.STRING, 0);
-					int gamemode = wrapper.user().get(PlayerSessionStorage.class).gameMode;
-					if (gamemode == 3 && msg.toLowerCase().startsWith("/stp ")) {
+					if (tracker.isSpectator() && msg.toLowerCase().startsWith("/stp ")) { // TODO add setting
 						String username = msg.split(" ")[1];
 						GameProfileStorage storage = wrapper.user().get(GameProfileStorage.class);
 						GameProfileStorage.GameProfile profile = storage.get(username, true);
@@ -556,11 +517,11 @@ public class PlayerPackets1_8 {
 						return;
 					}
 					final int entityId = wrapper.get(Type.VAR_INT, 0);
-					final EntityTracker1_8 tracker = wrapper.user().get(EntityTracker1_8.class);
+					final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(Protocol1_7_6_10To1_8.class);
 					final PlayerSessionStorage position = wrapper.user().get(PlayerSessionStorage.class);
 
-					if (tracker.getVirtualHologramMap().containsKey(entityId)) {
-						final AABB boundingBox = tracker.getVirtualHologramMap().get(entityId).getBoundingBox();
+					if (tracker.getHolograms().containsKey(entityId)) {
+						final AABB boundingBox = tracker.getHolograms().get(entityId).getBoundingBox();
 
 						Vector3d pos = new Vector3d(position.getPosX(), position.getPosY() + 1.8, position.getPosZ());
 						double yaw = Math.toRadians(position.yaw);
@@ -760,15 +721,15 @@ public class PlayerPackets1_8 {
 					wrapper.write(Type.UNSIGNED_BYTE, flags);
 
 					if (unmount) {
-						EntityTracker1_8 tracker = wrapper.user().get(EntityTracker1_8.class);
-						if (tracker.spectatingPlayerId != tracker.getPlayerId()) {
+						EntityTracker1_8 tracker = wrapper.user().getEntityTracker(Protocol1_7_6_10To1_8.class);
+						if (tracker.spectatingClientEntityId != tracker.clientEntityId()) {
 							PacketWrapper sneakPacket = PacketWrapper.create(0x0B, null, wrapper.user());
-							sneakPacket.write(Type.VAR_INT, tracker.getPlayerId());
+							sneakPacket.write(Type.VAR_INT, tracker.clientEntityId());
 							sneakPacket.write(Type.VAR_INT, 0);  //Start sneaking
 							sneakPacket.write(Type.VAR_INT, 0);  //Action Parameter
 
 							PacketWrapper unsneakPacket = PacketWrapper.create(0x0B, null, wrapper.user());
-							unsneakPacket.write(Type.VAR_INT, tracker.getPlayerId());
+							unsneakPacket.write(Type.VAR_INT, tracker.clientEntityId());
 							unsneakPacket.write(Type.VAR_INT, 1);  //Stop sneaking
 							unsneakPacket.write(Type.VAR_INT, 0);  //Action Parameter
 

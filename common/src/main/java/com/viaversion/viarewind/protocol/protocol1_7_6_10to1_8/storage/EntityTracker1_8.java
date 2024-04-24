@@ -18,107 +18,90 @@
 package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage;
 
 import com.viaversion.viarewind.ViaRewind;
-import com.viaversion.viarewind.api.rewriter.ReplacementEntityTracker;
 import com.viaversion.viarewind.protocol.protocol1_7_2_5to1_7_6_10.ServerboundPackets1_7_2_5;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.model.VirtualHologramEntity;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.data.MetadataRewriter;
-import com.viaversion.viarewind.api.type.metadata.MetaType1_7_6_10;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.emulation.VirtualHologramEntity;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
-import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.data.entity.EntityTrackerBase;
+import com.viaversion.viaversion.libs.fastutil.ints.Int2IntArrayMap;
+import com.viaversion.viaversion.libs.fastutil.ints.Int2IntMap;
+import com.viaversion.viaversion.libs.fastutil.ints.Int2ObjectArrayMap;
+import com.viaversion.viaversion.libs.fastutil.ints.Int2ObjectMap;
+import com.viaversion.viaversion.libs.fastutil.objects.Object2IntMap;
+import com.viaversion.viaversion.libs.fastutil.objects.Object2IntOpenHashMap;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
-public class EntityTracker1_8 extends ReplacementEntityTracker {
+public class EntityTracker1_8 extends EntityTrackerBase {
 
-	protected final MetadataRewriter metadataRewriter;
+	private final Int2ObjectMap<VirtualHologramEntity> holograms = new Int2ObjectArrayMap<>();
+	private final Int2IntMap vehicles = new Int2IntArrayMap();
+	private final Int2ObjectMap<UUID> entityIdToUUID = new Int2ObjectArrayMap<>();
+	private final Object2IntMap<UUID> entityUUIDToId = new Object2IntOpenHashMap<>();
 
-	private final Map<Integer, Integer> vehicleMap = new ConcurrentHashMap<>();
-	private final Map<Integer, VirtualHologramEntity> virtualHologramMap = new HashMap<>();
+	public int spectatingClientEntityId = -1;
+	private int clientEntityGameMode;
 
-	private final Map<Integer, UUID> playersByEntityId = new HashMap<>();
-	private final Map<UUID, Integer> playersByUniqueId = new HashMap<>();
-
-	public int spectatingPlayerId = -1;
-
-	public EntityTracker1_8(UserConnection user, final MetadataRewriter metadataRewriter) {
-		super(user, ProtocolVersion.v1_8, MetaType1_7_6_10.Byte, MetaType1_7_6_10.String);
-		this.metadataRewriter = metadataRewriter;
-
-		registerEntity(EntityTypes1_10.EntityType.GUARDIAN, EntityTypes1_10.EntityType.SQUID, "Guardian");
-		registerEntity(EntityTypes1_10.EntityType.ENDERMITE, EntityTypes1_10.EntityType.SQUID, "Endermite");
-		registerEntity(EntityTypes1_10.EntityType.RABBIT, EntityTypes1_10.EntityType.CHICKEN, "Rabbit");
-	}
-
-	public void trackHologram(final int entityId, final VirtualHologramEntity hologram) {
-		addEntity(entityId, EntityTypes1_10.EntityType.ARMOR_STAND);
-		getEntityReplacementMap().put(entityId, EntityTypes1_10.EntityType.ARMOR_STAND);
-
-		virtualHologramMap.put(entityId, hologram);
+	public EntityTracker1_8(UserConnection connection) {
+		super(connection, EntityTypes1_10.EntityType.ENTITY_HUMAN);
 	}
 
 	@Override
-	public void updateMetadata(int entityId, List<Metadata> metadata) throws Exception {
-		if (virtualHologramMap.containsKey(entityId)) {
-			virtualHologramMap.get(entityId).updateMetadata(metadata);
-			return;
+	public void addEntity(int id, EntityType type) {
+		super.addEntity(id, type);
+		if (type == EntityTypes1_10.EntityType.ARMOR_STAND) {
+			holograms.put(id, new VirtualHologramEntity(user(), id));
 		}
-
-		super.updateMetadata(entityId, metadata);
 	}
 
 	@Override
 	public void removeEntity(int entityId) {
 		super.removeEntity(entityId);
 
-		if (playersByEntityId.containsKey(entityId)) {
-			final UUID playerId = playersByEntityId.remove(entityId);
+		if (entityIdToUUID.containsKey(entityId)) {
+			final UUID playerId = entityIdToUUID.remove(entityId);
 
-			playersByUniqueId.remove(playerId);
-			getUser().get(PlayerSessionStorage.class).getPlayerEquipment().remove(playerId);
+			entityUUIDToId.removeInt(playerId);
+			user().get(PlayerSessionStorage.class).getPlayerEquipment().remove(playerId);
 		}
 	}
 
 	@Override
-	public void clear() {
-		super.clear();
-
-		vehicleMap.clear();
+	public void clearEntities() {
+		super.clearEntities();
+		vehicles.clear();
 	}
 
 	@Override
 	public void setClientEntityId(int entityId) {
-		if (this.spectatingPlayerId == this.getPlayerId()) {
-			this.spectatingPlayerId = entityId;
+		if (this.spectatingClientEntityId == this.clientEntityId()) {
+			this.spectatingClientEntityId = entityId;
 		}
 		super.setClientEntityId(entityId);
 	}
 
-	public void addPlayer(final Integer entityId, final UUID uuid) {
-		playersByUniqueId.put(uuid, entityId);
-		playersByEntityId.put(entityId, uuid);
+	public void addPlayer(final int entityId, final UUID uuid) {
+		entityUUIDToId.put(uuid, entityId);
+		entityIdToUUID.put(entityId, uuid);
 	}
 
 	public UUID getPlayerUUID(final int entityId) {
-		return playersByEntityId.get(entityId);
+		return entityIdToUUID.get(entityId);
 	}
 
 	public int getPlayerEntityId(final UUID uuid) {
-		return playersByUniqueId.getOrDefault(uuid, -1);
+		return entityUUIDToId.getOrDefault(uuid, -1);
 	}
 
 	public int getVehicle(final int passengerId) {
-		for (Map.Entry<Integer, Integer> vehicle : vehicleMap.entrySet()) {
+		for (Map.Entry<Integer, Integer> vehicle : vehicles.entrySet()) {
 			if (vehicle.getValue() == passengerId) {
 				return vehicle.getValue();
 			}
@@ -127,15 +110,15 @@ public class EntityTracker1_8 extends ReplacementEntityTracker {
 	}
 
 	public int getPassenger(int vehicleId) {
-		return vehicleMap.getOrDefault(vehicleId, -1);
+		return vehicles.getOrDefault(vehicleId, -1);
 	}
 
 	protected void startSneaking() {
 		try {
-			final PacketWrapper entityAction = PacketWrapper.create(ServerboundPackets1_7_2_5.ENTITY_ACTION, getUser());
-			entityAction.write(Type.VAR_INT, this.getPlayerId()); // entity id
-			entityAction.write(Type.VAR_INT, 0); // action id, start sneaking
-			entityAction.write(Type.VAR_INT, 0); // jump boost
+			final PacketWrapper entityAction = PacketWrapper.create(ServerboundPackets1_7_2_5.ENTITY_ACTION, user());
+			entityAction.write(Type.VAR_INT, this.clientEntityId()); // Entity id
+			entityAction.write(Type.VAR_INT, 0); // Action id
+			entityAction.write(Type.VAR_INT, 0); // Jump boost
 
 			entityAction.sendToServer(Protocol1_7_6_10To1_8.class);
 		} catch (Exception e) {
@@ -143,25 +126,25 @@ public class EntityTracker1_8 extends ReplacementEntityTracker {
 		}
 	}
 
-	public void setPassenger(int vehicleId, int passengerId) {
-		if (vehicleId == this.spectatingPlayerId && this.spectatingPlayerId != this.getPlayerId()) {
+	public void setPassenger(final int vehicleId, final int passengerId) {
+		if (vehicleId == this.spectatingClientEntityId && this.spectatingClientEntityId != this.clientEntityId()) {
 			startSneaking();
-			setSpectating(this.getPlayerId());
+			setSpectating(this.clientEntityId());
 		}
 
 		if (vehicleId == -1) {
-			vehicleMap.remove(getVehicle(passengerId));
+			vehicles.remove(getVehicle(passengerId));
 		} else if (passengerId == -1) {
-			vehicleMap.remove(vehicleId);
+			vehicles.remove(vehicleId);
 		} else {
-			vehicleMap.put(vehicleId, passengerId);
+			vehicles.put(vehicleId, passengerId);
 		}
 	}
 
 	protected void attachEntity(final int target) {
 		try {
-			final PacketWrapper attachEntity = PacketWrapper.create(ClientboundPackets1_8.ATTACH_ENTITY, getUser());
-			attachEntity.write(Type.INT, this.getPlayerId()); // vehicle id
+			final PacketWrapper attachEntity = PacketWrapper.create(ClientboundPackets1_8.ATTACH_ENTITY, user());
+			attachEntity.write(Type.INT, this.clientEntityId()); // vehicle id
 			attachEntity.write(Type.INT, target); // passenger id
 			attachEntity.write(Type.BOOLEAN, false); // leash
 
@@ -172,21 +155,29 @@ public class EntityTracker1_8 extends ReplacementEntityTracker {
 	}
 
 	public void setSpectating(int spectating) {
-		if (spectating != this.getPlayerId() && getPassenger(spectating) != -1) {
+		if (spectating != this.clientEntityId() && getPassenger(spectating) != -1) {
 			startSneaking();
-			setSpectating(this.getPlayerId());
+			setSpectating(this.clientEntityId());
 			return;
 		}
-		if (this.spectatingPlayerId != spectating && this.spectatingPlayerId != this.getPlayerId()) {
+		if (this.spectatingClientEntityId != spectating && this.spectatingClientEntityId != this.clientEntityId()) {
 			attachEntity(-1);
 		}
-		this.spectatingPlayerId = spectating;
-		if (spectating != this.getPlayerId()) {
-			attachEntity(this.spectatingPlayerId);
+		this.spectatingClientEntityId = spectating;
+		if (spectating != this.clientEntityId()) {
+			attachEntity(this.spectatingClientEntityId);
 		}
 	}
 
-	public Map<Integer, VirtualHologramEntity> getVirtualHologramMap() {
-		return virtualHologramMap;
+	public Int2ObjectMap<VirtualHologramEntity> getHolograms() {
+		return holograms;
+	}
+
+	public boolean isSpectator() {
+		return clientEntityGameMode == 3;
+	}
+
+	public void setClientEntityGameMode(int clientEntityGameMode) {
+		this.clientEntityGameMode = clientEntityGameMode;
 	}
 }

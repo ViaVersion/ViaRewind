@@ -18,14 +18,12 @@
 package com.viaversion.viarewind.protocol.protocol1_8to1_9.storage;
 
 import com.viaversion.viarewind.ViaRewind;
-import com.viaversion.viarewind.protocol.protocol1_8to1_9.cooldown.CooldownVisualization;
-import com.viaversion.viarewind.protocol.protocol1_8to1_9.cooldown.CooldownVisualization.Factory;
+import com.viaversion.viarewind.protocol.protocol1_8to1_9.emulation.CooldownVisualization;
 import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.util.Pair;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.logging.Level;
 
 public class CooldownStorage implements StorableObject {
