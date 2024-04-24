@@ -161,10 +161,9 @@ public class MetadataRewriter1_7_6_10To1_8 extends VREntityRewriter<ClientboundP
 						wrapper.cancel();
 
 						final EntityTracker1_8 tracker = tracker(wrapper.user());
-
 						final VirtualHologramEntity hologram = tracker.getHolograms().get(entityId);
-						hologram.updateReplacementPosition(x / 32.0, y / 32.0, z / 32.0);
-						hologram.setYawPitch(yaw * 360f / 256, pitch * 360f / 256);
+						hologram.setPosition(x / 32.0, y / 32.0, z / 32.0);
+						hologram.setRotation(yaw * 360f / 256, pitch * 360f / 256);
 						hologram.setHeadYaw(yaw * 360f / 256);
 					} else if (type != null && type.isOrHasParent(EntityTypes1_10.EntityType.FALLING_BLOCK)) {
 						int blockId = data & 0xFFF;
@@ -262,9 +261,10 @@ public class MetadataRewriter1_7_6_10To1_8 extends VREntityRewriter<ClientboundP
 						final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(Protocol1_7_6_10To1_8.class);
 						final VirtualHologramEntity hologram = tracker.getHolograms().get(entityId);
 
-						hologram.updateReplacementPosition(x / 32.0, y / 32.0, z / 32.0);
-						hologram.setYawPitch(yaw * 360f / 256, pitch * 360f / 256);
+						hologram.setPosition(x / 32.0, y / 32.0, z / 32.0);
+						hologram.setRotation(yaw * 360f / 256, pitch * 360f / 256);
 						hologram.setHeadYaw(headYaw * 360f / 256);
+						hologram.syncState(protocol().getEntityRewriter(), wrapper.get(Types1_7_6_10.METADATA_LIST, 0));
 					}
 				});
 			}
@@ -343,7 +343,14 @@ public class MetadataRewriter1_7_6_10To1_8 extends VREntityRewriter<ClientboundP
 		});
 	}
 
-	private void handleMetadata(MetaHandlerEvent event, Metadata metadata) {
+	public void handleMetadata(MetaHandlerEvent event, Metadata metadata) throws Exception {
+		if (event.entityType() == EntityType.ARMOR_STAND) {
+			final EntityTracker1_8 tracker = tracker(event.user());
+			tracker.getHolograms().get(event.entityId()).syncState(this, event.metadataList());
+			event.cancel(); // We are rewriting metadata manually
+			return;
+		}
+
 		final MetaIndex metaIndex = MetaIndex.searchIndex(event.entityType(), metadata.id());
 		if (metaIndex == null) {
 			// Almost certainly bad data, remove it

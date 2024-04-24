@@ -88,10 +88,6 @@ public class EntityPackets1_8 {
 			@Override
 			public void register() {
 				map(Type.VAR_INT, Type.INT); // entity id
-
-				map(Type.SHORT); // velocity x
-				map(Type.SHORT); // velocity y
-				map(Type.SHORT); // velocity z
 			}
 		});
 
@@ -121,7 +117,7 @@ public class EntityPackets1_8 {
 						final int y = wrapper.get(Type.BYTE, 1);
 						final int z = wrapper.get(Type.BYTE, 2);
 
-						hologram.handleOriginalMovementPacket(x / 32.0, y / 32.0, z / 32.0);
+						hologram.setRelativePosition(x / 32.0, y / 32.0, z / 32.0);
 					}
 				});
 			}
@@ -144,7 +140,7 @@ public class EntityPackets1_8 {
 						final int yaw = wrapper.get(Type.BYTE, 0);
 						final int pitch = wrapper.get(Type.BYTE, 1);
 
-						hologram.setYawPitch(yaw * 360f / 256, pitch * 360f / 256);
+						hologram.setRotation(yaw * 360f / 256, pitch * 360f / 256);
 					}
 				});
 			}
@@ -174,8 +170,8 @@ public class EntityPackets1_8 {
 						final int yaw = wrapper.get(Type.BYTE, 3);
 						final int pitch = wrapper.get(Type.BYTE, 4);
 
-						hologram.handleOriginalMovementPacket(x / 32.0, y / 32.0, z / 32.0);
-						hologram.setYawPitch(yaw * 360f / 256, pitch * 360f / 256);
+						hologram.setRelativePosition(x / 32.0, y / 32.0, z / 32.0);
+						hologram.setRotation(yaw * 360f / 256, pitch * 360f / 256);
 					}
 				});
 			}
@@ -211,8 +207,8 @@ public class EntityPackets1_8 {
 						final int yaw = wrapper.get(Type.BYTE, 0);
 						final int pitch = wrapper.get(Type.BYTE, 1);
 
-						hologram.updateReplacementPosition(x / 32.0, y / 32.0, z / 32.0);
-						hologram.setYawPitch(yaw * 360f / 256, pitch * 360f / 256);
+						hologram.setPosition(x / 32.0, y / 32.0, z / 32.0);
+						hologram.setRotation(yaw * 360f / 256, pitch * 360f / 256);
 					}
 				});
 			}
