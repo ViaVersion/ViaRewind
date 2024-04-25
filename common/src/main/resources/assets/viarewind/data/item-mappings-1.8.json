@@ -1,283 +1,338 @@
 {
-  "157": {
-    "id": "28",
-    "name": "1.8 Activator Rail",
-    "block": true
+  "items": {
+    "182": {
+      "id": "44",
+      "data": "1",
+      "name": "1.8 Red Sandstone Slab"
+    },
+    "409": {
+      "id": "406",
+      "name": "1.8 Prismarine Shard"
+    },
+    "410": {
+      "id": "406",
+      "name": "1.8 Prismarine Crystal"
+    },
+    "411": {
+      "id": "365",
+      "name": "1.8 Raw Rabbit"
+    },
+    "412": {
+      "id": "366",
+      "name": "1.8 Cooked Rabbit"
+    },
+    "413": {
+      "id": "282",
+      "name": "1.8 Rabbit Stew"
+    },
+    "414": {
+      "id": "375",
+      "name": "1.8 Rabbit's Foot"
+    },
+    "415": {
+      "id": "334",
+      "name": "1.8 Rabbit Hide"
+    },
+    "416": {
+      "id": "280",
+      "name": "1.8 Armor Stand"
+    },
+    "423": {
+      "id": "363",
+      "name": "1.8 Raw Mutton"
+    },
+    "424": {
+      "id": "364",
+      "name": "1.8 Cooked Mutton"
+    },
+    "425": {
+      "id": "323",
+      "name": "1.8 Banner"
+    },
+    "373:8203": {
+      "id": "373",
+      "data": "0",
+      "name": "1.8 Potion of Leaping"
+    },
+    "373:8235": {
+      "id": "373",
+      "data": "0",
+      "name": "1.8 Potion of Leaping"
+    },
+    "373:8267": {
+      "id": "373",
+      "data": "0",
+      "name": "1.8 Potion of Leaping"
+    },
+    "373:16395": {
+      "id": "373",
+      "data": "0",
+      "name": "1.8 Splash Potion of Leaping"
+    },
+    "373:16427": {
+      "id": "373",
+      "data": "0",
+      "name": "1.8 Splash Potion of Leaping"
+    },
+    "373:16459": {
+      "id": "373",
+      "data": "0",
+      "name": "1.8 Splash Potion of Leaping"
+    },
+    "383:30": {
+      "id": "383",
+      "name": "1.8 Spawn ArmorStand"
+    },
+    "383:67": {
+      "id": "383",
+      "name": "1.8 Spawn Endermite"
+    },
+    "383:68": {
+      "id": "383",
+      "name": "1.8 Spawn Guardian"
+    },
+    "383:101": {
+      "id": "383",
+      "name": "1.8 Spawn Rabbit"
+    },
+    "19:1": {
+      "id": "19",
+      "data": "0",
+      "name": "1.8 Wet Sponge"
+    }
   },
-  "165": {
-    "id": "95",
-    "data": "5",
-    "name": "1.8 Slime Block",
-    "block": true
+  "block-items": {
+    "157": {
+      "id": "28",
+      "name": "1.8 Activator Rail"
+    },
+    "165": {
+      "id": "95",
+      "data": "5",
+      "name": "1.8 Slime Block"
+    },
+    "166": {
+      "id": "20",
+      "name": "1.8 Barrier"
+    },
+    "167": {
+      "id": "96",
+      "data": "-1",
+      "name": "1.8 Iron Trapdoor"
+    },
+    "169": {
+      "id": "89",
+      "name": "1.8 Sea Lantern"
+    },
+    "180": {
+      "id": "128",
+      "name": "1.8 Red Sandstone Stairs"
+    },
+    "181": {
+      "id": "43",
+      "data": "1",
+      "name": "1.8 Double Red Sandstone Slab"
+    },
+    "183": {
+      "id": "107",
+      "data": "-1",
+      "name": "1.8 Spruce Fence Gate"
+    },
+    "184": {
+      "id": "107",
+      "data": "-1",
+      "name": "1.8 Birch Fence Gate"
+    },
+    "185": {
+      "id": "107",
+      "data": "-1",
+      "name": "1.8 Jungle Fence Gate"
+    },
+    "186": {
+      "id": "107",
+      "data": "-1",
+      "name": "1.8 Dark Oak Fence Gate"
+    },
+    "187": {
+      "id": "107",
+      "data": "-1",
+      "name": "1.8 Acacia Fence Gate"
+    },
+    "188": {
+      "id": "85",
+      "data": "-1",
+      "name": "1.8 Spruce Fence"
+    },
+    "189": {
+      "id": "85",
+      "data": "-1",
+      "name": "1.8 Birch Fence"
+    },
+    "190": {
+      "id": "85",
+      "data": "-1",
+      "name": "1.8 Jungle Fence"
+    },
+    "191": {
+      "id": "85",
+      "data": "-1",
+      "name": "1.8 Dark Oak Fence"
+    },
+    "192": {
+      "id": "85",
+      "data": "-1",
+      "name": "1.8 Acacia Fence"
+    },
+    "427": {
+      "id": "324",
+      "data": "-1",
+      "name": "1.8 Spruce Door"
+    },
+    "428": {
+      "id": "324",
+      "data": "-1",
+      "name": "1.8 Birch Door"
+    },
+    "429": {
+      "id": "324",
+      "data": "-1",
+      "name": "1.8 Jungle Door"
+    },
+    "430": {
+      "id": "324",
+      "data": "-1",
+      "name": "1.8 Dark Oak Door"
+    },
+    "431": {
+      "id": "324",
+      "data": "-1",
+      "name": "1.8 Acacia Door"
+    },
+    "1:1": {
+      "id": "1",
+      "data": "0",
+      "name": "1.8 Granite"
+    },
+    "1:2": {
+      "id": "1",
+      "data": "0",
+      "name": "1.8 Polished Granite"
+    },
+    "1:3": {
+      "id": "1",
+      "data": "0",
+      "name": "1.8 Diorite"
+    },
+    "1:4": {
+      "id": "1",
+      "data": "0",
+      "name": "1.8 Polished Diorite"
+    },
+    "1:5": {
+      "id": "1",
+      "data": "0",
+      "name": "1.8 Andesite"
+    },
+    "1:6": {
+      "id": "1",
+      "data": "0",
+      "name": "1.8 Polished Andesite"
+    },
+    "168:0": {
+      "id": "1",
+      "data": "0",
+      "name": "1.8 Prismarine"
+    },
+    "168:1": {
+      "id": "98",
+      "data": "0",
+      "name": "1.8 Prismarine Bricks"
+    },
+    "168:2": {
+      "id": "98",
+      "data": "1",
+      "name": "1.8 Dark Prismarine"
+    },
+    "179:0": {
+      "id": "24",
+      "data": "-1",
+      "name": "1.8 Red Sandstone"
+    },
+    "179:1": {
+      "id": "24",
+      "data": "-1",
+      "name": "1.8 Chiseled Red Sandstone"
+    },
+    "179:2": {
+      "id": "24",
+      "data": "-1",
+      "name": "1.8 Smooth Sandstone"
+    }
   },
-  "166": {
-    "id": "20",
-    "name": "1.8 Barrier",
-    "block": true
-  },
-  "167": {
-    "id": "96",
-    "name": "1.8 Iron Trapdoor",
-    "block": true
-  },
-  "169": {
-    "id": "89",
-    "name": "1.8 Sea Lantern",
-    "block": true
-  },
-  "180": {
-    "id": "128",
-    "name": "1.8 Red Sandstone Stairs",
-    "block": true
-  },
-  "181": {
-    "id": "43",
-    "data": "1",
-    "name": "1.8 Double Red Sandstone Slab",
-    "block": true
-  },
-  "182": {
-    "id": "44",
-    "data": "1",
-    "name": "1.8 Red Sandstone Slab"
-  },
-  "183": {
-    "id": "107",
-    "name": "1.8 Spruce Fence Gate",
-    "block": true
-  },
-  "184": {
-    "id": "107",
-    "name": "1.8 Birch Fence Gate",
-    "block": true
-  },
-  "185": {
-    "id": "107",
-    "name": "1.8 Jungle Fence Gate",
-    "block": true
-  },
-  "186": {
-    "id": "107",
-    "name": "1.8 Dark Oak Fence Gate",
-    "block": true
-  },
-  "187": {
-    "id": "107",
-    "name": "1.8 Acacia Fence Gate",
-    "block": true
-  },
-  "188": {
-    "id": "85",
-    "name": "1.8 Spruce Fence",
-    "block": true
-  },
-  "189": {
-    "id": "85",
-    "name": "1.8 Birch Fence",
-    "block": true
-  },
-  "190": {
-    "id": "85",
-    "name": "1.8 Jungle Fence",
-    "block": true
-  },
-  "191": {
-    "id": "85",
-    "name": "1.8 Dark Oak Fence",
-    "block": true
-  },
-  "192": {
-    "id": "85",
-    "name": "1.8 Acacia Fence",
-    "block": true
-  },
-  "409": {
-    "id": "406",
-    "name": "1.8 Prismarine Shard"
-  },
-  "410": {
-    "id": "406",
-    "name": "1.8 Prismarine Crystal"
-  },
-  "411": {
-    "id": "365",
-    "name": "1.8 Raw Rabbit"
-  },
-  "412": {
-    "id": "366",
-    "name": "1.8 Cooked Rabbit"
-  },
-  "413": {
-    "id": "282",
-    "name": "1.8 Rabbit Stew"
-  },
-  "414": {
-    "id": "375",
-    "name": "1.8 Rabbit's Foot"
-  },
-  "415": {
-    "id": "334",
-    "name": "1.8 Rabbit Hide"
-  },
-  "416": {
-    "id": "280",
-    "name": "1.8 Armor Stand"
-  },
-  "423": {
-    "id": "363",
-    "name": "1.8 Raw Mutton"
-  },
-  "424": {
-    "id": "364",
-    "name": "1.8 Cooked Mutton"
-  },
-  "425": {
-    "id": "323",
-    "name": "1.8 Banner"
-  },
-  "427": {
-    "id": "324",
-    "name": "1.8 Spruce Door",
-    "block": true
-  },
-  "428": {
-    "id": "324",
-    "name": "1.8 Birch Door",
-    "block": true
-  },
-  "429": {
-    "id": "324",
-    "name": "1.8 Jungle Door",
-    "block": true
-  },
-  "430": {
-    "id": "324",
-    "name": "1.8 Dark Oak Door",
-    "block": true
-  },
-  "431": {
-    "id": "324",
-    "name": "1.8 Acacia Door",
-    "block": true
-  },
-  "373:8203": {
-    "id": "373",
-    "data": "0",
-    "name": "1.8 Potion of Leaping"
-  },
-  "373:8235": {
-    "id": "373",
-    "data": "0",
-    "name": "1.8 Potion of Leaping"
-  },
-  "373:8267": {
-    "id": "373",
-    "data": "0",
-    "name": "1.8 Potion of Leaping"
-  },
-  "373:16395": {
-    "id": "373",
-    "data": "0",
-    "name": "1.8 Splash Potion of Leaping"
-  },
-  "373:16427": {
-    "id": "373",
-    "data": "0",
-    "name": "1.8 Splash Potion of Leaping"
-  },
-  "373:16459": {
-    "id": "373",
-    "data": "0",
-    "name": "1.8 Splash Potion of Leaping"
-  },
-  "383:30": {
-    "id": "383",
-    "name": "1.8 Spawn ArmorStand"
-  },
-  "383:67": {
-    "id": "383",
-    "name": "1.8 Spawn Endermite"
-  },
-  "383:68": {
-    "id": "383",
-    "name": "1.8 Spawn Guardian"
-  },
-  "383:101": {
-    "id": "383",
-    "name": "1.8 Spawn Rabbit"
-  },
-  "19:1": {
-    "id": "19",
-    "data": "0",
-    "name": "1.8 Wet Sponge"
-  },
-  "1:1": {
-    "id": "1",
-    "data": "0",
-    "name": "1.8 Granite",
-    "block": true
-  },
-  "1:2": {
-    "id": "1",
-    "data": "0",
-    "name": "1.8 Polished Granite",
-    "block": true
-  },
-  "1:3": {
-    "id": "1",
-    "data": "0",
-    "name": "1.8 Diorite",
-    "block": true
-  },
-  "1:4": {
-    "id": "1",
-    "data": "0",
-    "name": "1.8 Polished Diorite",
-    "block": true
-  },
-  "1:5": {
-    "id": "1",
-    "data": "0",
-    "name": "1.8 Andesite",
-    "block": true
-  },
-  "1:6": {
-    "id": "1",
-    "data": "0",
-    "name": "1.8 Polished Andesite",
-    "block": true
-  },
-  "168:0": {
-    "id": "1",
-    "data": "0",
-    "name": "1.8 Prismarine",
-    "block": true
-  },
-  "168:1": {
-    "id": "98",
-    "data": "0",
-    "name": "1.8 Prismarine Bricks",
-    "block": true
-  },
-  "168:2": {
-    "id": "98",
-    "data": "1",
-    "name": "1.8 Dark Prismarine",
-    "block": true
-  },
-  "179:0": {
-    "id": "24",
-    "name": "1.8 Red Sandstone",
-    "block": true
-  },
-  "179:1": {
-    "id": "24",
-    "name": "1.8 Chiseled Red Sandstone",
-    "block": true
-  },
-  "179:2": {
-    "id": "24",
-    "name": "1.8 Smooth Sandstone",
-    "block": true
+  "blocks": {
+    "176": {
+      "id": "63"
+    },
+    "177": {
+      "id": "68"
+    },
+    "193": {
+      "id": "64"
+    },
+    "194": {
+      "id": "64"
+    },
+    "195": {
+      "id": "64"
+    },
+    "196": {
+      "id": "64"
+    },
+    "197": {
+      "id": "64"
+    },
+    "77:5": {
+      "id": "69",
+      "data": "6"
+    },
+    "77:13": {
+      "id": "69",
+      "data": "14"
+    },
+    "77:0": {
+      "id": "69",
+      "data": "0"
+    },
+    "77:8": {
+      "id": "69",
+      "data": "8"
+    },
+    "143:5": {
+      "id": "69",
+      "data": "6"
+    },
+    "143:13": {
+      "id": "69",
+      "data": "14"
+    },
+    "143:0": {
+      "id": "69",
+      "data": "0"
+    },
+    "143:8": {
+      "id": "69",
+      "data": "8"
+    },
+    "178": {
+      "id": "151"
+    },
+    "182:0": {
+      "id": "44",
+      "data": "1"
+    },
+    "182:8": {
+      "id": "44",
+      "data": "9"
+    }
   }
 }
