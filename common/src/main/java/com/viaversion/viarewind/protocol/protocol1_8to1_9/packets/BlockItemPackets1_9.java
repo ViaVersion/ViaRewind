@@ -87,7 +87,7 @@ public class BlockItemPackets1_9 extends VRBlockItemRewriter<ClientboundPackets1
 		protocol.registerClientbound(ClientboundPackets1_9.WINDOW_ITEMS, wrapper -> {
 			final short windowId = wrapper.passthrough(Type.UNSIGNED_BYTE);
 
-			Item[] items = wrapper.passthrough(Type.ITEM1_8_SHORT_ARRAY);
+			Item[] items = wrapper.read(Type.ITEM1_8_SHORT_ARRAY);
 			for (int i = 0; i < items.length; i++) {
 				items[i] = handleItemToClient(wrapper.user(), items[i]);
 			}
@@ -107,6 +107,8 @@ public class BlockItemPackets1_9 extends VRBlockItemRewriter<ClientboundPackets1
 					System.arraycopy(old, 5, items, 4, old.length - 5);
 				}
 			}
+
+			wrapper.write(Type.ITEM1_8_SHORT_ARRAY, items);
 		});
 
 		protocol.registerClientbound(ClientboundPackets1_9.SET_SLOT, wrapper -> {
