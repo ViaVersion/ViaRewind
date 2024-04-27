@@ -42,7 +42,7 @@ public class EntityTracker1_9 extends EntityTrackerBase {
 		offsets.remove(id);
 		status.remove(id);
 
-		vehicles.forEach((vehicle, passengers) -> passengers.removeInt(id));
+		vehicles.forEach((vehicle, passengers) -> passengers.rem(id));
 		vehicles.int2ObjectEntrySet().removeIf(entry -> entry.getValue().isEmpty());
 		super.removeEntity(id);
 	}
