@@ -21,6 +21,9 @@ java {
 }
 
 shadowJar {
+    manifest {
+        attributes["paperweight-mappings-namespace"] = "mojang"
+    }
     archiveClassifier.set("")
     archiveBaseName.set("ViaRewind-" + project.maven_version)
     configurations {
