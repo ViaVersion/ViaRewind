@@ -32,10 +32,12 @@ import com.viaversion.viaversion.libs.mcstructs.text.serializer.TextComponentSer
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class WindowTracker extends StoredObject {
 	private final HashMap<Short, String> types = new HashMap<>();
 	private final HashMap<Short, Item[]> brewingItems = new HashMap<>();
+	private final Map<Short, WindowProperties> enchantmentProperties = new HashMap<>();
 
 	public WindowTracker(UserConnection user) {
 		super(user);
@@ -61,6 +63,21 @@ public class WindowTracker extends StoredObject {
 				new DataItem(),
 				new DataItem()
 		});
+	}
+
+	public void storeEnchantmentTableProperty(short windowId, int key, int value) {
+		enchantmentProperties.computeIfAbsent(windowId, aShort -> new WindowProperties()).put(key, value);
+	}
+
+	public short getEnchantmentTableProperty(short windowId, int key) {
+		final Integer value = enchantmentProperties.get(windowId).get(key);
+		if (value == null) {
+			return 0; // Assume default value, nothing we can do about
+		}
+		if (enchantmentProperties.get(windowId).properties.isEmpty()) { // Remove from list if nothing to track
+			enchantmentProperties.remove(windowId);
+		}
+		return value.shortValue();
 	}
 
 	public static void updateBrewingStand(UserConnection user, Item blazePowder, short windowId) throws Exception {
@@ -90,6 +107,22 @@ public class WindowTracker extends StoredObject {
 			setSlot.write(Type.SHORT, (short) i);
 			setSlot.write(Type.ITEM1_8, items[i]);
 			setSlot.scheduleSend(Protocol1_8To1_9.class);
+		}
+	}
+
+	public static class WindowProperties {
+
+		private final Map<Integer, Integer> properties = new HashMap<>();
+
+		public Integer get(int key) {
+			if (!properties.containsKey(key)) {
+				return null;
+			}
+			return properties.remove(key);
+		}
+
+		public void put(int key, int value) {
+			properties.put(key, value);
 		}
 	}
 }
