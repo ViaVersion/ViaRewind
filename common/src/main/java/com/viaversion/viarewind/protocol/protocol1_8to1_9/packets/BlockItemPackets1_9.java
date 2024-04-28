@@ -65,7 +65,14 @@ public class BlockItemPackets1_9 extends VRBlockItemRewriter<ClientboundPackets1
 
 		protocol.registerClientbound(ClientboundPackets1_9.CLOSE_WINDOW, wrapper -> {
 			final short windowId = wrapper.passthrough(Type.UNSIGNED_BYTE);
-			wrapper.user().get(WindowTracker.class).remove(windowId);
+
+			final WindowTracker tracker = wrapper.user().get(WindowTracker.class);
+
+			final String windowType = tracker.get(windowId);
+			if (windowType != null && windowType.equalsIgnoreCase("minecraft:enchanting_table")) {
+				tracker.clearEnchantmentProperties();
+			}
+			tracker.remove(windowId);
 		});
 
 		protocol.registerClientbound(ClientboundPackets1_9.OPEN_WINDOW, wrapper -> {
@@ -173,11 +180,11 @@ public class BlockItemPackets1_9 extends VRBlockItemRewriter<ClientboundPackets1
 			final String windowType = tracker.get(windowId);
 			if (windowType != null && windowType.equalsIgnoreCase("minecraft:enchanting_table")) {
 				if (key >= 4 && key <= 6) { // Store enchantment ids
-					tracker.storeEnchantmentTableProperty(windowId, key, value);
+					tracker.putEnchantmentProperty(key, value);
 					wrapper.cancel();
 				} else if (key >= 7 && key <= 9) { // Mix levels with tracked ids
 					key -= 3;
-					final short property = tracker.getEnchantmentTableProperty(windowId, key);
+					final short property = tracker.getEnchantmentValue(key);
 					value = (short) (property | (value << 8));
 				}
 			}
