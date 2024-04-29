@@ -55,10 +55,11 @@ public class WorldPackets1_9 {
 					final CompoundTag tag = wrapper.get(Type.NAMED_COMPOUND_TAG, 0);
 
 					final CompoundTag spawnData = tag.remove("SpawnData");
-					if (spawnData != null && spawnData.contains("id")) {
+					if (spawnData != null) {
 						final StringTag id = spawnData.remove("id");
-						if (id == null) return;
-						tag.put("EntityId", id);
+						if (id != null) {
+							tag.put("EntityId", id);
+						}
 					}
 				});
 			}

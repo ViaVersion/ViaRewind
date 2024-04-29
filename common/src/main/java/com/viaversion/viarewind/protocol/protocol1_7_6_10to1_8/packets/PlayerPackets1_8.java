@@ -366,7 +366,7 @@ public class PlayerPackets1_8 {
 			@Override
 			public void register() {
 				map(Type.STRING);
-				handler(wrapper -> {
+				handlerSoftFail(wrapper -> {
 					String channel = wrapper.get(Type.STRING, 0);
 					if (channel.equals("MC|TrList")) {
 						wrapper.passthrough(Type.INT);  //Window Id

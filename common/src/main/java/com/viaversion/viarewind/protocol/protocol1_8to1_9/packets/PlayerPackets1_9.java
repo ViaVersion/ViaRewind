@@ -504,7 +504,7 @@ public class PlayerPackets1_9 {
 			@Override
 			public void register() {
 				map(Type.STRING);
-				handler(wrapper -> {
+				handlerSoftFail(wrapper -> {
 					String channel = wrapper.get(Type.STRING, 0);
 					if (channel.equals("MC|BEdit") || channel.equals("MC|BSign")) {
 						Item book = wrapper.passthrough(Type.ITEM);
