@@ -48,18 +48,17 @@ public class WorldPackets1_9 {
 		protocol.registerClientbound(ClientboundPackets1_9.BLOCK_ENTITY_DATA, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Type.POSITION1_8);
-				map(Type.UNSIGNED_BYTE);
-				map(Type.NAMED_COMPOUND_TAG);
+				map(Type.POSITION1_8); // Position
+				map(Type.UNSIGNED_BYTE); // Action
+				map(Type.NAMED_COMPOUND_TAG); // Tag
 				handler(wrapper -> {
-					CompoundTag tag = wrapper.get(Type.NAMED_COMPOUND_TAG, 0);
-					if (tag != null && tag.contains("SpawnData")) {
-						CompoundTag spawnData = tag.get("SpawnData");
-						if (spawnData.contains("id")) {
-							String entity = (String) spawnData.get("id").getValue();
-							tag.remove("SpawnData");
-							tag.put("entityId", new StringTag(entity));
-						}
+					final CompoundTag tag = wrapper.get(Type.NAMED_COMPOUND_TAG, 0);
+
+					final CompoundTag spawnData = tag.remove("SpawnData");
+					if (spawnData != null && spawnData.contains("id")) {
+						final StringTag id = spawnData.remove("id");
+						if (id == null) return;
+						tag.put("EntityId", id);
 					}
 				});
 			}
