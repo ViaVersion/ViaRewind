@@ -278,6 +278,11 @@ public class EntityPackets1_8 {
 			public void register() {
 				map(Type.VAR_INT, Type.INT); // entity id
 				handler(wrapper -> {
+					final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(Protocol1_7_6_10To1_8.class);
+					if (tracker.getHolograms().containsKey(wrapper.get(Type.INT, 0))) { // Don't handle properties for hologram emulation
+						wrapper.cancel();
+						return;
+					}
 					final int amount = wrapper.passthrough(Type.INT);
 					for (int i = 0; i < amount; i++) {
 						wrapper.passthrough(Type.STRING); // id
