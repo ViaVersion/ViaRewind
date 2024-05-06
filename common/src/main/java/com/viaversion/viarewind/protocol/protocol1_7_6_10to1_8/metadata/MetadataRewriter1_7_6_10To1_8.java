@@ -17,6 +17,8 @@
  */
 package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.metadata;
 
+import com.google.common.collect.Lists;
+import com.google.common.primitives.Ints;
 import com.viaversion.viarewind.ViaRewind;
 import com.viaversion.viarewind.api.rewriter.VREntityRewriter;
 import com.viaversion.viarewind.api.type.Types1_7_6_10;
@@ -87,14 +89,19 @@ public class MetadataRewriter1_7_6_10To1_8 extends VREntityRewriter<ClientboundP
 				});
 			}
 		});
-		protocol.registerClientbound(ClientboundPackets1_8.DESTROY_ENTITIES, new PacketHandlers() {
-			@Override
-			public void register() {
-				map(Type.VAR_INT_ARRAY_PRIMITIVE, Types1_7_6_10.BYTE_INT_ARRAY); // Entity ids
-				handler(wrapper -> {
-					final int[] entities = wrapper.get(Types1_7_6_10.BYTE_INT_ARRAY, 0);
-					untrackEntities(wrapper.user(), entities);
-				});
+		protocol.registerClientbound(ClientboundPackets1_8.DESTROY_ENTITIES, wrapper -> {
+			final int[] entities = wrapper.read(Type.VAR_INT_ARRAY_PRIMITIVE);
+			untrackEntities(wrapper.user(), entities);
+
+			wrapper.cancel();
+
+			// Split entity destroy packets into smaller packets because 1.8 can handle more entities at once then 1.7 can.
+			final List<List<Integer>> parts = Lists.partition(Ints.asList(entities), Byte.MAX_VALUE);
+
+			for (List<Integer> part : parts) {
+				final PacketWrapper destroy = PacketWrapper.create(ClientboundPackets1_7_2_5.DESTROY_ENTITIES, wrapper.user());
+				destroy.write(Types1_7_6_10.BYTE_INT_ARRAY, part.stream().mapToInt(Integer::intValue).toArray());
+				destroy.scheduleSend(Protocol1_7_6_10To1_8.class);
 			}
 		});
 		protocol.registerClientbound(ClientboundPackets1_8.ENTITY_METADATA, new PacketHandlers() {
