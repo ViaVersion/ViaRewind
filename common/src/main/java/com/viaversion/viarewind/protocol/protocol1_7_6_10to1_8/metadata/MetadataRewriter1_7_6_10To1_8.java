@@ -411,6 +411,12 @@ public class MetadataRewriter1_7_6_10To1_8 extends VREntityRewriter<ClientboundP
 			case Slot:
 				metadata.setValue(protocol.getItemRewriter().handleItemToClient(event.user(), (Item) value));
 				break;
+			case Float:
+			case String:
+			case Short:
+			case Position:
+				metadata.setValue(value);
+				break;
 			default:
 				event.cancel();
 				break;
