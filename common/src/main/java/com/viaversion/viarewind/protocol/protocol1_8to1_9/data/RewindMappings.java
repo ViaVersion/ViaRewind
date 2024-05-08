@@ -36,7 +36,7 @@ public final class RewindMappings extends com.viaversion.viarewind.api.data.Rewi
 	protected void loadExtras(CompoundTag data) {
 		super.loadExtras(data);
 
-		final JsonArray sounds = VRMappingDataLoader.INSTANCE.loadData("sounds-1.9.4.json").getAsJsonArray("sounds");
+		final JsonArray sounds = VRMappingDataLoader.INSTANCE.loadData("sounds-1.9.json").getAsJsonArray("sounds");
 		for (final JsonElement sound : sounds) {
 			this.sounds.add(sound.getAsString());
 		}
