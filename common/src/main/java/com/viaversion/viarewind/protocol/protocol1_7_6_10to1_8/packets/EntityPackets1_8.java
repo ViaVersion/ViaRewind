@@ -18,7 +18,7 @@
 package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.packets;
 
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.emulation.VirtualHologramEntity;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.data.VirtualHologramEntity;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.EntityTracker1_8;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.GameProfileStorage;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage.PlayerSessionStorage;
@@ -46,6 +46,15 @@ public class EntityPackets1_8 {
 					final Item item = wrapper.get(Types1_7_6_10.COMPRESSED_NBT_ITEM, 0);
 					protocol.getItemRewriter().handleItemToClient(wrapper.user(), item);
 					wrapper.set(Types1_7_6_10.COMPRESSED_NBT_ITEM, 0, item);
+				});
+
+				handler(wrapper -> {
+					final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(Protocol1_7_6_10To1_8.class);
+					final int id = wrapper.get(Type.INT, 0);
+					int limit = tracker.clientEntityId() == id ? 3 : 4;
+					if (wrapper.get(Type.SHORT, 0) > limit) {
+						wrapper.cancel();
+					}
 				});
 
 				handler(wrapper -> {

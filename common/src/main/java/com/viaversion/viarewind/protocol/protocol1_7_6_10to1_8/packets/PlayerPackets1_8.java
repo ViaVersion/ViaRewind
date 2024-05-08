@@ -701,7 +701,7 @@ public class PlayerPackets1_8 {
 						abilitiesPacket.write(Type.BYTE, playerSession.combineAbilities());
 						abilitiesPacket.write(Type.FLOAT, playerSession.sprinting ? playerSession.flySpeed * 2.0f : playerSession.flySpeed);
 						abilitiesPacket.write(Type.FLOAT, playerSession.walkSpeed);
-						abilitiesPacket.send(Protocol1_7_6_10To1_8.class);
+						abilitiesPacket.scheduleSend(Protocol1_7_6_10To1_8.class);
 					}
 				});
 			}

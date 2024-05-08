@@ -224,7 +224,7 @@ public class WorldPackets1_8 {
 							mapData.write(Type.SHORT, (short) columnData.length); // data length
 							mapData.write(new FixedByteArrayType(columnData.length), columnData); // data
 
-							mapData.send(Protocol1_7_6_10To1_8.class, true);
+							mapData.send(Protocol1_7_6_10To1_8.class);
 						}
 					}
 
@@ -242,7 +242,7 @@ public class WorldPackets1_8 {
 						mapData.write(Type.SHORT, (short) iconData.length); // data length
 						mapData.write(new FixedByteArrayType(iconData.length), iconData); // data
 
-						mapData.send(Protocol1_7_6_10To1_8.class, true);
+						mapData.send(Protocol1_7_6_10To1_8.class);
 					}
 
 					// Update scale
@@ -251,7 +251,7 @@ public class WorldPackets1_8 {
 					mapData.write(Type.SHORT, (short) 2); // data length
 					mapData.write(new FixedByteArrayType(2), new byte[]{2, scale}); // data
 
-					mapData.send(Protocol1_7_6_10To1_8.class, true);
+					mapData.send(Protocol1_7_6_10To1_8.class);
 				});
 			}
 		});

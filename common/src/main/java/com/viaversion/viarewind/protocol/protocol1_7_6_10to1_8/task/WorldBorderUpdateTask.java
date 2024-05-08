@@ -85,7 +85,7 @@ public class WorldBorderUpdateTask implements Runnable {
 				spawnParticle.write(Type.INT, (int) Math.floor((maxH - minH) * (maxV - minV) * 0.5));
 
 				try {
-					spawnParticle.send(Protocol1_7_6_10To1_8.class, true);
+					spawnParticle.send(Protocol1_7_6_10To1_8.class);
 				} catch (Exception e) {
 					ViaRewind.getPlatform().getLogger().log(Level.SEVERE, "Failed to send world border particle", e);
 				}

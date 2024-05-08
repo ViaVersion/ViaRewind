@@ -204,7 +204,6 @@ public class ScoreboardPackets1_8 {
 						wrapper.read(Type.STRING); // name tag visibility
 						byte color = wrapper.read(Type.BYTE);
 						if (mode == 2 && scoreboard.getTeamColor(team).get() != color) {
-							String username = wrapper.user().getProtocolInfo().getUsername();
 							String sidebar = scoreboard.getColorDependentSidebar().get(color);
 							PacketWrapper sidebarPacket = wrapper.create(0x3D);
 							sidebarPacket.write(Type.BYTE, (byte) 1);

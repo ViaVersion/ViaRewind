@@ -48,49 +48,49 @@ public class Protocol1_7_2_5To1_7_6_10 extends AbstractProtocol<ClientboundPacke
 		this.registerClientbound(State.LOGIN, ClientboundLoginPackets.GAME_PROFILE.getId(), ClientboundLoginPackets.GAME_PROFILE.getId(), new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Type.STRING, REMOVE_DASHES); // uuid
-				map(Type.STRING); // name
+				map(Type.STRING, REMOVE_DASHES); // Uuid
+				map(Type.STRING); // Name
 			}
 		});
 
 		this.registerClientbound(ClientboundPackets1_7_2_5.SPAWN_PLAYER, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Type.VAR_INT); // entity id
-				map(Type.STRING, REMOVE_DASHES); // uuid
-				map(Type.STRING); // name
-				handler(wrapper -> { // delete data introduced in 1.7.6
-					final int size = wrapper.read(Type.VAR_INT); // data count
+				map(Type.VAR_INT); // Entity id
+				map(Type.STRING, REMOVE_DASHES); // Uuid
+				map(Type.STRING); // Name
+				handler(wrapper -> {
+					final int size = wrapper.read(Type.VAR_INT); // Data count
 					for (int i = 0; i < size; i++) {
-						wrapper.read(Type.STRING); // data name
-						wrapper.read(Type.STRING); // data value
-						wrapper.read(Type.STRING); // data signature
+						wrapper.read(Type.STRING); // Data name
+						wrapper.read(Type.STRING); // Data value
+						wrapper.read(Type.STRING); // Data signature
 					}
 				});
-				map(Type.INT); // x
-				map(Type.INT); // y
-				map(Type.INT); // z
-				map(Type.BYTE); // yaw
-				map(Type.BYTE); // pitch
-				map(Type.SHORT); // item in hand
-				map(Types1_7_6_10.METADATA_LIST); // metadata
+				map(Type.INT); // X
+				map(Type.INT); // Y
+				map(Type.INT); // Z
+				map(Type.BYTE); // Yaw
+				map(Type.BYTE); // Pitch
+				map(Type.SHORT); // Item in hand
+				map(Types1_7_6_10.METADATA_LIST); // Metadata
 			}
 		});
 
 		this.registerClientbound(ClientboundPackets1_7_2_5.TEAMS, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Type.STRING); // team name
-				map(Type.BYTE); // mode
+				map(Type.STRING); // Team name
+				map(Type.BYTE); // Mode
 				handler(wrapper -> {
 					final byte mode = wrapper.get(Type.BYTE, 0);
-					if (mode == 0 || mode == 2) { // team is created or information is updated
-						wrapper.passthrough(Type.STRING); // team display name
-						wrapper.passthrough(Type.STRING); // team prefix
-						wrapper.passthrough(Type.STRING); // team suffix
-						wrapper.passthrough(Type.BYTE); // friendly fire
+					if (mode == 0 || mode == 2) { // Team is created or information is updated
+						wrapper.passthrough(Type.STRING); // Team display name
+						wrapper.passthrough(Type.STRING); // Team prefix
+						wrapper.passthrough(Type.STRING); // Team suffix
+						wrapper.passthrough(Type.BYTE); // Friendly fire
 					}
-					if (mode == 0 || mode == 3 || mode == 4) { // team is created, player is added or player is removed
+					if (mode == 0 || mode == 3 || mode == 4) { // Team is created, player is added or player is removed
 						List<String> entryList = new ArrayList<>();
 						final int size = wrapper.read(Type.SHORT);
 						for (int i = 0; i < size; i++) {

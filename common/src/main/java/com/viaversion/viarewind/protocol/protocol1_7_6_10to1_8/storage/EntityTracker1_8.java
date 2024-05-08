@@ -20,7 +20,7 @@ package com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.storage;
 import com.viaversion.viarewind.ViaRewind;
 import com.viaversion.viarewind.protocol.protocol1_7_2_5to1_7_6_10.ServerboundPackets1_7_2_5;
 import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.Protocol1_7_6_10To1_8;
-import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.emulation.VirtualHologramEntity;
+import com.viaversion.viarewind.protocol.protocol1_7_6_10to1_8.data.VirtualHologramEntity;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
@@ -148,7 +148,7 @@ public class EntityTracker1_8 extends EntityTrackerBase {
 			attachEntity.write(Type.INT, target); // passenger id
 			attachEntity.write(Type.BOOLEAN, false); // leash
 
-			attachEntity.scheduleSend(Protocol1_7_6_10To1_8.class, true);
+			attachEntity.scheduleSend(Protocol1_7_6_10To1_8.class);
 		} catch (Exception e) {
 			ViaRewind.getPlatform().getLogger().log(Level.SEVERE, "Failed to send attach packet", e);
 		}

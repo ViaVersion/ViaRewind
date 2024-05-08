@@ -50,7 +50,7 @@ public class BossBarVisualization implements CooldownVisualization {
 			wrapper.write(Type.VAR_INT, 2); // Action - update health
 			wrapper.write(Type.FLOAT, (float) progress); // Health
 		}
-		wrapper.scheduleSend(Protocol1_8To1_9.class, false);
+		wrapper.send(Protocol1_8To1_9.class, false);
 	}
 
 	@Override
@@ -61,7 +61,7 @@ public class BossBarVisualization implements CooldownVisualization {
 		PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_9.BOSSBAR, null, user);
 		wrapper.write(Type.UUID, bossUUID);
 		wrapper.write(Type.VAR_INT, 1); // Action - remove
-		wrapper.scheduleSend(Protocol1_8To1_9.class, false);
+		wrapper.send(Protocol1_8To1_9.class, false);
 		bossUUID = null;
 	}
 }
