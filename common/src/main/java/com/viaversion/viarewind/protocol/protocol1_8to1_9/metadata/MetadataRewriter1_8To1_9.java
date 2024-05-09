@@ -247,14 +247,13 @@ public class MetadataRewriter1_8To1_9 extends VREntityRewriter<ClientboundPacket
 		}
 		if (metaIndex.getOldType() == null || metaIndex.getNewType() == null) {
 			if (metaIndex == MetaIndex.PLAYER_HAND) { // Player eating/aiming/drinking
-				int status = tracker.getStatus().getOrDefault(event.entityId(), 0);
+				byte status = (byte) tracker.getStatus().getOrDefault(event.entityId(), 0);
 				if ((((byte) metadata.value()) & 1 << HAND_ACTIVE_BIT) != 0) {
 					status = (byte) (status | 1 << STATUS_USE_BIT);
 				} else {
 					status = (byte) (status & ~(1 << STATUS_USE_BIT));
 				}
 				event.createExtraMeta(new Metadata(MetaIndex.ENTITY_STATUS.getIndex(), MetaType1_8.Byte, status));
-				return;
 			}
 			event.cancel();
 			return;
