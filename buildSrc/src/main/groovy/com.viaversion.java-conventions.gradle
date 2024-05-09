@@ -44,7 +44,7 @@ base {
     archivesName = project.maven_name
     group = project.maven_group
     version = project.maven_version
-    description = "ViaVersion addon to allow 1.8.x and 1.7.x clients on newer server versions."
+    description = "ViaBackwards addon to allow 1.8.x and 1.7.x clients on newer server versions."
 }
 
 java.sourceCompatibility = JavaVersion.VERSION_1_8
