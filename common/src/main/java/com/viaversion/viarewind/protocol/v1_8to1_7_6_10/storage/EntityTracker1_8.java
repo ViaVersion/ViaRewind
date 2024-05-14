@@ -18,14 +18,14 @@
 package com.viaversion.viarewind.protocol.v1_8to1_7_6_10.storage;
 
 import com.viaversion.viarewind.ViaRewind;
-import com.viaversion.viarewind.protocol.v1_7_6_10to1_7_2_5.ServerboundPackets1_7_2_5;
+import com.viaversion.viarewind.protocol.v1_7_6_10to1_7_2_5.packet.ServerboundPackets1_7_2_5;
 import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.Protocol1_8To1_7_6_10;
 import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.data.VirtualHologramEntity;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
-import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_8;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.libs.fastutil.ints.Int2IntArrayMap;
 import com.viaversion.viaversion.libs.fastutil.ints.Int2IntMap;
@@ -33,7 +33,7 @@ import com.viaversion.viaversion.libs.fastutil.ints.Int2ObjectArrayMap;
 import com.viaversion.viaversion.libs.fastutil.ints.Int2ObjectMap;
 import com.viaversion.viaversion.libs.fastutil.objects.Object2IntMap;
 import com.viaversion.viaversion.libs.fastutil.objects.Object2IntOpenHashMap;
-import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
+import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_8;
 
 import java.util.Map;
 import java.util.UUID;
@@ -50,13 +50,13 @@ public class EntityTracker1_8 extends EntityTrackerBase {
 	private int clientEntityGameMode;
 
 	public EntityTracker1_8(UserConnection connection) {
-		super(connection, EntityTypes1_10.EntityType.ENTITY_HUMAN);
+		super(connection, EntityTypes1_8.EntityType.PLAYER);
 	}
 
 	@Override
 	public void addEntity(int id, EntityType type) {
 		super.addEntity(id, type);
-		if (type == EntityTypes1_10.EntityType.ARMOR_STAND) {
+		if (type == EntityTypes1_8.EntityType.ARMOR_STAND) {
 			holograms.put(id, new VirtualHologramEntity(user(), id));
 		}
 	}
@@ -115,10 +115,10 @@ public class EntityTracker1_8 extends EntityTrackerBase {
 
 	protected void startSneaking() {
 		try {
-			final PacketWrapper entityAction = PacketWrapper.create(ServerboundPackets1_7_2_5.ENTITY_ACTION, user());
-			entityAction.write(Type.VAR_INT, this.clientEntityId()); // Entity id
-			entityAction.write(Type.VAR_INT, 0); // Action id
-			entityAction.write(Type.VAR_INT, 0); // Jump boost
+			final PacketWrapper entityAction = PacketWrapper.create(ServerboundPackets1_7_2_5.PLAYER_COMMAND, user());
+			entityAction.write(Types.VAR_INT, this.clientEntityId()); // Entity id
+			entityAction.write(Types.VAR_INT, 0); // Action id
+			entityAction.write(Types.VAR_INT, 0); // Jump boost
 
 			entityAction.sendToServer(Protocol1_8To1_7_6_10.class);
 		} catch (Exception e) {
@@ -143,10 +143,10 @@ public class EntityTracker1_8 extends EntityTrackerBase {
 
 	protected void attachEntity(final int target) {
 		try {
-			final PacketWrapper attachEntity = PacketWrapper.create(ClientboundPackets1_8.ATTACH_ENTITY, user());
-			attachEntity.write(Type.INT, this.clientEntityId()); // vehicle id
-			attachEntity.write(Type.INT, target); // passenger id
-			attachEntity.write(Type.BOOLEAN, false); // leash
+			final PacketWrapper attachEntity = PacketWrapper.create(ClientboundPackets1_8.SET_ENTITY_LINK, user());
+			attachEntity.write(Types.INT, this.clientEntityId()); // vehicle id
+			attachEntity.write(Types.INT, target); // passenger id
+			attachEntity.write(Types.BOOLEAN, false); // leash
 
 			attachEntity.scheduleSend(Protocol1_8To1_7_6_10.class);
 		} catch (Exception e) {

@@ -19,7 +19,7 @@ package com.viaversion.viarewind.protocol.v1_9to1_8.storage;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.Vector;
-import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_9;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 import com.viaversion.viaversion.libs.fastutil.ints.*;
 
@@ -33,7 +33,7 @@ public class EntityTracker1_9 extends EntityTrackerBase {
 	private final Int2IntMap status = new Int2IntOpenHashMap();
 
 	public EntityTracker1_9(UserConnection connection) {
-		super(connection, EntityTypes1_10.EntityType.ENTITY_HUMAN);
+		super(connection, EntityTypes1_9.EntityType.PLAYER);
 	}
 
 	@Override

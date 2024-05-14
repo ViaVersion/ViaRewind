@@ -18,8 +18,8 @@
 package com.viaversion.viarewind.api.type.item;
 
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.libs.opennbt.tag.builtin.CompoundTag;
-import com.viaversion.viaversion.libs.opennbt.tag.io.NBTIO;
+import com.viaversion.nbt.tag.CompoundTag;
+import com.viaversion.nbt.io.NBTIO;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.ByteBufOutputStream;
@@ -34,7 +34,7 @@ public class NBTType extends Type<CompoundTag> {
 	}
 
 	@Override
-	public CompoundTag read(ByteBuf buffer) throws IOException {
+	public CompoundTag read(ByteBuf buffer) {
 		short length = buffer.readShort();
 		if (length <= 0) {
 			return null;
@@ -44,11 +44,13 @@ public class NBTType extends Type<CompoundTag> {
 
 		try (GZIPInputStream gzipStream = new GZIPInputStream(new ByteBufInputStream(compressed))) {
 			return NBTIO.reader(CompoundTag.class).named().read(gzipStream);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
 		}
 	}
 
 	@Override
-	public void write(ByteBuf buffer, CompoundTag nbt) throws Exception {
+	public void write(ByteBuf buffer, CompoundTag nbt) {
 		if (nbt == null) {
 			buffer.writeShort(-1);
 			return;
@@ -58,6 +60,8 @@ public class NBTType extends Type<CompoundTag> {
 		try {
 			try (GZIPOutputStream gzipStream = new GZIPOutputStream(new ByteBufOutputStream(compressedBuf))) {
 				NBTIO.writer().named().write(gzipStream, nbt);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
 			}
 
 			buffer.writeShort(compressedBuf.readableBytes());

@@ -19,7 +19,7 @@ package com.viaversion.viarewind.api.rewriter;
 
 import com.viaversion.viabackwards.api.BackwardsProtocol;
 import com.viaversion.viabackwards.api.rewriters.LegacyBlockItemRewriter;
-import com.viaversion.viarewind.api.data.VRMappingDataLoader;
+import com.viaversion.viarewind.api.data.RewindMappingDataLoader;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
 import com.viaversion.viaversion.libs.gson.JsonObject;
@@ -32,7 +32,7 @@ public class VRBlockItemRewriter<C extends ClientboundPacketType, S extends Serv
 
 	@Override
 	protected JsonObject readMappingsFile(String name) {
-		return VRMappingDataLoader.INSTANCE.loadFromDataDir(name);
+		return RewindMappingDataLoader.INSTANCE.loadFromDataDir(name);
 	}
 
 	@Override

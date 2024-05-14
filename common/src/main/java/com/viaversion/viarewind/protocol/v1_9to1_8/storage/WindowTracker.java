@@ -23,13 +23,13 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.libs.mcstructs.core.TextFormatting;
 import com.viaversion.viaversion.libs.mcstructs.text.ATextComponent;
 import com.viaversion.viaversion.libs.mcstructs.text.components.StringComponent;
 import com.viaversion.viaversion.libs.mcstructs.text.components.TranslationComponent;
 import com.viaversion.viaversion.libs.mcstructs.text.serializer.TextComponentSerializer;
-import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
+import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_8;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -80,15 +80,15 @@ public class WindowTracker extends StoredObject {
 		enchantmentProperties.clear();
 	}
 
-	public static void updateBrewingStand(UserConnection user, Item blazePowder, short windowId) throws Exception {
+	public static void updateBrewingStand(UserConnection user, Item blazePowder, short windowId) {
 		if (blazePowder != null && blazePowder.identifier() != 377) {
 			return;
 		}
 		int amount = blazePowder == null ? 0 : blazePowder.amount();
 
-		PacketWrapper openWindow = PacketWrapper.create(ClientboundPackets1_8.OPEN_WINDOW, user);
-		openWindow.write(Type.UNSIGNED_BYTE, windowId);
-		openWindow.write(Type.STRING, "minecraft:brewing_stand");
+		PacketWrapper openWindow = PacketWrapper.create(ClientboundPackets1_8.OPEN_SCREEN, user);
+		openWindow.write(Types.UNSIGNED_BYTE, windowId);
+		openWindow.write(Types.STRING, "minecraft:brewing_stand");
 
 		ATextComponent title = new StringComponent().
 			append(new TranslationComponent("container.brewing")).
@@ -96,16 +96,16 @@ public class WindowTracker extends StoredObject {
 			append(new StringComponent(amount + " " + TextFormatting.DARK_RED)).
 			append(new TranslationComponent("item.blazePowder.name", TextFormatting.DARK_RED));
 
-		openWindow.write(Type.COMPONENT, TextComponentSerializer.V1_8.serializeJson(title));
-		openWindow.write(Type.UNSIGNED_BYTE, (short) 420);
+		openWindow.write(Types.COMPONENT, TextComponentSerializer.V1_8.serializeJson(title));
+		openWindow.write(Types.UNSIGNED_BYTE, (short) 420);
 		openWindow.scheduleSend(Protocol1_9To1_8.class);
 
 		Item[] items = user.get(WindowTracker.class).getBrewingItems(windowId);
 		for (int i = 0; i < items.length; i++) {
-			PacketWrapper setSlot = PacketWrapper.create(ClientboundPackets1_8.SET_SLOT, user);
-			setSlot.write(Type.UNSIGNED_BYTE, windowId);
-			setSlot.write(Type.SHORT, (short) i);
-			setSlot.write(Type.ITEM1_8, items[i]);
+			PacketWrapper setSlot = PacketWrapper.create(ClientboundPackets1_8.CONTAINER_SET_SLOT, user);
+			setSlot.write(Types.UNSIGNED_BYTE, windowId);
+			setSlot.write(Types.SHORT, (short) i);
+			setSlot.write(Types.ITEM1_8, items[i]);
 			setSlot.scheduleSend(Protocol1_9To1_8.class);
 		}
 	}

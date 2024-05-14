@@ -25,6 +25,7 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 public class ViaRewindConfig extends Config implements com.viaversion.viarewind.api.ViaRewindConfig {
 
@@ -39,8 +40,8 @@ public class ViaRewindConfig extends Config implements com.viaversion.viarewind.
 	private boolean enableOffhand;
 	private String offhandCommand;
 
-    public ViaRewindConfig(File configFile) {
-        super(configFile);
+    public ViaRewindConfig(File configFile, Logger logger) {
+        super(configFile, logger);
     }
 
 	@Override

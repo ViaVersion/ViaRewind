@@ -18,9 +18,9 @@
 package com.viaversion.viarewind.protocol.v1_9to1_8;
 
 import com.viaversion.viabackwards.api.BackwardsProtocol;
-import com.viaversion.viarewind.protocol.v1_9to1_8.data.RewindMappings;
-import com.viaversion.viarewind.protocol.v1_9to1_8.metadata.MetadataRewriter1_8To1_9;
-import com.viaversion.viarewind.protocol.v1_9to1_8.packets.*;
+import com.viaversion.viarewind.protocol.v1_9to1_8.data.RewindMappingData1_8;
+import com.viaversion.viarewind.protocol.v1_9to1_8.rewriter.EntityPacketRewriter1_9;
+import com.viaversion.viarewind.protocol.v1_9to1_8.rewriter.*;
 import com.viaversion.viarewind.protocol.v1_9to1_8.storage.*;
 import com.viaversion.viarewind.protocol.v1_9to1_8.task.CooldownIndicatorTask;
 import com.viaversion.viarewind.protocol.v1_9to1_8.task.LevitationUpdateTask;
@@ -29,34 +29,34 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.platform.providers.ViaProviders;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.ValueTransformer;
-import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
-import com.viaversion.viaversion.protocols.protocol1_8.ServerboundPackets1_8;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.minecraft.ClientWorld;
-import com.viaversion.viaversion.protocols.protocol1_9to1_8.ClientboundPackets1_9;
-import com.viaversion.viaversion.protocols.protocol1_9to1_8.ServerboundPackets1_9;
+import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_8;
+import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_9;
+import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ServerboundPackets1_8;
+import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ServerboundPackets1_9;
 
 import java.util.concurrent.TimeUnit;
 
 public class Protocol1_9To1_8 extends BackwardsProtocol<ClientboundPackets1_9, ClientboundPackets1_8, ServerboundPackets1_9, ServerboundPackets1_8> {
 
-	public static final ValueTransformer<Double, Integer> DOUBLE_TO_INT_TIMES_32 = new ValueTransformer<Double, Integer>(Type.INT) {
+	public static final ValueTransformer<Double, Integer> DOUBLE_TO_INT_TIMES_32 = new ValueTransformer<Double, Integer>(Types.INT) {
 		@Override
 		public Integer transform(PacketWrapper wrapper, Double inputValue) {
 			return (int) (inputValue * 32.0D);
 		}
 	};
-	public static final ValueTransformer<Float, Byte> DEGREES_TO_ANGLE = new ValueTransformer<Float, Byte>(Type.BYTE) {
+	public static final ValueTransformer<Float, Byte> DEGREES_TO_ANGLE = new ValueTransformer<Float, Byte>(Types.BYTE) {
 		@Override
 		public Byte transform(PacketWrapper packetWrapper, Float degrees) {
 			return (byte) ((degrees / 360F) * 256);
 		}
 	};
 
-	public static final RewindMappings MAPPINGS = new RewindMappings();
+	public static final RewindMappingData1_8 MAPPINGS = new RewindMappingData1_8();
 
-	private final BlockItemPackets1_9 itemRewriter = new BlockItemPackets1_9(this);
-	private final MetadataRewriter1_8To1_9 metadataRewriter = new MetadataRewriter1_8To1_9(this);
+	private final BlockItemPacketRewriter1_9 itemRewriter = new BlockItemPacketRewriter1_9(this);
+	private final EntityPacketRewriter1_9 entityRewriter = new EntityPacketRewriter1_9(this);
 
 	public Protocol1_9To1_8() {
 		super(ClientboundPackets1_9.class, ClientboundPackets1_8.class, ServerboundPackets1_9.class, ServerboundPackets1_8.class);
@@ -64,12 +64,11 @@ public class Protocol1_9To1_8 extends BackwardsProtocol<ClientboundPackets1_9, C
 
 	@Override
 	protected void registerPackets() {
-		metadataRewriter.register();
+		entityRewriter.register();
 		itemRewriter.register();
 
-		EntityPackets1_9.register(this);
-		PlayerPackets1_9.register(this);
-		WorldPackets1_9.register(this);
+		PlayerPacketRewriter1_9.register(this);
+		WorldPacketRewriter1_9.register(this);
 	}
 
 	@Override
@@ -95,18 +94,18 @@ public class Protocol1_9To1_8 extends BackwardsProtocol<ClientboundPackets1_9, C
 	}
 
 	@Override
-	public RewindMappings getMappingData() {
+	public RewindMappingData1_8 getMappingData() {
 		return MAPPINGS;
 	}
 
 	@Override
-	public BlockItemPackets1_9 getItemRewriter() {
+	public BlockItemPacketRewriter1_9 getItemRewriter() {
 		return itemRewriter;
 	}
 
 	@Override
-	public MetadataRewriter1_8To1_9 getEntityRewriter() {
-		return metadataRewriter;
+	public EntityPacketRewriter1_9 getEntityRewriter() {
+		return entityRewriter;
 	}
 
 	@Override

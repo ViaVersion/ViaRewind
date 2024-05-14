@@ -18,7 +18,7 @@
 package com.viaversion.viarewind.protocol.v1_9to1_8.storage;
 
 import com.viaversion.viarewind.ViaRewind;
-import com.viaversion.viarewind.protocol.v1_9to1_8.emulation.CooldownVisualization;
+import com.viaversion.viarewind.protocol.v1_9to1_8.cooldown.CooldownVisualization;
 import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.util.Pair;

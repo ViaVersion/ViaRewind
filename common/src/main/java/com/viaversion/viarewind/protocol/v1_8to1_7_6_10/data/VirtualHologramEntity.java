@@ -17,29 +17,28 @@
  */
 package com.viaversion.viarewind.protocol.v1_8to1_7_6_10.data;
 
-import com.viaversion.viarewind.protocol.v1_7_6_10to1_7_2_5.ClientboundPackets1_7_2_5;
+import com.viaversion.viarewind.api.type.version.Types1_7_6_10;
+import com.viaversion.viarewind.protocol.v1_7_6_10to1_7_2_5.packet.ClientboundPackets1_7_2_5;
 import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.Protocol1_8To1_7_6_10;
-import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.metadata.MetaIndex;
-import com.viaversion.viarewind.api.type.Types1_7_6_10;
-import com.viaversion.viarewind.api.type.metadata.MetaType1_7_6_10;
-import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.metadata.MetadataRewriter1_7_6_10To1_8;
-import com.viaversion.viarewind.utils.math.AABB;
-import com.viaversion.viarewind.utils.math.Vector3d;
+import com.viaversion.viarewind.api.minecraft.entitydata.EntityDataTypes1_7_6_10;
+import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.rewriter.EntityPacketRewriter1_8;
+import com.viaversion.viarewind.api.minecraft.math.AABB;
+import com.viaversion.viarewind.api.minecraft.math.Vector3d;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
-import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
-import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_8;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_8;
+import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
+import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes1_8;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.data.entity.TrackedEntityImpl;
-import com.viaversion.viaversion.rewriter.meta.MetaHandlerEvent;
-import com.viaversion.viaversion.rewriter.meta.MetaHandlerEventImpl;
+import com.viaversion.viaversion.rewriter.entitydata.EntityDataHandlerEvent;
+import com.viaversion.viaversion.rewriter.entitydata.EntityDataHandlerEventImpl;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class VirtualHologramEntity {
-	private final List<Metadata> metadataTracker = new ArrayList<>();
+	private final List<EntityData> metadataTracker = new ArrayList<>();
 	private double locX, locY, locZ;
 
 	private final UserConnection user;
@@ -58,7 +57,7 @@ public class VirtualHologramEntity {
 		this.entityId = entityId;
 	}
 
-	public void setPosition(final double x, final double y, final double z) throws Exception {
+	public void setPosition(final double x, final double y, final double z) {
 		if (x == this.locX && y == this.locY && z == this.locZ) return;
 		this.locX = x;
 		this.locY = y;
@@ -67,7 +66,7 @@ public class VirtualHologramEntity {
 		updateLocation(false);
 	}
 
-	public void setRelativePosition(final double x, final double y, final double z) throws Exception {
+	public void setRelativePosition(final double x, final double y, final double z) {
 		if (x == 0.0 && y == 0.0 && z == 0.0) return;
 		this.locX += x;
 		this.locY += y;
@@ -76,7 +75,7 @@ public class VirtualHologramEntity {
 		updateLocation(false);
 	}
 
-	public void setRotation(final float yaw, final float pitch) throws Exception {
+	public void setRotation(final float yaw, final float pitch) {
 		if (this.yaw == yaw || this.headYaw == yaw || this.pitch == pitch) return;
 		this.yaw = yaw;
 		this.headYaw = yaw;
@@ -85,16 +84,16 @@ public class VirtualHologramEntity {
 		updateLocation(false);
 	}
 
-	public void setHeadYaw(float yaw) throws Exception {
+	public void setHeadYaw(float yaw) {
 		if (this.headYaw == yaw) return;
 		this.headYaw = yaw;
 
 		updateLocation(false);
 	}
 
-	public void syncState(final MetadataRewriter1_7_6_10To1_8 entityRewriter, final List<Metadata> metadataList) throws Exception {
+	public void syncState(final EntityPacketRewriter1_8 entityRewriter, final List<EntityData> metadataList) {
 		// Merge metadata updates into current tracker
-		for (Metadata metadata : metadataList) {
+		for (EntityData metadata : metadataList) {
 			metadataTracker.removeIf(m -> m.id() == metadata.id());
 			metadataTracker.add(metadata);
 		}
@@ -102,13 +101,13 @@ public class VirtualHologramEntity {
 		// Filter armor stand data to calculate emulation
 		byte flags = 0;
 		byte armorStandFlags = 0;
-		for (Metadata metadata : metadataTracker) {
-			if (metadata.id() == 0 && metadata.metaType() == MetaType1_8.Byte) {
+		for (EntityData metadata : metadataTracker) {
+			if (metadata.id() == 0 && metadata.dataType() == EntityDataTypes1_8.BYTE) {
 				flags = ((Number) metadata.getValue()).byteValue();
-			} else if (metadata.id() == 2 && metadata.metaType() == MetaType1_8.String) {
+			} else if (metadata.id() == 2 && metadata.dataType() == EntityDataTypes1_8.STRING) {
 				name = metadata.getValue().toString();
 				if (name != null && name.isEmpty()) name = null;
-			} else if (metadata.id() == 10 && metadata.metaType() == MetaType1_8.Byte) {
+			} else if (metadata.id() == 10 && metadata.dataType() == EntityDataTypes1_8.BYTE) {
 				armorStandFlags = ((Number) metadata.getValue()).byteValue();
 			}
 		}
@@ -132,25 +131,25 @@ public class VirtualHologramEntity {
 		}
 	}
 
-	private void updateLocation(final boolean remount) throws Exception {
+	private void updateLocation(final boolean remount) {
 		if (entityIds == null) {
 			return;
 		}
 		if (currentState == State.ZOMBIE) {
 			teleportEntity(entityId, locX, locY, locZ, yaw, pitch);
 
-			final PacketWrapper entityHeadLook = PacketWrapper.create(ClientboundPackets1_7_2_5.ENTITY_HEAD_LOOK, user);
+			final PacketWrapper entityHeadLook = PacketWrapper.create(ClientboundPackets1_7_2_5.ROTATE_HEAD, user);
 
-			entityHeadLook.write(Type.INT, entityId);
-			entityHeadLook.write(Type.BYTE, (byte) ((headYaw / 360f) * 256));
+			entityHeadLook.write(Types.INT, entityId);
+			entityHeadLook.write(Types.BYTE, (byte) ((headYaw / 360f) * 256));
 
 			entityHeadLook.send(Protocol1_8To1_7_6_10.class);
 		} else if (currentState == State.HOLOGRAM) {
 			if (remount) {
-				PacketWrapper detach = PacketWrapper.create(ClientboundPackets1_7_2_5.ATTACH_ENTITY, user);
-				detach.write(Type.INT, entityIds[1]);
-				detach.write(Type.INT, -1);
-				detach.write(Type.BOOLEAN, false);
+				PacketWrapper detach = PacketWrapper.create(ClientboundPackets1_7_2_5.SET_ENTITY_LINK, user);
+				detach.write(Types.INT, entityIds[1]);
+				detach.write(Types.INT, -1);
+				detach.write(Types.BOOLEAN, false);
 				detach.send(Protocol1_8To1_7_6_10.class);
 			}
 
@@ -160,52 +159,52 @@ public class VirtualHologramEntity {
 			if (remount) {
 				teleportEntity(entityIds[1], locX, locY + 56.75, locZ, 0, 0); // Horse
 
-				PacketWrapper attach = PacketWrapper.create(ClientboundPackets1_7_2_5.ATTACH_ENTITY, null, user);
-				attach.write(Type.INT, entityIds[1]);
-				attach.write(Type.INT, entityIds[0]);
-				attach.write(Type.BOOLEAN, false);
+				PacketWrapper attach = PacketWrapper.create(ClientboundPackets1_7_2_5.SET_ENTITY_LINK, null, user);
+				attach.write(Types.INT, entityIds[1]);
+				attach.write(Types.INT, entityIds[0]);
+				attach.write(Types.BOOLEAN, false);
 				attach.send(Protocol1_8To1_7_6_10.class);
 			}
 		}
 	}
 
-	protected void teleportEntity(final int entityId, final double x, final double y, final double z, final float yaw, final float pitch) throws Exception {
-		final PacketWrapper entityTeleport = PacketWrapper.create(ClientboundPackets1_7_2_5.ENTITY_TELEPORT, user);
+	protected void teleportEntity(final int entityId, final double x, final double y, final double z, final float yaw, final float pitch) {
+		final PacketWrapper entityTeleport = PacketWrapper.create(ClientboundPackets1_7_2_5.TELEPORT_ENTITY, user);
 
-		entityTeleport.write(Type.INT, entityId); // entity id
-		entityTeleport.write(Type.INT, (int) (x * 32.0)); // x
-		entityTeleport.write(Type.INT, (int) (y * 32.0)); // y
-		entityTeleport.write(Type.INT, (int) (z * 32.0)); // z
-		entityTeleport.write(Type.BYTE, (byte) ((yaw / 360f) * 256)); // yaw
-		entityTeleport.write(Type.BYTE, (byte) ((pitch / 360f) * 256)); // pitch
+		entityTeleport.write(Types.INT, entityId); // entity id
+		entityTeleport.write(Types.INT, (int) (x * 32.0)); // x
+		entityTeleport.write(Types.INT, (int) (y * 32.0)); // y
+		entityTeleport.write(Types.INT, (int) (z * 32.0)); // z
+		entityTeleport.write(Types.BYTE, (byte) ((yaw / 360f) * 256)); // yaw
+		entityTeleport.write(Types.BYTE, (byte) ((pitch / 360f) * 256)); // pitch
 
 		entityTeleport.send(Protocol1_8To1_7_6_10.class);
 	}
 
-	protected void spawnEntity(final int entityId, final int type, final double locX, final double locY, final double locZ) throws Exception {
-		final PacketWrapper spawnMob = PacketWrapper.create(ClientboundPackets1_7_2_5.SPAWN_MOB, null, user);
+	protected void spawnEntity(final int entityId, final int type, final double locX, final double locY, final double locZ) {
+		final PacketWrapper spawnMob = PacketWrapper.create(ClientboundPackets1_7_2_5.ADD_MOB, null, user);
 
-		spawnMob.write(Type.VAR_INT, entityId); // entity id
-		spawnMob.write(Type.UNSIGNED_BYTE, (short) type); // type
-		spawnMob.write(Type.INT, (int) (locX * 32.0)); // x
-		spawnMob.write(Type.INT, (int) (locY * 32.0)); // y
-		spawnMob.write(Type.INT, (int) (locZ * 32.0)); // z
-		spawnMob.write(Type.BYTE, (byte) 0); // yaw
-		spawnMob.write(Type.BYTE, (byte) 0); // pitch
-		spawnMob.write(Type.BYTE, (byte) 0); // head pitch
-		spawnMob.write(Type.SHORT, (short) 0); // velocity x
-		spawnMob.write(Type.SHORT, (short) 0); // velocity y
-		spawnMob.write(Type.SHORT, (short) 0); // velocity z
-		spawnMob.write(Types1_7_6_10.METADATA_LIST, new ArrayList<>()); // metadata
+		spawnMob.write(Types.VAR_INT, entityId); // entity id
+		spawnMob.write(Types.UNSIGNED_BYTE, (short) type); // type
+		spawnMob.write(Types.INT, (int) (locX * 32.0)); // x
+		spawnMob.write(Types.INT, (int) (locY * 32.0)); // y
+		spawnMob.write(Types.INT, (int) (locZ * 32.0)); // z
+		spawnMob.write(Types.BYTE, (byte) 0); // yaw
+		spawnMob.write(Types.BYTE, (byte) 0); // pitch
+		spawnMob.write(Types.BYTE, (byte) 0); // head pitch
+		spawnMob.write(Types.SHORT, (short) 0); // velocity x
+		spawnMob.write(Types.SHORT, (short) 0); // velocity y
+		spawnMob.write(Types.SHORT, (short) 0); // velocity z
+		spawnMob.write(Types1_7_6_10.ENTITY_DATA_LIST, new ArrayList<>()); // metadata
 
 		spawnMob.send(Protocol1_8To1_7_6_10.class);
 	}
 
-	public void sendMetadataUpdate(final MetadataRewriter1_7_6_10To1_8 entityRewriter) throws Exception {
+	public void sendMetadataUpdate(final EntityPacketRewriter1_8 entityRewriter) {
 		if (entityIds == null) {
 			return;
 		}
-		final PacketWrapper metadataPacket = PacketWrapper.create(ClientboundPackets1_7_2_5.ENTITY_METADATA, user);
+		final PacketWrapper metadataPacket = PacketWrapper.create(ClientboundPackets1_7_2_5.SET_ENTITY_DATA, user);
 
 		if (currentState == State.ZOMBIE) {
 			writeZombieMeta(entityRewriter, metadataPacket);
@@ -217,25 +216,25 @@ public class VirtualHologramEntity {
 		metadataPacket.send(Protocol1_8To1_7_6_10.class);
 	}
 
-	private void writeZombieMeta(final MetadataRewriter1_7_6_10To1_8 entityRewriter, PacketWrapper wrapper) {
-		wrapper.write(Type.INT, entityIds[0]);
+	private void writeZombieMeta(final EntityPacketRewriter1_8 entityRewriter, PacketWrapper wrapper) {
+		wrapper.write(Types.INT, entityIds[0]);
 
 		// Filter metadata sent by the server and convert them together with our custom metadata
-		final List<Metadata> metadataList = new ArrayList<>();
-		for (Metadata metadata : metadataTracker) {
+		final List<EntityData> metadataList = new ArrayList<>();
+		for (EntityData metadata : metadataTracker) {
 			// Remove non existent metadata
 			if (metadata.id() < 0 || metadata.id() > 9) {
 				continue;
 			}
-			metadataList.add(new Metadata(metadata.id(), metadata.metaType(), metadata.getValue()));
+			metadataList.add(new EntityData(metadata.id(), metadata.dataType(), metadata.getValue()));
 		}
 		if (small) {
-			metadataList.add(new Metadata(12, MetaType1_8.Byte, (byte) 1));
+			metadataList.add(new EntityData(12, EntityDataTypes1_8.BYTE, (byte) 1));
 		}
 
 		// Push metadata from the server through metadata conversion 1.7->1.8
-		for (Metadata metadata : metadataList.toArray(new Metadata[0])) {
-			final MetaHandlerEvent event = new MetaHandlerEventImpl(wrapper.user(), new TrackedEntityImpl(EntityTypes1_10.EntityType.ZOMBIE), -1, metadata, metadataList);
+		for (EntityData metadata : metadataList.toArray(new EntityData[0])) {
+			final EntityDataHandlerEvent event = new EntityDataHandlerEventImpl(wrapper.user(), new TrackedEntityImpl(EntityTypes1_8.EntityType.ZOMBIE), -1, metadata, metadataList);
 			try {
 				entityRewriter.handleMetadata(event, metadata);
 			} catch (Exception e) {
@@ -247,22 +246,22 @@ public class VirtualHologramEntity {
 				break;
 			}
 		}
-		wrapper.write(Types1_7_6_10.METADATA_LIST, metadataList);
+		wrapper.write(Types1_7_6_10.ENTITY_DATA_LIST, metadataList);
 	}
 
 	private void writeHologramMeta(PacketWrapper wrapper) {
-		wrapper.write(Type.INT, entityIds[1]);
+		wrapper.write(Types.INT, entityIds[1]);
 
 		// Directly write 1.7 metadata here since we are making them up
-		final List<Metadata> metadataList = new ArrayList<>();
-		metadataList.add(new Metadata(MetaIndex.ENTITY_AGEABLE_AGE.getIndex(), MetaType1_7_6_10.Int, -1700000));
-		metadataList.add(new Metadata(MetaIndex.ENTITY_LIVING_NAME_TAG.getIndex(), MetaType1_7_6_10.String, name));
-		metadataList.add(new Metadata(MetaIndex.ENTITY_LIVING_NAME_TAG_VISIBILITY.getIndex(), MetaType1_7_6_10.Byte, (byte) 1));
+		final List<EntityData> metadataList = new ArrayList<>();
+		metadataList.add(new EntityData(EntityDataIndex1_7_6_10.ENTITY_AGEABLE_AGE.getIndex(), EntityDataTypes1_7_6_10.INT, -1700000));
+		metadataList.add(new EntityData(EntityDataIndex1_7_6_10.ENTITY_LIVING_NAME_TAG.getIndex(), EntityDataTypes1_7_6_10.STRING, name));
+		metadataList.add(new EntityData(EntityDataIndex1_7_6_10.ENTITY_LIVING_NAME_TAG_VISIBILITY.getIndex(), EntityDataTypes1_7_6_10.BYTE, (byte) 1));
 
-		wrapper.write(Types1_7_6_10.METADATA_LIST, metadataList);
+		wrapper.write(Types1_7_6_10.ENTITY_DATA_LIST, metadataList);
 	}
 
-	public void sendSpawnPacket(final MetadataRewriter1_7_6_10To1_8 entityRewriter) throws Exception {
+	public void sendSpawnPacket(final EntityPacketRewriter1_8 entityRewriter) {
 		if (entityIds != null) {
 			deleteEntity();
 		}
@@ -273,15 +272,15 @@ public class VirtualHologramEntity {
 		} else if (currentState == State.HOLOGRAM) {
 			final int[] entityIds = { entityId, additionalEntityId() };
 
-			final PacketWrapper spawnSkull = PacketWrapper.create(ClientboundPackets1_7_2_5.SPAWN_ENTITY, user);
-			spawnSkull.write(Type.VAR_INT, entityIds[0]);
-			spawnSkull.write(Type.BYTE, (byte) 66);
-			spawnSkull.write(Type.INT, (int) (locX * 32.0));
-			spawnSkull.write(Type.INT, (int) (locY * 32.0));
-			spawnSkull.write(Type.INT, (int) (locZ * 32.0));
-			spawnSkull.write(Type.BYTE, (byte) 0);
-			spawnSkull.write(Type.BYTE, (byte) 0);
-			spawnSkull.write(Type.INT, 0);
+			final PacketWrapper spawnSkull = PacketWrapper.create(ClientboundPackets1_7_2_5.ADD_ENTITY, user);
+			spawnSkull.write(Types.VAR_INT, entityIds[0]);
+			spawnSkull.write(Types.BYTE, (byte) 66);
+			spawnSkull.write(Types.INT, (int) (locX * 32.0));
+			spawnSkull.write(Types.INT, (int) (locY * 32.0));
+			spawnSkull.write(Types.INT, (int) (locZ * 32.0));
+			spawnSkull.write(Types.BYTE, (byte) 0);
+			spawnSkull.write(Types.BYTE, (byte) 0);
+			spawnSkull.write(Types.INT, 0);
 			spawnSkull.send(Protocol1_8To1_7_6_10.class);
 
 			spawnEntity(entityIds[1], 100, locX, locY, locZ); // Horse
@@ -307,14 +306,14 @@ public class VirtualHologramEntity {
 		return Integer.MAX_VALUE - 16000 - entityId;
 	}
 
-	public void deleteEntity() throws Exception {
+	public void deleteEntity() {
 		if (entityIds == null) {
 			return;
 		}
-		final PacketWrapper despawn = PacketWrapper.create(ClientboundPackets1_7_2_5.DESTROY_ENTITIES, user);
-		despawn.write(Type.BYTE, (byte) entityIds.length);
+		final PacketWrapper despawn = PacketWrapper.create(ClientboundPackets1_7_2_5.REMOVE_ENTITIES, user);
+		despawn.write(Types.BYTE, (byte) entityIds.length);
 		for (int id : entityIds) {
-			despawn.write(Type.INT, id);
+			despawn.write(Types.INT, id);
 		}
 		entityIds = null;
 		despawn.send(Protocol1_8To1_7_6_10.class);
@@ -322,9 +321,5 @@ public class VirtualHologramEntity {
 
 	private enum State {
 		HOLOGRAM, ZOMBIE
-	}
-
-	public int getEntityId() {
-		return entityId;
 	}
 }

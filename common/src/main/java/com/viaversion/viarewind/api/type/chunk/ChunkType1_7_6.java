@@ -17,7 +17,7 @@
  */
 package com.viaversion.viarewind.api.type.chunk;
 
-import com.viaversion.viarewind.utils.ExtendedBlockStorage;
+import com.viaversion.viarewind.api.minecraft.ExtendedBlockStorage;
 import com.viaversion.viaversion.api.minecraft.chunks.*;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.util.Pair;
@@ -36,13 +36,18 @@ public class ChunkType1_7_6 extends Type<Chunk> {
 	}
 
 	@Override
-	public Chunk read(ByteBuf byteBuf) throws Exception {
+	public Chunk read(ByteBuf byteBuf) {
 		throw new UnsupportedOperationException(); // Not needed, see https://github.com/ViaVersion/ViaLegacy/blob/main/src/main/java/net/raphimc/vialegacy/protocols/release/protocol1_8to1_7_6_10/types/Chunk1_7_6Type.java
 	}
 
 	@Override
-	public void write(ByteBuf output, Chunk chunk) throws Exception {
-		final Pair<byte[], Short> chunkData = serialize(chunk);
+	public void write(ByteBuf output, Chunk chunk) {
+		Pair<byte[], Short> chunkData;
+		try {
+			chunkData = serialize(chunk);
+		} catch (IOException e) {
+			throw new RuntimeException("Unable to serialize chunk", e);
+		}
 		final byte[] data = chunkData.key();
 		final short additionalBitMask = chunkData.value();
 

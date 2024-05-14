@@ -23,8 +23,8 @@ import com.viaversion.viarewind.protocol.v1_9to1_8.storage.LevitationStorage;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
+import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_8;
 
 import java.util.logging.Level;
 
@@ -38,11 +38,11 @@ public class LevitationUpdateTask implements Runnable {
 				continue;
 			}
 
-			final PacketWrapper velocityPacket = PacketWrapper.create(ClientboundPackets1_8.ENTITY_VELOCITY, connection);
-			velocityPacket.write(Type.VAR_INT, connection.getEntityTracker(Protocol1_9To1_8.class).clientEntityId());
-			velocityPacket.write(Type.SHORT, (short) 0);
-			velocityPacket.write(Type.SHORT, (short) ((levitation.getAmplifier() + 1) * 360));
-			velocityPacket.write(Type.SHORT, (short) 0);
+			final PacketWrapper velocityPacket = PacketWrapper.create(ClientboundPackets1_8.SET_ENTITY_MOTION, connection);
+			velocityPacket.write(Types.VAR_INT, connection.getEntityTracker(Protocol1_9To1_8.class).clientEntityId());
+			velocityPacket.write(Types.SHORT, (short) 0);
+			velocityPacket.write(Types.SHORT, (short) ((levitation.getAmplifier() + 1) * 360));
+			velocityPacket.write(Types.SHORT, (short) 0);
 			try {
 				velocityPacket.scheduleSend(Protocol1_9To1_8.class);
 			} catch (Exception e) {

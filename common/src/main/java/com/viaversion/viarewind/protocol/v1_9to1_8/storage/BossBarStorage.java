@@ -17,7 +17,7 @@
  */
 package com.viaversion.viarewind.protocol.v1_9to1_8.storage;
 
-import com.viaversion.viarewind.protocol.v1_9to1_8.emulation.WitherBossBar;
+import com.viaversion.viarewind.protocol.v1_9to1_8.data.WitherBossBar;
 import com.viaversion.viaversion.api.connection.StoredObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 
@@ -38,7 +38,7 @@ public class BossBarStorage extends StoredObject {
 		changeWorld();
 	}
 
-	public void add(UUID uuid, String title, float health) throws Exception {
+	public void add(UUID uuid, String title, float health) {
 		WitherBossBar bossBar = new WitherBossBar(this.getUser(), uuid, title, health);
 		PlayerPositionTracker playerPositionTracker = this.getUser().get(PlayerPositionTracker.class);
 		bossBar.setPlayerLocation(playerPositionTracker.getPosX(), playerPositionTracker.getPosY(), playerPositionTracker.getPosZ(), playerPositionTracker.getYaw(), playerPositionTracker.getPitch());

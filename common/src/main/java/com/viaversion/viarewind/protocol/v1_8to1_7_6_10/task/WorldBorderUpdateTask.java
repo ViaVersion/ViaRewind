@@ -24,8 +24,8 @@ import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.storage.WorldBorderEmula
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
+import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_8;
 
 import java.util.logging.Level;
 
@@ -73,16 +73,16 @@ public class WorldBorderUpdateTask implements Runnable {
 
 				double particleOffset = 2.5;
 
-				final PacketWrapper spawnParticle = PacketWrapper.create(ClientboundPackets1_8.SPAWN_PARTICLE, connection);
-				spawnParticle.write(Type.STRING, ViaRewind.getConfig().getWorldBorderParticle()); // particle name
-				spawnParticle.write(Type.FLOAT, (float) (side.modX != 0 ? worldBorderEmulatorTracker.getX() + (radius * side.modX) : centerH)); // x
-				spawnParticle.write(Type.FLOAT, (float) centerV); // y
-				spawnParticle.write(Type.FLOAT, (float) (side.modX == 0 ? worldBorderEmulatorTracker.getZ() + (radius * side.modZ) : centerH)); // z
-				spawnParticle.write(Type.FLOAT, (float) (side.modX != 0 ? 0f : (maxH - minH) / particleOffset)); // offset x
-				spawnParticle.write(Type.FLOAT, (float) ((maxV - minV) / particleOffset)); // offset y
-				spawnParticle.write(Type.FLOAT, (float) (side.modX == 0 ? 0f : (maxH - minH) / particleOffset)); // offset z
-				spawnParticle.write(Type.FLOAT, 0F); // particle data
-				spawnParticle.write(Type.INT, (int) Math.floor((maxH - minH) * (maxV - minV) * 0.5));
+				final PacketWrapper spawnParticle = PacketWrapper.create(ClientboundPackets1_8.LEVEL_PARTICLES, connection);
+				spawnParticle.write(Types.STRING, ViaRewind.getConfig().getWorldBorderParticle()); // particle name
+				spawnParticle.write(Types.FLOAT, (float) (side.modX != 0 ? worldBorderEmulatorTracker.getX() + (radius * side.modX) : centerH)); // x
+				spawnParticle.write(Types.FLOAT, (float) centerV); // y
+				spawnParticle.write(Types.FLOAT, (float) (side.modX == 0 ? worldBorderEmulatorTracker.getZ() + (radius * side.modZ) : centerH)); // z
+				spawnParticle.write(Types.FLOAT, (float) (side.modX != 0 ? 0f : (maxH - minH) / particleOffset)); // offset x
+				spawnParticle.write(Types.FLOAT, (float) ((maxV - minV) / particleOffset)); // offset y
+				spawnParticle.write(Types.FLOAT, (float) (side.modX == 0 ? 0f : (maxH - minH) / particleOffset)); // offset z
+				spawnParticle.write(Types.FLOAT, 0F); // particle data
+				spawnParticle.write(Types.INT, (int) Math.floor((maxH - minH) * (maxV - minV) * 0.5));
 
 				try {
 					spawnParticle.send(Protocol1_8To1_7_6_10.class);

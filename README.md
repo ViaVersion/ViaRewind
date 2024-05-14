@@ -37,6 +37,8 @@ Building
 After cloning this repository, build the project with Gradle by running `./gradlew build` and take the created jar out
 of the `universal/build/libs` directory.
 
+You need JDK 17 or newer to build ViaRewind.
+
 License
 -
 This project is licensed under the [GNU General Public License Version 3](LICENSE).

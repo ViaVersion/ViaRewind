@@ -47,7 +47,7 @@ base {
     description = "ViaBackwards addon to allow 1.8.x and 1.7.x clients on newer server versions."
 }
 
-java.sourceCompatibility = JavaVersion.VERSION_1_8
+java.sourceCompatibility = JavaVersion.VERSION_17
 
 tasks {
     // Variable replacements

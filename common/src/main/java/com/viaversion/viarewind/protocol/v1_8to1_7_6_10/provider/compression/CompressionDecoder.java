@@ -17,7 +17,7 @@
  */
 package com.viaversion.viarewind.protocol.v1_8to1_7_6_10.provider.compression;
 
-import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.ChannelHandlerContext;
@@ -41,7 +41,7 @@ public class CompressionDecoder extends MessageToMessageDecoder<ByteBuf> {
 	protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
 		if (!in.isReadable()) return;
 
-		int outLength = Type.VAR_INT.readPrimitive(in);
+		int outLength = Types.VAR_INT.readPrimitive(in);
 		if (outLength == 0) {
 			out.add(in.readBytes(in.readableBytes()));
 			return;

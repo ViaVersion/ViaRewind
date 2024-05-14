@@ -22,20 +22,20 @@ import com.viaversion.viabackwards.api.rewriters.LegacyEntityRewriter;
 import com.viaversion.viarewind.ViaRewind;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.ClientWorld;
-import com.viaversion.viaversion.api.minecraft.metadata.MetaType;
-import com.viaversion.viaversion.api.minecraft.metadata.types.MetaType1_8;
+import com.viaversion.viaversion.api.minecraft.entitydata.EntityDataType;
+import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes1_8;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
-import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 
 public abstract class VREntityRewriter<C extends ClientboundPacketType, T extends BackwardsProtocol<C, ?, ?, ?>> extends LegacyEntityRewriter<C, T> {
 
 	public VREntityRewriter(T protocol) {
-		super(protocol, MetaType1_8.String, MetaType1_8.Byte);
+		super(protocol, EntityDataTypes1_8.STRING, EntityDataTypes1_8.BYTE);
 	}
 
-	public VREntityRewriter(T protocol, MetaType displayType, MetaType displayVisibilityType) {
+	public VREntityRewriter(T protocol, EntityDataType displayType, EntityDataType displayVisibilityType) {
 		super(protocol, displayType, displayVisibilityType);
 	}
 
@@ -43,11 +43,11 @@ public abstract class VREntityRewriter<C extends ClientboundPacketType, T extend
 		protocol.registerClientbound(packetType, new PacketHandlers() {
 			@Override
 			protected void register() {
-				map(Type.INT); // Entity id
-				map(Type.UNSIGNED_BYTE); // Game mode
-				map(Type.BYTE); // Dimension
+				map(Types.INT); // Entity id
+				map(Types.UNSIGNED_BYTE); // Game mode
+				map(Types.BYTE); // Dimension
 				handler(playerTrackerHandler());
-				handler(wrapper -> wrapper.user().get(ClientWorld.class).setEnvironment(wrapper.get(Type.BYTE, 0)));
+				handler(wrapper -> wrapper.user().get(ClientWorld.class).setEnvironment(wrapper.get(Types.BYTE, 0)));
 			}
 		});
 	}

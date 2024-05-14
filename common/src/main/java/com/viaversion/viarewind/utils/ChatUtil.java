@@ -23,7 +23,7 @@ import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.libs.gson.JsonElement;
 import com.viaversion.viaversion.libs.gson.JsonObject;
 import com.viaversion.viaversion.libs.gson.JsonParser;
-import com.viaversion.viaversion.protocols.protocol1_13to1_12_2.Protocol1_13To1_12_2;
+import com.viaversion.viaversion.protocols.v1_12_2to1_13.Protocol1_12_2To1_13;
 import com.viaversion.viaversion.rewriter.ComponentRewriter;
 import com.viaversion.viaversion.util.ComponentUtil;
 
@@ -36,7 +36,7 @@ public class ChatUtil {
 	private static final ComponentRewriter<ClientboundPacketType> LEGACY_REWRITER = new ComponentRewriter<ClientboundPacketType>(null, ComponentRewriter.ReadType.JSON) {
 		@Override
 		protected void handleTranslate(JsonObject object, String translate) {
-			String text = Protocol1_13To1_12_2.MAPPINGS.getMojangTranslation().get(translate);
+			String text = Protocol1_12_2To1_13.MAPPINGS.getMojangTranslation().get(translate);
 			if (text != null) {
 				object.addProperty("translate", text);
 			}

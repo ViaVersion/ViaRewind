@@ -17,13 +17,15 @@
  */
 package com.viaversion.viarewind.protocol.v1_7_6_10to1_7_2_5;
 
-import com.viaversion.viarewind.api.type.Types1_7_6_10;
+import com.viaversion.viarewind.api.type.version.Types1_7_6_10;
+import com.viaversion.viarewind.protocol.v1_7_6_10to1_7_2_5.packet.ClientboundPackets1_7_2_5;
+import com.viaversion.viarewind.protocol.v1_7_6_10to1_7_2_5.packet.ServerboundPackets1_7_2_5;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.protocol.remapper.ValueTransformer;
-import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
 
 import java.util.ArrayList;
@@ -32,7 +34,7 @@ import java.util.stream.Collectors;
 
 public class Protocol1_7_6_10To1_7_2_5 extends AbstractProtocol<ClientboundPackets1_7_2_5, ClientboundPackets1_7_2_5, ServerboundPackets1_7_2_5, ServerboundPackets1_7_2_5> {
 
-	public static final ValueTransformer<String, String> REMOVE_DASHES = new ValueTransformer<String, String>(Type.STRING) {
+	public static final ValueTransformer<String, String> REMOVE_DASHES = new ValueTransformer<>(Types.STRING) {
 		@Override
 		public String transform(PacketWrapper wrapper, String s) {
 			return s.replace("-", "");
@@ -48,53 +50,53 @@ public class Protocol1_7_6_10To1_7_2_5 extends AbstractProtocol<ClientboundPacke
 		this.registerClientbound(State.LOGIN, ClientboundLoginPackets.GAME_PROFILE.getId(), ClientboundLoginPackets.GAME_PROFILE.getId(), new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Type.STRING, REMOVE_DASHES); // Uuid
-				map(Type.STRING); // Name
+				map(Types.STRING, REMOVE_DASHES); // Uuid
+				map(Types.STRING); // Name
 			}
 		});
 
-		this.registerClientbound(ClientboundPackets1_7_2_5.SPAWN_PLAYER, new PacketHandlers() {
+		this.registerClientbound(ClientboundPackets1_7_2_5.ADD_PLAYER, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Type.VAR_INT); // Entity id
-				map(Type.STRING, REMOVE_DASHES); // Uuid
-				map(Type.STRING); // Name
+				map(Types.VAR_INT); // Entity id
+				map(Types.STRING, REMOVE_DASHES); // Uuid
+				map(Types.STRING); // Name
 				handler(wrapper -> {
-					final int size = wrapper.read(Type.VAR_INT); // Data count
+					final int size = wrapper.read(Types.VAR_INT); // Data count
 					for (int i = 0; i < size; i++) {
-						wrapper.read(Type.STRING); // Data name
-						wrapper.read(Type.STRING); // Data value
-						wrapper.read(Type.STRING); // Data signature
+						wrapper.read(Types.STRING); // Data name
+						wrapper.read(Types.STRING); // Data value
+						wrapper.read(Types.STRING); // Data signature
 					}
 				});
-				map(Type.INT); // X
-				map(Type.INT); // Y
-				map(Type.INT); // Z
-				map(Type.BYTE); // Yaw
-				map(Type.BYTE); // Pitch
-				map(Type.SHORT); // Item in hand
-				map(Types1_7_6_10.METADATA_LIST); // Metadata
+				map(Types.INT); // X
+				map(Types.INT); // Y
+				map(Types.INT); // Z
+				map(Types.BYTE); // Yaw
+				map(Types.BYTE); // Pitch
+				map(Types.SHORT); // Item in hand
+				map(Types1_7_6_10.ENTITY_DATA_LIST); // Metadata
 			}
 		});
 
-		this.registerClientbound(ClientboundPackets1_7_2_5.TEAMS, new PacketHandlers() {
+		this.registerClientbound(ClientboundPackets1_7_2_5.SET_PLAYER_TEAM, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Type.STRING); // Team name
-				map(Type.BYTE); // Mode
+				map(Types.STRING); // Team name
+				map(Types.BYTE); // Mode
 				handler(wrapper -> {
-					final byte mode = wrapper.get(Type.BYTE, 0);
+					final byte mode = wrapper.get(Types.BYTE, 0);
 					if (mode == 0 || mode == 2) { // Team is created or information is updated
-						wrapper.passthrough(Type.STRING); // Team display name
-						wrapper.passthrough(Type.STRING); // Team prefix
-						wrapper.passthrough(Type.STRING); // Team suffix
-						wrapper.passthrough(Type.BYTE); // Friendly fire
+						wrapper.passthrough(Types.STRING); // Team display name
+						wrapper.passthrough(Types.STRING); // Team prefix
+						wrapper.passthrough(Types.STRING); // Team suffix
+						wrapper.passthrough(Types.BYTE); // Friendly fire
 					}
 					if (mode == 0 || mode == 3 || mode == 4) { // Team is created, player is added or player is removed
 						List<String> entryList = new ArrayList<>();
-						final int size = wrapper.read(Type.SHORT);
+						final int size = wrapper.read(Types.SHORT);
 						for (int i = 0; i < size; i++) {
-							entryList.add(wrapper.read(Type.STRING));
+							entryList.add(wrapper.read(Types.STRING));
 						}
 
 						entryList = entryList.stream()
@@ -102,9 +104,9 @@ public class Protocol1_7_6_10To1_7_2_5 extends AbstractProtocol<ClientboundPacke
 							.distinct() // remove duplicates
 							.collect(Collectors.toList());
 
-						wrapper.write(Type.SHORT, (short) entryList.size());
+						wrapper.write(Types.SHORT, (short) entryList.size());
 						for (String entry : entryList) {
-							wrapper.write(Type.STRING, entry);
+							wrapper.write(Types.STRING, entry);
 						}
 					}
 				});

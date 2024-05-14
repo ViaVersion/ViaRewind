@@ -35,12 +35,12 @@ public class BulkChunkType1_7_6 extends Type<Chunk[]> {
 	}
 
 	@Override
-	public Chunk[] read(ByteBuf byteBuf) throws Exception {
+	public Chunk[] read(ByteBuf byteBuf) {
 		throw new UnsupportedOperationException(); // Not needed, see https://github.com/ViaVersion/ViaLegacy/blob/main/src/main/java/net/raphimc/vialegacy/protocols/release/protocol1_8to1_7_6_10/types/ChunkBulk1_7_6Type.java
 	}
 
 	@Override
-	public void write(ByteBuf byteBuf, Chunk[] chunks) throws Exception {
+	public void write(ByteBuf byteBuf, Chunk[] chunks) {
 		final int chunkCount = chunks.length;
 		final ByteArrayOutputStream output = new ByteArrayOutputStream();
 		final int[] chunkX = new int[chunkCount];
@@ -50,8 +50,13 @@ public class BulkChunkType1_7_6 extends Type<Chunk[]> {
 
 		for (int i = 0; i < chunkCount; i++) {
 			final Chunk chunk = chunks[i];
-			final Pair<byte[], Short> chunkData = ChunkType1_7_6.serialize(chunk);
-			output.write(chunkData.key());
+			Pair<byte[], Short> chunkData;
+			try {
+				chunkData = ChunkType1_7_6.serialize(chunk);
+				output.write(chunkData.key());
+			} catch (Exception e) {
+				throw new RuntimeException("Unable to serialize chunk", e);
+			}
 			chunkX[i] = chunk.getX();
 			chunkZ[i] = chunk.getZ();
 			primaryBitMask[i] = (short) chunk.getBitmask();

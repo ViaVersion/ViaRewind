@@ -38,7 +38,7 @@ public class PlayerPositionTracker implements StorableObject {
 		this.posZ = z;
 	}
 
-	public void sendAnimations() throws Exception {
+	public void sendAnimations() {
 		PacketWrapper wrapper;
 		while ((wrapper = animations.poll()) != null) {
 			wrapper.sendToServer(Protocol1_9To1_8.class);

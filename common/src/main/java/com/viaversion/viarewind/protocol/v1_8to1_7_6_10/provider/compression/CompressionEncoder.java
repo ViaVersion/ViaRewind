@@ -17,7 +17,7 @@
  */
 package com.viaversion.viarewind.protocol.v1_8to1_7_6_10.provider.compression;
 
-import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.ChannelHandlerContext;
@@ -44,7 +44,7 @@ public class CompressionEncoder extends MessageToByteEncoder<ByteBuf> {
 			return;
 		}
 
-		Type.VAR_INT.writePrimitive(out, frameLength);
+		Types.VAR_INT.writePrimitive(out, frameLength);
 
 		ByteBuf temp = in;
 		if (!in.hasArray()) {

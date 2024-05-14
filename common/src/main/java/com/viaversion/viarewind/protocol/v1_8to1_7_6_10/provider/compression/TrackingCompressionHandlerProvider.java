@@ -17,8 +17,8 @@
  */
 package com.viaversion.viarewind.protocol.v1_8to1_7_6_10.provider.compression;
 
-import com.viaversion.viarewind.api.netty.EmptyChannelHandler;
-import com.viaversion.viarewind.api.netty.ForwardMessageToByteEncoder;
+import com.viaversion.viarewind.api.minecraft.netty.EmptyChannelHandler;
+import com.viaversion.viarewind.api.minecraft.netty.ForwardMessageToByteEncoder;
 import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.provider.CompressionHandlerProvider;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;

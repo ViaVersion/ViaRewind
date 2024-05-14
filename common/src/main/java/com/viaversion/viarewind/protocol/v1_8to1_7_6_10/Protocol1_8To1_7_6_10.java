@@ -19,11 +19,11 @@ package com.viaversion.viarewind.protocol.v1_8to1_7_6_10;
 
 import com.viaversion.viabackwards.api.BackwardsProtocol;
 import com.viaversion.viarewind.ViaRewind;
-import com.viaversion.viarewind.api.data.RewindMappings;
-import com.viaversion.viarewind.protocol.v1_7_6_10to1_7_2_5.ClientboundPackets1_7_2_5;
-import com.viaversion.viarewind.protocol.v1_7_6_10to1_7_2_5.ServerboundPackets1_7_2_5;
-import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.metadata.MetadataRewriter1_7_6_10To1_8;
-import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.packets.*;
+import com.viaversion.viarewind.api.data.RewindMappingData;
+import com.viaversion.viarewind.protocol.v1_7_6_10to1_7_2_5.packet.ClientboundPackets1_7_2_5;
+import com.viaversion.viarewind.protocol.v1_7_6_10to1_7_2_5.packet.ServerboundPackets1_7_2_5;
+import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.rewriter.EntityPacketRewriter1_8;
+import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.rewriter.*;
 import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.provider.CompressionHandlerProvider;
 import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.provider.compression.TrackingCompressionHandlerProvider;
 import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.storage.*;
@@ -36,20 +36,21 @@ import com.viaversion.viaversion.api.protocol.packet.Direction;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
-import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.exception.CancelException;
 import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
 import com.viaversion.viaversion.protocols.base.ServerboundLoginPackets;
-import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
-import com.viaversion.viaversion.protocols.protocol1_8.ServerboundPackets1_8;
+import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_8;
+import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ServerboundPackets1_8;
 
 import java.util.concurrent.TimeUnit;
 
 public class Protocol1_8To1_7_6_10 extends BackwardsProtocol<ClientboundPackets1_8, ClientboundPackets1_7_2_5, ServerboundPackets1_8, ServerboundPackets1_7_2_5> {
 
-	public static final RewindMappings MAPPINGS = new RewindMappings("1.8", "1.7.10");
+	public static final RewindMappingData MAPPINGS = new RewindMappingData("1.8", "1.7.10");
 
-	private final BlockItemPackets1_8 itemRewriter = new BlockItemPackets1_8(this);
-	private final MetadataRewriter1_7_6_10To1_8 metadataRewriter = new MetadataRewriter1_7_6_10To1_8(this);
+	private final BlockItemPacketRewriter1_8 itemRewriter = new BlockItemPacketRewriter1_8(this);
+	private final EntityPacketRewriter1_8 entityRewriter = new EntityPacketRewriter1_8(this);
 
 	public Protocol1_8To1_7_6_10() {
 		super(ClientboundPackets1_8.class, ClientboundPackets1_7_2_5.class, ServerboundPackets1_8.class, ServerboundPackets1_7_2_5.class);
@@ -58,26 +59,25 @@ public class Protocol1_8To1_7_6_10 extends BackwardsProtocol<ClientboundPackets1
 	@Override
 	protected void registerPackets() {
 		itemRewriter.register();
-		metadataRewriter.register();
+		entityRewriter.register();
 
-		EntityPackets1_8.register(this);
-		PlayerPackets1_8.register(this);
-		ScoreboardPackets1_8.register(this);
-		WorldPackets1_8.register(this);
+		PlayerPacketRewriter1_8.register(this);
+		ScoreboardPacketRewriter1_8.register(this);
+		WorldPacketRewriter1_8.register(this);
 
 		this.registerClientbound(State.LOGIN, ClientboundLoginPackets.HELLO.getId(), ClientboundLoginPackets.HELLO.getId(), new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Type.STRING); // server hash
-				map(Type.BYTE_ARRAY_PRIMITIVE, Type.SHORT_BYTE_ARRAY); // public key
-				map(Type.BYTE_ARRAY_PRIMITIVE, Type.SHORT_BYTE_ARRAY); // verification token
+				map(Types.STRING); // server hash
+				map(Types.BYTE_ARRAY_PRIMITIVE, Types.SHORT_BYTE_ARRAY); // public key
+				map(Types.BYTE_ARRAY_PRIMITIVE, Types.SHORT_BYTE_ARRAY); // verification token
 			}
 		});
 		this.registerClientbound(State.LOGIN, ClientboundLoginPackets.LOGIN_COMPRESSION.getId(), ClientboundLoginPackets.LOGIN_COMPRESSION.getId(), new PacketHandlers() {
 			@Override
 			public void register() {
 				handler(wrapper -> {
-					final int threshold = wrapper.read(Type.VAR_INT);
+					final int threshold = wrapper.read(Types.VAR_INT);
 
 					Via.getManager().getProviders().get(CompressionHandlerProvider.class).onHandleLoginCompressionPacket(wrapper.user(), threshold);
 					wrapper.cancel();
@@ -88,28 +88,28 @@ public class Protocol1_8To1_7_6_10 extends BackwardsProtocol<ClientboundPackets1
 		this.registerClientbound(ClientboundPackets1_8.KEEP_ALIVE, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Type.VAR_INT, Type.INT); // id
+				map(Types.VAR_INT, Types.INT); // id
 			}
 		});
 
 		this.registerServerbound(State.LOGIN, ServerboundLoginPackets.ENCRYPTION_KEY.getId(), ServerboundLoginPackets.ENCRYPTION_KEY.getId(), new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Type.SHORT_BYTE_ARRAY, Type.BYTE_ARRAY_PRIMITIVE); // shared secret
-				map(Type.SHORT_BYTE_ARRAY, Type.BYTE_ARRAY_PRIMITIVE); // verification token
+				map(Types.SHORT_BYTE_ARRAY, Types.BYTE_ARRAY_PRIMITIVE); // shared secret
+				map(Types.SHORT_BYTE_ARRAY, Types.BYTE_ARRAY_PRIMITIVE); // verification token
 			}
 		});
 
 		this.registerServerbound(ServerboundPackets1_7_2_5.KEEP_ALIVE, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Type.INT, Type.VAR_INT); // id
+				map(Types.INT, Types.VAR_INT); // id
 			}
 		});
 	}
 
 	@Override
-	public void transform(Direction direction, State state, PacketWrapper packetWrapper) throws Exception {
+	public void transform(Direction direction, State state, PacketWrapper packetWrapper) throws CancelException {
 		Via.getManager().getProviders().get(CompressionHandlerProvider.class).onTransformPacket(packetWrapper.user());
 
 		super.transform(direction, state, packetWrapper);
@@ -122,7 +122,7 @@ public class Protocol1_8To1_7_6_10 extends BackwardsProtocol<ClientboundPackets1
 		connection.put(new InventoryTracker(connection));
 		connection.put(new PlayerSessionStorage(connection));
 		connection.put(new GameProfileStorage(connection));
-		connection.put(new Scoreboard(connection));
+		connection.put(new ScoreboardTracker(connection));
 		connection.put(new CompressionStatusTracker(connection));
 		connection.put(new WorldBorderEmulator(connection));
 
@@ -141,18 +141,18 @@ public class Protocol1_8To1_7_6_10 extends BackwardsProtocol<ClientboundPackets1
 	}
 
 	@Override
-	public RewindMappings getMappingData() {
+	public RewindMappingData getMappingData() {
 		return MAPPINGS;
 	}
 
 	@Override
-	public BlockItemPackets1_8 getItemRewriter() {
+	public BlockItemPacketRewriter1_8 getItemRewriter() {
 		return itemRewriter;
 	}
 
 	@Override
-	public MetadataRewriter1_7_6_10To1_8 getEntityRewriter() {
-		return metadataRewriter;
+	public EntityPacketRewriter1_8 getEntityRewriter() {
+		return entityRewriter;
 	}
 
 	@Override
