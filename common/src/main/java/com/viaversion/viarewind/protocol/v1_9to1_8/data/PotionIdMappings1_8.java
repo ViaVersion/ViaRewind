@@ -17,7 +17,7 @@
  */
 package com.viaversion.viarewind.protocol.v1_9to1_8.data;
 
-import com.viaversion.viaversion.protocols.v1_8to1_9.data.PotionIds1_8;
+import com.viaversion.viaversion.protocols.v1_8to1_9.data.PotionIdMappings1_9;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,7 +28,7 @@ public class PotionIdMappings1_8 {
 	public static final Map<String, Integer> POTION_NAME_TO_ID = new HashMap<>();
 
 	static {
-		POTION_NAME_TO_ID.putAll(PotionIds1_8.POTION_NAME_TO_ID);
+		POTION_NAME_TO_ID.putAll(PotionIdMappings1_9.POTION_NAME_TO_ID);
 		POTION_NAME_TO_ID.put("luck", 8203);
 
 		POTION_NAME_INDEX.put("water", "§rWater Bottle");

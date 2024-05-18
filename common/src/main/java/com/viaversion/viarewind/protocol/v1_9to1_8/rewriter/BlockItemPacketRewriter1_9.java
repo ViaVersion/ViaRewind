@@ -30,7 +30,7 @@ import com.viaversion.viaversion.libs.gson.JsonElement;
 import com.viaversion.viaversion.libs.gson.JsonParser;
 import com.viaversion.nbt.tag.*;
 import com.viaversion.viaversion.protocols.v1_8to1_9.data.EntityIds1_8;
-import com.viaversion.viaversion.protocols.v1_8to1_9.data.PotionIds1_8;
+import com.viaversion.viaversion.protocols.v1_8to1_9.data.PotionIdMappings1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ServerboundPackets1_8;
 import com.viaversion.viaversion.util.Key;
@@ -322,7 +322,7 @@ public class BlockItemPacketRewriter1_9 extends VRBlockItemRewriter<ClientboundP
 				item.setData((short) (item.data() - 8192));
 			}
 
-			final String name = item.data() == 8192 ? "water" : PotionIds1_8.potionNameFromDamage(item.data());
+			final String name = item.data() == 8192 ? "water" : PotionIdMappings1_9.potionNameFromDamage(item.data());
 			tag.put("Potion", new StringTag("minecraft:" + name));
 			item.setData((short) 0);
 		}

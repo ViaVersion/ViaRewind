@@ -42,7 +42,7 @@ import com.viaversion.viaversion.api.type.types.version.Types1_8;
 import com.viaversion.viaversion.api.type.types.version.Types1_9;
 import com.viaversion.viaversion.libs.fastutil.ints.IntArrayList;
 import com.viaversion.viaversion.libs.fastutil.ints.IntList;
-import com.viaversion.viaversion.protocols.v1_8to1_9.data.MetaIndex1_8;
+import com.viaversion.viaversion.protocols.v1_8to1_9.data.EntityDataIndex1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_9;
 import com.viaversion.viaversion.rewriter.entitydata.EntityDataHandlerEvent;
@@ -535,24 +535,24 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
 
 	private void handleEntityData(EntityDataHandlerEvent event, EntityData metadata) {
 		final EntityTracker1_9 tracker = tracker(event.user());
-		if (metadata.id() == MetaIndex1_8.ENTITY_STATUS.getIndex()) {
+		if (metadata.id() == EntityDataIndex1_9.ENTITY_STATUS.getIndex()) {
 			tracker.getStatus().put(event.entityId(), (Byte) metadata.value());
 		}
-		final MetaIndex1_8 metaIndex = EntityDataIndex1_8.searchIndex(event.entityType(), metadata.id());
+		final EntityDataIndex1_9 metaIndex = EntityDataIndex1_8.searchIndex(event.entityType(), metadata.id());
 		if (metaIndex == null) {
 			// Almost certainly bad data, remove it
 			event.cancel();
 			return;
 		}
 		if (metaIndex.getOldType() == null || metaIndex.getNewType() == null) {
-			if (metaIndex == MetaIndex1_8.PLAYER_HAND) { // Player eating/aiming/drinking
+			if (metaIndex == EntityDataIndex1_9.PLAYER_HAND) { // Player eating/aiming/drinking
 				byte status = (byte) tracker.getStatus().getOrDefault(event.entityId(), 0);
 				if ((((byte) metadata.value()) & 1 << HAND_ACTIVE_BIT) != 0) {
 					status = (byte) (status | 1 << STATUS_USE_BIT);
 				} else {
 					status = (byte) (status & ~(1 << STATUS_USE_BIT));
 				}
-				event.createExtraData(new EntityData(MetaIndex1_8.ENTITY_STATUS.getIndex(), EntityDataTypes1_8.BYTE, status));
+				event.createExtraData(new EntityData(EntityDataIndex1_9.ENTITY_STATUS.getIndex(), EntityDataTypes1_8.BYTE, status));
 			}
 			event.cancel();
 			return;
@@ -601,7 +601,7 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
 				break;
 			case BOOLEAN:
 				final boolean bool = (Boolean) value;
-				if (metaIndex == MetaIndex1_8.ABSTRACT_AGEABLE_AGE) {
+				if (metaIndex == EntityDataIndex1_9.ABSTRACT_AGEABLE_AGE) {
 					metadata.setValue((byte) (bool ? -1 : 0));
 				} else {
 					metadata.setValue((byte) (bool ? 1 : 0));
