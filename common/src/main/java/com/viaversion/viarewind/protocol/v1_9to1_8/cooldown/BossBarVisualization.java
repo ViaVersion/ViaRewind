@@ -36,22 +36,22 @@ public class BossBarVisualization implements CooldownVisualization {
 
 	@Override
 	public void show(double progress) throws Exception {
-		PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_9.BOSS_EVENT, user);
+		final PacketWrapper setBossbar = PacketWrapper.create(ClientboundPackets1_9.BOSS_EVENT, user);
 		if (bossUUID == null) {
 			bossUUID = UUID.randomUUID();
-			wrapper.write(Types.UUID, bossUUID);
-			wrapper.write(Types.VAR_INT, 0); // Action - add
-			wrapper.write(Types.COMPONENT, new JsonPrimitive(" ")); // Title
-			wrapper.write(Types.FLOAT, (float) progress); // Health
-			wrapper.write(Types.VAR_INT, 0); // Color
-			wrapper.write(Types.VAR_INT, 0); // Division
-			wrapper.write(Types.UNSIGNED_BYTE, (short) 0); // Flags
+			setBossbar.write(Types.UUID, bossUUID);
+			setBossbar.write(Types.VAR_INT, 0); // Action - add
+			setBossbar.write(Types.COMPONENT, new JsonPrimitive(" ")); // Title
+			setBossbar.write(Types.FLOAT, (float) progress); // Health
+			setBossbar.write(Types.VAR_INT, 0); // Color
+			setBossbar.write(Types.VAR_INT, 0); // Division
+			setBossbar.write(Types.UNSIGNED_BYTE, (short) 0); // Flags
 		} else {
-			wrapper.write(Types.UUID, bossUUID);
-			wrapper.write(Types.VAR_INT, 2); // Action - update health
-			wrapper.write(Types.FLOAT, (float) progress); // Health
+			setBossbar.write(Types.UUID, bossUUID);
+			setBossbar.write(Types.VAR_INT, 2); // Action - update health
+			setBossbar.write(Types.FLOAT, (float) progress); // Health
 		}
-		wrapper.send(Protocol1_9To1_8.class, false);
+		setBossbar.send(Protocol1_9To1_8.class, false);
 	}
 
 	@Override
@@ -59,10 +59,10 @@ public class BossBarVisualization implements CooldownVisualization {
 		if (bossUUID == null) {
 			return;
 		}
-		PacketWrapper wrapper = PacketWrapper.create(ClientboundPackets1_9.BOSS_EVENT, null, user);
-		wrapper.write(Types.UUID, bossUUID);
-		wrapper.write(Types.VAR_INT, 1); // Action - remove
-		wrapper.send(Protocol1_9To1_8.class, false);
+		final PacketWrapper removeBossbar = PacketWrapper.create(ClientboundPackets1_9.BOSS_EVENT, user);
+		removeBossbar.write(Types.UUID, bossUUID);
+		removeBossbar.write(Types.VAR_INT, 1); // Action - remove
+		removeBossbar.send(Protocol1_9To1_8.class, false);
 		bossUUID = null;
 	}
 }

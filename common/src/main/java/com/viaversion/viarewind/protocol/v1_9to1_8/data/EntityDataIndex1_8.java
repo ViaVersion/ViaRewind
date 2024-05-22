@@ -27,18 +27,18 @@ import java.util.Optional;
 
 public class EntityDataIndex1_8 {
 
-	private static final HashMap<Pair<EntityTypes1_9.EntityType, Integer>, EntityDataIndex1_9> metadataRewrites = new HashMap<>();
+	private static final HashMap<Pair<EntityTypes1_9.EntityType, Integer>, EntityDataIndex1_9> ENTITY_DATA_REWRITES = new HashMap<>();
 
 	static {
 		for (EntityDataIndex1_9 index : EntityDataIndex1_9.values()) {
-			metadataRewrites.put(new Pair<>(index.getClazz(), index.getNewIndex()), index);
+			ENTITY_DATA_REWRITES.put(new Pair<>(index.getClazz(), index.getNewIndex()), index);
 		}
 	}
 
 	private static Optional<EntityDataIndex1_9> getIndex(final EntityType type, final int index) {
 		final Pair<EntityType, Integer> pair = new Pair<>(type, index);
-		if (metadataRewrites.containsKey(pair)) {
-			return Optional.of(metadataRewrites.get(pair));
+		if (ENTITY_DATA_REWRITES.containsKey(pair)) {
+			return Optional.of(ENTITY_DATA_REWRITES.get(pair));
 		} else {
 			return Optional.empty();
 		}
@@ -55,4 +55,5 @@ public class EntityDataIndex1_8 {
 		} while (currentType != null);
 		return null;
 	}
+
 }

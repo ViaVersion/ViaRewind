@@ -52,18 +52,13 @@ public interface CooldownVisualization {
 		}
 
 		static Factory fromIndicator(CooldownIndicator indicator) {
-			switch (indicator) {
-				case TITLE:
-					return TitleCooldownVisualization::new;
-				case BOSS_BAR:
-					return BossBarVisualization::new;
-				case ACTION_BAR:
-					return ActionBarVisualization::new;
-				case DISABLED:
-					return DISABLED;
-				default:
-					throw new IllegalArgumentException("Unexpected: " + indicator);
-			}
+			return switch (indicator) {
+				case TITLE -> TitleCooldownVisualization::new;
+				case BOSS_BAR -> BossBarVisualization::new;
+				case ACTION_BAR -> ActionBarVisualization::new;
+				case DISABLED -> DISABLED;
+				default -> throw new IllegalArgumentException("Unexpected: " + indicator);
+			};
 		}
 
 		Factory DISABLED = user -> new DisabledCooldownVisualization();

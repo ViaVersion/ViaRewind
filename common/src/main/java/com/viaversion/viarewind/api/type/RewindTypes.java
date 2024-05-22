@@ -31,6 +31,9 @@ import com.viaversion.nbt.tag.CompoundTag;
 
 import java.util.List;
 
+/**
+ * Safe to use before protocol loading
+ */
 public class RewindTypes {
 
 	public static final Type<int[]> INT_ARRAY = new IntArrayType(); // Integer array with byte as length indicator

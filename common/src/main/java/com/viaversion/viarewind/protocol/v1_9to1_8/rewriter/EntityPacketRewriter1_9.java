@@ -30,8 +30,8 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.minecraft.EulerAngle;
 import com.viaversion.viaversion.api.minecraft.Vector;
+import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_9;
-import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_9.EntityType;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
 import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes1_8;
@@ -73,7 +73,7 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
 			@Override
 			public void register() {
 				map(Types.VAR_INT); // Entity id
-				read(Types.UUID); // Entity UUID
+				read(Types.UUID); // Entity uuid
 				map(Types.BYTE); // Entity type
 				map(Types.DOUBLE, Protocol1_9To1_8.DOUBLE_TO_INT_TIMES_32); // X
 				map(Types.DOUBLE, Protocol1_9To1_8.DOUBLE_TO_INT_TIMES_32); // Y
@@ -130,12 +130,12 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
 						final short velocityY = wrapper.read(Types.SHORT);
 						final short velocityZ = wrapper.read(Types.SHORT);
 
-						final PacketWrapper velocityPacket = PacketWrapper.create(ClientboundPackets1_8.SET_ENTITY_MOTION, wrapper.user());
-						velocityPacket.write(Types.VAR_INT, entityId);
-						velocityPacket.write(Types.SHORT, velocityX);
-						velocityPacket.write(Types.SHORT, velocityY);
-						velocityPacket.write(Types.SHORT, velocityZ);
-						velocityPacket.scheduleSend(Protocol1_9To1_8.class);
+						final PacketWrapper setEntityMotion = PacketWrapper.create(ClientboundPackets1_8.SET_ENTITY_MOTION, wrapper.user());
+						setEntityMotion.write(Types.VAR_INT, entityId);
+						setEntityMotion.write(Types.SHORT, velocityX);
+						setEntityMotion.write(Types.SHORT, velocityY);
+						setEntityMotion.write(Types.SHORT, velocityZ);
+						setEntityMotion.scheduleSend(Protocol1_9To1_8.class);
 					}
 				});
 			}
@@ -166,7 +166,7 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
 				map(Types.DOUBLE, Protocol1_9To1_8.DOUBLE_TO_INT_TIMES_32); // Z
 				handler(wrapper -> {
 					final int entityId = wrapper.get(Types.VAR_INT, 0);
-					wrapper.user().getEntityTracker(Protocol1_9To1_8.class).addEntity(entityId, EntityType.LIGHTNING_BOLT);
+					wrapper.user().getEntityTracker(Protocol1_9To1_8.class).addEntity(entityId, EntityTypes1_9.EntityType.LIGHTNING_BOLT);
 				});
 			}
 		});
@@ -175,7 +175,7 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
 			@Override
 			public void register() {
 				map(Types.VAR_INT); // Entity id
-				read(Types.UUID); // Entity UUID
+				read(Types.UUID); // Entity uuid
 				map(Types.UNSIGNED_BYTE); // Entity type
 				map(Types.DOUBLE, Protocol1_9To1_8.DOUBLE_TO_INT_TIMES_32); // X
 				map(Types.DOUBLE, Protocol1_9To1_8.DOUBLE_TO_INT_TIMES_32); // Y
@@ -186,7 +186,7 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
 				map(Types.SHORT); // Velocity x
 				map(Types.SHORT); // Velocity y
 				map(Types.SHORT); // Velocity z
-				map(Types1_9.ENTITY_DATA_LIST, Types1_8.ENTITY_DATA_LIST); // Metadata
+				map(Types1_9.ENTITY_DATA_LIST, Types1_8.ENTITY_DATA_LIST); // Entity data
 
 				handler(getTrackerHandler(Types.UNSIGNED_BYTE, 0));
 				handler(getMobSpawnRewriter(Types1_8.ENTITY_DATA_LIST));
@@ -197,7 +197,7 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
 			@Override
 			public void register() {
 				map(Types.VAR_INT); // Entity id
-				read(Types.UUID); // Entity UUID
+				read(Types.UUID); // Entity uuid
 				map(Types.STRING); // Title
 				map(Types.BLOCK_POSITION1_8); // Position
 				map(Types.BYTE, Types.UNSIGNED_BYTE); // Direction
@@ -212,14 +212,14 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
 			@Override
 			public void register() {
 				map(Types.VAR_INT); // Entity id
-				map(Types.UUID); // Player UUID
+				map(Types.UUID); // Player uuid
 				map(Types.DOUBLE, Protocol1_9To1_8.DOUBLE_TO_INT_TIMES_32); // X
 				map(Types.DOUBLE, Protocol1_9To1_8.DOUBLE_TO_INT_TIMES_32); // Y
 				map(Types.DOUBLE, Protocol1_9To1_8.DOUBLE_TO_INT_TIMES_32); // Z
 				map(Types.BYTE); // Yaw
 				map(Types.BYTE); // Pitch
 				create(Types.SHORT, (short) 0); // Current item
-				map(Types1_9.ENTITY_DATA_LIST, Types1_8.ENTITY_DATA_LIST); // Metadata
+				map(Types1_9.ENTITY_DATA_LIST, Types1_8.ENTITY_DATA_LIST); // Entity data
 
 				handler(getTrackerAndMetaHandler(Types1_8.ENTITY_DATA_LIST, EntityTypes1_9.EntityType.PLAYER));
 			}
@@ -329,17 +329,19 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
 				map(Types.FLOAT, Protocol1_9To1_8.DEGREES_TO_ANGLE); // Yaw
 				map(Types.FLOAT, Protocol1_9To1_8.DEGREES_TO_ANGLE); // Pitch
 				handler(wrapper -> {
-					if (wrapper.isCancelled()) return;
-					final PlayerPositionTracker position = wrapper.user().get(PlayerPositionTracker.class);
+					if (wrapper.isCancelled()) {
+						return;
+					}
+					final PlayerPositionTracker storage = wrapper.user().get(PlayerPositionTracker.class);
 					double x = wrapper.get(Types.INT, 0) / 32d;
 					double y = wrapper.get(Types.INT, 1) / 32d;
 					double z = wrapper.get(Types.INT, 2) / 32d;
-					position.setPos(x, y, z);
+					storage.setPos(x, y, z);
 				});
 				create(Types.BOOLEAN, true);
 				handler(wrapper -> {
 					final int entityId = wrapper.get(Types.VAR_INT, 0);
-					final com.viaversion.viaversion.api.minecraft.entities.EntityType type = wrapper.user().getEntityTracker(Protocol1_9To1_8.class).entityType(entityId);
+					final EntityType type = wrapper.user().getEntityTracker(Protocol1_9To1_8.class).entityType(entityId);
 					if (type == EntityTypes1_9.EntityType.BOAT) {
 						byte yaw = wrapper.get(Types.BYTE, 1);
 						yaw -= 64;
@@ -517,28 +519,19 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
 	@Override
 	protected void registerRewrites() {
 		// Handle new entities
-		mapEntityTypeWithData(EntityType.SHULKER, EntityType.MAGMA_CUBE).plainName();
-		mapEntityTypeWithData(EntityType.SHULKER_BULLET, EntityType.WITCH).plainName();
+		mapEntityTypeWithData(EntityTypes1_9.EntityType.SHULKER, EntityTypes1_9.EntityType.MAGMA_CUBE).plainName();
+		mapEntityTypeWithData(EntityTypes1_9.EntityType.SHULKER_BULLET, EntityTypes1_9.EntityType.WITCH).plainName();
 
-		// Metadata rewrite
-		filter().handler((event, meta) -> {
-			try {
-				handleEntityData(event, meta);
-			} catch (Exception e) {
-				if (Via.getManager().isDebug()) {
-					ViaRewind.getPlatform().getLogger().log(Level.SEVERE, "An error occurred with entity metadata: " + meta, e);
-				}
-				event.cancel();
-			}
-		});
+		// Entity data rewrite
+		filter().handler(this::handleEntityData);
 	}
 
-	private void handleEntityData(EntityDataHandlerEvent event, EntityData metadata) {
+	private void handleEntityData(EntityDataHandlerEvent event, EntityData entityData) {
 		final EntityTracker1_9 tracker = tracker(event.user());
-		if (metadata.id() == EntityDataIndex1_9.ENTITY_STATUS.getIndex()) {
-			tracker.getStatus().put(event.entityId(), (Byte) metadata.value());
+		if (entityData.id() == EntityDataIndex1_9.ENTITY_STATUS.getIndex()) {
+			tracker.getStatus().put(event.entityId(), (Byte) entityData.value());
 		}
-		final EntityDataIndex1_9 metaIndex = EntityDataIndex1_8.searchIndex(event.entityType(), metadata.id());
+		final EntityDataIndex1_9 metaIndex = EntityDataIndex1_8.searchIndex(event.entityType(), entityData.id());
 		if (metaIndex == null) {
 			// Almost certainly bad data, remove it
 			event.cancel();
@@ -547,7 +540,7 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
 		if (metaIndex.getOldType() == null || metaIndex.getNewType() == null) {
 			if (metaIndex == EntityDataIndex1_9.PLAYER_HAND) { // Player eating/aiming/drinking
 				byte status = (byte) tracker.getStatus().getOrDefault(event.entityId(), 0);
-				if ((((byte) metadata.value()) & 1 << HAND_ACTIVE_BIT) != 0) {
+				if ((((byte) entityData.value()) & 1 << HAND_ACTIVE_BIT) != 0) {
 					status = (byte) (status | 1 << STATUS_USE_BIT);
 				} else {
 					status = (byte) (status & ~(1 << STATUS_USE_BIT));
@@ -558,17 +551,17 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
 			return;
 		}
 
-		metadata.setId(metaIndex.getIndex());
-		metadata.setDataTypeUnsafe(metaIndex.getOldType());
+		entityData.setId(metaIndex.getIndex());
+		entityData.setDataTypeUnsafe(metaIndex.getOldType());
 
-		final Object value = metadata.getValue();
+		final Object value = entityData.getValue();
 		switch (metaIndex.getNewType()) {
 			case BYTE:
 				if (metaIndex.getOldType() == EntityDataTypes1_8.BYTE) {
-					metadata.setValue(value);
+					entityData.setValue(value);
 				}
 				if (metaIndex.getOldType() == EntityDataTypes1_8.INT) {
-					metadata.setValue(((Byte) value).intValue());
+					entityData.setValue(((Byte) value).intValue());
 				}
 				break;
 			case OPTIONAL_UUID:
@@ -577,7 +570,7 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
 					break;
 				}
 				final UUID owner = (UUID) value;
-				metadata.setValue(owner != null ? owner.toString() : "");
+				entityData.setValue(owner != null ? owner.toString() : "");
 				break;
 			case OPTIONAL_BLOCK_STATE:
 				event.cancel();
@@ -585,38 +578,38 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
 				break;
 			case VAR_INT:
 				if (metaIndex.getOldType() == EntityDataTypes1_8.BYTE) {
-					metadata.setValue(((Integer) value).byteValue());
+					entityData.setValue(((Integer) value).byteValue());
 				}
 				if (metaIndex.getOldType() == EntityDataTypes1_8.SHORT) {
-					metadata.setValue(((Integer) value).shortValue());
+					entityData.setValue(((Integer) value).shortValue());
 				}
 				if (metaIndex.getOldType() == EntityDataTypes1_8.INT) {
-					metadata.setValue(value);
+					entityData.setValue(value);
 				}
 				break;
 			case FLOAT:
 			case STRING:
 			case COMPONENT:
-				metadata.setValue(value);
+				entityData.setValue(value);
 				break;
 			case BOOLEAN:
 				final boolean bool = (Boolean) value;
 				if (metaIndex == EntityDataIndex1_9.ABSTRACT_AGEABLE_AGE) {
-					metadata.setValue((byte) (bool ? -1 : 0));
+					entityData.setValue((byte) (bool ? -1 : 0));
 				} else {
-					metadata.setValue((byte) (bool ? 1 : 0));
+					entityData.setValue((byte) (bool ? 1 : 0));
 				}
 				break;
 			case ITEM:
-				metadata.setValue(protocol.getItemRewriter().handleItemToClient(event.user(), (Item) value));
+				entityData.setValue(protocol.getItemRewriter().handleItemToClient(event.user(), (Item) value));
 				break;
 			case BLOCK_POSITION:
 				final BlockPosition position = (BlockPosition) value;
-				metadata.setValue(position);
+				entityData.setValue(position);
 				break;
 			case ROTATIONS:
 				final EulerAngle angle = (EulerAngle) value;
-				metadata.setValue(angle);
+				entityData.setValue(angle);
 				break;
 			default:
 				event.cancel();
@@ -625,12 +618,12 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
 	}
 
 	@Override
-	public EntityType typeFromId(int type) {
+	public EntityTypes1_9.EntityType typeFromId(int type) {
 		return EntityTypes1_9.getTypeFromId(type, false);
 	}
 
 	@Override
-	public EntityType objectTypeFromId(int type) {
+	public EntityTypes1_9.EntityType objectTypeFromId(int type) {
 		return EntityTypes1_9.getTypeFromId(type, true);
 	}
 }

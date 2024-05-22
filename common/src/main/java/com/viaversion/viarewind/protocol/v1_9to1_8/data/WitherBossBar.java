@@ -17,7 +17,7 @@
  */
 package com.viaversion.viarewind.protocol.v1_9to1_8.data;
 
-import com.viaversion.viarewind.ViaRewind;
+import com.viaversion.viarewind.protocol.v1_7_6_10to1_7_2_5.packet.ClientboundPackets1_7_2_5;
 import com.viaversion.viarewind.protocol.v1_9to1_8.Protocol1_9To1_8;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.legacy.bossbar.BossBar;
@@ -31,9 +31,9 @@ import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.Types1_8;
 
 import java.util.*;
-import java.util.logging.Level;
 
 public class WitherBossBar implements BossBar {
+
 	private static int highestId = Integer.MAX_VALUE - 10000;
 
 	private final UUID uuid;
@@ -62,11 +62,7 @@ public class WitherBossBar implements BossBar {
 	public BossBar setTitle(String title) {
 		this.title = title;
 		if (this.visible) {
-			try {
-				updateMetadata();
-			} catch (Exception e) {
-				ViaRewind.getPlatform().getLogger().log(Level.SEVERE, "Failed to update wither boss bar title", e);
-			}
+			updateEntityData();
 		}
 		return this;
 	}
@@ -83,11 +79,7 @@ public class WitherBossBar implements BossBar {
 			this.health = 0.0001f;
 		}
 		if (this.visible) {
-			try {
-				updateMetadata();
-			} catch (Exception e) {
-				ViaRewind.getPlatform().getLogger().log(Level.SEVERE, "Failed to update wither boss bar health", e);
-			}
+			updateEntityData();
 		}
 		return this;
 	}
@@ -160,12 +152,8 @@ public class WitherBossBar implements BossBar {
 	@Override
 	public BossBar show() {
 		if (!this.visible) {
+			addWither();
 			this.visible = true;
-			try {
-				spawnWither();
-			} catch (Exception e) {
-				ViaRewind.getPlatform().getLogger().log(Level.SEVERE, "Failed to spawn wither boss bar", e);
-			}
 		}
 		return this;
 	}
@@ -173,12 +161,8 @@ public class WitherBossBar implements BossBar {
 	@Override
 	public BossBar hide() {
 		if (this.visible) {
+			removeWither();
 			this.visible = false;
-			try {
-				despawnWither();
-			} catch (Exception e) {
-				ViaRewind.getPlatform().getLogger().log(Level.SEVERE, "Failed to despawn wither boss bar", e);
-			}
 		}
 		return this;
 	}
@@ -200,62 +184,58 @@ public class WitherBossBar implements BossBar {
 		updateLocation();
 	}
 
-	private void spawnWither() {
-		PacketWrapper wrapper = PacketWrapper.create(0x0F, null, this.connection);
-		wrapper.write(Types.VAR_INT, entityId);
-		wrapper.write(Types.UNSIGNED_BYTE, (short) 64);
-		wrapper.write(Types.INT, (int) (locX * 32d));
-		wrapper.write(Types.INT, (int) (locY * 32d));
-		wrapper.write(Types.INT, (int) (locZ * 32d));
-		wrapper.write(Types.BYTE, (byte) 0);
-		wrapper.write(Types.BYTE, (byte) 0);
-		wrapper.write(Types.BYTE, (byte) 0);
-		wrapper.write(Types.SHORT, (short) 0);
-		wrapper.write(Types.SHORT, (short) 0);
-		wrapper.write(Types.SHORT, (short) 0);
+	private void addWither() {
+		final PacketWrapper addMob = PacketWrapper.create(ClientboundPackets1_7_2_5.ADD_MOB, this.connection);
+		addMob.write(Types.VAR_INT, entityId);
+		addMob.write(Types.UNSIGNED_BYTE, (short) 64);
+		addMob.write(Types.INT, (int) (locX * 32D));
+		addMob.write(Types.INT, (int) (locY * 32D));
+		addMob.write(Types.INT, (int) (locZ * 32D));
+		addMob.write(Types.BYTE, (byte) 0);
+		addMob.write(Types.BYTE, (byte) 0);
+		addMob.write(Types.BYTE, (byte) 0);
+		addMob.write(Types.SHORT, (short) 0);
+		addMob.write(Types.SHORT, (short) 0);
+		addMob.write(Types.SHORT, (short) 0);
 
-		List<EntityData> metadata = new ArrayList<>();
-		metadata.add(new EntityData(0, EntityDataTypes1_8.BYTE, (byte) 0x20));
-		metadata.add(new EntityData(2, EntityDataTypes1_8.STRING, title));
-		metadata.add(new EntityData(3, EntityDataTypes1_8.BYTE, (byte) 1));
-		metadata.add(new EntityData(6, EntityDataTypes1_8.FLOAT, health * 300f));
+		final List<EntityData> entityData = new ArrayList<>();
+		entityData.add(new EntityData(0, EntityDataTypes1_8.BYTE, (byte) 0x20));
+		entityData.add(new EntityData(2, EntityDataTypes1_8.STRING, title));
+		entityData.add(new EntityData(3, EntityDataTypes1_8.BYTE, (byte) 1));
+		entityData.add(new EntityData(6, EntityDataTypes1_8.FLOAT, health * 300f));
 
-		wrapper.write(Types1_8.ENTITY_DATA_LIST, metadata);
-
-		wrapper.scheduleSend(Protocol1_9To1_8.class);
+		addMob.write(Types1_8.ENTITY_DATA_LIST, entityData);
+		addMob.scheduleSend(Protocol1_9To1_8.class);
 	}
 
 	private void updateLocation() {
-		PacketWrapper wrapper = PacketWrapper.create(0x18, null, this.connection);
-		wrapper.write(Types.VAR_INT, entityId);
-		wrapper.write(Types.INT, (int) (locX * 32d));
-		wrapper.write(Types.INT, (int) (locY * 32d));
-		wrapper.write(Types.INT, (int) (locZ * 32d));
-		wrapper.write(Types.BYTE, (byte) 0);
-		wrapper.write(Types.BYTE, (byte) 0);
-		wrapper.write(Types.BOOLEAN, false);
-
-		wrapper.scheduleSend(Protocol1_9To1_8.class);
+		final PacketWrapper teleportEntity = PacketWrapper.create(ClientboundPackets1_7_2_5.TELEPORT_ENTITY, this.connection);
+		teleportEntity.write(Types.VAR_INT, entityId);
+		teleportEntity.write(Types.INT, (int) (locX * 32D));
+		teleportEntity.write(Types.INT, (int) (locY * 32D));
+		teleportEntity.write(Types.INT, (int) (locZ * 32D));
+		teleportEntity.write(Types.BYTE, (byte) 0);
+		teleportEntity.write(Types.BYTE, (byte) 0);
+		teleportEntity.write(Types.BOOLEAN, false);
+		teleportEntity.scheduleSend(Protocol1_9To1_8.class);
 	}
 
-	private void updateMetadata() {
-		PacketWrapper wrapper = PacketWrapper.create(0x1C, null, this.connection);
-		wrapper.write(Types.VAR_INT, entityId);
+	private void updateEntityData() {
+		final PacketWrapper setEntityData = PacketWrapper.create(ClientboundPackets1_7_2_5.SET_ENTITY_DATA, this.connection);
+		setEntityData.write(Types.VAR_INT, entityId);
 
-		List<EntityData> metadata = new ArrayList<>();
-		metadata.add(new EntityData(2, EntityDataTypes1_8.STRING, title));
-		metadata.add(new EntityData(6, EntityDataTypes1_8.FLOAT, health * 300f));
+		final List<EntityData> entityData = new ArrayList<>();
+		entityData.add(new EntityData(2, EntityDataTypes1_8.STRING, title));
+		entityData.add(new EntityData(6, EntityDataTypes1_8.FLOAT, health * 300f));
 
-		wrapper.write(Types1_8.ENTITY_DATA_LIST, metadata);
-
-		wrapper.scheduleSend(Protocol1_9To1_8.class);
+		setEntityData.write(Types1_8.ENTITY_DATA_LIST, entityData);
+		setEntityData.scheduleSend(Protocol1_9To1_8.class);
 	}
 
-	private void despawnWither() {
-		PacketWrapper wrapper = PacketWrapper.create(0x13, null, this.connection);
-		wrapper.write(Types.VAR_INT_ARRAY_PRIMITIVE, new int[]{entityId});
-
-		wrapper.scheduleSend(Protocol1_9To1_8.class);
+	private void removeWither() {
+		final PacketWrapper removeEntity = PacketWrapper.create(ClientboundPackets1_7_2_5.REMOVE_ENTITIES, this.connection);
+		removeEntity.write(Types.VAR_INT_ARRAY_PRIMITIVE, new int[]{entityId});
+		removeEntity.scheduleSend(Protocol1_9To1_8.class);
 	}
 
 	public void setPlayerLocation(double posX, double posY, double posZ, float yaw, float pitch) {
@@ -268,4 +248,5 @@ public class WitherBossBar implements BossBar {
 
 		setLocation(posX, posY, posZ);
 	}
+
 }

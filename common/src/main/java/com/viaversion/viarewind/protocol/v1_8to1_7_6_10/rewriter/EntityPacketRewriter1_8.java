@@ -32,7 +32,6 @@ import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.storage.EntityTracker1_8
 import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.storage.GameProfileStorage;
 import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.storage.PlayerSessionStorage;
 import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.storage.ScoreboardTracker;
-import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_8;
@@ -50,7 +49,6 @@ import com.viaversion.viaversion.util.IdAndData;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.logging.Level;
 
 public class EntityPacketRewriter1_8 extends VREntityRewriter<ClientboundPackets1_8, Protocol1_8To1_7_6_10> {
 
@@ -111,11 +109,11 @@ public class EntityPacketRewriter1_8 extends VREntityRewriter<ClientboundPackets
 			@Override
 			public void register() {
 				map(Types.VAR_INT, Types.INT); // Entity id
-				map(Types1_8.ENTITY_DATA_LIST, Types1_7_6_10.ENTITY_DATA_LIST); // Metadata
+				map(Types1_8.ENTITY_DATA_LIST, Types1_7_6_10.ENTITY_DATA_LIST); // Entity data
 				handler(wrapper -> {
 					final int entityId = wrapper.get(Types.INT, 0);
-					final List<EntityData> metadata = wrapper.get(Types1_7_6_10.ENTITY_DATA_LIST, 0);
-					handleEntityData(entityId, metadata, wrapper.user());
+					final List<EntityData> entityData = wrapper.get(Types1_7_6_10.ENTITY_DATA_LIST, 0);
+					handleEntityData(entityId, entityData, wrapper.user());
 				});
 			}
 		});
@@ -248,7 +246,7 @@ public class EntityPacketRewriter1_8 extends VREntityRewriter<ClientboundPackets
 				map(Types.SHORT); // Velocity x
 				map(Types.SHORT); // Velocity y
 				map(Types.SHORT); // Velocity z
-				map(Types1_8.ENTITY_DATA_LIST, Types1_7_6_10.ENTITY_DATA_LIST); // Metadata
+				map(Types1_8.ENTITY_DATA_LIST, Types1_7_6_10.ENTITY_DATA_LIST); // Entity data
 
 				handler(getTrackerHandler(Types.UNSIGNED_BYTE, 0));
 				handler(getMobSpawnRewriter(Types1_7_6_10.ENTITY_DATA_LIST));
@@ -283,25 +281,25 @@ public class EntityPacketRewriter1_8 extends VREntityRewriter<ClientboundPackets
 		protocol.registerClientbound(ClientboundPackets1_8.ADD_PLAYER, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Types.VAR_INT); // entity id
+				map(Types.VAR_INT); // Entity id
 				handler(wrapper -> {
 					final UUID uuid = wrapper.read(Types.UUID);
-					wrapper.write(Types.STRING, uuid.toString()); // map to string
+					wrapper.write(Types.STRING, uuid.toString());
 
 					final GameProfileStorage gameProfileStorage = wrapper.user().get(GameProfileStorage.class);
 
 					GameProfileStorage.GameProfile gameProfile = gameProfileStorage.get(uuid);
 					if (gameProfile == null) {
-						wrapper.write(Types.STRING, ""); // name
-						wrapper.write(Types.VAR_INT, 0); // properties count
+						wrapper.write(Types.STRING, ""); // Name
+						wrapper.write(Types.VAR_INT, 0); // Properties count
 					} else {
-						wrapper.write(Types.STRING, gameProfile.name.length() > 16 ? gameProfile.name.substring(0, 16) : gameProfile.name); // name
-						wrapper.write(Types.VAR_INT, gameProfile.properties.size()); // properties count
+						wrapper.write(Types.STRING, gameProfile.name.length() > 16 ? gameProfile.name.substring(0, 16) : gameProfile.name); // Name
+						wrapper.write(Types.VAR_INT, gameProfile.properties.size()); // Properties count
 
 						for (GameProfileStorage.Property property : gameProfile.properties) {
-							wrapper.write(Types.STRING, property.name); // property name
-							wrapper.write(Types.STRING, property.value); // property value
-							wrapper.write(Types.STRING, property.signature == null ? "" : property.signature); // property signature
+							wrapper.write(Types.STRING, property.name); // Property name
+							wrapper.write(Types.STRING, property.value); // Property value
+							wrapper.write(Types.STRING, property.signature == null ? "" : property.signature); // Property signature
 						}
 					}
 
@@ -321,13 +319,13 @@ public class EntityPacketRewriter1_8 extends VREntityRewriter<ClientboundPackets
 
 					tracker.addPlayer(entityId, uuid);
 				});
-				map(Types.INT); // x
-				map(Types.INT); // y
-				map(Types.INT); // z
-				map(Types.BYTE); // yaw
-				map(Types.BYTE); // pitch
+				map(Types.INT); // X
+				map(Types.INT); // Y
+				map(Types.INT); // Z
+				map(Types.BYTE); // Yaw
+				map(Types.BYTE); // Pitch
 				map(Types.SHORT); // Current item
-				map(Types1_8.ENTITY_DATA_LIST, Types1_7_6_10.ENTITY_DATA_LIST); // metadata
+				map(Types1_8.ENTITY_DATA_LIST, Types1_7_6_10.ENTITY_DATA_LIST); // Entity data
 
 				handler(getTrackerAndMetaHandler(Types1_7_6_10.ENTITY_DATA_LIST, EntityTypes1_8.EntityType.PLAYER));
 			}
@@ -335,21 +333,17 @@ public class EntityPacketRewriter1_8 extends VREntityRewriter<ClientboundPackets
 		protocol.registerClientbound(ClientboundPackets1_8.SET_EQUIPPED_ITEM, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Types.VAR_INT, Types.INT); // entity id
-				map(Types.SHORT); // slot
-				map(Types.ITEM1_8, RewindTypes.COMPRESSED_NBT_ITEM); // item
+				map(Types.VAR_INT, Types.INT); // Entity id
+				map(Types.SHORT); // Slot
+				map(Types.ITEM1_8, RewindTypes.COMPRESSED_NBT_ITEM); // Item
 
-				// remap item
-				handler(wrapper -> {
-					final Item item = wrapper.get(RewindTypes.COMPRESSED_NBT_ITEM, 0);
-					protocol.getItemRewriter().handleItemToClient(wrapper.user(), item);
-					wrapper.set(RewindTypes.COMPRESSED_NBT_ITEM, 0, item);
-				});
+				handler(wrapper -> protocol.getItemRewriter().handleItemToClient(wrapper.user(), wrapper.get(RewindTypes.COMPRESSED_NBT_ITEM, 0)));
 
 				handler(wrapper -> {
 					final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_7_6_10.class);
 					final int id = wrapper.get(Types.INT, 0);
-					int limit = tracker.clientEntityId() == id ? 3 : 4;
+
+					final int limit = tracker.clientEntityId() == id ? 3 : 4;
 					if (wrapper.get(Types.SHORT, 0) > limit) {
 						wrapper.cancel();
 					}
@@ -359,8 +353,9 @@ public class EntityPacketRewriter1_8 extends VREntityRewriter<ClientboundPackets
 					final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_7_6_10.class);
 					final short slot = wrapper.get(Types.SHORT, 0);
 					final UUID uuid = tracker.getPlayerUUID(wrapper.get(Types.INT, 0));
-					if (uuid == null) return;
-
+					if (uuid == null) {
+						return;
+					}
 					final Item item = wrapper.get(RewindTypes.COMPRESSED_NBT_ITEM, 0);
 					wrapper.user().get(PlayerSessionStorage.class).setPlayerEquipment(uuid, item, slot);
 
@@ -376,16 +371,16 @@ public class EntityPacketRewriter1_8 extends VREntityRewriter<ClientboundPackets
 		protocol.registerClientbound(ClientboundPackets1_8.PLAYER_SLEEP, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Types.VAR_INT, Types.INT); // entity id
-				map(Types.BLOCK_POSITION1_8, RewindTypes.U_BYTE_POSITION); // position
+				map(Types.VAR_INT, Types.INT); // Entity id
+				map(Types.BLOCK_POSITION1_8, RewindTypes.U_BYTE_POSITION); // Position
 			}
 		});
 
 		protocol.registerClientbound(ClientboundPackets1_8.TAKE_ITEM_ENTITY, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Types.VAR_INT, Types.INT); // collected entity id
-				map(Types.VAR_INT, Types.INT); // collector entity id
+				map(Types.VAR_INT, Types.INT); // Collected Entity id
+				map(Types.VAR_INT, Types.INT); // Collector Entity id
 
 				handler(wrapper -> wrapper.user().getEntityTracker(Protocol1_8To1_7_6_10.class).removeEntity(wrapper.get(Types.INT, 0)));
 			}
@@ -394,25 +389,25 @@ public class EntityPacketRewriter1_8 extends VREntityRewriter<ClientboundPackets
 		protocol.registerClientbound(ClientboundPackets1_8.SET_ENTITY_MOTION, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Types.VAR_INT, Types.INT); // entity id
+				map(Types.VAR_INT, Types.INT); // Entity id
 			}
 		});
 
 		protocol.registerClientbound(ClientboundPackets1_8.MOVE_ENTITY, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Types.VAR_INT, Types.INT); // entity id
+				map(Types.VAR_INT, Types.INT); // Entity id
 			}
 		});
 
 		protocol.registerClientbound(ClientboundPackets1_8.MOVE_ENTITY_POS, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Types.VAR_INT, Types.INT); // entity id
-				map(Types.BYTE); // x
-				map(Types.BYTE); // y
-				map(Types.BYTE); // z
-				read(Types.BOOLEAN); // on ground
+				map(Types.VAR_INT, Types.INT); // Entity id
+				map(Types.BYTE); // X
+				map(Types.BYTE); // Y
+				map(Types.BYTE); // Z
+				read(Types.BOOLEAN); // On ground
 
 				handler(wrapper -> {
 					final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_7_6_10.class);
@@ -433,10 +428,10 @@ public class EntityPacketRewriter1_8 extends VREntityRewriter<ClientboundPackets
 		protocol.registerClientbound(ClientboundPackets1_8.MOVE_ENTITY_ROT, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Types.VAR_INT, Types.INT); // entity id
-				map(Types.BYTE); // yaw
-				map(Types.BYTE); // pitch
-				read(Types.BOOLEAN); // on ground
+				map(Types.VAR_INT, Types.INT); // Entity id
+				map(Types.BYTE); // Yaw
+				map(Types.BYTE); // Pitch
+				read(Types.BOOLEAN); // On ground
 
 				handler(wrapper -> {
 					final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_7_6_10.class);
@@ -456,13 +451,13 @@ public class EntityPacketRewriter1_8 extends VREntityRewriter<ClientboundPackets
 		protocol.registerClientbound(ClientboundPackets1_8.MOVE_ENTITY_POS_ROT, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Types.VAR_INT, Types.INT); // entity id
-				map(Types.BYTE); // x
-				map(Types.BYTE); // y
-				map(Types.BYTE); // z
-				map(Types.BYTE); // yaw
-				map(Types.BYTE); // pitch
-				read(Types.BOOLEAN); // on ground
+				map(Types.VAR_INT, Types.INT); // Entity id
+				map(Types.BYTE); // X
+				map(Types.BYTE); // Y
+				map(Types.BYTE); // Z
+				map(Types.BYTE); // Yaw
+				map(Types.BYTE); // Pitch
+				read(Types.BOOLEAN); // On ground
 
 				handler(wrapper -> {
 					final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_7_6_10.class);
@@ -487,13 +482,13 @@ public class EntityPacketRewriter1_8 extends VREntityRewriter<ClientboundPackets
 		protocol.registerClientbound(ClientboundPackets1_8.TELEPORT_ENTITY, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Types.VAR_INT, Types.INT); // entity id
-				map(Types.INT); // x
-				map(Types.INT); // y
-				map(Types.INT); // z
-				map(Types.BYTE); // yaw
-				map(Types.BYTE); // pitch
-				read(Types.BOOLEAN); // on ground
+				map(Types.VAR_INT, Types.INT); // Entity id
+				map(Types.INT); // X
+				map(Types.INT); // Y
+				map(Types.INT); // Z
+				map(Types.BYTE); // Yaw
+				map(Types.BYTE); // Pitch
+				read(Types.BOOLEAN); // On ground
 				handler(wrapper -> {
 					final int entityId = wrapper.get(Types.INT, 0);
 
@@ -524,8 +519,8 @@ public class EntityPacketRewriter1_8 extends VREntityRewriter<ClientboundPackets
 		protocol.registerClientbound(ClientboundPackets1_8.ROTATE_HEAD, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Types.VAR_INT, Types.INT); // entity id
-				map(Types.BYTE); // head yaw
+				map(Types.VAR_INT, Types.INT); // Entity id
+				map(Types.BYTE); // Head yaw
 
 				handler(wrapper -> {
 					final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_7_6_10.class);
@@ -544,9 +539,9 @@ public class EntityPacketRewriter1_8 extends VREntityRewriter<ClientboundPackets
 		protocol.registerClientbound(ClientboundPackets1_8.SET_ENTITY_LINK, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Types.INT); // riding entity id
-				map(Types.INT); // vehicle entity id
-				map(Types.BOOLEAN); // leash state
+				map(Types.INT); // Riding Entity id
+				map(Types.INT); // Vehicle Entity id
+				map(Types.BOOLEAN); // Leash state
 				handler(wrapper -> {
 					final boolean leash = wrapper.get(Types.BOOLEAN, 0);
 					if (!leash) {
@@ -564,26 +559,26 @@ public class EntityPacketRewriter1_8 extends VREntityRewriter<ClientboundPackets
 		protocol.registerClientbound(ClientboundPackets1_8.UPDATE_MOB_EFFECT, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Types.VAR_INT, Types.INT); // entity id
-				map(Types.BYTE); // effect id
-				map(Types.BYTE); // amplifier
-				map(Types.VAR_INT, Types.SHORT); // duration
-				read(Types.BYTE); // hide particles
+				map(Types.VAR_INT, Types.INT); // Entity id
+				map(Types.BYTE); // Effect id
+				map(Types.BYTE); // Amplifier
+				map(Types.VAR_INT, Types.SHORT); // Duration
+				read(Types.BYTE); // Hide particles
 			}
 		});
 
 		protocol.registerClientbound(ClientboundPackets1_8.REMOVE_MOB_EFFECT, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Types.VAR_INT, Types.INT); // entity id
-				map(Types.BYTE); // effect id
+				map(Types.VAR_INT, Types.INT); // Entity id
+				map(Types.BYTE); // Effect id
 			}
 		});
 
 		protocol.registerClientbound(ClientboundPackets1_8.UPDATE_ATTRIBUTES, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Types.VAR_INT, Types.INT); // entity id
+				map(Types.VAR_INT, Types.INT); // Entity id
 				handler(wrapper -> {
 					final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_7_6_10.class);
 					if (tracker.getHolograms().containsKey(wrapper.get(Types.INT, 0))) { // Don't handle properties for hologram emulation
@@ -618,28 +613,19 @@ public class EntityPacketRewriter1_8 extends VREntityRewriter<ClientboundPackets
 		mapEntityTypeWithData(EntityType.ENDERMITE, EntityType.SQUID).plainName();
 		mapEntityTypeWithData(EntityType.RABBIT, EntityType.CHICKEN).plainName();
 
-		// Metadata rewrite
-		filter().handler((event, meta) -> {
-			try {
-				handleMetadata(event, meta);
-			} catch (Exception e) {
-				if (Via.getManager().isDebug()) {
-					ViaRewind.getPlatform().getLogger().log(Level.SEVERE, "An error occurred with entity metadata: " + meta, e);
-				}
-				event.cancel();
-			}
-		});
+		// Entity data rewrite
+		filter().handler(this::handleEntityData);
 	}
 
-	public void handleMetadata(EntityDataHandlerEvent event, EntityData metadata) throws Exception {
+	public void handleEntityData(EntityDataHandlerEvent event, EntityData entityData) {
 		if (event.entityType() == EntityType.ARMOR_STAND) {
 			final EntityTracker1_8 tracker = tracker(event.user());
 			tracker.getHolograms().get(event.entityId()).syncState(this, event.dataList());
-			event.cancel(); // We are rewriting metadata manually
+			event.cancel(); // We are rewriting entityData manually
 			return;
 		}
 
-		final EntityDataIndex1_7_6_10 metaIndex = EntityDataIndex1_7_6_10.searchIndex(event.entityType(), metadata.id());
+		final EntityDataIndex1_7_6_10 metaIndex = EntityDataIndex1_7_6_10.searchIndex(event.entityType(), entityData.id());
 		if (metaIndex == null) {
 			// Almost certainly bad data, remove it
 			event.cancel();
@@ -649,54 +635,54 @@ public class EntityPacketRewriter1_8 extends VREntityRewriter<ClientboundPackets
 			event.cancel();
 			return;
 		}
-		final Object value = metadata.getValue();
-		metadata.setTypeAndValue(metaIndex.getNewType(), value);
-		metadata.setDataTypeUnsafe(metaIndex.getOldType());
-		metadata.setId(metaIndex.getIndex());
+		final Object value = entityData.getValue();
+		entityData.setTypeAndValue(metaIndex.getNewType(), value);
+		entityData.setDataTypeUnsafe(metaIndex.getOldType());
+		entityData.setId(metaIndex.getIndex());
 
 		switch (metaIndex.getOldType()) {
 			case INT:
 				if (metaIndex.getNewType() == EntityDataTypes1_8.BYTE) {
-					metadata.setValue(((Byte) value).intValue());
-					if (metaIndex == EntityDataIndex1_7_6_10.ENTITY_AGEABLE_AGE) {
-						if ((Integer) metadata.getValue() < 0) {
-							metadata.setValue(-25000);
+					entityData.setValue(((Byte) value).intValue());
+					if (metaIndex == EntityDataIndex1_7_6_10.ABSTRACT_AGEABLE_AGE) {
+						if ((Integer) entityData.getValue() < 0) {
+							entityData.setValue(-25000);
 						}
 					}
 				}
 				if (metaIndex.getNewType() == EntityDataTypes1_8.SHORT) {
-					metadata.setValue(((Short) value).intValue());
+					entityData.setValue(((Short) value).intValue());
 				}
 				if (metaIndex.getNewType() == EntityDataTypes1_8.INT) {
-					metadata.setValue(value);
+					entityData.setValue(value);
 				}
 				break;
 			case BYTE:
 				if (metaIndex.getNewType() == EntityDataTypes1_8.INT) {
-					metadata.setValue(((Integer) value).byteValue());
+					entityData.setValue(((Integer) value).byteValue());
 				}
 				if (metaIndex.getNewType() == EntityDataTypes1_8.BYTE) {
 					if (metaIndex == EntityDataIndex1_7_6_10.ITEM_FRAME_ROTATION) {
-						metadata.setValue(Integer.valueOf((Byte) value % 4).byteValue());
+						entityData.setValue(Integer.valueOf((Byte) value % 4).byteValue());
 					} else {
-						metadata.setValue(value);
+						entityData.setValue(value);
 					}
 				}
-				if (metaIndex == EntityDataIndex1_7_6_10.HUMAN_SKIN_FLAGS) {
+				if (metaIndex == EntityDataIndex1_7_6_10.PLAYER_SKIN_FLAGS) {
 					byte flags = (byte) value;
 					boolean cape = (flags & 0x01) != 0;
 					flags = (byte) (cape ? 0x00 : 0x02);
-					metadata.setValue(flags);
+					entityData.setValue(flags);
 				}
 				break;
 			case ITEM:
-				metadata.setValue(protocol.getItemRewriter().handleItemToClient(event.user(), (Item) value));
+				entityData.setValue(protocol.getItemRewriter().handleItemToClient(event.user(), (Item) value));
 				break;
 			case FLOAT:
 			case STRING:
 			case SHORT:
 			case POSITION:
-				metadata.setValue(value);
+				entityData.setValue(value);
 				break;
 			default:
 				event.cancel();

@@ -27,7 +27,6 @@ import io.netty.handler.codec.MessageToMessageDecoder;
 import java.util.List;
 import java.util.zip.Inflater;
 
-// https://github.com/Gerrygames/ClientViaVersion/blob/master/src/main/java/de/gerrygames/the5zig/clientviaversion/netty/CompressionDecoder.java
 public class CompressionDecoder extends MessageToMessageDecoder<ByteBuf> {
 	private final Inflater inflater = new Inflater();
 

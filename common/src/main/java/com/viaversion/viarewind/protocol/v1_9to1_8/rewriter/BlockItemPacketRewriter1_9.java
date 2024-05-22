@@ -81,7 +81,7 @@ public class BlockItemPacketRewriter1_9 extends VRBlockItemRewriter<ClientboundP
 
 			wrapper.user().get(WindowTracker.class).put(windowId, windowType);
 
-			// TODO check
+			// TODO This is wrong, VB is missing pre 1.13 mappings for translations
 			if (windowType.equalsIgnoreCase("minecraft:shulker_box")) {
 				wrapper.set(Types.STRING, 0, "minecraft:container");
 			}

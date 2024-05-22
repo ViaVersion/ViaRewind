@@ -38,7 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class VirtualHologramEntity {
-	private final List<EntityData> metadataTracker = new ArrayList<>();
+	private final List<EntityData> entityDataTracker = new ArrayList<>();
 	private double locX, locY, locZ;
 
 	private final UserConnection user;
@@ -91,24 +91,24 @@ public class VirtualHologramEntity {
 		updateLocation(false);
 	}
 
-	public void syncState(final EntityPacketRewriter1_8 entityRewriter, final List<EntityData> metadataList) {
-		// Merge metadata updates into current tracker
-		for (EntityData metadata : metadataList) {
-			metadataTracker.removeIf(m -> m.id() == metadata.id());
-			metadataTracker.add(metadata);
+	public void syncState(final EntityPacketRewriter1_8 entityRewriter, final List<EntityData> entityDataList) {
+		// Merge entity data updates into current tracker
+		for (EntityData entityData : entityDataList) {
+			entityDataTracker.removeIf(m -> m.id() == entityData.id());
+			entityDataTracker.add(entityData);
 		}
 
 		// Filter armor stand data to calculate emulation
 		byte flags = 0;
 		byte armorStandFlags = 0;
-		for (EntityData metadata : metadataTracker) {
-			if (metadata.id() == 0 && metadata.dataType() == EntityDataTypes1_8.BYTE) {
-				flags = ((Number) metadata.getValue()).byteValue();
-			} else if (metadata.id() == 2 && metadata.dataType() == EntityDataTypes1_8.STRING) {
-				name = metadata.getValue().toString();
+		for (EntityData entityData : entityDataTracker) {
+			if (entityData.id() == 0 && entityData.dataType() == EntityDataTypes1_8.BYTE) {
+				flags = ((Number) entityData.getValue()).byteValue();
+			} else if (entityData.id() == 2 && entityData.dataType() == EntityDataTypes1_8.STRING) {
+				name = entityData.getValue().toString();
 				if (name != null && name.isEmpty()) name = null;
-			} else if (metadata.id() == 10 && metadata.dataType() == EntityDataTypes1_8.BYTE) {
-				armorStandFlags = ((Number) metadata.getValue()).byteValue();
+			} else if (entityData.id() == 10 && entityData.dataType() == EntityDataTypes1_8.BYTE) {
+				armorStandFlags = ((Number) entityData.getValue()).byteValue();
 			}
 		}
 		final boolean invisible = (flags & 0x20) != 0;
@@ -126,7 +126,7 @@ public class VirtualHologramEntity {
 			deleteEntity();
 			sendSpawnPacket(entityRewriter);
 		} else {
-			sendMetadataUpdate(entityRewriter);
+			sendEntityDataUpdate(entityRewriter);
 			updateLocation(false);
 		}
 	}
@@ -182,83 +182,83 @@ public class VirtualHologramEntity {
 	}
 
 	protected void spawnEntity(final int entityId, final int type, final double locX, final double locY, final double locZ) {
-		final PacketWrapper spawnMob = PacketWrapper.create(ClientboundPackets1_7_2_5.ADD_MOB, null, user);
+		final PacketWrapper addMob = PacketWrapper.create(ClientboundPackets1_7_2_5.ADD_MOB, user);
 
-		spawnMob.write(Types.VAR_INT, entityId); // entity id
-		spawnMob.write(Types.UNSIGNED_BYTE, (short) type); // type
-		spawnMob.write(Types.INT, (int) (locX * 32.0)); // x
-		spawnMob.write(Types.INT, (int) (locY * 32.0)); // y
-		spawnMob.write(Types.INT, (int) (locZ * 32.0)); // z
-		spawnMob.write(Types.BYTE, (byte) 0); // yaw
-		spawnMob.write(Types.BYTE, (byte) 0); // pitch
-		spawnMob.write(Types.BYTE, (byte) 0); // head pitch
-		spawnMob.write(Types.SHORT, (short) 0); // velocity x
-		spawnMob.write(Types.SHORT, (short) 0); // velocity y
-		spawnMob.write(Types.SHORT, (short) 0); // velocity z
-		spawnMob.write(Types1_7_6_10.ENTITY_DATA_LIST, new ArrayList<>()); // metadata
+		addMob.write(Types.VAR_INT, entityId); // Entity id
+		addMob.write(Types.UNSIGNED_BYTE, (short) type); // Entity type
+		addMob.write(Types.INT, (int) (locX * 32.0)); // X
+		addMob.write(Types.INT, (int) (locY * 32.0)); // Y
+		addMob.write(Types.INT, (int) (locZ * 32.0)); // Z
+		addMob.write(Types.BYTE, (byte) 0); // Yaw
+		addMob.write(Types.BYTE, (byte) 0); // Pitch
+		addMob.write(Types.BYTE, (byte) 0); // Head pitch
+		addMob.write(Types.SHORT, (short) 0); // Velocity x
+		addMob.write(Types.SHORT, (short) 0); // Velocity y
+		addMob.write(Types.SHORT, (short) 0); // Velocity z
+		addMob.write(Types1_7_6_10.ENTITY_DATA_LIST, new ArrayList<>()); // Entity data
 
-		spawnMob.send(Protocol1_8To1_7_6_10.class);
+		addMob.send(Protocol1_8To1_7_6_10.class);
 	}
 
-	public void sendMetadataUpdate(final EntityPacketRewriter1_8 entityRewriter) {
+	public void sendEntityDataUpdate(final EntityPacketRewriter1_8 entityRewriter) {
 		if (entityIds == null) {
 			return;
 		}
-		final PacketWrapper metadataPacket = PacketWrapper.create(ClientboundPackets1_7_2_5.SET_ENTITY_DATA, user);
+		final PacketWrapper setEntityData = PacketWrapper.create(ClientboundPackets1_7_2_5.SET_ENTITY_DATA, user);
 
 		if (currentState == State.ZOMBIE) {
-			writeZombieMeta(entityRewriter, metadataPacket);
+			writeZombieMeta(entityRewriter, setEntityData);
 		} else if (currentState == State.HOLOGRAM) {
-			writeHologramMeta(metadataPacket);
+			writeHologramMeta(setEntityData);
 		} else {
 			return;
 		}
-		metadataPacket.send(Protocol1_8To1_7_6_10.class);
+		setEntityData.send(Protocol1_8To1_7_6_10.class);
 	}
 
 	private void writeZombieMeta(final EntityPacketRewriter1_8 entityRewriter, PacketWrapper wrapper) {
 		wrapper.write(Types.INT, entityIds[0]);
 
-		// Filter metadata sent by the server and convert them together with our custom metadata
-		final List<EntityData> metadataList = new ArrayList<>();
-		for (EntityData metadata : metadataTracker) {
-			// Remove non existent metadata
-			if (metadata.id() < 0 || metadata.id() > 9) {
+		// Filter entity data sent by the server and convert them together with our custom entity data
+		final List<EntityData> entityDataList = new ArrayList<>();
+		for (EntityData entityData : entityDataTracker) {
+			// Remove non existent entityData
+			if (entityData.id() < 0 || entityData.id() > 9) {
 				continue;
 			}
-			metadataList.add(new EntityData(metadata.id(), metadata.dataType(), metadata.getValue()));
+			entityDataList.add(new EntityData(entityData.id(), entityData.dataType(), entityData.getValue()));
 		}
 		if (small) {
-			metadataList.add(new EntityData(12, EntityDataTypes1_8.BYTE, (byte) 1));
+			entityDataList.add(new EntityData(12, EntityDataTypes1_8.BYTE, (byte) 1));
 		}
 
-		// Push metadata from the server through metadata conversion 1.7->1.8
-		for (EntityData metadata : metadataList.toArray(new EntityData[0])) {
-			final EntityDataHandlerEvent event = new EntityDataHandlerEventImpl(wrapper.user(), new TrackedEntityImpl(EntityTypes1_8.EntityType.ZOMBIE), -1, metadata, metadataList);
+		// Push entity data from the server through entity data conversion 1.7->1.8
+		for (EntityData entityData : entityDataList.toArray(new EntityData[0])) {
+			final EntityDataHandlerEvent event = new EntityDataHandlerEventImpl(wrapper.user(), new TrackedEntityImpl(EntityTypes1_8.EntityType.ZOMBIE), -1, entityData, entityDataList);
 			try {
-				entityRewriter.handleMetadata(event, metadata);
+				entityRewriter.handleEntityData(event, entityData);
 			} catch (Exception e) {
-				metadataList.remove(metadata);
+				entityDataList.remove(entityData);
 				break;
 			}
 			if (event.cancelled()) {
-				metadataList.remove(metadata);
+				entityDataList.remove(entityData);
 				break;
 			}
 		}
-		wrapper.write(Types1_7_6_10.ENTITY_DATA_LIST, metadataList);
+		wrapper.write(Types1_7_6_10.ENTITY_DATA_LIST, entityDataList);
 	}
 
 	private void writeHologramMeta(PacketWrapper wrapper) {
 		wrapper.write(Types.INT, entityIds[1]);
 
-		// Directly write 1.7 metadata here since we are making them up
-		final List<EntityData> metadataList = new ArrayList<>();
-		metadataList.add(new EntityData(EntityDataIndex1_7_6_10.ENTITY_AGEABLE_AGE.getIndex(), EntityDataTypes1_7_6_10.INT, -1700000));
-		metadataList.add(new EntityData(EntityDataIndex1_7_6_10.ENTITY_LIVING_NAME_TAG.getIndex(), EntityDataTypes1_7_6_10.STRING, name));
-		metadataList.add(new EntityData(EntityDataIndex1_7_6_10.ENTITY_LIVING_NAME_TAG_VISIBILITY.getIndex(), EntityDataTypes1_7_6_10.BYTE, (byte) 1));
+		// Directly write 1.7 entity data here since we are making them up
+		final List<EntityData> entityDataList = new ArrayList<>();
+		entityDataList.add(new EntityData(EntityDataIndex1_7_6_10.ABSTRACT_AGEABLE_AGE.getIndex(), EntityDataTypes1_7_6_10.INT, -1700000));
+		entityDataList.add(new EntityData(EntityDataIndex1_7_6_10.LIVING_ENTITY_BASE_NAME_TAG.getIndex(), EntityDataTypes1_7_6_10.STRING, name));
+		entityDataList.add(new EntityData(EntityDataIndex1_7_6_10.LIVING_ENTITY_BASE_NAME_TAG_VISIBILITY.getIndex(), EntityDataTypes1_7_6_10.BYTE, (byte) 1));
 
-		wrapper.write(Types1_7_6_10.ENTITY_DATA_LIST, metadataList);
+		wrapper.write(Types1_7_6_10.ENTITY_DATA_LIST, entityDataList);
 	}
 
 	public void sendSpawnPacket(final EntityPacketRewriter1_8 entityRewriter) {
@@ -288,7 +288,7 @@ public class VirtualHologramEntity {
 			this.entityIds = entityIds;
 		}
 
-		sendMetadataUpdate(entityRewriter);
+		sendEntityDataUpdate(entityRewriter);
 		updateLocation(true);
 	}
 

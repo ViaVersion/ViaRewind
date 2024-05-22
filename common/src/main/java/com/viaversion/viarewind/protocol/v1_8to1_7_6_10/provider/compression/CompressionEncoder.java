@@ -25,7 +25,6 @@ import io.netty.handler.codec.MessageToByteEncoder;
 
 import java.util.zip.Deflater;
 
-// https://github.com/Gerrygames/ClientViaVersion/blob/master/src/main/java/de/gerrygames/the5zig/clientviaversion/netty/CompressionEncoder.java
 public class CompressionEncoder extends MessageToByteEncoder<ByteBuf> {
 	private final Deflater deflater = new Deflater();
 

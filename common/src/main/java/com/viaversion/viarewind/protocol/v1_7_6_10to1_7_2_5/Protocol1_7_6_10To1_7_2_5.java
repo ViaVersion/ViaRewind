@@ -75,7 +75,7 @@ public class Protocol1_7_6_10To1_7_2_5 extends AbstractProtocol<ClientboundPacke
 				map(Types.BYTE); // Yaw
 				map(Types.BYTE); // Pitch
 				map(Types.SHORT); // Item in hand
-				map(Types1_7_6_10.ENTITY_DATA_LIST); // Metadata
+				map(Types1_7_6_10.ENTITY_DATA_LIST); // Entity data
 			}
 		});
 

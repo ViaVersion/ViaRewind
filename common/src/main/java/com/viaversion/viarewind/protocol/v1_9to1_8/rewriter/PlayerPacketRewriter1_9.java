@@ -36,11 +36,13 @@ import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.viaversion.api.minecraft.ClientWorld;
+import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ServerboundPackets1_8;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ServerboundPackets1_9;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class PlayerPacketRewriter1_9 {
@@ -114,7 +116,7 @@ public class PlayerPacketRewriter1_9 {
 							wrapper.write(Types.ITEM1_8, itemRewriter.handleItemToClient(wrapper.user(), wrapper.read(Types.ITEM1_8))); // Buy item 1
 							wrapper.write(Types.ITEM1_8, itemRewriter.handleItemToClient(wrapper.user(), wrapper.read(Types.ITEM1_8))); // Buy item 3
 
-							boolean has3Items = wrapper.passthrough(Types.BOOLEAN);
+							final boolean has3Items = wrapper.passthrough(Types.BOOLEAN);
 							if (has3Items) {
 								wrapper.write(Types.ITEM1_8, itemRewriter.handleItemToClient(wrapper.user(), wrapper.read(Types.ITEM1_8))); // Buy item 2
 							}
@@ -203,8 +205,8 @@ public class PlayerPacketRewriter1_9 {
 					if (!ViaRewind.getConfig().isEnableOffhand()) {
 						return;
 					}
-					final String msg = wrapper.get(Types.STRING, 0);
-					if (msg.toLowerCase().trim().startsWith(ViaRewind.getConfig().getOffhandCommand())) {
+					final String message = wrapper.get(Types.STRING, 0);
+					if (message.toLowerCase().trim().startsWith(ViaRewind.getConfig().getOffhandCommand())) {
 						wrapper.cancel();
 						final PacketWrapper swapItems = PacketWrapper.create(ServerboundPackets1_9.PLAYER_ACTION, wrapper.user());
 						swapItems.write(Types.VAR_INT, 6);
@@ -275,9 +277,9 @@ public class PlayerPacketRewriter1_9 {
 		protocol.registerServerbound(ServerboundPackets1_8.MOVE_PLAYER_ROT, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Types.FLOAT);
-				map(Types.FLOAT);
-				map(Types.BOOLEAN);
+				map(Types.FLOAT); // Yaw
+				map(Types.FLOAT); // Pitch
+				map(Types.BOOLEAN); // On ground
 				handler(wrapper -> {
 					wrapper.user().get(PlayerPositionTracker.class).sendAnimations();
 
@@ -291,174 +293,127 @@ public class PlayerPacketRewriter1_9 {
 			}
 		});
 
-		protocol.registerServerbound(ServerboundPackets1_8.MOVE_PLAYER_POS_ROT, new PacketHandlers() {
-			@Override
-			public void register() {
-				map(Types.DOUBLE);
-				map(Types.DOUBLE);
-				map(Types.DOUBLE);
-				map(Types.FLOAT);
-				map(Types.FLOAT);
-				map(Types.BOOLEAN);
-				handler(wrapper -> {
-					wrapper.user().get(PlayerPositionTracker.class).sendAnimations();
+		protocol.registerServerbound(ServerboundPackets1_8.MOVE_PLAYER_POS_ROT, wrapper -> {
+			final double x = wrapper.passthrough(Types.DOUBLE);
+			final double y = wrapper.passthrough(Types.DOUBLE);
+			final double z = wrapper.passthrough(Types.DOUBLE);
+			final float yaw = wrapper.passthrough(Types.FLOAT);
+			final float pitch = wrapper.passthrough(Types.FLOAT);
+			final boolean onGround = wrapper.passthrough(Types.BOOLEAN);
 
-					double x = wrapper.get(Types.DOUBLE, 0);
-					double y = wrapper.get(Types.DOUBLE, 1);
-					double z = wrapper.get(Types.DOUBLE, 2);
-					float yaw = wrapper.get(Types.FLOAT, 0);
-					float pitch = wrapper.get(Types.FLOAT, 1);
-					boolean onGround = wrapper.get(Types.BOOLEAN, 0);
+			PlayerPositionTracker storage = wrapper.user().get(PlayerPositionTracker.class);
+			storage.sendAnimations();
+			if (storage.getConfirmId() != -1) {
+				if (storage.getPosX() == x && storage.getPosY() == y && storage.getPosZ() == z && storage.getYaw() == yaw && storage.getPitch() == pitch) {
+					final PacketWrapper confirmTeleport = PacketWrapper.create(ServerboundPackets1_9.ACCEPT_TELEPORTATION, wrapper.user());
+					confirmTeleport.write(Types.VAR_INT, storage.getConfirmId());
+					confirmTeleport.sendToServer(Protocol1_9To1_8.class);
 
-					PlayerPositionTracker pos = wrapper.user().get(PlayerPositionTracker.class);
-					if (pos.getConfirmId() != -1) {
-						if (pos.getPosX() == x && pos.getPosY() == y && pos.getPosZ() == z
-								&& pos.getYaw() == yaw && pos.getPitch() == pitch) {
-							PacketWrapper confirmTeleport = wrapper.create(0x00);
-							confirmTeleport.write(Types.VAR_INT, pos.getConfirmId());
-							confirmTeleport.sendToServer(Protocol1_9To1_8.class);
-
-							pos.setConfirmId(-1);
-						}
-					} else {
-						pos.setPos(x, y, z);
-						pos.setYaw(yaw);
-						pos.setPitch(pitch);
-						pos.setOnGround(onGround);
-						wrapper.user().get(BossBarStorage.class).updateLocation();
-					}
-				});
+					storage.setConfirmId(-1);
+				}
+			} else {
+				storage.setPos(x, y, z);
+				storage.setYaw(yaw);
+				storage.setPitch(pitch);
+				storage.setOnGround(onGround);
+				wrapper.user().get(BossBarStorage.class).updateLocation();
 			}
 		});
 
-		protocol.registerServerbound(ServerboundPackets1_8.PLAYER_ACTION, new PacketHandlers() {
-			@Override
-			public void register() {
-				map(Types.VAR_INT);
-				map(Types.BLOCK_POSITION1_8);
-				handler(wrapper -> {
-					int state = wrapper.get(Types.VAR_INT, 0);
-					if (state == 0) {
-						wrapper.user().get(BlockPlaceDestroyTracker.class).setMining();
-					} else if (state == 2) {
-						BlockPlaceDestroyTracker tracker = wrapper.user().get(BlockPlaceDestroyTracker.class);
-						tracker.setMining();
-						tracker.setLastMining(System.currentTimeMillis() + 100);
-						wrapper.user().get(CooldownStorage.class).setLastHit(0);
-					} else if (state == 1) {
-						BlockPlaceDestroyTracker tracker = wrapper.user().get(BlockPlaceDestroyTracker.class);
-						tracker.setMining();
-						tracker.setLastMining(0);
-						wrapper.user().get(CooldownStorage.class).hit();
-					}
-				});
+		protocol.registerServerbound(ServerboundPackets1_8.PLAYER_ACTION, wrapper -> {
+			final int status = wrapper.passthrough(Types.VAR_INT);
+
+			final BlockPlaceDestroyTracker tracker = wrapper.user().get(BlockPlaceDestroyTracker.class);
+			if (status == 0 || status == 1 || status == 2) { // Start, cancel or finish
+				tracker.setMining();
+			}
+
+			final CooldownStorage cooldown = wrapper.user().get(CooldownStorage.class);
+			if (status == 1) { // Cancel
+				tracker.setLastMining(0);
+				cooldown.hit();
+			} else if (status == 2) { // Finish
+				tracker.setLastMining(System.currentTimeMillis() + 100);
+				cooldown.setLastHit(0);
 			}
 		});
 
 		protocol.registerServerbound(ServerboundPackets1_8.USE_ITEM_ON, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Types.BLOCK_POSITION1_8);
-				map(Types.BYTE, Types.VAR_INT);
-				read(Types.ITEM1_8);
-				create(Types.VAR_INT, 0); //Main Hand
-				map(Types.BYTE, Types.UNSIGNED_BYTE);
-				map(Types.BYTE, Types.UNSIGNED_BYTE);
-				map(Types.BYTE, Types.UNSIGNED_BYTE);
+				map(Types.BLOCK_POSITION1_8); // Position
+				map(Types.BYTE, Types.VAR_INT); // Face
+				read(Types.ITEM1_8); // Current item
+				create(Types.VAR_INT, 0); // Hand - main
+				map(Types.BYTE, Types.UNSIGNED_BYTE); // Cursor position x
+				map(Types.BYTE, Types.UNSIGNED_BYTE); // Cursor position y
+				map(Types.BYTE, Types.UNSIGNED_BYTE); // Cursor position z
 				handler(wrapper -> {
 					if (wrapper.get(Types.VAR_INT, 0) == -1) {
 						wrapper.cancel();
-						PacketWrapper useItem = PacketWrapper.create(0x1D, null, wrapper.user());
+						final PacketWrapper useItem = PacketWrapper.create(ServerboundPackets1_9.USE_ITEM, wrapper.user());
 						useItem.write(Types.VAR_INT, 0);
-
 						useItem.sendToServer(Protocol1_9To1_8.class);
 					}
 				});
 			}
 		});
 
-		protocol.registerServerbound(ServerboundPackets1_8.SET_CARRIED_ITEM, new PacketHandlers() {
-			@Override
-			public void register() {
-				handler(wrapper -> wrapper.user().get(CooldownStorage.class).hit());
-			}
-		});
+		protocol.registerServerbound(ServerboundPackets1_8.SET_CARRIED_ITEM, wrapper -> wrapper.user().get(CooldownStorage.class).hit());
 
-		protocol.registerServerbound(ServerboundPackets1_8.SWING, new PacketHandlers() {
-			@Override
-			public void register() {
-				handler(wrapper -> {
-					wrapper.cancel();
+		// Queue swing packet to be sent after on ground idle packets
+		protocol.registerServerbound(ServerboundPackets1_8.SWING, wrapper -> {
+			wrapper.cancel();
 
-					/* We have to add ArmAnimation to a queue to be sent on PacketPlayInFlying. In 1.9,
-					 * PacketPlayInArmAnimation is sent after PacketPlayInUseEntity, not before like it used to be.
-					 * However, all packets are sent before PacketPlayInFlying. We'd just do a normal delay, but
-					 * it would cause the packet to be sent after PacketPlayInFlying, potentially false flagging
-					 * anticheats that check for this behavior from clients. Since all packets are sent before
-					 * PacketPlayInFlying, if we queue it to be sent right before PacketPlayInFlying is processed,
-					 * we can be certain it will be sent after PacketPlayInUseEntity */
-					wrapper.cancel();
-					final PacketWrapper delayedPacket = PacketWrapper.create(0x1A, null, wrapper.user());
-					delayedPacket.write(Types.VAR_INT, 0);  //Main Hand
+			final PacketWrapper swing = PacketWrapper.create(ServerboundPackets1_9.SWING, wrapper.user());
+			swing.write(Types.VAR_INT, 0); // Main Hand
+			wrapper.user().get(PlayerPositionTracker.class).queueAnimation(swing);
 
-					wrapper.user().get(PlayerPositionTracker.class).queueAnimation(delayedPacket);
-				});
-				handler(wrapper -> {
-					wrapper.user().get(BlockPlaceDestroyTracker.class).updateMining();
-					wrapper.user().get(CooldownStorage.class).hit();
-				});
-			}
+			wrapper.user().get(BlockPlaceDestroyTracker.class).updateMining();
+			wrapper.user().get(CooldownStorage.class).hit();
 		});
 
 		protocol.registerServerbound(ServerboundPackets1_8.PLAYER_COMMAND, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Types.VAR_INT);
-				map(Types.VAR_INT);
-				map(Types.VAR_INT);
+				map(Types.VAR_INT); // Entity id
+				map(Types.VAR_INT); // Action id
+				map(Types.VAR_INT); // Action parameter
 				handler(wrapper -> {
-					int action = wrapper.get(Types.VAR_INT, 1);
-					if (action == 6) {
+					final PlayerPositionTracker tracker = wrapper.user().get(PlayerPositionTracker.class);
+					final int action = wrapper.get(Types.VAR_INT, 1);
+					if (action == 6) { // Jump with horse
 						wrapper.set(Types.VAR_INT, 1, 7);
-					} else if (action == 0) {
-						PlayerPositionTracker pos = wrapper.user().get(PlayerPositionTracker.class);
-						if (!pos.isOnGround()) {
-							PacketWrapper elytra = PacketWrapper.create(0x14, null, wrapper.user());
-							elytra.write(Types.VAR_INT, wrapper.get(Types.VAR_INT, 0));
-							elytra.write(Types.VAR_INT, 8);
-							elytra.write(Types.VAR_INT, 0);
-							elytra.scheduleSendToServer(Protocol1_9To1_8.class);
-						}
+					} else if (action == 0 && !tracker.isOnGround()) { // Start sneaking
+						final PacketWrapper elytra = PacketWrapper.create(ServerboundPackets1_9.PLAYER_COMMAND, wrapper.user());
+						elytra.write(Types.VAR_INT, wrapper.get(Types.VAR_INT, 0));
+						elytra.write(Types.VAR_INT, 8);
+						elytra.write(Types.VAR_INT, 0);
+						elytra.scheduleSendToServer(Protocol1_9To1_8.class);
 					}
 				});
 			}
 		});
 
-		protocol.registerServerbound(ServerboundPackets1_8.PLAYER_INPUT, new PacketHandlers() {
-			@Override
-			public void register() {
-				map(Types.FLOAT);
-				map(Types.FLOAT);
-				map(Types.UNSIGNED_BYTE);
-				handler(wrapper -> {
-					final EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
-					final int vehicle = tracker.getVehicle(tracker.clientEntityId());
-					if (vehicle != -1 && tracker.entityType(vehicle) == EntityTypes1_9.EntityType.BOAT) {
-						PacketWrapper steerBoat = PacketWrapper.create(0x11, null, wrapper.user());
-						float left = wrapper.get(Types.FLOAT, 0);
-						float forward = wrapper.get(Types.FLOAT, 1);
-						steerBoat.write(Types.BOOLEAN, forward != 0.0f || left < 0.0f);
-						steerBoat.write(Types.BOOLEAN, forward != 0.0f || left > 0.0f);
-						steerBoat.scheduleSendToServer(Protocol1_9To1_8.class);
-					}
-				});
+		protocol.registerServerbound(ServerboundPackets1_8.PLAYER_INPUT, wrapper -> {
+			final float sideways = wrapper.passthrough(Types.FLOAT);
+			final float forward = wrapper.passthrough(Types.FLOAT);
+
+			final EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
+			final int vehicle = tracker.getVehicle(tracker.clientEntityId());
+
+			if (vehicle != -1 && tracker.entityType(vehicle) == EntityTypes1_9.EntityType.BOAT) {
+				final PacketWrapper paddleBoat = PacketWrapper.create(ServerboundPackets1_9.PADDLE_BOAT, wrapper.user());
+				paddleBoat.write(Types.BOOLEAN, forward != 0.0f || sideways < 0.0f);
+				paddleBoat.write(Types.BOOLEAN, forward != 0.0f || sideways > 0.0f);
+				paddleBoat.scheduleSendToServer(Protocol1_9To1_8.class);
 			}
 		});
 
 		protocol.registerServerbound(ServerboundPackets1_8.SIGN_UPDATE, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Types.BLOCK_POSITION1_8);
+				map(Types.BLOCK_POSITION1_8); // Position
 				handler(wrapper -> {
 					for (int i = 0; i < 4; i++) {
 						wrapper.write(Types.STRING, ChatUtil.jsonToLegacy(wrapper.user(), wrapper.read(Types.COMPONENT)));
@@ -470,31 +425,31 @@ public class PlayerPacketRewriter1_9 {
 		protocol.registerServerbound(ServerboundPackets1_8.COMMAND_SUGGESTION, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Types.STRING);
-				create(Types.BOOLEAN, false);
-				map(Types.OPTIONAL_POSITION1_8);
+				map(Types.STRING); // Message
+				create(Types.BOOLEAN, false); // Has position
+				map(Types.OPTIONAL_POSITION1_8); // Looked at block (position)
 			}
 		});
+
 		protocol.registerServerbound(ServerboundPackets1_8.CLIENT_INFORMATION, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Types.STRING);
-				map(Types.BYTE);
-				map(Types.BYTE, Types.VAR_INT);
-				map(Types.BOOLEAN);
-				map(Types.UNSIGNED_BYTE);
-				create(Types.VAR_INT, 1);
+				map(Types.STRING); // Locale
+				map(Types.BYTE); // View distance
+				map(Types.BYTE, Types.VAR_INT); // Chat mode
+				map(Types.BOOLEAN); // Chat colors
+				map(Types.UNSIGNED_BYTE); // Displayed skin parts
+				create(Types.VAR_INT, 1); // Main hand
 				handler(wrapper -> {
-					short flags = wrapper.get(Types.UNSIGNED_BYTE, 0);
+					final short flags = wrapper.get(Types.UNSIGNED_BYTE, 0);
 
-					PacketWrapper updateSkin = PacketWrapper.create(0x1C, null, wrapper.user());
+					final PacketWrapper updateSkin = PacketWrapper.create(ClientboundPackets1_8.SET_ENTITY_DATA, wrapper.user());
 					updateSkin.write(Types.VAR_INT, wrapper.user().getEntityTracker(Protocol1_9To1_8.class).clientEntityId());
 
-					ArrayList<EntityData> metadata = new ArrayList<>();
-					metadata.add(new EntityData(10, EntityDataTypes1_8.BYTE, (byte) flags));
+					final List<EntityData> entityData = new ArrayList<>();
+					entityData.add(new EntityData(10, EntityDataTypes1_8.BYTE, (byte) flags));
 
-					updateSkin.write(Types1_8.ENTITY_DATA_LIST, metadata);
-
+					updateSkin.write(Types1_8.ENTITY_DATA_LIST, entityData);
 					updateSkin.scheduleSend(Protocol1_9To1_8.class);
 				});
 			}
@@ -503,9 +458,9 @@ public class PlayerPacketRewriter1_9 {
 		protocol.registerServerbound(ServerboundPackets1_8.CUSTOM_PAYLOAD, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Types.STRING);
+				map(Types.STRING); // Channel
 				handlerSoftFail(wrapper -> {
-					String channel = wrapper.get(Types.STRING, 0);
+					final String channel = wrapper.get(Types.STRING, 0);
 					if (channel.equals("MC|BEdit") || channel.equals("MC|BSign")) {
 						Item book = wrapper.passthrough(Types.ITEM1_8);
 						book.setIdentifier(386);
@@ -534,4 +489,5 @@ public class PlayerPacketRewriter1_9 {
 			}
 		});
 	}
+
 }

@@ -68,12 +68,12 @@ public class WorldPacketRewriter1_9 {
 		protocol.registerClientbound(ClientboundPackets1_9.BLOCK_EVENT, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Types.BLOCK_POSITION1_8);
-				map(Types.UNSIGNED_BYTE);
-				map(Types.UNSIGNED_BYTE);
-				map(Types.VAR_INT);
+				map(Types.BLOCK_POSITION1_8); // Position
+				map(Types.UNSIGNED_BYTE); // Byte 1 (depending on block type)
+				map(Types.UNSIGNED_BYTE); // Byte 2 (depending on block type)
+				map(Types.VAR_INT); // Block
 				handler(wrapper -> {
-					int block = wrapper.get(Types.VAR_INT, 0);
+					final int block = wrapper.get(Types.VAR_INT, 0);
 					if (block >= 219 && block <= 234) {
 						wrapper.set(Types.VAR_INT, 0, 130);
 					}
@@ -84,7 +84,7 @@ public class WorldPacketRewriter1_9 {
 		protocol.registerClientbound(ClientboundPackets1_9.CUSTOM_SOUND, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Types.STRING);
+				map(Types.STRING); // Sound name
 				handler(wrapper -> {
 					String name = wrapper.get(Types.STRING, 0);
 					name = protocol.getMappingData().getMappedNamedSound(name);
@@ -94,12 +94,12 @@ public class WorldPacketRewriter1_9 {
 						wrapper.set(Types.STRING, 0, name);
 					}
 				});
-				read(Types.VAR_INT);
-				map(Types.INT);
-				map(Types.INT);
-				map(Types.INT);
-				map(Types.FLOAT);
-				map(Types.UNSIGNED_BYTE);
+				read(Types.VAR_INT); // Sound category
+				map(Types.INT); // Effect position x
+				map(Types.INT); // Effect position y
+				map(Types.INT); // Effect position z
+				map(Types.FLOAT); // Volume
+				map(Types.UNSIGNED_BYTE); // Pitch
 			}
 		});
 
@@ -135,7 +135,7 @@ public class WorldPacketRewriter1_9 {
 						}
 					}
 
-					if (chunk.isFullChunk() && chunk.getBitmask() == 0) {  //This would be an unload packet for 1.8 clients. Just set one air section
+					if (chunk.isFullChunk() && chunk.getBitmask() == 0) { // This would be an unload packet for 1.8 clients. Just set one air section
 						boolean skylight = environment == Environment.NORMAL;
 						ChunkSection[] sections = new ChunkSection[16];
 						ChunkSection section = new ChunkSectionImpl(true);
@@ -147,10 +147,10 @@ public class WorldPacketRewriter1_9 {
 
 					wrapper.write(ChunkType1_8.forEnvironment(environment), chunk);
 
-					final UserConnection user = wrapper.user();
 					chunk.getBlockEntities().forEach(nbt -> {
-						if (!nbt.contains("x") || !nbt.contains("y") || !nbt.contains("z") || !nbt.contains("id"))
+						if (!nbt.contains("x") || !nbt.contains("y") || !nbt.contains("z") || !nbt.contains("id")) {
 							return;
+						}
 						BlockPosition position = new BlockPosition((int) nbt.get("x").getValue(), (int) nbt.get("y").getValue(), (int) nbt.get("z").getValue());
 						String id = (String) nbt.get("id").getValue();
 
@@ -178,16 +178,11 @@ public class WorldPacketRewriter1_9 {
 								return;
 						}
 
-						PacketWrapper updateTileEntity = PacketWrapper.create(0x09, null, user);
-						updateTileEntity.write(Types.BLOCK_POSITION1_8, position);
-						updateTileEntity.write(Types.UNSIGNED_BYTE, action);
-						updateTileEntity.write(Types.NAMED_COMPOUND_TAG, nbt);
-
-						try {
-							updateTileEntity.scheduleSend(Protocol1_9To1_8.class, false);
-						} catch (Exception e) {
-							ViaRewind.getPlatform().getLogger().warning("Error sending tile entity update packet: " + e.getMessage());
-						}
+						final PacketWrapper blockEntityData = PacketWrapper.create(ClientboundPackets1_9.BLOCK_ENTITY_DATA, wrapper.user());
+						blockEntityData.write(Types.BLOCK_POSITION1_8, position);
+						blockEntityData.write(Types.UNSIGNED_BYTE, action);
+						blockEntityData.write(Types.NAMED_COMPOUND_TAG, nbt);
+						blockEntityData.scheduleSend(Protocol1_9To1_8.class, false);
 					});
 				});
 			}
@@ -196,10 +191,10 @@ public class WorldPacketRewriter1_9 {
 		protocol.registerClientbound(ClientboundPackets1_9.LEVEL_EVENT, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Types.INT);
-				map(Types.BLOCK_POSITION1_8);
-				map(Types.INT);
-				map(Types.BOOLEAN);
+				map(Types.INT); // Effect id
+				map(Types.BLOCK_POSITION1_8); // Position
+				map(Types.INT); // data
+				map(Types.BOOLEAN); // disable relative volume
 				handler(wrapper -> {
 					int id = wrapper.get(Types.INT, 0);
 					id = EffectIdMappings1_8.getOldId(id);
@@ -219,20 +214,20 @@ public class WorldPacketRewriter1_9 {
 		protocol.registerClientbound(ClientboundPackets1_9.LEVEL_PARTICLES, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Types.INT);
+				map(Types.INT); // Particle id
 				handler(wrapper -> {
-					int type = wrapper.get(Types.INT, 0);
-					if (type > 41 && !ViaRewind.getConfig().isReplaceParticles()) {
+					int id = wrapper.get(Types.INT, 0);
+					if (id > 41 && !ViaRewind.getConfig().isReplaceParticles()) {
 						wrapper.cancel();
 						return;
 					}
-					if (type == 42) { // Dragon Breath
+					if (id == 42) { // Dragon Breath
 						wrapper.set(Types.INT, 0, 24); // Portal
-					} else if (type == 43) { // End Rod
+					} else if (id == 43) { // End Rod
 						wrapper.set(Types.INT, 0, 3); // Firework Spark
-					} else if (type == 44) { // Damage Indicator
+					} else if (id == 44) { // Damage Indicator
 						wrapper.set(Types.INT, 0, 34); // Heart
-					} else if (type == 45) { // Sweep Attack
+					} else if (id == 45) { // Sweep Attack
 						wrapper.set(Types.INT, 0, 1); // Large Explosion
 					}
 				});
@@ -242,9 +237,9 @@ public class WorldPacketRewriter1_9 {
 		protocol.registerClientbound(ClientboundPackets1_9.MAP_ITEM_DATA, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Types.VAR_INT);
-				map(Types.BYTE);
-				read(Types.BOOLEAN);
+				map(Types.VAR_INT); // Item damage
+				map(Types.BYTE); // Scale
+				read(Types.BOOLEAN); // Tracking position
 			}
 		});
 
@@ -260,12 +255,12 @@ public class WorldPacketRewriter1_9 {
 						wrapper.write(Types.STRING, protocol.getMappingData().getMappedNamedSound(soundName));
 					}
 				});
-				read(Types.VAR_INT);
-				map(Types.INT);
-				map(Types.INT);
-				map(Types.INT);
-				map(Types.FLOAT);
-				map(Types.UNSIGNED_BYTE);
+				read(Types.VAR_INT); // Sound category
+				map(Types.INT); // Effect position x
+				map(Types.INT); // Effect position y
+				map(Types.INT); // Effect position z
+				map(Types.FLOAT); // Volume
+				map(Types.UNSIGNED_BYTE); // Pitch
 			}
 		});
 	}

@@ -51,13 +51,13 @@ public class WorldPacketRewriter1_8 {
 		protocol.registerClientbound(ClientboundPackets1_8.BLOCK_UPDATE, new PacketHandlers() {
 			@Override
 			protected void register() {
-				map(Types.BLOCK_POSITION1_8, RewindTypes.U_BYTE_POSITION); // position
+				map(Types.BLOCK_POSITION1_8, RewindTypes.U_BYTE_POSITION); // Position
 				handler(wrapper -> {
-					int data = wrapper.read(Types.VAR_INT); // block data
+					int data = wrapper.read(Types.VAR_INT); // Block data
 					data = protocol.getItemRewriter().handleBlockId(data);
 
-					wrapper.write(Types.VAR_INT, IdAndData.getId(data)); // block id
-					wrapper.write(Types.UNSIGNED_BYTE, (short) IdAndData.getData(data)); // block data
+					wrapper.write(Types.VAR_INT, IdAndData.getId(data)); // Block id
+					wrapper.write(Types.UNSIGNED_BYTE, (short) IdAndData.getData(data)); // Block data
 				});
 			}
 		});
@@ -65,18 +65,18 @@ public class WorldPacketRewriter1_8 {
 		protocol.registerClientbound(ClientboundPackets1_8.CHUNK_BLOCKS_UPDATE, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Types.INT); // chunk x
-				map(Types.INT); // chunk z
+				map(Types.INT); // Chunk x
+				map(Types.INT); // Chunk z
 
 				handler(wrapper -> {
 					final BlockChangeRecord[] records = wrapper.read(Types.BLOCK_CHANGE_ARRAY);
 
-					wrapper.write(Types.SHORT, (short) records.length); // record count
-					wrapper.write(Types.INT, records.length * 4); // data array length (position + block id)
+					wrapper.write(Types.SHORT, (short) records.length); // Record count
+					wrapper.write(Types.INT, records.length * 4); // Data array length (position + block id)
 
 					for (BlockChangeRecord record : records) {
-						wrapper.write(Types.SHORT, (short) (record.getSectionX() << 12 | record.getSectionZ() << 8 | record.getY())); // position
-						wrapper.write(Types.SHORT, (short) protocol.getItemRewriter().handleBlockId(record.getBlockId())); // block id
+						wrapper.write(Types.SHORT, (short) (record.getSectionX() << 12 | record.getSectionZ() << 8 | record.getY())); // Position
+						wrapper.write(Types.SHORT, (short) protocol.getItemRewriter().handleBlockId(record.getBlockId())); // Block id
 					}
 				});
 			}
@@ -85,19 +85,19 @@ public class WorldPacketRewriter1_8 {
 		protocol.registerClientbound(ClientboundPackets1_8.BLOCK_EVENT, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Types.BLOCK_POSITION1_8, RewindTypes.SHORT_POSITION); // position
-				map(Types.UNSIGNED_BYTE); // type
-				map(Types.UNSIGNED_BYTE); // data
-				map(Types.VAR_INT); // block id
+				map(Types.BLOCK_POSITION1_8, RewindTypes.SHORT_POSITION); // Position
+				map(Types.UNSIGNED_BYTE); // Type
+				map(Types.UNSIGNED_BYTE); // Data
+				map(Types.VAR_INT); // Block id
 			}
 		});
 
 		protocol.registerClientbound(ClientboundPackets1_8.BLOCK_DESTRUCTION, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Types.VAR_INT); // entity id
-				map(Types.BLOCK_POSITION1_8, RewindTypes.INT_POSITION); // position
-				map(Types.BYTE); // progress
+				map(Types.VAR_INT); // Entity id
+				map(Types.BLOCK_POSITION1_8, RewindTypes.INT_POSITION); // Position
+				map(Types.BYTE); // Progress
 			}
 		});
 
@@ -113,10 +113,10 @@ public class WorldPacketRewriter1_8 {
 		protocol.registerClientbound(ClientboundPackets1_8.LEVEL_EVENT, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Types.INT); // effect id
-				map(Types.BLOCK_POSITION1_8, RewindTypes.BYTE_POSITION); // position
-				map(Types.INT); // data
-				map(Types.BOOLEAN); // disable relative volume
+				map(Types.INT); // Effect id
+				map(Types.BLOCK_POSITION1_8, RewindTypes.BYTE_POSITION); // Position
+				map(Types.INT); // Data
+				map(Types.BOOLEAN); // Disable relative volume
 			}
 		});
 
@@ -124,21 +124,23 @@ public class WorldPacketRewriter1_8 {
 			@Override
 			public void register() {
 				handler(wrapper -> {
-					final int particleId = wrapper.read(Types.INT); // particle id
+					final int particleId = wrapper.read(Types.INT); // Particle id
 					Particles1_8 particle = Particles1_8.find(particleId);
-					if (particle == null) particle = Particles1_8.CRIT;
-					wrapper.write(Types.STRING, particle.name); // particle name
+					if (particle == null) {
+						particle = Particles1_8.CRIT;
+					}
+					wrapper.write(Types.STRING, particle.name); // Particle name
 
 				});
-				read(Types.BOOLEAN); // long distance
-				map(Types.FLOAT); // x
-				map(Types.FLOAT); // y
-				map(Types.FLOAT); // z
-				map(Types.FLOAT); // offset x
-				map(Types.FLOAT); // offset y
-				map(Types.FLOAT); // offset z
-				map(Types.FLOAT); // particle data
-				map(Types.INT); // particle count
+				read(Types.BOOLEAN); // Long distance
+				map(Types.FLOAT); // X
+				map(Types.FLOAT); // Y
+				map(Types.FLOAT); // Z
+				map(Types.FLOAT); // Offset x
+				map(Types.FLOAT); // Offset y
+				map(Types.FLOAT); // Offset z
+				map(Types.FLOAT); // Particle data
+				map(Types.INT); // Particle count
 				handler(wrapper -> {
 					String name = wrapper.get(Types.STRING, 0);
 					Particles1_8 particle = Particles1_8.find(name);
@@ -184,76 +186,71 @@ public class WorldPacketRewriter1_8 {
 			}
 		});
 
-		protocol.registerClientbound(ClientboundPackets1_8.MAP_ITEM_DATA, new PacketHandlers() {
-			@Override
-			public void register() {
-				handler(wrapper -> {
-					wrapper.cancel();
-					final int id = wrapper.read(Types.VAR_INT);
-					final byte scale = wrapper.read(Types.BYTE);
+		protocol.registerClientbound(ClientboundPackets1_8.MAP_ITEM_DATA, wrapper -> {
+			wrapper.cancel();
+			final int id = wrapper.read(Types.VAR_INT);
+			final byte scale = wrapper.read(Types.BYTE);
 
-					final int iconCount = wrapper.read(Types.VAR_INT);
-					byte[] icons = new byte[iconCount * 4];
-					for (int i = 0; i < iconCount; i++) {
-						final int directionAndType = wrapper.read(Types.BYTE);
+			final int iconCount = wrapper.read(Types.VAR_INT);
+			byte[] icons = new byte[iconCount * 4];
+			for (int i = 0; i < iconCount; i++) {
+				final int directionAndType = wrapper.read(Types.BYTE);
 
-						icons[i * 4] = (byte) (directionAndType >> 4 & 0xF);
-						icons[i * 4 + 1] = wrapper.read(Types.BYTE); // x
-						icons[i * 4 + 2] = wrapper.read(Types.BYTE); // z
-						icons[i * 4 + 3] = (byte) (directionAndType & 0xF);
-					}
-					final short columns = wrapper.read(Types.UNSIGNED_BYTE);
-					if (columns > 0) {
-						final short rows = wrapper.read(Types.UNSIGNED_BYTE);
-						final short x = wrapper.read(Types.UNSIGNED_BYTE);
-						final short z = wrapper.read(Types.UNSIGNED_BYTE);
+				icons[i * 4] = (byte) (directionAndType >> 4 & 0xF);
+				icons[i * 4 + 1] = wrapper.read(Types.BYTE); // x
+				icons[i * 4 + 2] = wrapper.read(Types.BYTE); // z
+				icons[i * 4 + 3] = (byte) (directionAndType & 0xF);
+			}
+			final short columns = wrapper.read(Types.UNSIGNED_BYTE);
+			if (columns > 0) {
+				final short rows = wrapper.read(Types.UNSIGNED_BYTE);
+				final short x = wrapper.read(Types.UNSIGNED_BYTE);
+				final short z = wrapper.read(Types.UNSIGNED_BYTE);
 
-						final byte[] data = wrapper.read(Types.BYTE_ARRAY_PRIMITIVE);
-						for (int column = 0; column < columns; column++) {
-							byte[] columnData = new byte[rows + 3];
-							columnData[0] = 0;
-							columnData[1] = (byte) (x + column);
-							columnData[2] = (byte) z;
+				final byte[] data = wrapper.read(Types.BYTE_ARRAY_PRIMITIVE);
+				for (int column = 0; column < columns; column++) {
+					byte[] columnData = new byte[rows + 3];
+					columnData[0] = 0;
+					columnData[1] = (byte) (x + column);
+					columnData[2] = (byte) z;
 
-							for (int i = 0; i < rows; i++) {
-								columnData[i + 3] = data[column + i * columns];
-							}
-
-							final PacketWrapper mapData = PacketWrapper.create(ClientboundPackets1_8.MAP_ITEM_DATA, wrapper.user());
-							mapData.write(Types.VAR_INT, id); // map id
-							mapData.write(Types.SHORT, (short) columnData.length); // data length
-							mapData.write(new FixedByteArrayType(columnData.length), columnData); // data
-
-							mapData.send(Protocol1_8To1_7_6_10.class);
-						}
+					for (int i = 0; i < rows; i++) {
+						columnData[i + 3] = data[column + i * columns];
 					}
 
-					if (iconCount > 0) {
-						final byte[] iconData = new byte[iconCount * 3 + 1];
-						iconData[0] = 1;
-						for (int i = 0; i < iconCount; i++) {
-							iconData[i * 3 + 1] = (byte) (icons[i * 4] << 4 | icons[i * 4 + 3] & 0xF);
-							iconData[i * 3 + 2] = icons[i * 4 + 1];
-							iconData[i * 3 + 3] = icons[i * 4 + 2];
-						}
-
-						final PacketWrapper mapData = PacketWrapper.create(ClientboundPackets1_8.MAP_ITEM_DATA, wrapper.user());
-						mapData.write(Types.VAR_INT, id); // map id
-						mapData.write(Types.SHORT, (short) iconData.length); // data length
-						mapData.write(new FixedByteArrayType(iconData.length), iconData); // data
-
-						mapData.send(Protocol1_8To1_7_6_10.class);
-					}
-
-					// Update scale
 					final PacketWrapper mapData = PacketWrapper.create(ClientboundPackets1_8.MAP_ITEM_DATA, wrapper.user());
 					mapData.write(Types.VAR_INT, id); // map id
-					mapData.write(Types.SHORT, (short) 2); // data length
-					mapData.write(new FixedByteArrayType(2), new byte[]{2, scale}); // data
+					mapData.write(Types.SHORT, (short) columnData.length); // data length
+					mapData.write(new FixedByteArrayType(columnData.length), columnData); // data
 
 					mapData.send(Protocol1_8To1_7_6_10.class);
-				});
+				}
 			}
+
+			if (iconCount > 0) {
+				final byte[] iconData = new byte[iconCount * 3 + 1];
+				iconData[0] = 1;
+				for (int i = 0; i < iconCount; i++) {
+					iconData[i * 3 + 1] = (byte) (icons[i * 4] << 4 | icons[i * 4 + 3] & 0xF);
+					iconData[i * 3 + 2] = icons[i * 4 + 1];
+					iconData[i * 3 + 3] = icons[i * 4 + 2];
+				}
+
+				final PacketWrapper mapData = PacketWrapper.create(ClientboundPackets1_8.MAP_ITEM_DATA, wrapper.user());
+				mapData.write(Types.VAR_INT, id); // map id
+				mapData.write(Types.SHORT, (short) iconData.length); // data length
+				mapData.write(new FixedByteArrayType(iconData.length), iconData); // data
+
+				mapData.send(Protocol1_8To1_7_6_10.class);
+			}
+
+			// Update scale
+			final PacketWrapper mapData = PacketWrapper.create(ClientboundPackets1_8.MAP_ITEM_DATA, wrapper.user());
+			mapData.write(Types.VAR_INT, id); // map id
+			mapData.write(Types.SHORT, (short) 2); // data length
+			mapData.write(new FixedByteArrayType(2), new byte[]{2, scale}); // data
+
+			mapData.send(Protocol1_8To1_7_6_10.class);
 		});
 
 		protocol.registerClientbound(ClientboundPackets1_8.BLOCK_ENTITY_DATA, new PacketHandlers() {

@@ -50,11 +50,11 @@ public class BlockItemPacketRewriter1_8 extends VRBlockItemRewriter<ClientboundP
 		protocol.registerClientbound(ClientboundPackets1_8.OPEN_SCREEN, wrapper -> {
 			final InventoryTracker windowTracker = wrapper.user().get(InventoryTracker.class);
 
-			final short windowId = wrapper.passthrough(Types.UNSIGNED_BYTE); // window id
-			final short windowTypeId = InventoryTracker.getInventoryType(wrapper.read(Types.STRING)); // window type
+			final short windowId = wrapper.passthrough(Types.UNSIGNED_BYTE); // Window id
+			final short windowTypeId = InventoryTracker.getInventoryType(wrapper.read(Types.STRING)); // Window type
 
 			windowTracker.getWindowTypeMap().put(windowId, windowTypeId);
-			wrapper.write(Types.UNSIGNED_BYTE, windowTypeId); // window type id
+			wrapper.write(Types.UNSIGNED_BYTE, windowTypeId); // Window type id
 
 			final JsonElement titleComponent = wrapper.read(Types.COMPONENT); // Title
 			String title = ChatUtil.jsonToLegacy(wrapper.user(), titleComponent);
@@ -62,18 +62,18 @@ public class BlockItemPacketRewriter1_8 extends VRBlockItemRewriter<ClientboundP
 			if (title.length() > 32) {
 				title = title.substring(0, 32);
 			}
-			wrapper.write(Types.STRING, title); // window title
+			wrapper.write(Types.STRING, title); // Window title
 
-			wrapper.passthrough(Types.UNSIGNED_BYTE); // slots count
-			wrapper.write(Types.BOOLEAN, true); // use provided window title
+			wrapper.passthrough(Types.UNSIGNED_BYTE); // Slots
+			wrapper.write(Types.BOOLEAN, true); // Use provided window title
 
 			if (windowTypeId == 11) { // Horse
-				wrapper.passthrough(Types.INT); // entity id
+				wrapper.passthrough(Types.INT); // Entity id
 			}
 		});
 
 		protocol.registerClientbound(ClientboundPackets1_8.CONTAINER_CLOSE, wrapper -> {
-			final short windowId = wrapper.passthrough(Types.UNSIGNED_BYTE); // window id
+			final short windowId = wrapper.passthrough(Types.UNSIGNED_BYTE); // Window id
 
 			wrapper.user().get(InventoryTracker.class).remove(windowId);
 		});
@@ -81,8 +81,8 @@ public class BlockItemPacketRewriter1_8 extends VRBlockItemRewriter<ClientboundP
 		protocol.registerClientbound(ClientboundPackets1_8.CONTAINER_SET_SLOT, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Types.UNSIGNED_BYTE); // window id
-				map(Types.SHORT); // slot
+				map(Types.UNSIGNED_BYTE); // Window id
+				map(Types.SHORT); // Slot
 
 				handler(wrapper -> {
 					final short windowType = wrapper.user().get(InventoryTracker.class).get(wrapper.get(Types.UNSIGNED_BYTE, 0));
@@ -97,22 +97,17 @@ public class BlockItemPacketRewriter1_8 extends VRBlockItemRewriter<ClientboundP
 				});
 
 				map(Types.ITEM1_8, RewindTypes.COMPRESSED_NBT_ITEM); // item
-
-				// remap item
-				handler(wrapper -> {
-					final Item item = wrapper.get(RewindTypes.COMPRESSED_NBT_ITEM, 0);
-					handleItemToClient(wrapper.user(), item);
-
-					wrapper.set(RewindTypes.COMPRESSED_NBT_ITEM, 0, item);
-				});
+				handler(wrapper -> handleItemToClient(wrapper.user(), wrapper.get(RewindTypes.COMPRESSED_NBT_ITEM, 0)));
 
 				handler(wrapper -> {
 					final short windowId = wrapper.get(Types.UNSIGNED_BYTE, 0);
-					if (windowId != 0) return;
-
+					if (windowId != 0) {
+						return;
+					}
 					final short slot = wrapper.get(Types.SHORT, 0);
-					if (slot < 5 || slot > 8) return;
-
+					if (slot < 5 || slot > 8) {
+						return;
+					}
 					final PlayerSessionStorage playerSession = wrapper.user().get(PlayerSessionStorage.class);
 					final Item item = wrapper.get(RewindTypes.COMPRESSED_NBT_ITEM, 0);
 					playerSession.setPlayerEquipment(wrapper.user().getProtocolInfo().getUuid(), item, 8 - slot);
@@ -128,7 +123,7 @@ public class BlockItemPacketRewriter1_8 extends VRBlockItemRewriter<ClientboundP
 		protocol.registerClientbound(ClientboundPackets1_8.CONTAINER_SET_CONTENT, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Types.UNSIGNED_BYTE); // window id
+				map(Types.UNSIGNED_BYTE); // Window id
 
 				// remap enchantment table items
 				handler(wrapper -> {
@@ -144,13 +139,14 @@ public class BlockItemPacketRewriter1_8 extends VRBlockItemRewriter<ClientboundP
 					for (int i = 0; i < items.length; i++) {
 						items[i] = handleItemToClient(wrapper.user(), items[i]);
 					}
-					wrapper.write(RewindTypes.COMPRESSED_NBT_ITEM_ARRAY, items); // items
+					wrapper.write(RewindTypes.COMPRESSED_NBT_ITEM_ARRAY, items); // Items
 				});
 
 				handler(wrapper -> {
 					final short windowId = wrapper.get(Types.UNSIGNED_BYTE, 0);
-					if (windowId != 0) return;
-
+					if (windowId != 0) {
+						return;
+					}
 					final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_7_6_10.class);
 					final UUID userId = wrapper.user().getProtocolInfo().getUuid();
 
@@ -174,9 +170,9 @@ public class BlockItemPacketRewriter1_8 extends VRBlockItemRewriter<ClientboundP
 		protocol.registerClientbound(ClientboundPackets1_8.CONTAINER_SET_DATA, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Types.UNSIGNED_BYTE); // window id
-				map(Types.SHORT); // progress bar id
-				map(Types.SHORT); // progress bar value
+				map(Types.UNSIGNED_BYTE); // Window id
+				map(Types.SHORT); // Progress bar id
+				map(Types.SHORT); // Progress bar value
 
 				handler(wrapper -> {
 					final InventoryTracker windowTracker = wrapper.user().get(InventoryTracker.class);
@@ -236,10 +232,10 @@ public class BlockItemPacketRewriter1_8 extends VRBlockItemRewriter<ClientboundP
 		protocol.registerServerbound(ServerboundPackets1_7_2_5.CONTAINER_CLICK, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Types.BYTE, Types.UNSIGNED_BYTE); // window id
-				map(Types.SHORT); // slot
+				map(Types.BYTE, Types.UNSIGNED_BYTE); // Window id
+				map(Types.SHORT); // Slot
 				handler(wrapper -> {
-					final short windowId = wrapper.get(Types.UNSIGNED_BYTE, 0);  //Window Id
+					final short windowId = wrapper.get(Types.UNSIGNED_BYTE, 0); // Window id
 					final short slot = wrapper.get(Types.SHORT, 0);
 
 					final short windowType = wrapper.user().get(InventoryTracker.class).get(windowId);
@@ -249,25 +245,20 @@ public class BlockItemPacketRewriter1_8 extends VRBlockItemRewriter<ClientboundP
 						}
 					}
 				});
-				map(Types.BYTE); // button
-				map(Types.SHORT); // action number
-				map(Types.BYTE); // mode
-				map(RewindTypes.COMPRESSED_NBT_ITEM, Types.ITEM1_8); // clicked item
+				map(Types.BYTE); // Button
+				map(Types.SHORT); // Action number
+				map(Types.BYTE); // Mode
+				map(RewindTypes.COMPRESSED_NBT_ITEM, Types.ITEM1_8); // Clicked item
 
-				// remap item
-				handler(wrapper -> {
-					final Item item = wrapper.get(Types.ITEM1_8, 0);
-					handleItemToServer(wrapper.user(), item);
-					wrapper.set(Types.ITEM1_8, 0, item);
-				});
+				handler(wrapper -> handleItemToServer(wrapper.user(), wrapper.get(Types.ITEM1_8, 0)));
 			}
 		});
 
 		protocol.registerServerbound(ServerboundPackets1_7_2_5.SET_CREATIVE_MODE_SLOT, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Types.SHORT); // slot
-				map(RewindTypes.COMPRESSED_NBT_ITEM, Types.ITEM1_8); // item
+				map(Types.SHORT); // Slot
+				map(RewindTypes.COMPRESSED_NBT_ITEM, Types.ITEM1_8); // Item
 
 				handler(wrapper -> handleItemToServer(wrapper.user(), wrapper.get(Types.ITEM1_8, 0)));
 			}

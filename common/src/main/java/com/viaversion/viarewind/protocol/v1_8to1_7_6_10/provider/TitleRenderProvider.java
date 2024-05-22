@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
+// TODO I believe this should be a storage?
 public abstract class TitleRenderProvider implements Provider {
 	protected Map<UUID, Integer> fadeIn = new HashMap<>();
 	protected Map<UUID, Integer> stay = new HashMap<>();

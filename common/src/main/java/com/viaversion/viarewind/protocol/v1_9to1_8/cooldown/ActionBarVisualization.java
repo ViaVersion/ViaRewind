@@ -41,7 +41,7 @@ public class ActionBarVisualization implements CooldownVisualization {
 		sendActionBar("§r");
 	}
 
-	private void sendActionBar(String bar) throws Exception {
+	private void sendActionBar(final String bar) {
 		PacketWrapper actionBarPacket = PacketWrapper.create(ClientboundPackets1_8.CHAT, user);
 		actionBarPacket.write(Types.COMPONENT, new JsonPrimitive(bar));
 		actionBarPacket.write(Types.BYTE, (byte) 2); // Position - above hotbar

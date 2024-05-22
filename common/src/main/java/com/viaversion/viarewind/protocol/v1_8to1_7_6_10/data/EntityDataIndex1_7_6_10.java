@@ -36,16 +36,16 @@ public enum EntityDataIndex1_7_6_10 {
 	ENTITY_NAME_TAG_VISIBILITY(ENTITY, -1, null, 3, EntityDataTypes1_8.BYTE),
 	ENTITY_SILENT(ENTITY, -1, null, 4, EntityDataTypes1_8.BYTE),
 
-	ENTITY_LIVING_HEALTH(LIVING_ENTITY_BASE, 6, EntityDataTypes1_7_6_10.FLOAT, EntityDataTypes1_8.FLOAT),
-	ENTITY_LIVING_POTION_EFFECT_COLOR(LIVING_ENTITY_BASE, 7, EntityDataTypes1_7_6_10.INT, EntityDataTypes1_8.INT),
-	ENTITY_LIVING_IS_POTION_EFFECT_AMBIENT(LIVING_ENTITY_BASE, 8, EntityDataTypes1_7_6_10.BYTE, EntityDataTypes1_8.BYTE),
-	ENTITY_LIVING_ARROWS(LIVING_ENTITY_BASE, 9, EntityDataTypes1_7_6_10.BYTE, EntityDataTypes1_8.BYTE),
-	ENTITY_LIVING_NAME_TAG(LIVING_ENTITY_BASE, 10, EntityDataTypes1_7_6_10.STRING, 2, EntityDataTypes1_8.STRING),
-	ENTITY_LIVING_NAME_TAG_VISIBILITY(LIVING_ENTITY_BASE, 11, EntityDataTypes1_7_6_10.BYTE, 3, EntityDataTypes1_8.BYTE),
+	LIVING_ENTITY_BASE_HEALTH(LIVING_ENTITY_BASE, 6, EntityDataTypes1_7_6_10.FLOAT, EntityDataTypes1_8.FLOAT),
+	LIVING_ENTITY_BASE_POTION_EFFECT_COLOR(LIVING_ENTITY_BASE, 7, EntityDataTypes1_7_6_10.INT, EntityDataTypes1_8.INT),
+	LIVING_ENTITY_BASE_IS_POTION_EFFECT_AMBIENT(LIVING_ENTITY_BASE, 8, EntityDataTypes1_7_6_10.BYTE, EntityDataTypes1_8.BYTE),
+	LIVING_ENTITY_BASE_ARROWS(LIVING_ENTITY_BASE, 9, EntityDataTypes1_7_6_10.BYTE, EntityDataTypes1_8.BYTE),
+	LIVING_ENTITY_BASE_NAME_TAG(LIVING_ENTITY_BASE, 10, EntityDataTypes1_7_6_10.STRING, 2, EntityDataTypes1_8.STRING),
+	LIVING_ENTITY_BASE_NAME_TAG_VISIBILITY(LIVING_ENTITY_BASE, 11, EntityDataTypes1_7_6_10.BYTE, 3, EntityDataTypes1_8.BYTE),
 
-	ENTITY_LIVING_AI(LIVING_ENTITY, -1, null, 15, EntityDataTypes1_8.BYTE),
+	LIVING_ENTITY_AI(LIVING_ENTITY, -1, null, 15, EntityDataTypes1_8.BYTE),
 
-	ENTITY_AGEABLE_AGE(ABSTRACT_AGEABLE, 12, EntityDataTypes1_7_6_10.INT, EntityDataTypes1_8.BYTE),
+	ABSTRACT_AGEABLE_AGE(ABSTRACT_AGEABLE, 12, EntityDataTypes1_7_6_10.INT, EntityDataTypes1_8.BYTE),
 
 	ARMOR_STAND_FLAGS(ARMOR_STAND, -1, null, 10, EntityDataTypes1_8.BYTE),
 	ARMOR_STAND_HEAD_POSITION(ARMOR_STAND, -1, null, 11, EntityDataTypes1_8.ROTATIONS),
@@ -55,10 +55,10 @@ public enum EntityDataIndex1_7_6_10 {
 	ARMOR_STAND_LEFT_LEG_POSITION(ARMOR_STAND, -1, null, 15, EntityDataTypes1_8.ROTATIONS),
 	ARMOR_STAND_RIGHT_LEG_POSITION(ARMOR_STAND, -1, null, 16, EntityDataTypes1_8.ROTATIONS),
 
-	HUMAN_SKIN_FLAGS(PLAYER, 16, EntityDataTypes1_7_6_10.BYTE, 10, EntityDataTypes1_8.BYTE),
-	HUMAN_UNUSED(PLAYER, -1, null, 16, EntityDataTypes1_8.BYTE),
-	HUMAN_ABSORPTION_HEATS(PLAYER, 17, EntityDataTypes1_7_6_10.FLOAT, EntityDataTypes1_8.FLOAT),
-	HUMAN_SCORE(PLAYER, 18, EntityDataTypes1_7_6_10.INT, EntityDataTypes1_8.INT),
+	PLAYER_SKIN_FLAGS(PLAYER, 16, EntityDataTypes1_7_6_10.BYTE, 10, EntityDataTypes1_8.BYTE),
+	PLAYER_UNUSED(PLAYER, -1, null, 16, EntityDataTypes1_8.BYTE),
+	PLAYER_ABSORPTION_HEATS(PLAYER, 17, EntityDataTypes1_7_6_10.FLOAT, EntityDataTypes1_8.FLOAT),
+	PLAYER_SCORE(PLAYER, 18, EntityDataTypes1_7_6_10.INT, EntityDataTypes1_8.INT),
 
 	HORSE_FLAGS(HORSE, 16, EntityDataTypes1_7_6_10.INT, EntityDataTypes1_8.INT),
 	HORSE_TYPE(HORSE, 19, EntityDataTypes1_7_6_10.BYTE, EntityDataTypes1_8.BYTE),
@@ -68,8 +68,8 @@ public enum EntityDataIndex1_7_6_10 {
 
 	BAT_HANGING(BAT, 16, EntityDataTypes1_7_6_10.BYTE, EntityDataTypes1_8.BYTE),
 
-	TAMEABLE_FLAGS(TAMABLE_ANIMAL, 16, EntityDataTypes1_7_6_10.BYTE, EntityDataTypes1_8.BYTE),
-	TAMEABLE_OWNER(TAMABLE_ANIMAL, 17, EntityDataTypes1_7_6_10.STRING, EntityDataTypes1_8.STRING),
+	TAMABLE_ANIMAL_FLAGS(TAMABLE_ANIMAL, 16, EntityDataTypes1_7_6_10.BYTE, EntityDataTypes1_8.BYTE),
+	TAMABLE_ANIMAL_OWNER(TAMABLE_ANIMAL, 17, EntityDataTypes1_7_6_10.STRING, EntityDataTypes1_8.STRING),
 
 	OCELOT_TYPE(OCELOT, 18, EntityDataTypes1_7_6_10.BYTE, EntityDataTypes1_8.BYTE),
 
@@ -123,12 +123,12 @@ public enum EntityDataIndex1_7_6_10 {
 	BOAT_FORWARD_DIRECTION(BOAT, 18, EntityDataTypes1_7_6_10.INT, EntityDataTypes1_8.INT),
 	BOAT_DAMAGE_TAKEN(BOAT, 19, EntityDataTypes1_7_6_10.FLOAT, EntityDataTypes1_8.FLOAT),
 
-	MINECART_SHAKING_POWER(ABSTRACT_MINECART, 17, EntityDataTypes1_7_6_10.INT, EntityDataTypes1_8.INT),
-	MINECART_SHAKING_DIRECTION(ABSTRACT_MINECART, 18, EntityDataTypes1_7_6_10.INT, EntityDataTypes1_8.INT),
-	MINECART_DAMAGE_TAKEN(ABSTRACT_MINECART, 19, EntityDataTypes1_7_6_10.FLOAT, EntityDataTypes1_8.FLOAT),
-	MINECART_BLOCK_INSIDE(ABSTRACT_MINECART, 20, EntityDataTypes1_7_6_10.INT, EntityDataTypes1_8.INT),
-	MINECART_BLOCK_Y(ABSTRACT_MINECART, 21, EntityDataTypes1_7_6_10.INT, EntityDataTypes1_8.INT),
-	MINECART_SHOW_BLOCK(ABSTRACT_MINECART, 22, EntityDataTypes1_7_6_10.BYTE, EntityDataTypes1_8.BYTE),
+	ABSTRACT_MINECART_SHAKING_POWER(ABSTRACT_MINECART, 17, EntityDataTypes1_7_6_10.INT, EntityDataTypes1_8.INT),
+	ABSTRACT_MINECART_SHAKING_DIRECTION(ABSTRACT_MINECART, 18, EntityDataTypes1_7_6_10.INT, EntityDataTypes1_8.INT),
+	ABSTRACT_MINECART_DAMAGE_TAKEN(ABSTRACT_MINECART, 19, EntityDataTypes1_7_6_10.FLOAT, EntityDataTypes1_8.FLOAT),
+	ABSTRACT_MINECART_BLOCK_INSIDE(ABSTRACT_MINECART, 20, EntityDataTypes1_7_6_10.INT, EntityDataTypes1_8.INT),
+	ABSTRACT_MINECART_BLOCK_Y(ABSTRACT_MINECART, 21, EntityDataTypes1_7_6_10.INT, EntityDataTypes1_8.INT),
+	ABSTRACT_MINECART_SHOW_BLOCK(ABSTRACT_MINECART, 22, EntityDataTypes1_7_6_10.BYTE, EntityDataTypes1_8.BYTE),
 
 	FURNACE_MINECART_IS_POWERED(FURNACE_MINECART, 16, EntityDataTypes1_7_6_10.BYTE, EntityDataTypes1_8.BYTE),
 
@@ -136,18 +136,18 @@ public enum EntityDataIndex1_7_6_10 {
 
 	ARROW_IS_CRITICAL(ARROW, 16, EntityDataTypes1_7_6_10.BYTE, EntityDataTypes1_8.BYTE),
 
-	FIREWORK_INFO(FIREWORK_ROCKET, 8, EntityDataTypes1_7_6_10.ITEM, EntityDataTypes1_8.ITEM),
+	FIREWORK_ROCKET_INFO(FIREWORK_ROCKET, 8, EntityDataTypes1_7_6_10.ITEM, EntityDataTypes1_8.ITEM),
 
 	ITEM_FRAME_ITEM(ITEM_FRAME, 2, EntityDataTypes1_7_6_10.ITEM, 8, EntityDataTypes1_8.ITEM),
 	ITEM_FRAME_ROTATION(ITEM_FRAME, 3, EntityDataTypes1_7_6_10.BYTE, 9, EntityDataTypes1_8.BYTE),
 
-	ENDER_CRYSTAL_HEALTH(END_CRYSTAL, 8, EntityDataTypes1_7_6_10.INT, 9, EntityDataTypes1_8.INT);
+	END_CRYSTAL_HEALTH(END_CRYSTAL, 8, EntityDataTypes1_7_6_10.INT, 9, EntityDataTypes1_8.INT);
 
-	private static final HashMap<Pair<EntityTypes1_8.EntityType, Integer>, EntityDataIndex1_7_6_10> metadataRewrites = new HashMap<>();
+	private static final HashMap<Pair<EntityTypes1_8.EntityType, Integer>, EntityDataIndex1_7_6_10> ENTITY_DATA_REWRITES = new HashMap<>();
 
 	static {
 		for (EntityDataIndex1_7_6_10 index : EntityDataIndex1_7_6_10.values()) {
-			metadataRewrites.put(new Pair<>(index.getClazz(), index.getNewIndex()), index);
+			ENTITY_DATA_REWRITES.put(new Pair<>(index.getClazz(), index.getNewIndex()), index);
 		}
 	}
 
@@ -175,8 +175,8 @@ public enum EntityDataIndex1_7_6_10 {
 
 	private static Optional<EntityDataIndex1_7_6_10> getIndex(EntityType type, int index) {
 		Pair<EntityType, Integer> pair = new Pair<>(type, index);
-		if (metadataRewrites.containsKey(pair)) {
-			return Optional.of(metadataRewrites.get(pair));
+		if (ENTITY_DATA_REWRITES.containsKey(pair)) {
+			return Optional.of(ENTITY_DATA_REWRITES.get(pair));
 		}
 
 		return Optional.empty();
