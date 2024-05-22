@@ -30,8 +30,8 @@ import com.viaversion.viarewind.api.minecraft.math.Ray3d;
 import com.viaversion.viarewind.api.minecraft.math.RayTracing;
 import com.viaversion.viarewind.api.minecraft.math.Vector3d;
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.minecraft.Environment;
-import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_8;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
@@ -629,7 +629,7 @@ public class PlayerPacketRewriter1_8 {
 					int x = wrapper.read(Types.INT);
 					int y = wrapper.read(Types.UNSIGNED_BYTE);
 					int z = wrapper.read(Types.INT);
-					wrapper.write(Types.BLOCK_POSITION1_8, new Position(x, y, z));
+					wrapper.write(Types.BLOCK_POSITION1_8, new BlockPosition(x, y, z));
 				});
 			}
 		});
@@ -641,7 +641,7 @@ public class PlayerPacketRewriter1_8 {
 					int x = wrapper.read(Types.INT);
 					int y = wrapper.read(Types.UNSIGNED_BYTE);
 					int z = wrapper.read(Types.INT);
-					wrapper.write(Types.BLOCK_POSITION1_8, new Position(x, y, z));
+					wrapper.write(Types.BLOCK_POSITION1_8, new BlockPosition(x, y, z));
 
 					wrapper.passthrough(Types.BYTE);  //Direction
 					Item item = wrapper.read(RewindTypes.COMPRESSED_NBT_ITEM);
@@ -747,7 +747,7 @@ public class PlayerPacketRewriter1_8 {
 					int x = wrapper.read(Types.INT);
 					int y = wrapper.read(Types.SHORT);
 					int z = wrapper.read(Types.INT);
-					wrapper.write(Types.BLOCK_POSITION1_8, new Position(x, y, z));
+					wrapper.write(Types.BLOCK_POSITION1_8, new BlockPosition(x, y, z));
 					for (int i = 0; i < 4; i++) {
 						final String line = wrapper.read(Types.STRING);
 

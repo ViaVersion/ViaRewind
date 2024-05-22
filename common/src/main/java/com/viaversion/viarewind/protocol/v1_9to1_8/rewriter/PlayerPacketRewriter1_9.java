@@ -21,7 +21,7 @@ import com.viaversion.viarewind.ViaRewind;
 import com.viaversion.viarewind.protocol.v1_9to1_8.Protocol1_9To1_8;
 import com.viaversion.viarewind.protocol.v1_9to1_8.storage.*;
 import com.viaversion.viarewind.utils.ChatUtil;
-import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_9;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
@@ -208,7 +208,7 @@ public class PlayerPacketRewriter1_9 {
 						wrapper.cancel();
 						final PacketWrapper swapItems = PacketWrapper.create(ServerboundPackets1_9.PLAYER_ACTION, wrapper.user());
 						swapItems.write(Types.VAR_INT, 6);
-						swapItems.write(Types.BLOCK_POSITION1_8, new Position(0, 0, 0));
+						swapItems.write(Types.BLOCK_POSITION1_8, new BlockPosition(0, 0, 0));
 						swapItems.write(Types.BYTE, (byte) 255);
 
 						swapItems.sendToServer(Protocol1_9To1_8.class);

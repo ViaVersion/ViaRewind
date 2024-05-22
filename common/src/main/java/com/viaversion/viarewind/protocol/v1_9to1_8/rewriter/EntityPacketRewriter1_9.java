@@ -27,8 +27,8 @@ import com.viaversion.viarewind.protocol.v1_9to1_8.storage.EntityTracker1_9;
 import com.viaversion.viarewind.protocol.v1_9to1_8.storage.LevitationStorage;
 import com.viaversion.viarewind.protocol.v1_9to1_8.storage.PlayerPositionTracker;
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.minecraft.EulerAngle;
-import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.Vector;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_9;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_9.EntityType;
@@ -611,7 +611,7 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
 				metadata.setValue(protocol.getItemRewriter().handleItemToClient(event.user(), (Item) value));
 				break;
 			case BLOCK_POSITION:
-				final Position position = (Position) value;
+				final BlockPosition position = (BlockPosition) value;
 				metadata.setValue(position);
 				break;
 			case ROTATIONS:

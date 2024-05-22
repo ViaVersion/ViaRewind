@@ -22,8 +22,8 @@ import com.viaversion.viarewind.ViaRewind;
 import com.viaversion.viarewind.protocol.v1_9to1_8.Protocol1_9To1_8;
 import com.viaversion.viarewind.protocol.v1_9to1_8.data.EffectIdMappings1_8;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.minecraft.Environment;
-import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.chunks.BaseChunk;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
@@ -151,7 +151,7 @@ public class WorldPacketRewriter1_9 {
 					chunk.getBlockEntities().forEach(nbt -> {
 						if (!nbt.contains("x") || !nbt.contains("y") || !nbt.contains("z") || !nbt.contains("id"))
 							return;
-						Position position = new Position((int) nbt.get("x").getValue(), (int) nbt.get("y").getValue(), (int) nbt.get("z").getValue());
+						BlockPosition position = new BlockPosition((int) nbt.get("x").getValue(), (int) nbt.get("y").getValue(), (int) nbt.get("z").getValue());
 						String id = (String) nbt.get("id").getValue();
 
 						short action;

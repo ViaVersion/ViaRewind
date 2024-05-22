@@ -33,8 +33,8 @@ import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.storage.GameProfileStora
 import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.storage.PlayerSessionStorage;
 import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.storage.ScoreboardTracker;
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.minecraft.ClientWorld;
-import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_8;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_8.EntityType;
 import com.viaversion.viaversion.api.minecraft.item.Item;
@@ -211,7 +211,7 @@ public class EntityPacketRewriter1_8 extends VREntityRewriter<ClientboundPackets
 				map(Types.UNSIGNED_BYTE, Types.INT); // Rotation
 				handler(wrapper -> {
 					final int entityId = wrapper.get(Types.VAR_INT, 0);
-					final Position position = wrapper.get(RewindTypes.INT_POSITION, 0);
+					final BlockPosition position = wrapper.get(RewindTypes.INT_POSITION, 0);
 					final int rotation = wrapper.get(Types.INT, 0);
 					int modX = 0;
 					int modZ = 0;
@@ -229,7 +229,7 @@ public class EntityPacketRewriter1_8 extends VREntityRewriter<ClientboundPackets
 							modX = -1;
 							break;
 					}
-					wrapper.set(RewindTypes.INT_POSITION, 0, new Position(position.x() + modX, position.y(), position.z() + modZ));
+					wrapper.set(RewindTypes.INT_POSITION, 0, new BlockPosition(position.x() + modX, position.y(), position.z() + modZ));
 					addTrackedEntity(wrapper, entityId, EntityTypes1_8.EntityType.PAINTING);
 				});
 			}

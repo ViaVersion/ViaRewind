@@ -17,35 +17,35 @@
  */
 package com.viaversion.viarewind.api.type;
 
-import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.type.Type;
 import io.netty.buffer.ByteBuf;
 
 import java.util.function.IntFunction;
 
-public class PositionVarYType<T extends Number> extends Type<Position> {
+public class PositionVarYType<T extends Number> extends Type<BlockPosition> {
 
 	private final Type<T> yType;
 	private final IntFunction<T> toY;
 
 	public PositionVarYType(final Type<T> yType, final IntFunction<T> toY) {
-		super(Position.class);
+		super(BlockPosition.class);
 
 		this.yType = yType;
 		this.toY = toY;
 	}
 
 	@Override
-	public Position read(ByteBuf buffer) {
+	public BlockPosition read(ByteBuf buffer) {
 		final int x = buffer.readInt();
 		final int y = yType.read(buffer).intValue();
 		final int z = buffer.readInt();
 
-		return new Position(x, y, z);
+		return new BlockPosition(x, y, z);
 	}
 
 	@Override
-	public void write(ByteBuf buffer, Position value) {
+	public void write(ByteBuf buffer, BlockPosition value) {
 		buffer.writeInt(value.x());
 		yType.write(buffer, this.toY.apply(value.y()));
 		buffer.writeInt(value.z());
