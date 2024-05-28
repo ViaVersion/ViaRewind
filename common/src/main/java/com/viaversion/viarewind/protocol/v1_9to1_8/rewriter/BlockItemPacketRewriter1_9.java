@@ -26,8 +26,6 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Types;
-import com.viaversion.viaversion.libs.gson.JsonElement;
-import com.viaversion.viaversion.libs.gson.JsonParser;
 import com.viaversion.nbt.tag.*;
 import com.viaversion.viaversion.protocols.v1_8to1_9.data.EntityIds1_8;
 import com.viaversion.viaversion.protocols.v1_8to1_9.data.PotionIdMappings1_9;
@@ -77,17 +75,8 @@ public class BlockItemPacketRewriter1_9 extends VRBlockItemRewriter<ClientboundP
 		protocol.registerClientbound(ClientboundPackets1_9.OPEN_SCREEN, wrapper -> {
 			final short windowId = wrapper.passthrough(Types.UNSIGNED_BYTE);
 			final String windowType = wrapper.passthrough(Types.STRING);
-			final JsonElement windowTitle = wrapper.passthrough(Types.COMPONENT);
 
 			wrapper.user().get(WindowTracker.class).put(windowId, windowType);
-
-			// TODO This is wrong, VB is missing pre 1.13 mappings for translations
-			if (windowType.equalsIgnoreCase("minecraft:shulker_box")) {
-				wrapper.set(Types.STRING, 0, "minecraft:container");
-			}
-			if (windowTitle.toString().equalsIgnoreCase("{\"translate\":\"container.shulkerBox\"}")) {
-				wrapper.set(Types.COMPONENT, 0, JsonParser.parseString("{\"text\":\"Shulker Box\"}"));
-			}
 		});
 
 		protocol.registerClientbound(ClientboundPackets1_9.CONTAINER_SET_CONTENT, wrapper -> {
