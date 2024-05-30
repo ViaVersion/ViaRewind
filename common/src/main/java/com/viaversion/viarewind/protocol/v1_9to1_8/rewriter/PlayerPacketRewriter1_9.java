@@ -211,7 +211,7 @@ public class PlayerPacketRewriter1_9 {
 						final PacketWrapper swapItems = PacketWrapper.create(ServerboundPackets1_9.PLAYER_ACTION, wrapper.user());
 						swapItems.write(Types.VAR_INT, 6);
 						swapItems.write(Types.BLOCK_POSITION1_8, new BlockPosition(0, 0, 0));
-						swapItems.write(Types.BYTE, (byte) 255);
+						swapItems.write(Types.UNSIGNED_BYTE, (short) 255);
 
 						swapItems.sendToServer(Protocol1_9To1_8.class);
 					}
