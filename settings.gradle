@@ -2,9 +2,7 @@ import java.util.function.Consumer
 
 setupViaSubproject("common")
 setupViaSubproject("bukkit")
-setupViaSubproject("bungee")
 setupViaSubproject("fabric")
-setupViaSubproject("sponge")
 setupViaSubproject("velocity")
 
 setupSubproject("viarewind", project -> {

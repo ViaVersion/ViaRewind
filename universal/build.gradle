@@ -9,9 +9,7 @@ plugins {
 dependencies {
     api project(":viarewind-common")
     api project(":viarewind-bukkit")
-    api project(":viarewind-bungee")
     api project(":viarewind-fabric")
-    api project(":viarewind-sponge")
     api project(":viarewind-velocity")
 }
 
@@ -111,8 +109,6 @@ if (!isRelease || isMainBranch) { // Only publish releases from the main branch
         loaders.add("paper")
         loaders.add("folia")
         loaders.add("velocity")
-        loaders.add("bungeecord")
-        loaders.add("sponge")
         autoAddDependsOn.set(false)
         detectLoaders.set(false)
         dependencies {
@@ -145,18 +141,6 @@ if (!isRelease || isMainBranch) { // Only publish releases from the main branch
                 VELOCITY {
                     jar = shadowJar.archiveFile
                     platformVersions = [property("velocityVersion") as String]
-                    dependencies {
-                        hangar("ViaVersion") {
-                            required = true
-                        }
-                        hangar("ViaBackwards") {
-                            required = true
-                        }
-                    }
-                }
-                WATERFALL {
-                    jar = shadowJar.archiveFile
-                    platformVersions = [property("waterfallVersion") as String]
                     dependencies {
                         hangar("ViaVersion") {
                             required = true

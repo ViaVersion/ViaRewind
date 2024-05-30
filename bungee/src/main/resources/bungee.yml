@@ -1,6 +1,0 @@
-name: ViaRewind
-main: com.viaversion.viarewind.BungeePlugin
-authors: [FlorianMichael/EnZaXD, Gerrygames, creeper123321123]
-version: ${version}
-depends: [ViaVersion, ViaBackwards]
-website: https://viaversion.com/rewind

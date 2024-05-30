@@ -1,9 +1,0 @@
-plugins {
-    id "com.viaversion.java-conventions"
-}
-
-dependencies {
-    api project(":viarewind-common")
-
-    compileOnly(annotationProcessor("net.md-5:bungeecord-api:1.19-R0.1-SNAPSHOT"))
-}
