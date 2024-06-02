@@ -539,7 +539,7 @@ public class PlayerPacketRewriter1_8 {
 		protocol.registerServerbound(ServerboundPackets1_7_2_5.MOVE_PLAYER_POS, wrapper -> {
 			final double x = wrapper.passthrough(Types.DOUBLE);
 			final double y = wrapper.passthrough(Types.DOUBLE);
-			wrapper.passthrough(Types.DOUBLE); // Head Y
+			wrapper.read(Types.DOUBLE); // Head Y
 			final double z = wrapper.passthrough(Types.DOUBLE);
 
 			final PlayerSessionStorage storage = wrapper.user().get(PlayerSessionStorage.class);
@@ -557,7 +557,7 @@ public class PlayerPacketRewriter1_8 {
 		protocol.registerServerbound(ServerboundPackets1_7_2_5.MOVE_PLAYER_POS_ROT, wrapper -> {
 			final double x = wrapper.passthrough(Types.DOUBLE);
 			final double y = wrapper.passthrough(Types.DOUBLE);
-			wrapper.passthrough(Types.DOUBLE); // Head Y
+			wrapper.read(Types.DOUBLE); // Head Y
 			final double z = wrapper.passthrough(Types.DOUBLE);
 
 			final PlayerSessionStorage storage = wrapper.user().get(PlayerSessionStorage.class);
