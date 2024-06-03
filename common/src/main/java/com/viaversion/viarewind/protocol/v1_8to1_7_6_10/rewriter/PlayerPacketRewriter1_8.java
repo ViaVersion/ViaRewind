@@ -571,7 +571,7 @@ public class PlayerPacketRewriter1_8 {
 			@Override
 			protected void register() {
 				map(Types.VAR_INT); // Status
-				map(Types.BLOCK_POSITION1_8, RewindTypes.U_BYTE_POSITION); // Position
+				map(RewindTypes.U_BYTE_POSITION, Types.BLOCK_POSITION1_8); // Position
 			}
 		});
 
