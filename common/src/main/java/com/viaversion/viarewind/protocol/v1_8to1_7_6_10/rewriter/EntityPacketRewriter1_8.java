@@ -111,9 +111,15 @@ public class EntityPacketRewriter1_8 extends VREntityRewriter<ClientboundPackets
 				map(Types.VAR_INT, Types.INT); // Entity id
 				map(Types1_8.ENTITY_DATA_LIST, Types1_7_6_10.ENTITY_DATA_LIST); // Entity data
 				handler(wrapper -> {
+					final EntityTracker1_8 tracker = tracker(wrapper.user());
 					final int entityId = wrapper.get(Types.INT, 0);
 					final List<EntityData> entityData = wrapper.get(Types1_7_6_10.ENTITY_DATA_LIST, 0);
-					handleEntityData(entityId, entityData, wrapper.user());
+					if (tracker.getHolograms().containsKey(entityId)) {
+						wrapper.cancel();
+						tracker.getHolograms().get(entityId).syncState(EntityPacketRewriter1_8.this, entityData);
+					} else {
+						handleEntityData(entityId, entityData, wrapper.user());
+					}
 				});
 			}
 		});
@@ -249,7 +255,6 @@ public class EntityPacketRewriter1_8 extends VREntityRewriter<ClientboundPackets
 				map(Types1_8.ENTITY_DATA_LIST, Types1_7_6_10.ENTITY_DATA_LIST); // Entity data
 
 				handler(getTrackerHandler(Types.UNSIGNED_BYTE, 0));
-				handler(getMobSpawnRewriter(Types1_7_6_10.ENTITY_DATA_LIST));
 
 				// Handle holograms
 				handler(wrapper -> {
@@ -276,6 +281,7 @@ public class EntityPacketRewriter1_8 extends VREntityRewriter<ClientboundPackets
 						hologram.syncState(protocol().getEntityRewriter(), wrapper.get(Types1_7_6_10.ENTITY_DATA_LIST, 0));
 					}
 				});
+				handler(getMobSpawnRewriter(Types1_7_6_10.ENTITY_DATA_LIST));
 			}
 		});
 		protocol.registerClientbound(ClientboundPackets1_8.ADD_PLAYER, new PacketHandlers() {
@@ -618,13 +624,6 @@ public class EntityPacketRewriter1_8 extends VREntityRewriter<ClientboundPackets
 	}
 
 	public void handleEntityData(EntityDataHandlerEvent event, EntityData entityData) {
-		if (event.entityType() == EntityType.ARMOR_STAND) {
-			final EntityTracker1_8 tracker = tracker(event.user());
-			tracker.getHolograms().get(event.entityId()).syncState(this, event.dataList());
-			event.cancel(); // We are rewriting entityData manually
-			return;
-		}
-
 		final EntityDataIndex1_7_6_10 metaIndex = EntityDataIndex1_7_6_10.searchIndex(event.entityType(), entityData.id());
 		if (metaIndex == null) {
 			// Almost certainly bad data, remove it

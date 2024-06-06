@@ -266,7 +266,7 @@ public class VirtualHologramEntity {
 			deleteEntity();
 		}
 		if (currentState == State.ZOMBIE) {
-			spawnEntity(entityId, 54, locX, locY, locZ);
+			spawnEntity(entityId, EntityTypes1_8.EntityType.ZOMBIE.getId(), locX, locY, locZ);
 
 			entityIds = new int[]{entityId};
 		} else if (currentState == State.HOLOGRAM) {
@@ -283,7 +283,7 @@ public class VirtualHologramEntity {
 			spawnSkull.write(Types.INT, 0);
 			spawnSkull.send(Protocol1_8To1_7_6_10.class);
 
-			spawnEntity(entityIds[1], 100, locX, locY, locZ); // Horse
+			spawnEntity(entityIds[1], EntityTypes1_8.EntityType.HORSE.getId(), locX, locY, locZ); // Horse
 
 			this.entityIds = entityIds;
 		}
