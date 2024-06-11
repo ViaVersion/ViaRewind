@@ -365,13 +365,7 @@ public class PlayerPacketRewriter1_8 {
 					if (channel.equals("MC|TrList")) {
 						wrapper.passthrough(Types.INT); // Window id
 
-						int size;
-						if (wrapper.isReadable(Types.BYTE, 0)) {
-							size = wrapper.passthrough(Types.BYTE);
-						} else {
-							size = wrapper.passthrough(Types.UNSIGNED_BYTE);
-						}
-
+						int size = wrapper.passthrough(Types.UNSIGNED_BYTE);
 						for (int i = 0; i < size; i++) {
 							Item item = protocol.getItemRewriter().handleItemToClient(wrapper.user(), wrapper.read(Types.ITEM1_8));
 							wrapper.write(RewindTypes.COMPRESSED_NBT_ITEM, item); // Buy item 1
