@@ -100,33 +100,10 @@ public class PlayerPacketRewriter1_9 {
 				map(Types.STRING); // Channel
 				handlerSoftFail(wrapper -> {
 					final String channel = wrapper.get(Types.STRING, 0);
-					if (channel.equals("MC|TrList")) {
-						wrapper.passthrough(Types.INT); // Window id
-
-						int size;
-						if (wrapper.isReadable(Types.BYTE, 0)) {
-							size = wrapper.passthrough(Types.BYTE);
-						} else {
-							size = wrapper.passthrough(Types.UNSIGNED_BYTE);
-						}
-
-						final ItemRewriter<?> itemRewriter = protocol.getItemRewriter();
-
-						for (int i = 0; i < size; i++) {
-							wrapper.write(Types.ITEM1_8, itemRewriter.handleItemToClient(wrapper.user(), wrapper.read(Types.ITEM1_8))); // Buy item 1
-							wrapper.write(Types.ITEM1_8, itemRewriter.handleItemToClient(wrapper.user(), wrapper.read(Types.ITEM1_8))); // Buy item 3
-
-							final boolean has3Items = wrapper.passthrough(Types.BOOLEAN);
-							if (has3Items) {
-								wrapper.write(Types.ITEM1_8, itemRewriter.handleItemToClient(wrapper.user(), wrapper.read(Types.ITEM1_8))); // Buy item 2
-							}
-
-							wrapper.passthrough(Types.BOOLEAN); //Unavailable
-							wrapper.passthrough(Types.INT); //Uses
-							wrapper.passthrough(Types.INT); //Max Uses
-						}
-					} else if (channel.equals("MC|BOpen")) {
+					if (channel.equals("MC|BOpen")) {
 						wrapper.read(Types.VAR_INT);
+					} else if (channel.equals("MC|TrList")) {
+						protocol.getItemRewriter().handleTradeList(wrapper);
 					}
 				});
 			}
