@@ -1,5 +1,7 @@
 import java.util.function.Consumer
 
+includeBuild("build-logic")
+
 setupViaSubproject("common")
 setupViaSubproject("bukkit")
 setupViaSubproject("fabric")
