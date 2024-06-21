@@ -37,11 +37,7 @@ public class EntityDataIndex1_8 {
 
 	private static Optional<EntityDataIndex1_9> getIndex(final EntityType type, final int index) {
 		final Pair<EntityType, Integer> pair = new Pair<>(type, index);
-		if (ENTITY_DATA_REWRITES.containsKey(pair)) {
-			return Optional.of(ENTITY_DATA_REWRITES.get(pair));
-		} else {
-			return Optional.empty();
-		}
+		return Optional.ofNullable(ENTITY_DATA_REWRITES.get(pair));
 	}
 
 	public static EntityDataIndex1_9 searchIndex(final EntityType type, final int index) {
