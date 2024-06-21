@@ -28,10 +28,11 @@ import java.util.logging.Level;
 
 public class CooldownStorage implements StorableObject {
 
-	private double attackSpeed = 4.0;
-	private long lastHit = 0;
 	private CooldownVisualization.Factory visualizationFactory = CooldownVisualization.Factory.fromConfiguration();
 	private CooldownVisualization current;
+
+	private double attackSpeed = 4.0;
+	private long lastHit = 0;
 
 	public void tick(final UserConnection connection) {
 		if (!hasCooldown()) {
@@ -109,5 +110,13 @@ public class CooldownStorage implements StorableObject {
 
 	public void setLastHit(long lastHit) {
 		this.lastHit = lastHit;
+	}
+
+	public CooldownVisualization.Factory getVisualizationFactory() {
+		return visualizationFactory;
+	}
+
+	public void setVisualizationFactory(CooldownVisualization.Factory visualizationFactory) {
+		this.visualizationFactory = visualizationFactory;
 	}
 }
