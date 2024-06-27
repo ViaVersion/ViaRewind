@@ -174,12 +174,8 @@ public enum EntityDataIndex1_7_6_10 {
 	}
 
 	private static Optional<EntityDataIndex1_7_6_10> getIndex(EntityType type, int index) {
-		Pair<EntityType, Integer> pair = new Pair<>(type, index);
-		if (ENTITY_DATA_REWRITES.containsKey(pair)) {
-			return Optional.of(ENTITY_DATA_REWRITES.get(pair));
-		}
-
-		return Optional.empty();
+		final Pair<EntityType, Integer> pair = new Pair<>(type, index);
+		return Optional.ofNullable(ENTITY_DATA_REWRITES.get(pair));
 	}
 
 	public EntityTypes1_8.EntityType getClazz() {
@@ -203,6 +199,10 @@ public enum EntityDataIndex1_7_6_10 {
 	}
 
 	public static EntityDataIndex1_7_6_10 searchIndex(EntityType type, int index) {
+		if (type == null) {
+			// Plugins sending metadata before an entity is spawned, causing exceptions while the game ignores them.
+			return null;
+		}
 		EntityType currentType = type;
 		do {
 			Optional<EntityDataIndex1_7_6_10> optMeta = getIndex(currentType, index);
