@@ -57,7 +57,6 @@ public interface CooldownVisualization {
 				case BOSS_BAR -> BossBarVisualization::new;
 				case ACTION_BAR -> ActionBarVisualization::new;
 				case DISABLED -> DISABLED;
-				default -> throw new IllegalArgumentException("Unexpected: " + indicator);
 			};
 		}
 

@@ -3,7 +3,8 @@
 # Specifies how 1.8.x clients should see the cooldown indicator
 # You can choose between TITLE, ACTION_BAR, BOSS_BAR and DISABLED
 # ONLY DISABLE IF YOU HAVE 1.9 COOLDOWN DISABLED ON YOUR SERVER
-# 1.8 PLAYERS MAY ASK WHY PVP IS NOT WORKING OTHERWISE
+# 1.8 PLAYERS MAY ASK WHY PVP IS NOT WORKING OTHERWISE.
+# REQUIRES A SERVER RESTART TO TAKE EFFECT
 cooldown-indicator: 'TITLE'
 #
 # Replaces Adventure mode with Survival mode for 1.7.x clients
@@ -11,7 +12,7 @@ cooldown-indicator: 'TITLE'
 # or 'CanPlaceOn' flags on items
 replace-adventure: false
 #
-# Whether 1.9 particles should be replaced by similar ones in
+# Whether similar ones should replace 1.9 particles in
 # 1.8 and lower
 replace-particles: false
 #
@@ -36,3 +37,6 @@ enable-offhand: true
 #
 # Allows defining the offhand command
 offhand-command: '/offhand'
+#
+# If enabled, 1.8 players on 1.9+ servers will also experience the levitation effect by sending velocity packets.
+emulate-levitation-effect: true

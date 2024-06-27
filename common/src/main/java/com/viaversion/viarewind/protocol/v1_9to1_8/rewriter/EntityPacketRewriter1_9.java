@@ -17,7 +17,6 @@
  */
 package com.viaversion.viarewind.protocol.v1_9to1_8.rewriter;
 
-import com.viaversion.viarewind.ViaRewind;
 import com.viaversion.viarewind.api.minecraft.math.RelativeMoveUtil;
 import com.viaversion.viarewind.api.rewriter.VREntityRewriter;
 import com.viaversion.viarewind.protocol.v1_9to1_8.Protocol1_9To1_8;
@@ -26,7 +25,6 @@ import com.viaversion.viarewind.protocol.v1_9to1_8.storage.CooldownStorage;
 import com.viaversion.viarewind.protocol.v1_9to1_8.storage.EntityTracker1_9;
 import com.viaversion.viarewind.protocol.v1_9to1_8.storage.LevitationStorage;
 import com.viaversion.viarewind.protocol.v1_9to1_8.storage.PlayerPositionTracker;
-import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.minecraft.EulerAngle;
 import com.viaversion.viaversion.api.minecraft.Vector;
@@ -52,7 +50,6 @@ import com.viaversion.viaversion.util.Pair;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.logging.Level;
 
 public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets1_9, Protocol1_9To1_8> {
 

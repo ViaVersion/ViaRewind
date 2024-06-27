@@ -103,4 +103,11 @@ public interface ViaRewindConfig extends Config {
 	 * @return the offhand command
 	 */
 	String getOffhandCommand();
+
+	/**
+	 * If enabled, 1.8 players on 1.9+ servers will also experience the levitation effect by sending velocity packets.
+	 *
+	 * @return true if enabled
+	 */
+	boolean emulateLevitationEffect();
 }

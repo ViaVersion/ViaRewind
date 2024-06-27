@@ -39,6 +39,7 @@ public class ViaRewindConfig extends Config implements com.viaversion.viarewind.
 	private String worldBorderParticle;
 	private boolean enableOffhand;
 	private String offhandCommand;
+	private boolean emulateLevitationEffect;
 
     public ViaRewindConfig(File configFile, Logger logger) {
         super(configFile, logger);
@@ -61,6 +62,7 @@ public class ViaRewindConfig extends Config implements com.viaversion.viarewind.
 		worldBorderParticle = getString("world-border-particle", "fireworksSpark");
 		enableOffhand = getBoolean("enable-offhand", true);
 		offhandCommand = getString("offhand-command", "/offhand");
+		emulateLevitationEffect = getBoolean("emulate-levitation-effect", true);
 	}
 
 	@Override
@@ -111,6 +113,11 @@ public class ViaRewindConfig extends Config implements com.viaversion.viarewind.
 	@Override
 	public String getOffhandCommand() {
 		return offhandCommand;
+	}
+
+	@Override
+	public boolean emulateLevitationEffect() {
+		return emulateLevitationEffect;
 	}
 
 	@Override

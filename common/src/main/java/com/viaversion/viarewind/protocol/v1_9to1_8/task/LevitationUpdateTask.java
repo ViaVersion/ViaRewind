@@ -32,6 +32,9 @@ public class LevitationUpdateTask implements Runnable {
 
 	@Override
 	public void run() {
+		if (!ViaRewind.getConfig().emulateLevitationEffect()) {
+			return;
+		}
 		for (UserConnection connection : Via.getManager().getConnectionManager().getConnections()) {
 			final LevitationStorage levitation = connection.get(LevitationStorage.class);
 			if (!levitation.isActive()) {
