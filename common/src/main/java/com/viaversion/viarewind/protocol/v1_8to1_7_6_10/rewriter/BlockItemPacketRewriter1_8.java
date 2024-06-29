@@ -277,9 +277,8 @@ public class BlockItemPacketRewriter1_8 extends VRBlockItemRewriter<ClientboundP
 		super.handleItemToClient(connection, item);
 
 		CompoundTag tag = item.tag();
-		if (tag == null) {
-			item.setTag(tag = new CompoundTag());
-		}
+		if (tag == null) return item;
+
 		enchantmentRewriter.handleToClient(item);
 
 		if (item.identifier() == 387) {
