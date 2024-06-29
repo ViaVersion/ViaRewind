@@ -194,15 +194,11 @@ public class BlockItemPacketRewriter1_9 extends VRBlockItemRewriter<ClientboundP
 		super.handleItemToClient(connection, item);
 
 		CompoundTag tag = item.tag();
-		if (tag == null) {
-			item.setTag(tag = new CompoundTag());
-		}
-
 		enchantmentRewriter.handleToClient(item);
 
-		CompoundTag displayTag = tag.getCompoundTag("display");
-		if (item.data() != 0 && tag.contains("Unbreakable")) {
-			final ByteTag unbreakableTag = tag.getByteTag("Unbreakable");
+		CompoundTag displayTag = tag == null ? null : tag.getCompoundTag("display");
+		if (item.data() != 0) {
+			final ByteTag unbreakableTag = tag == null ? null : tag.getByteTag("Unbreakable");
 			if (unbreakableTag != null && unbreakableTag.asByte() != 0) {
 				tag.put(nbtTagName() + "|Unbreakable", new ByteTag(unbreakableTag.asByte()));
 				tag.remove("Unbreakable");
@@ -222,7 +218,7 @@ public class BlockItemPacketRewriter1_9 extends VRBlockItemRewriter<ClientboundP
 
 		if (item.identifier() == 383 && item.data() == 0) { // Spawn eggs
 			int data = 0;
-			final CompoundTag entityTag = tag.getCompoundTag("EntityTag");
+			final CompoundTag entityTag = tag == null ? null : tag.getCompoundTag("EntityTag");
 			if (entityTag != null) {
 				final StringTag idTag = entityTag.getStringTag("id");
 				if (idTag != null) {
@@ -246,7 +242,7 @@ public class BlockItemPacketRewriter1_9 extends VRBlockItemRewriter<ClientboundP
 
 		if (potion || splashPotion || lingeringPotion) {
 			int data = 0;
-			final StringTag potionTag = tag.getStringTag("Potion");
+			final StringTag potionTag = tag == null ? null : tag.getStringTag("Potion");
 			if (potionTag != null) {
 				String potionName = Key.stripMinecraftNamespace(potionTag.getValue());
 				if (PotionIdMappings1_8.POTION_NAME_TO_ID.containsKey(potionName)) {
@@ -272,7 +268,7 @@ public class BlockItemPacketRewriter1_9 extends VRBlockItemRewriter<ClientboundP
 			item.setData((short) data);
 		}
 
-		final ListTag<CompoundTag> attributeModifiers = tag.getListTag("AttributeModifiers", CompoundTag.class);
+		final ListTag<CompoundTag> attributeModifiers = tag == null ? null : tag.getListTag("AttributeModifiers", CompoundTag.class);
 		if (attributeModifiers != null) {
 			tag.put(nbtTagName() + "|AttributeModifiers", attributeModifiers.copy());
 			attributeModifiers.getValue().removeIf(entries -> {
@@ -290,14 +286,14 @@ public class BlockItemPacketRewriter1_9 extends VRBlockItemRewriter<ClientboundP
 		super.handleItemToServer(connection, item);
 
 		CompoundTag tag = item.tag();
-		if (tag == null) {
-			item.setTag(tag = new CompoundTag());
-		}
 
 		enchantmentRewriter.handleToServer(item);
 
 		if (item.identifier() == 383 && item.data() != 0) { // Spawn eggs
-			if (!tag.contains("EntityTag") && EntityIds1_8.ENTITY_ID_TO_NAME.containsKey((int) item.data())) {
+			if ((tag == null || !tag.contains("EntityTag")) && EntityIds1_8.ENTITY_ID_TO_NAME.containsKey((int) item.data())) {
+				if (tag == null) {
+					item.setTag(tag = new CompoundTag());
+				}
 				final CompoundTag entityTag = new CompoundTag();
 				entityTag.put("id", new StringTag(EntityIds1_8.ENTITY_ID_TO_NAME.get((int) item.data())));
 				tag.put("EntityTag", entityTag);
@@ -305,20 +301,30 @@ public class BlockItemPacketRewriter1_9 extends VRBlockItemRewriter<ClientboundP
 			item.setData((short) 0);
 		}
 
-		if (item.identifier() == 373 && !tag.contains("Potion")) { // Potions
+		if (item.identifier() == 373 && (tag == null || !tag.contains("Potion"))) { // Potions
             if (item.data() >= 16384) {
 				item.setIdentifier(438);
 				item.setData((short) (item.data() - 8192));
 			}
 
-			final String name = item.data() == 8192 ? "water" : PotionIdMappings1_9.potionNameFromDamage(item.data());
-			tag.put("Potion", new StringTag("minecraft:" + name));
+			if (tag == null) {
+				item.setTag(tag = new CompoundTag());
+
+				final String name = item.data() == 8192 ? "water" : PotionIdMappings1_9.potionNameFromDamage(item.data());
+				tag.put("Potion", new StringTag("minecraft:" + name));
+			}
 			item.setData((short) 0);
 		}
 
+		if (tag == null) {
+			return item;
+		}
 		final Tag noDisplayTag = tag.remove(nbtTagName() + "|noDisplay");
 		if (noDisplayTag != null) {
 			tag.remove("display");
+			if (tag.isEmpty()) {
+				item.setTag(null);
+			}
 		}
 		final Tag unbreakableTag = tag.remove(nbtTagName() + "|Unbreakable");
 		if (unbreakableTag != null) {
