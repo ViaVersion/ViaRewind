@@ -25,7 +25,7 @@
   "depends": {
     "fabricloader": ">=0.14.0",
     "viafabric": ">=0.4.10",
-    "viabackwards": "*"
+    "viabackwards": ">=5.0.0"
   },
   "custom": {
     "modmenu:api": true,
