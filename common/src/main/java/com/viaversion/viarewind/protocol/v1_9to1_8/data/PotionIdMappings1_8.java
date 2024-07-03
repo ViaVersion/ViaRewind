@@ -22,14 +22,13 @@ import com.viaversion.viaversion.protocols.v1_8to1_9.data.PotionIdMappings1_9;
 import java.util.HashMap;
 import java.util.Map;
 
-// TODO | Check if this is correct???
 public class PotionIdMappings1_8 {
 	public static final Map<String, String> POTION_NAME_INDEX = new HashMap<>();
 	public static final Map<String, Integer> POTION_NAME_TO_ID = new HashMap<>();
 
 	static {
 		POTION_NAME_TO_ID.putAll(PotionIdMappings1_9.POTION_NAME_TO_ID);
-		POTION_NAME_TO_ID.put("luck", 8203);
+		POTION_NAME_TO_ID.put("luck", 8203); // Map new potion to similar one (luck->leaping)
 
 		POTION_NAME_INDEX.put("water", "§rWater Bottle");
 		POTION_NAME_INDEX.put("mundane", "§rMundane Potion");
