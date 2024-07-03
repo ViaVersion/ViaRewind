@@ -664,7 +664,7 @@ public class PlayerPacketRewriter1_8 {
 		protocol.registerServerbound(ServerboundPackets1_7_2_5.SIGN_UPDATE, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Types.BLOCK_POSITION1_8, RewindTypes.SHORT_POSITION); // Position
+				map(RewindTypes.SHORT_POSITION, Types.BLOCK_POSITION1_8); // Position
 				handler(wrapper -> {
 					for (int i = 0; i < 4; i++) {
 						final String line = wrapper.read(Types.STRING);
