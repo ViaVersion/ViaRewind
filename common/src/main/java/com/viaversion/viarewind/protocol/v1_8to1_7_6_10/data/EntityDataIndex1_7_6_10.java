@@ -199,10 +199,6 @@ public enum EntityDataIndex1_7_6_10 {
 	}
 
 	public static EntityDataIndex1_7_6_10 searchIndex(EntityType type, int index) {
-		if (type == null) {
-			// Plugins sending metadata before an entity is spawned, causing exceptions while the game ignores them.
-			return null;
-		}
 		EntityType currentType = type;
 		do {
 			Optional<EntityDataIndex1_7_6_10> optMeta = getIndex(currentType, index);

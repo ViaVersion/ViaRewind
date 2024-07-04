@@ -41,10 +41,6 @@ public class EntityDataIndex1_8 {
 	}
 
 	public static EntityDataIndex1_9 searchIndex(final EntityType type, final int index) {
-		if (type == null) {
-			// Plugins sending metadata before an entity is spawned, causing exceptions while the game ignores them.
-			return null;
-		}
 		EntityType currentType = type;
 		do {
 			final Optional<EntityDataIndex1_9> optMeta = getIndex(currentType, index);

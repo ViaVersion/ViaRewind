@@ -64,7 +64,18 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
 	protected void registerPackets() {
 		registerJoinGame1_8(ClientboundPackets1_9.LOGIN);
 		registerRemoveEntities(ClientboundPackets1_9.REMOVE_ENTITIES);
-		registerSetEntityData(ClientboundPackets1_9.SET_ENTITY_DATA, Types1_9.ENTITY_DATA_LIST, Types1_8.ENTITY_DATA_LIST);
+
+		protocol.registerClientbound(ClientboundPackets1_9.SET_ENTITY_DATA, wrapper -> {
+			final int entityId = wrapper.passthrough(Types.VAR_INT);
+			if (!tracker(wrapper.user()).hasEntity(entityId)) {
+				wrapper.cancel();
+				return;
+			}
+			final List<EntityData> entityData = wrapper.read(Types1_9.ENTITY_DATA_LIST);
+			handleEntityData(entityId, entityData, wrapper.user());
+
+			wrapper.write(Types1_8.ENTITY_DATA_LIST, entityData);
+		});
 
 		protocol.registerClientbound(ClientboundPackets1_9.ADD_ENTITY, new PacketHandlers() {
 			@Override

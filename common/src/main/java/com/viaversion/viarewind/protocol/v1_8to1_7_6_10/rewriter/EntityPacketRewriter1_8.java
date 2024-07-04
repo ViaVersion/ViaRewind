@@ -117,8 +117,10 @@ public class EntityPacketRewriter1_8 extends VREntityRewriter<ClientboundPackets
 					if (tracker.getHolograms().containsKey(entityId)) {
 						wrapper.cancel();
 						tracker.getHolograms().get(entityId).syncState(EntityPacketRewriter1_8.this, entityData);
-					} else {
+					} else if (tracker.hasEntity(entityId)) {
 						handleEntityData(entityId, entityData, wrapper.user());
+					} else {
+						wrapper.cancel();
 					}
 				});
 			}
