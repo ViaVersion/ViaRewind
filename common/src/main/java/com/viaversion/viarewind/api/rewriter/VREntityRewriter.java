@@ -60,7 +60,7 @@ public abstract class VREntityRewriter<C extends ClientboundPacketType, T extend
 	}
 
 	@Override
-	protected Object getDisplayVisibilityMetaValue() {
+	protected Object getDisplayVisibilityDataValue() {
 		return (byte) 1;
 	}
 

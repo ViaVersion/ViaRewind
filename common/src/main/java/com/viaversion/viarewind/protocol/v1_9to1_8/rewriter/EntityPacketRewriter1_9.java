@@ -229,7 +229,7 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
 				create(Types.SHORT, (short) 0); // Current item
 				map(Types1_9.ENTITY_DATA_LIST, Types1_8.ENTITY_DATA_LIST); // Entity data
 
-				handler(getTrackerAndMetaHandler(Types1_8.ENTITY_DATA_LIST, EntityTypes1_9.EntityType.PLAYER));
+				handler(getTrackerAndDataHandler(Types1_8.ENTITY_DATA_LIST, EntityTypes1_9.EntityType.PLAYER));
 			}
 		});
 
