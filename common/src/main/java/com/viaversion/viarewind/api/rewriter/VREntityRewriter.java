@@ -52,7 +52,7 @@ public abstract class VREntityRewriter<C extends ClientboundPacketType, T extend
 		});
 	}
 
-	protected void untrackEntities(final UserConnection connection, final int[] entities) {
+	protected void removeEntities(final UserConnection connection, final int[] entities) {
 		final EntityTrackerBase tracker = tracker(connection);
 		for (int entityId : entities) {
 			tracker.removeEntity(entityId);

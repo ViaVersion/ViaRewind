@@ -263,7 +263,6 @@ public class WorldPacketRewriter1_8 {
 		});
 
 		protocol.cancelClientbound(ClientboundPackets1_8.CHANGE_DIFFICULTY);
-		protocol.cancelClientbound(ClientboundPackets1_8.PLAYER_COMBAT);
 
 		protocol.registerClientbound(ClientboundPackets1_8.SET_BORDER, null, wrapper -> {
 			final WorldBorderEmulator emulator = wrapper.user().get(WorldBorderEmulator.class);

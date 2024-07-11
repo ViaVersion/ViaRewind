@@ -92,7 +92,7 @@ public class EntityPacketRewriter1_8 extends VREntityRewriter<ClientboundPackets
 		});
 		protocol.registerClientbound(ClientboundPackets1_8.REMOVE_ENTITIES, wrapper -> {
 			final int[] entities = wrapper.read(Types.VAR_INT_ARRAY_PRIMITIVE);
-			untrackEntities(wrapper.user(), entities);
+			removeEntities(wrapper.user(), entities);
 
 			wrapper.cancel();
 

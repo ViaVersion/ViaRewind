@@ -445,6 +445,7 @@ public class PlayerPacketRewriter1_8 {
 		});
 
 		protocol.cancelClientbound(ClientboundPackets1_8.TAB_LIST);
+		protocol.cancelClientbound(ClientboundPackets1_8.PLAYER_COMBAT);
 
 		protocol.registerClientbound(ClientboundPackets1_8.RESOURCE_PACK, ClientboundPackets1_7_2_5.CUSTOM_PAYLOAD, new PacketHandlers() {
 			@Override
