@@ -179,10 +179,10 @@ public class PlayerPacketRewriter1_9 {
 			if (action != 2) {
 				return;
 			}
-			wrapper.passthrough(Types.VAR_INT); // Duration
 
 			final EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
-			final int entityId = wrapper.passthrough(Types.INT);
+			final int entityId = wrapper.passthrough(Types.VAR_INT);
+			wrapper.passthrough(Types.INT); // Killer id
 
 			if (entityId != tracker.clientEntityId()) {
 				return;
@@ -198,7 +198,7 @@ public class PlayerPacketRewriter1_9 {
 
 			final PacketWrapper chatMessage = wrapper.create(ClientboundPackets1_8.CHAT);
 			chatMessage.write(Types.COMPONENT, message);
-			chatMessage.write(Types.BYTE, (byte) 2); // Position - above hotbar
+			chatMessage.write(Types.BYTE, (byte) 1); // Position - in chat
 			chatMessage.scheduleSend(Protocol1_9To1_8.class);
 		});
 
