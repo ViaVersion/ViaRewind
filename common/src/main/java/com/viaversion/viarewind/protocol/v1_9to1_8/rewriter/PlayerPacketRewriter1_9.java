@@ -28,7 +28,6 @@ import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
 import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes1_8;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
-import com.viaversion.viaversion.api.rewriter.ItemRewriter;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.Types1_8;
 import com.viaversion.viaversion.libs.gson.JsonElement;
@@ -172,6 +171,35 @@ public class PlayerPacketRewriter1_9 {
 					world.setEnvironment(wrapper.get(Types.INT, 0));
 				});
 			}
+		});
+
+		// Packet implementation doesn't do anything until 1.9
+		protocol.registerClientbound(ClientboundPackets1_9.PLAYER_COMBAT, wrapper -> {
+			final int action = wrapper.passthrough(Types.VAR_INT);
+			if (action != 2) {
+				return;
+			}
+			wrapper.passthrough(Types.VAR_INT); // Duration
+
+			final EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
+			final int entityId = wrapper.passthrough(Types.INT);
+
+			if (entityId != tracker.clientEntityId()) {
+				return;
+			}
+
+			final JsonElement message = wrapper.passthrough(Types.COMPONENT);
+
+			final PacketWrapper killPlayer = wrapper.create(ClientboundPackets1_8.SET_HEALTH);
+			killPlayer.write(Types.FLOAT, 0F); // Health
+			killPlayer.write(Types.VAR_INT, 0); // Food
+			killPlayer.write(Types.FLOAT, 0F); // Food Saturation
+			killPlayer.scheduleSend(Protocol1_9To1_8.class);
+
+			final PacketWrapper chatMessage = wrapper.create(ClientboundPackets1_8.CHAT);
+			chatMessage.write(Types.COMPONENT, message);
+			chatMessage.write(Types.BYTE, (byte) 2); // Position - above hotbar
+			chatMessage.scheduleSend(Protocol1_9To1_8.class);
 		});
 
 		protocol.registerServerbound(ServerboundPackets1_8.CHAT, new PacketHandlers() {
