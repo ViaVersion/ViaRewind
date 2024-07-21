@@ -1,58 +1,52 @@
 plugins {
-    id "com.github.johnrengelman.shadow" version "8.1.1"
+    id "vr.base-conventions"
+
     id "io.papermc.hangar-publish-plugin" version "0.1.2"
     id "com.modrinth.minotaur" version "2.+"
-    id "java-library"
-    id "maven-publish"
+}
+
+base {
+    archivesName = "ViaRewind"
+}
+
+configurations {
+    publishInclude
 }
 
 dependencies {
-    api project(":viarewind-common")
-    api project(":viarewind-bukkit")
-    api project(":viarewind-fabric")
-    api project(":viarewind-velocity")
+    publishInclude project(":viarewind-common")
+    publishInclude project(":viarewind-bukkit")
+    publishInclude project(":viarewind-fabric")
+    publishInclude project(":viarewind-velocity")
 }
 
-java {
-    withSourcesJar()
-    withJavadocJar()
-}
-
-shadowJar {
+jar {
+    dependsOn configurations.publishInclude
+    from {
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        configurations.publishInclude.collect {
+            zipTree(it)
+        }
+    } {
+        exclude "META-INF/*.RSA", "META-INF/*.SF", "META-INF/*.DSA"
+    }
     manifest {
-        attributes["paperweight-mappings-namespace"] = "mojang"
+        attributes(
+                "paperweight-mappings-namespace": "mojang"
+        )
     }
-    archiveClassifier.set("")
-    archiveBaseName.set("ViaRewind-" + project.maven_version)
-    configurations {
-        api
-    }
-}
-
-publishing {
-    repositories {
-        maven {
-            name = "Via"
-            url = "https://repo.viaversion.com/"
-
-            credentials(PasswordCredentials)
-            authentication {
-                basic(BasicAuthentication)
-            }
-        }
-    }
-    publications {
-        shadow(MavenPublication) { publication ->
-            artifactId = project.maven_name
-            groupId = project.maven_group
-            version = project.maven_version
-
-            from project.shadow.component(publication)
-        }
+    from("LICENSE") {
+        rename { "${it}_${project.name ?: rootProject.name}" }
     }
 }
 
-build.dependsOn shadowJar
+idea {
+    module {
+        ["run"].each {
+            excludeDirs << file("$it")
+        }
+    }
+}
 
 // -----------------------------------------------------
 // Publishing
@@ -103,7 +97,7 @@ if (!isRelease || isMainBranch) { // Only publish releases from the main branch
         versionNumber.set(suffixedVersion)
         versionName.set(suffixedVersion)
         changelog.set(changelogContent)
-        uploadFile.set(shadowJar.archiveFile)
+        uploadFile.set(jar.archiveFile)
         gameVersions.set(mcVersions)
         loaders.add("fabric")
         loaders.add("paper")
@@ -127,7 +121,7 @@ if (!isRelease || isMainBranch) { // Only publish releases from the main branch
             apiKey = System.getenv("HANGAR_TOKEN")
             platforms {
                 PAPER {
-                    jar = shadowJar.archiveFile
+                    jar = project.jar.archiveFile
                     platformVersions = [property('mcVersionRange') as String]
                     dependencies {
                         hangar("ViaVersion") {
@@ -139,7 +133,7 @@ if (!isRelease || isMainBranch) { // Only publish releases from the main branch
                     }
                 }
                 VELOCITY {
-                    jar = shadowJar.archiveFile
+                    jar = project.jar.archiveFile
                     platformVersions = [property("velocityVersion") as String]
                     dependencies {
                         hangar("ViaVersion") {

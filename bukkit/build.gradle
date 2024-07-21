@@ -1,9 +1,24 @@
 plugins {
-    id "vr.java-conventions"
+    id "vr.platform-conventions"
+}
+
+repositories {
+    maven {
+        name = "SpigotMC"
+        url "https://hub.spigotmc.org/nexus/content/repositories/snapshots/"
+    }
+    maven {
+        name = "SpongePowered"
+        url "https://repo.spongepowered.org/repository/maven-public/"
+    }
 }
 
 dependencies {
-    api project(":viarewind-common")
-
     compileOnly(annotationProcessor("org.spigotmc:spigot-api:1.12.2-R0.1-SNAPSHOT"))
+}
+
+processResources {
+    filesMatching("plugin.yml") {
+        expand("version": project.version, "description": project.description)
+    }
 }

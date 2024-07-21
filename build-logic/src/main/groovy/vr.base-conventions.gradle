@@ -1,0 +1,74 @@
+plugins {
+    id "java-library"
+    id "maven-publish"
+    id "idea"
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        name = "ViaVersion"
+        url "https://repo.viaversion.com"
+    }
+}
+
+base {
+    java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+    compileJava.options.encoding = compileTestJava.options.encoding = javadoc.options.encoding = "UTF-8"
+
+    group = rootProject.maven_group
+    version = rootProject.maven_version
+    description = rootProject.maven_description
+}
+
+dependencies {
+    compileOnly "com.viaversion:viaversion:${project.viaversion_version}"
+    compileOnly "com.viaversion:viabackwards:${project.viabackwards_version}"
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "Via"
+            url = "https://repo.viaversion.com/"
+
+            credentials(PasswordCredentials)
+            authentication {
+                basic(BasicAuthentication)
+            }
+        }
+    }
+    publications {
+        main(MavenPublication) {
+            artifactId = project.name
+            groupId = project.maven_group
+            version = project.maven_version
+
+            from components.java
+
+            pom {
+                name = "ViaRewind"
+                description = project.description
+                url = "https://github.com/ViaVersion/ViaRewind"
+                licenses {
+                    license {
+                        name = "GPL-3.0 License"
+                        url = "https://github.com/ViaVersion/ViaRewind/blob/main/LICENSE"
+                    }
+                }
+                developers {
+                    developer {
+                        id = "FlorianMichael"
+                        name = "EnZaXD"
+                        email = "florian.michael07@gmail.com"
+                    }
+                }
+                scm {
+                    connection = "scm:git:git://github.com/ViaVersion/ViaRewind.git"
+                    developerConnection = "scm:git:ssh://github.com/ViaVersion/ViaRewind.git"
+                    url = "github.com/ViaVersion/ViaRewind"
+                }
+            }
+        }
+    }
+}

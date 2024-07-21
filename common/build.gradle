@@ -1,28 +1,19 @@
 plugins {
-    id "vr.java-conventions"
-}
+    id "vr.base-conventions"
 
-plugins {
     id "net.raphimc.class-token-replacer" version "1.0.0"
 }
 
 dependencies {
+    compileOnly "io.netty:netty-all:${project.netty_version}"
+    compileOnly "com.google.guava:guava:${project.guava_version}"
 }
 
 sourceSets {
     main {
         classTokenReplacer {
             property("\${version}", rootProject.maven_version)
-            property("\${impl_version}", "git-ViaRewind-${rootProject.maven_version}:${project.latestCommitHash()}")
+            property("\${impl_version}", "git-ViaRewind-${rootProject.maven_version}:${rootProject.latestCommitHash()}")
         }
     }
-}
-
-String latestCommitHash() {
-    def stdout = new ByteArrayOutputStream()
-    exec {
-        commandLine 'git', 'rev-parse', '--short', 'HEAD'
-        standardOutput = stdout
-    }
-    return stdout.toString().trim()
 }

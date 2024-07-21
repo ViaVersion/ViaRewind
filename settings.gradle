@@ -1,4 +1,4 @@
-import java.util.function.Consumer
+rootProject.name = "viarewind"
 
 includeBuild("build-logic")
 
@@ -7,17 +7,9 @@ setupViaSubproject("bukkit")
 setupViaSubproject("fabric")
 setupViaSubproject("velocity")
 
-setupSubproject("viarewind", project -> {
-    project.projectDir = file("universal")
-})
-
 void setupViaSubproject(String name) {
-    setupSubproject("viarewind-" + name, project -> {
-        project.projectDir = file(name)
-    })
-}
+    var pName = "viarewind-" + name
 
-void setupSubproject(String name, Consumer<ProjectDescriptor> block) {
-    include name
-    block.accept(project(":" + name))
+    include pName
+    project(":" + pName).projectDir = file(name)
 }
