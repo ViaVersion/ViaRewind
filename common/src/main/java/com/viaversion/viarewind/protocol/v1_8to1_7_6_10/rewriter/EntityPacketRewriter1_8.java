@@ -122,6 +122,10 @@ public class EntityPacketRewriter1_8 extends VREntityRewriter<ClientboundPackets
 					} else {
 						wrapper.cancel();
 					}
+					if (tracker.clientEntityId() == entityId) {
+						tracker.getEntityData().removeIf(first -> entityData.stream().anyMatch(second -> first.id() == second.id()));
+						tracker.getEntityData().addAll(entityData);
+					}
 				});
 			}
 		});
@@ -335,7 +339,15 @@ public class EntityPacketRewriter1_8 extends VREntityRewriter<ClientboundPackets
 				map(Types.SHORT); // Current item
 				map(Types1_8.ENTITY_DATA_LIST, Types1_7_6_10.ENTITY_DATA_LIST); // Entity data
 
-				handler(getTrackerAndDataHandler(Types1_7_6_10.ENTITY_DATA_LIST, EntityTypes1_8.EntityType.PLAYER));
+				handler(wrapper -> {
+					addTrackedEntity(wrapper, wrapper.get(Types.VAR_INT, 0), EntityTypes1_8.EntityType.PLAYER);
+
+					final List<EntityData> entityDataList = wrapper.get(Types1_7_6_10.ENTITY_DATA_LIST, 0);
+					handleEntityData(wrapper.get(Types.VAR_INT, 0), entityDataList, wrapper.user());
+
+					final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_7_6_10.class);
+					tracker.setEntityData(entityDataList);
+				});
 			}
 		});
 		protocol.registerClientbound(ClientboundPackets1_8.SET_EQUIPPED_ITEM, new PacketHandlers() {

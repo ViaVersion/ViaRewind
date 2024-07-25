@@ -24,6 +24,7 @@ import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.data.VirtualHologramEnti
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_8;
+import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
@@ -35,6 +36,8 @@ import com.viaversion.viaversion.libs.fastutil.objects.Object2IntMap;
 import com.viaversion.viaversion.libs.fastutil.objects.Object2IntOpenHashMap;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_8;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -45,6 +48,8 @@ public class EntityTracker1_8 extends EntityTrackerBase {
 	private final Int2IntMap vehicles = new Int2IntArrayMap();
 	private final Int2ObjectMap<UUID> entityIdToUUID = new Int2ObjectArrayMap<>();
 	private final Object2IntMap<UUID> entityUUIDToId = new Object2IntOpenHashMap<>();
+
+	private List<EntityData> entityData = new ArrayList<>();
 
 	public int spectatingClientEntityId = -1;
 	private int clientEntityGameMode;
@@ -180,4 +185,13 @@ public class EntityTracker1_8 extends EntityTrackerBase {
 	public void setClientEntityGameMode(int clientEntityGameMode) {
 		this.clientEntityGameMode = clientEntityGameMode;
 	}
+
+	public List<EntityData> getEntityData() {
+		return entityData;
+	}
+
+	public void setEntityData(List<EntityData> entityData) {
+		this.entityData = entityData;
+	}
+
 }

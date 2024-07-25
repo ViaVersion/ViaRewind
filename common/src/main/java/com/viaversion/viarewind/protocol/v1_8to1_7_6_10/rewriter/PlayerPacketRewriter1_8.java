@@ -18,6 +18,7 @@
 package com.viaversion.viarewind.protocol.v1_8to1_7_6_10.rewriter;
 
 import com.viaversion.viarewind.ViaRewind;
+import com.viaversion.viarewind.api.type.version.Types1_7_6_10;
 import com.viaversion.viarewind.protocol.v1_7_6_10to1_7_2_5.packet.ClientboundPackets1_7_2_5;
 import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.Protocol1_8To1_7_6_10;
 import com.viaversion.viarewind.protocol.v1_7_6_10to1_7_2_5.packet.ServerboundPackets1_7_2_5;
@@ -30,7 +31,6 @@ import com.viaversion.viarewind.api.minecraft.math.Ray3d;
 import com.viaversion.viarewind.api.minecraft.math.RayTracing;
 import com.viaversion.viarewind.api.minecraft.math.Vector3d;
 import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.minecraft.Environment;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_8;
 import com.viaversion.viaversion.api.minecraft.item.Item;
@@ -110,6 +110,15 @@ public class PlayerPacketRewriter1_8 {
 						tracker.clearEntities();
 						tracker.addEntity(tracker.clientEntityId(), EntityTypes1_8.EntityType.PLAYER);
 					}
+
+					wrapper.send(Protocol1_8To1_7_6_10.class);
+					wrapper.cancel();
+
+					// 1.8 clients do keep entity data after respawn, 1.7 clients don't
+					final PacketWrapper setEntityData = PacketWrapper.create(ClientboundPackets1_7_2_5.SET_ENTITY_DATA, wrapper.user());
+					setEntityData.write(Types.VAR_INT, tracker.clientEntityId());
+					setEntityData.write(Types1_7_6_10.ENTITY_DATA_LIST, tracker.getEntityData());
+					setEntityData.send(Protocol1_8To1_7_6_10.class);
 				});
 			}
 		});
