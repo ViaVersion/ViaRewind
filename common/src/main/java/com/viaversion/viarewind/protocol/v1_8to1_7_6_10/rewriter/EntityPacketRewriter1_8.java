@@ -124,7 +124,14 @@ public class EntityPacketRewriter1_8 extends VREntityRewriter<ClientboundPackets
 					}
 					if (tracker.clientEntityId() == entityId) {
 						tracker.getEntityData().removeIf(first -> entityData.stream().anyMatch(second -> first.id() == second.id()));
-						tracker.getEntityData().addAll(entityData);
+						for (final EntityData data : entityData) {
+							final Object value = data.value();
+							if (value instanceof Item item) {
+								tracker.getEntityData().add(new EntityData(data.id(), data.dataType(), item.copy()));
+							} else {
+								tracker.getEntityData().add(new EntityData(data.id(), data.dataType(), value));
+							}
+						}
 					}
 				});
 			}
