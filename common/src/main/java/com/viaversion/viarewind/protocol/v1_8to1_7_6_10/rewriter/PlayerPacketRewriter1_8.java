@@ -114,6 +114,9 @@ public class PlayerPacketRewriter1_8 {
 					wrapper.send(Protocol1_8To1_7_6_10.class);
 					wrapper.cancel();
 
+					if (tracker.getEntityData().isEmpty()) {
+						return;
+					}
 					// 1.8 clients do keep entity data after respawn, 1.7 clients don't
 					final PacketWrapper setEntityData = PacketWrapper.create(ClientboundPackets1_7_2_5.SET_ENTITY_DATA, wrapper.user());
 					setEntityData.write(Types.VAR_INT, tracker.clientEntityId());

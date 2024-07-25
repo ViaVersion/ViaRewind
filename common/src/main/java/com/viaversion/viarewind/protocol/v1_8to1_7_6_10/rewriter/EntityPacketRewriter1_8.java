@@ -123,15 +123,7 @@ public class EntityPacketRewriter1_8 extends VREntityRewriter<ClientboundPackets
 						wrapper.cancel();
 					}
 					if (tracker.clientEntityId() == entityId) {
-						tracker.getEntityData().removeIf(first -> entityData.stream().anyMatch(second -> first.id() == second.id()));
-						for (final EntityData data : entityData) {
-							final Object value = data.value();
-							if (value instanceof Item item) {
-								tracker.getEntityData().add(new EntityData(data.id(), data.dataType(), item.copy()));
-							} else {
-								tracker.getEntityData().add(new EntityData(data.id(), data.dataType(), value));
-							}
-						}
+						tracker.updateEntityData(entityData);
 					}
 				});
 			}
@@ -346,15 +338,7 @@ public class EntityPacketRewriter1_8 extends VREntityRewriter<ClientboundPackets
 				map(Types.SHORT); // Current item
 				map(Types1_8.ENTITY_DATA_LIST, Types1_7_6_10.ENTITY_DATA_LIST); // Entity data
 
-				handler(wrapper -> {
-					addTrackedEntity(wrapper, wrapper.get(Types.VAR_INT, 0), EntityTypes1_8.EntityType.PLAYER);
-
-					final List<EntityData> entityDataList = wrapper.get(Types1_7_6_10.ENTITY_DATA_LIST, 0);
-					handleEntityData(wrapper.get(Types.VAR_INT, 0), entityDataList, wrapper.user());
-
-					final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_7_6_10.class);
-					tracker.setEntityData(entityDataList);
-				});
+				handler(getTrackerAndDataHandler(Types1_7_6_10.ENTITY_DATA_LIST, EntityTypes1_8.EntityType.PLAYER));
 			}
 		});
 		protocol.registerClientbound(ClientboundPackets1_8.SET_EQUIPPED_ITEM, new PacketHandlers() {
