@@ -5,8 +5,8 @@ plugins {
 }
 
 dependencies {
-    compileOnly "io.netty:netty-all:${project.netty_version}"
-    compileOnly "com.google.guava:guava:${project.guava_version}"
+    compileOnly "io.netty:netty-all:4.0.20.Final"
+    compileOnly "com.google.guava:guava:17.0"
 }
 
 sourceSets {

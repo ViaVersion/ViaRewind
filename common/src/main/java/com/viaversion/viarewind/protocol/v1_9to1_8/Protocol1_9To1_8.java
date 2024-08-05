@@ -40,13 +40,13 @@ import java.util.concurrent.TimeUnit;
 
 public class Protocol1_9To1_8 extends BackwardsProtocol<ClientboundPackets1_9, ClientboundPackets1_8, ServerboundPackets1_9, ServerboundPackets1_8> {
 
-	public static final ValueTransformer<Double, Integer> DOUBLE_TO_INT_TIMES_32 = new ValueTransformer<Double, Integer>(Types.INT) {
+	public static final ValueTransformer<Double, Integer> DOUBLE_TO_INT_TIMES_32 = new ValueTransformer<>(Types.INT) {
 		@Override
 		public Integer transform(PacketWrapper wrapper, Double inputValue) {
 			return (int) (inputValue * 32.0D);
 		}
 	};
-	public static final ValueTransformer<Float, Byte> DEGREES_TO_ANGLE = new ValueTransformer<Float, Byte>(Types.BYTE) {
+	public static final ValueTransformer<Float, Byte> DEGREES_TO_ANGLE = new ValueTransformer<>(Types.BYTE) {
 		@Override
 		public Byte transform(PacketWrapper packetWrapper, Float degrees) {
 			return (byte) ((degrees / 360F) * 256);
