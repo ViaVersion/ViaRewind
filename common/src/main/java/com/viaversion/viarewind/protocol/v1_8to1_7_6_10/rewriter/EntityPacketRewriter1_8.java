@@ -102,7 +102,7 @@ public class EntityPacketRewriter1_8 extends VREntityRewriter<ClientboundPackets
 			for (List<Integer> part : parts) {
 				final PacketWrapper destroy = PacketWrapper.create(ClientboundPackets1_7_2_5.REMOVE_ENTITIES, wrapper.user());
 				destroy.write(RewindTypes.INT_ARRAY, part.stream().mapToInt(Integer::intValue).toArray());
-				destroy.scheduleSend(Protocol1_8To1_7_6_10.class);
+				destroy.send(Protocol1_8To1_7_6_10.class);
 			}
 		});
 		protocol.registerClientbound(ClientboundPackets1_8.SET_ENTITY_DATA, new PacketHandlers() {
