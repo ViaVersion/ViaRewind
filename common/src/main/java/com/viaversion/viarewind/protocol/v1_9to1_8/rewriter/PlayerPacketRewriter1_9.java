@@ -39,6 +39,7 @@ import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ServerboundPackets1_8;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ServerboundPackets1_9;
+import com.viaversion.viaversion.util.ComponentUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,7 +61,7 @@ public class PlayerPacketRewriter1_9 {
 				wrapper.read(Types.VAR_INT); // Division
 				wrapper.read(Types.UNSIGNED_BYTE); // Flags
 
-				bossbar.add(uuid, ChatUtil.jsonToLegacy(wrapper.user(), title), health);
+				bossbar.add(uuid, ChatUtil.jsonToLegacy(title), health);
 			} else if (action == 1 /* remove */) {
 				bossbar.remove(uuid);
 			} else if (action == 2 /* update health */) {
@@ -68,7 +69,7 @@ public class PlayerPacketRewriter1_9 {
 				bossbar.updateHealth(uuid, health);
 			} else if (action == 3 /* update title */) {
 				final JsonElement title = wrapper.read(Types.COMPONENT);
-				bossbar.updateTitle(uuid, ChatUtil.jsonToLegacy(wrapper.user(), title));
+				bossbar.updateTitle(uuid, ChatUtil.jsonToLegacy(title));
 			}
 		});
 
@@ -421,7 +422,7 @@ public class PlayerPacketRewriter1_9 {
 				map(Types.BLOCK_POSITION1_8); // Position
 				handler(wrapper -> {
 					for (int i = 0; i < 4; i++) {
-						wrapper.write(Types.STRING, ChatUtil.jsonToLegacy(wrapper.user(), wrapper.read(Types.COMPONENT)));
+						wrapper.write(Types.STRING, ChatUtil.jsonToLegacy(wrapper.read(Types.COMPONENT)));
 					}
 				});
 			}
@@ -467,25 +468,30 @@ public class PlayerPacketRewriter1_9 {
 				handlerSoftFail(wrapper -> {
 					final String channel = wrapper.get(Types.STRING, 0);
 					if (channel.equals("MC|BEdit") || channel.equals("MC|BSign")) {
-						Item book = wrapper.passthrough(Types.ITEM1_8);
+						final Item book = wrapper.passthrough(Types.ITEM1_8);
 						book.setIdentifier(386);
-						CompoundTag tag = book.tag();
-						if (tag.contains("pages")) {
-							ListTag<StringTag> pages = tag.getListTag("pages", StringTag.class);
-							if (pages.size() > ViaRewind.getConfig().getMaxBookPages()) {
-								wrapper.user().disconnect("Too many book pages");
+						final CompoundTag tag = book.tag();
+						if (tag == null) {
+							return;
+						}
+						final ListTag<StringTag> pages = tag.getListTag("pages", StringTag.class);
+						if (pages == null) {
+							return;
+						}
+						if (pages.size() > ViaRewind.getConfig().getMaxBookPages()) {
+							wrapper.user().disconnect("Too many book pages");
+							return;
+						}
+						for (int i = 0; i < pages.size(); i++) {
+							final StringTag pageTag = pages.get(i);
+							final String value = pageTag.getValue();
+
+							if (value.length() > ViaRewind.getConfig().getMaxBookPageSize()) {
+								wrapper.user().disconnect("Book page too large");
 								return;
 							}
-							for (int i = 0; i < pages.size(); i++) {
-								StringTag page = pages.get(i);
-								String value = page.getValue();
-								if (value.length() > ViaRewind.getConfig().getMaxBookPageSize()) {
-									wrapper.user().disconnect("Book page too large");
-									return;
-								}
-								value = ChatUtil.jsonToLegacy(wrapper.user(), value);
-								page.setValue(value);
-							}
+
+							pageTag.setValue(ChatUtil.jsonToLegacy(value));
 						}
 					} else if (channel.equals("MC|AdvCdm")) {
 						wrapper.set(Types.STRING, 0, "MC|AdvCmd");

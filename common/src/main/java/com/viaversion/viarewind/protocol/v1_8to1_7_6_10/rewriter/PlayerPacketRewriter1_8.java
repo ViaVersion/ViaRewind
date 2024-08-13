@@ -251,7 +251,7 @@ public class PlayerPacketRewriter1_8 {
 					gameProfile.gamemode = gamemode;
 					JsonElement displayName = wrapper.read(Types.OPTIONAL_COMPONENT);
 					if (displayName != null) {
-						gameProfile.setDisplayName(ChatUtil.jsonToLegacy(wrapper.user(), displayName));
+						gameProfile.setDisplayName(ChatUtil.jsonToLegacy(displayName));
 					}
 
 					final PacketWrapper playerInfo = PacketWrapper.create(ClientboundPackets1_7_2_5.PLAYER_INFO, wrapper.user());
@@ -314,7 +314,7 @@ public class PlayerPacketRewriter1_8 {
 					packet.scheduleSend(Protocol1_8To1_7_6_10.class);
 				} else if (action == 3) {
 					JsonElement displayNameComponent = wrapper.read(Types.OPTIONAL_COMPONENT);
-					String displayName = displayNameComponent != null ? ChatUtil.jsonToLegacy(wrapper.user(), displayNameComponent) : null;
+					String displayName = displayNameComponent != null ? ChatUtil.jsonToLegacy(displayNameComponent) : null;
 
 					GameProfileStorage.GameProfile gameProfile = gameProfileStorage.get(uuid);
 					if (gameProfile == null || gameProfile.displayName == null && displayName == null) continue;

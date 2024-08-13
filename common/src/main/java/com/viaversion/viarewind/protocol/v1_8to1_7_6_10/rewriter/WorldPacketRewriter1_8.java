@@ -173,7 +173,7 @@ public class WorldPacketRewriter1_8 {
 				handler(wrapper -> {
 					for (int i = 0; i < 4; i++) {
 						String line = wrapper.read(Types.STRING);
-						line = ChatUtil.jsonToLegacy(wrapper.user(), line);
+						line = ChatUtil.jsonToLegacy(line);
 						line = ChatUtil.removeUnusedColor(line, '0');
 
 						if (line.length() > 15) {

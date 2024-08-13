@@ -18,7 +18,7 @@
 package com.viaversion.viarewind.utils;
 
 import com.viaversion.viarewind.ViaRewind;
-import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.libs.gson.JsonElement;
 import com.viaversion.viaversion.libs.gson.JsonObject;
@@ -43,29 +43,35 @@ public class ChatUtil {
 		}
 	};
 
-	public static String jsonToLegacy(UserConnection connection, String json) {
-		if (json == null || json.equals("null") || json.isEmpty()) return "";
+	public static String jsonToLegacy(String json) {
+		if (json == null || json.equals("null") || json.isEmpty()) {
+			return "";
+		}
 		try {
-			return jsonToLegacy(connection, JsonParser.parseString(json));
+			return jsonToLegacy(JsonParser.parseString(json));
 		} catch (Exception e) {
-			ViaRewind.getPlatform().getLogger().log(Level.WARNING, "Could not convert component to legacy text: " + json, e);
+			if (!Via.getConfig().isSuppressConversionWarnings()) {
+				ViaRewind.getPlatform().getLogger().log(Level.WARNING, "Could not convert component to legacy text: " + json, e);
+			}
 		}
 		return "";
 	}
 
-	public static String jsonToLegacy(UserConnection connection, JsonElement component) {
+	public static String jsonToLegacy(JsonElement component) {
 		if (component.isJsonNull() || component.isJsonArray() && component.getAsJsonArray().isEmpty() || component.isJsonObject() && component.getAsJsonObject().isEmpty()) {
 			return "";
 		} else if (component.isJsonPrimitive()) {
 			return component.getAsString();
 		} else {
 			try {
-				LEGACY_REWRITER.processText(connection, component);
+				LEGACY_REWRITER.processText(null, component);
 				String legacy = ComponentUtil.jsonToLegacy(component);
 				while (legacy.startsWith("§f")) legacy = legacy.substring(2);
 				return legacy;
 			} catch (Exception ex) {
-				ViaRewind.getPlatform().getLogger().log(Level.WARNING, "Could not convert component to legacy text: " + component, ex);
+				if (!Via.getConfig().isSuppressConversionWarnings()) {
+					ViaRewind.getPlatform().getLogger().log(Level.WARNING, "Could not convert component to legacy text: " + component, ex);
+				}
 			}
 			return "";
 		}

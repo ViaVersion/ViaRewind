@@ -57,7 +57,7 @@ public class BlockItemPacketRewriter1_8 extends VRBlockItemRewriter<ClientboundP
 			wrapper.write(Types.UNSIGNED_BYTE, windowTypeId); // Window type id
 
 			final JsonElement titleComponent = wrapper.read(Types.COMPONENT); // Title
-			String title = ChatUtil.jsonToLegacy(wrapper.user(), titleComponent);
+			String title = ChatUtil.jsonToLegacy(titleComponent);
 			title = ChatUtil.removeUnusedColor(title, '8');
 			if (title.length() > 32) {
 				title = title.substring(0, 32);
@@ -291,7 +291,7 @@ public class BlockItemPacketRewriter1_8 extends VRBlockItemRewriter<ClientboundP
 			for (StringTag page : pages) {
 				final String value = page.getValue();
 				oldPages.add(new StringTag(value));
-				page.setValue(ChatUtil.jsonToLegacy(connection, value));
+				page.setValue(ChatUtil.jsonToLegacy(value));
 			}
 		}
 		return item;
