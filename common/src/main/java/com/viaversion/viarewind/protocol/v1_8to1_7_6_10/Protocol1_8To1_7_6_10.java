@@ -65,7 +65,7 @@ public class Protocol1_8To1_7_6_10 extends BackwardsProtocol<ClientboundPackets1
 		ScoreboardPacketRewriter1_8.register(this);
 		WorldPacketRewriter1_8.register(this);
 
-		this.registerClientbound(State.LOGIN, ClientboundLoginPackets.HELLO.getId(), ClientboundLoginPackets.HELLO.getId(), new PacketHandlers() {
+		this.registerClientbound(State.LOGIN, ClientboundLoginPackets.HELLO, new PacketHandlers() {
 			@Override
 			public void register() {
 				map(Types.STRING); // server hash
@@ -73,7 +73,7 @@ public class Protocol1_8To1_7_6_10 extends BackwardsProtocol<ClientboundPackets1
 				map(Types.BYTE_ARRAY_PRIMITIVE, Types.SHORT_BYTE_ARRAY); // verification token
 			}
 		});
-		this.registerClientbound(State.LOGIN, ClientboundLoginPackets.LOGIN_COMPRESSION.getId(), ClientboundLoginPackets.LOGIN_COMPRESSION.getId(), new PacketHandlers() {
+		this.registerClientbound(State.LOGIN, ClientboundLoginPackets.LOGIN_COMPRESSION, new PacketHandlers() {
 			@Override
 			public void register() {
 				handler(wrapper -> {
@@ -92,7 +92,7 @@ public class Protocol1_8To1_7_6_10 extends BackwardsProtocol<ClientboundPackets1
 			}
 		});
 
-		this.registerServerbound(State.LOGIN, ServerboundLoginPackets.ENCRYPTION_KEY.getId(), ServerboundLoginPackets.ENCRYPTION_KEY.getId(), new PacketHandlers() {
+		this.registerServerbound(State.LOGIN, ServerboundLoginPackets.ENCRYPTION_KEY, new PacketHandlers() {
 			@Override
 			public void register() {
 				map(Types.SHORT_BYTE_ARRAY, Types.BYTE_ARRAY_PRIMITIVE); // shared secret
