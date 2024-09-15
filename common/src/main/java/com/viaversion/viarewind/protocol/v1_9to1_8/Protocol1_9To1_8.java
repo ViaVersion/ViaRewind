@@ -74,6 +74,7 @@ public class Protocol1_9To1_8 extends BackwardsProtocol<ClientboundPackets1_9, C
 	@Override
 	public void init(UserConnection connection) {
 		connection.addEntityTracker(this.getClass(), new EntityTracker1_9(connection));
+		connection.addClientWorld(this.getClass(), new ClientWorld());
 
 		connection.put(new WindowTracker(connection));
 		connection.put(new LevitationStorage());
@@ -81,10 +82,6 @@ public class Protocol1_9To1_8 extends BackwardsProtocol<ClientboundPackets1_9, C
 		connection.put(new CooldownStorage());
 		connection.put(new BlockPlaceDestroyTracker());
 		connection.put(new BossBarStorage(connection));
-
-		if (!connection.has(ClientWorld.class)) {
-			connection.put(new ClientWorld());
-		}
 	}
 
 	@Override

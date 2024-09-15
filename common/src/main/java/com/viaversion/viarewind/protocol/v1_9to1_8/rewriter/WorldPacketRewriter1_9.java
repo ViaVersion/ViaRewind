@@ -21,7 +21,6 @@ import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viarewind.ViaRewind;
 import com.viaversion.viarewind.protocol.v1_9to1_8.Protocol1_9To1_8;
 import com.viaversion.viarewind.protocol.v1_9to1_8.data.EffectIdMappings1_8;
-import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.minecraft.Environment;
 import com.viaversion.viaversion.api.minecraft.chunks.BaseChunk;
@@ -39,7 +38,6 @@ import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_9;
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.StringTag;
-import com.viaversion.viaversion.api.minecraft.ClientWorld;
 
 import java.util.ArrayList;
 
@@ -107,7 +105,7 @@ public class WorldPacketRewriter1_9 {
 			@Override
 			public void register() {
 				handler(wrapper -> {
-					final Environment environment = wrapper.user().get(ClientWorld.class).getEnvironment();
+					final Environment environment = wrapper.user().getClientWorld(Protocol1_9To1_8.class).getEnvironment();
 
 					final int chunkX = wrapper.read(Types.INT);
 					final int chunkZ = wrapper.read(Types.INT);
@@ -121,7 +119,7 @@ public class WorldPacketRewriter1_9 {
 			@Override
 			public void register() {
 				handler(wrapper -> {
-					final Environment environment = wrapper.user().get(ClientWorld.class).getEnvironment();
+					final Environment environment = wrapper.user().getClientWorld(Protocol1_9To1_8.class).getEnvironment();
 
 					Chunk chunk = wrapper.read(ChunkType1_9_1.forEnvironment(environment));
 

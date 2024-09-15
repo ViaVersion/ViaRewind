@@ -101,14 +101,13 @@ public class PlayerPacketRewriter1_8 {
 					final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_7_6_10.class);
 					tracker.setClientEntityGameMode(wrapper.get(Types.UNSIGNED_BYTE, 1));
 
-					final Environment dimension = Environment.getEnvironmentById(wrapper.get(Types.INT, 0));
+					final int dimension = wrapper.get(Types.INT, 0);
 
 					// Clear entities on dimension change and re-track player
-					final ClientWorld world = wrapper.user().get(ClientWorld.class);
-					if (world.getEnvironment() != dimension) {
-						world.setEnvironment(dimension.id());
+					final ClientWorld world = wrapper.user().getClientWorld(Protocol1_8To1_7_6_10.class);
+					if (world.setEnvironment(dimension)) {
 						tracker.clearEntities();
-						tracker.addEntity(tracker.clientEntityId(), EntityTypes1_8.EntityType.PLAYER);
+						tracker.addPlayer(tracker.clientEntityId(), wrapper.user().getProtocolInfo().getUuid());
 					}
 
 					wrapper.send(Protocol1_8To1_7_6_10.class);

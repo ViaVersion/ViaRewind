@@ -25,6 +25,7 @@ import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.minecraft.entitydata.EntityDataType;
 import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes1_8;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
@@ -47,7 +48,7 @@ public abstract class VREntityRewriter<C extends ClientboundPacketType, T extend
 				map(Types.UNSIGNED_BYTE); // Game mode
 				map(Types.BYTE); // Dimension
 				handler(playerTrackerHandler());
-				handler(wrapper -> wrapper.user().get(ClientWorld.class).setEnvironment(wrapper.get(Types.BYTE, 0)));
+				handler(wrapper -> wrapper.user().getClientWorld(protocol.getClass()).setEnvironment(wrapper.get(Types.BYTE, 0)));
 			}
 		});
 	}
@@ -57,6 +58,14 @@ public abstract class VREntityRewriter<C extends ClientboundPacketType, T extend
 		for (int entityId : entities) {
 			tracker.removeEntity(entityId);
 		}
+	}
+
+	protected PacketHandler getDimensionHandler() {
+		return wrapper -> {
+			final int dimension = wrapper.get(Types.BYTE, 0);
+			final ClientWorld clientWorld = wrapper.user().getClientWorld(protocol.getClass());
+			clientWorld.setEnvironment(dimension);
+		};
 	}
 
 	@Override

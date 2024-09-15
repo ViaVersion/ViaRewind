@@ -70,6 +70,7 @@ public class EntityPacketRewriter1_8 extends VREntityRewriter<ClientboundPackets
 				read(Types.BOOLEAN); // Reduced debug info
 
 				handler(playerTrackerHandler());
+				handler(getDimensionHandler());
 				handler(wrapper -> {
 					final int entityId = wrapper.get(Types.INT, 0);
 
@@ -81,9 +82,9 @@ public class EntityPacketRewriter1_8 extends VREntityRewriter<ClientboundPackets
 
 					final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_7_6_10.class);
 					tracker.addPlayer(entityId, wrapper.user().getProtocolInfo().getUuid());
-					tracker.setClientEntityGameMode(wrapper.get(Types.UNSIGNED_BYTE, 0));
 
-					wrapper.user().get(ClientWorld.class).setEnvironment(wrapper.get(Types.BYTE, 0));
+					tracker.setClientEntityId(entityId);
+					tracker.setClientEntityGameMode(wrapper.get(Types.UNSIGNED_BYTE, 0));
 
 					// Reset on Velocity server change
 					wrapper.user().put(new ScoreboardTracker(wrapper.user()));

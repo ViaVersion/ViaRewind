@@ -39,7 +39,6 @@ import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ServerboundPackets1_8;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ServerboundPackets1_9;
-import com.viaversion.viaversion.util.ComponentUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -166,10 +165,14 @@ public class PlayerPacketRewriter1_9 {
 			@Override
 			public void register() {
 				map(Types.INT); // Dimension
-				handler(wrapper -> wrapper.user().get(BossBarStorage.class).reset());
 				handler(wrapper -> {
-					final ClientWorld world = wrapper.user().get(ClientWorld.class);
-					world.setEnvironment(wrapper.get(Types.INT, 0));
+					final ClientWorld world = wrapper.user().getClientWorld(Protocol1_9To1_8.class);
+					final int dimension = wrapper.get(Types.INT, 0);
+
+					if (world.setEnvironment(dimension)) {
+						protocol.getEntityRewriter().clearEntities(wrapper.user());
+						wrapper.user().get(BossBarStorage.class).reset();
+					}
 				});
 			}
 		});

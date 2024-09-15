@@ -118,6 +118,7 @@ public class Protocol1_8To1_7_6_10 extends BackwardsProtocol<ClientboundPackets1
 	@Override
 	public void init(UserConnection connection) {
 		connection.addEntityTracker(this.getClass(), new EntityTracker1_8(connection));
+		connection.addClientWorld(this.getClass(), new ClientWorld());
 
 		connection.put(new InventoryTracker(connection));
 		connection.put(new PlayerSessionStorage(connection));
@@ -125,10 +126,6 @@ public class Protocol1_8To1_7_6_10 extends BackwardsProtocol<ClientboundPackets1
 		connection.put(new ScoreboardTracker(connection));
 		connection.put(new CompressionStatusTracker(connection));
 		connection.put(new WorldBorderEmulator(connection));
-
-		if (!connection.has(ClientWorld.class)) {
-			connection.put(new ClientWorld());
-		}
 	}
 
 	@Override
