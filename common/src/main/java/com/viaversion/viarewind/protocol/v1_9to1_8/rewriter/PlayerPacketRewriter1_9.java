@@ -185,6 +185,10 @@ public class PlayerPacketRewriter1_9 extends RewriterBase<Protocol1_9To1_8> {
 
 		// Packet implementation doesn't do anything until 1.9
 		protocol.registerClientbound(ClientboundPackets1_9.PLAYER_COMBAT, wrapper -> {
+			if (!ViaRewind.getConfig().handlePlayerCombatPacket()) {
+				return;
+			}
+
 			final int action = wrapper.passthrough(Types.VAR_INT);
 			if (action != 2) {
 				return;

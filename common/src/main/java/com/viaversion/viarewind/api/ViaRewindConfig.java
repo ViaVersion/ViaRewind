@@ -110,4 +110,11 @@ public interface ViaRewindConfig extends Config {
 	 * @return true if enabled
 	 */
 	boolean emulateLevitationEffect();
+
+	/**
+	 * If enabled, 1.8 players will handle the player combat packet added in 1.9 by showing the custom death message above the hotbar.
+	 *
+	 * @return true if enabled
+	 */
+	boolean handlePlayerCombatPacket();
 }
