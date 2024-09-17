@@ -83,7 +83,6 @@ public class EntityPacketRewriter1_8 extends VREntityRewriter<ClientboundPackets
 					final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_7_6_10.class);
 					tracker.addPlayer(entityId, wrapper.user().getProtocolInfo().getUuid());
 
-					tracker.setClientEntityId(entityId);
 					tracker.setClientEntityGameMode(wrapper.get(Types.UNSIGNED_BYTE, 0));
 
 					// Reset on Velocity server change

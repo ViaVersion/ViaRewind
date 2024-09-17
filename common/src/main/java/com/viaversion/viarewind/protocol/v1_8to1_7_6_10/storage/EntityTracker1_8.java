@@ -87,7 +87,7 @@ public class EntityTracker1_8 extends EntityTrackerBase {
 
 	@Override
 	public void setClientEntityId(int entityId) {
-		if (this.spectatingClientEntityId == this.clientEntityId()) {
+		if (this.hasClientEntityId() && this.spectatingClientEntityId == this.clientEntityId()) {
 			this.spectatingClientEntityId = entityId;
 		}
 		super.setClientEntityId(entityId);
