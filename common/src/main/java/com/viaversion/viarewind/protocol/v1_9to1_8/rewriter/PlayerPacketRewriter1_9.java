@@ -28,6 +28,7 @@ import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
 import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes1_8;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
+import com.viaversion.viaversion.api.rewriter.RewriterBase;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.Types1_8;
 import com.viaversion.viaversion.libs.gson.JsonElement;
@@ -44,9 +45,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class PlayerPacketRewriter1_9 {
+public class PlayerPacketRewriter1_9 extends RewriterBase<Protocol1_9To1_8> {
 
-	public static void register(final Protocol1_9To1_8 protocol) {
+	public PlayerPacketRewriter1_9(Protocol1_9To1_8 protocol) {
+		super(protocol);
+	}
+
+	@Override
+	protected void registerPackets() {
 		protocol.registerClientbound(ClientboundPackets1_9.BOSS_EVENT, null, wrapper -> {
 			wrapper.cancel();
 			final BossBarStorage bossbar = wrapper.user().get(BossBarStorage.class);

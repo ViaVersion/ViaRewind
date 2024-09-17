@@ -22,6 +22,7 @@ import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.Protocol1_8To1_7_6_10;
 import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.storage.ScoreboardTracker;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
+import com.viaversion.viaversion.api.rewriter.RewriterBase;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_8;
 import com.viaversion.viaversion.util.ChatColorUtil;
@@ -30,9 +31,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class ScoreboardPacketRewriter1_8 {
+public class ScoreboardPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6_10> {
 
-	public static void register(Protocol1_8To1_7_6_10 protocol) {
+	public ScoreboardPacketRewriter1_8(Protocol1_8To1_7_6_10 protocol) {
+		super(protocol);
+	}
+
+	@Override
+	protected void registerPackets() {
 		protocol.registerClientbound(ClientboundPackets1_8.SET_OBJECTIVE, wrapper -> {
 			String name = wrapper.passthrough(Types.STRING);
 			if (name.length() > 16) {

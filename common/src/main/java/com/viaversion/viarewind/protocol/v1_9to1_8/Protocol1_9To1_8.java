@@ -66,9 +66,8 @@ public class Protocol1_9To1_8 extends BackwardsProtocol<ClientboundPackets1_9, C
 	protected void registerPackets() {
 		entityRewriter.register();
 		itemRewriter.register();
-
-		PlayerPacketRewriter1_9.register(this);
-		WorldPacketRewriter1_9.register(this);
+		new PlayerPacketRewriter1_9(this).register();
+		new WorldPacketRewriter1_9(this).register();
 	}
 
 	@Override

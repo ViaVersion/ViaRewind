@@ -28,6 +28,7 @@ import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
+import com.viaversion.viaversion.api.rewriter.RewriterBase;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.FixedByteArrayType;
 import com.viaversion.viaversion.api.type.types.chunk.BulkChunkType1_8;
@@ -37,9 +38,14 @@ import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_
 import com.viaversion.viaversion.util.ChatColorUtil;
 import com.viaversion.viaversion.util.IdAndData;
 
-public class WorldPacketRewriter1_8 {
+public class WorldPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6_10> {
 
-	public static void register(Protocol1_8To1_7_6_10 protocol) {
+	public WorldPacketRewriter1_8(Protocol1_8To1_7_6_10 protocol) {
+		super(protocol);
+	}
+
+	@Override
+	protected void registerPackets() {
 		protocol.registerClientbound(ClientboundPackets1_8.LEVEL_CHUNK, wrapper -> {
 			final ClientWorld world = wrapper.user().getClientWorld(Protocol1_8To1_7_6_10.class);
 			final Chunk chunk = wrapper.read(ChunkType1_8.forEnvironment(world.getEnvironment()));

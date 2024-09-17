@@ -31,6 +31,7 @@ import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
 import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
+import com.viaversion.viaversion.api.rewriter.RewriterBase;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_8;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_9_1;
@@ -41,9 +42,14 @@ import com.viaversion.nbt.tag.StringTag;
 
 import java.util.ArrayList;
 
-public class WorldPacketRewriter1_9 {
+public class WorldPacketRewriter1_9 extends RewriterBase<Protocol1_9To1_8> {
 
-	public static void register(Protocol1_9To1_8 protocol) {
+	public WorldPacketRewriter1_9(Protocol1_9To1_8 protocol) {
+		super(protocol);
+	}
+
+	@Override
+	protected void registerPackets() {
 		protocol.registerClientbound(ClientboundPackets1_9.BLOCK_ENTITY_DATA, new PacketHandlers() {
 			@Override
 			public void register() {

@@ -61,9 +61,9 @@ public class Protocol1_8To1_7_6_10 extends BackwardsProtocol<ClientboundPackets1
 		itemRewriter.register();
 		entityRewriter.register();
 
-		PlayerPacketRewriter1_8.register(this);
-		ScoreboardPacketRewriter1_8.register(this);
-		WorldPacketRewriter1_8.register(this);
+		new PlayerPacketRewriter1_8(this).register();
+		new ScoreboardPacketRewriter1_8(this).register();
+		new WorldPacketRewriter1_8(this).register();
 
 		this.registerClientbound(State.LOGIN, ClientboundLoginPackets.HELLO, new PacketHandlers() {
 			@Override

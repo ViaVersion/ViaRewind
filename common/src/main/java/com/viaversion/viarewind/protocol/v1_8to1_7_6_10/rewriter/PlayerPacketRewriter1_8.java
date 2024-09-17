@@ -31,11 +31,10 @@ import com.viaversion.viarewind.api.minecraft.math.Ray3d;
 import com.viaversion.viarewind.api.minecraft.math.RayTracing;
 import com.viaversion.viarewind.api.minecraft.math.Vector3d;
 import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.minecraft.Environment;
-import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_8;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
+import com.viaversion.viaversion.api.rewriter.RewriterBase;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.libs.gson.JsonElement;
 import com.viaversion.nbt.tag.CompoundTag;
@@ -53,9 +52,14 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.UUID;
 
-public class PlayerPacketRewriter1_8 {
+public class PlayerPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6_10> {
 
-	public static void register(Protocol1_8To1_7_6_10 protocol) {
+	public PlayerPacketRewriter1_8(Protocol1_8To1_7_6_10 protocol) {
+		super(protocol);
+	}
+
+	@Override
+	protected void registerPackets() {
 		protocol.registerClientbound(ClientboundPackets1_8.CHAT, new PacketHandlers() {
 			@Override
 			public void register() {
