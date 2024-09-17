@@ -208,7 +208,7 @@ public class PlayerPacketRewriter1_9 extends RewriterBase<Protocol1_9To1_8> {
 
 			final PacketWrapper chatMessage = wrapper.create(ClientboundPackets1_8.CHAT);
 			chatMessage.write(Types.COMPONENT, message);
-			chatMessage.write(Types.BYTE, (byte) 1); // Position - in chat
+			chatMessage.write(Types.BYTE, (byte) 2); // Position - above hotbar
 			chatMessage.scheduleSend(Protocol1_9To1_8.class);
 		});
 
