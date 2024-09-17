@@ -33,7 +33,6 @@ import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.storage.GameProfileStora
 import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.storage.PlayerSessionStorage;
 import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.storage.ScoreboardTracker;
 import com.viaversion.viaversion.api.minecraft.BlockPosition;
-import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_8;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_8.EntityType;
 import com.viaversion.viaversion.api.minecraft.item.Item;
