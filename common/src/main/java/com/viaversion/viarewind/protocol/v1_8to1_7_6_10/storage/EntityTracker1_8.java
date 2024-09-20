@@ -37,10 +37,7 @@ import com.viaversion.viaversion.libs.fastutil.objects.Object2IntMap;
 import com.viaversion.viaversion.libs.fastutil.objects.Object2IntOpenHashMap;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_8;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.logging.Level;
 
 public class EntityTracker1_8 extends EntityTrackerBase {
@@ -50,9 +47,9 @@ public class EntityTracker1_8 extends EntityTrackerBase {
 	private final Int2ObjectMap<UUID> entityIdToUUID = new Int2ObjectArrayMap<>();
 	private final Object2IntMap<UUID> entityUUIDToId = new Object2IntOpenHashMap<>();
 
-	private List<EntityData> entityData = new ArrayList<>();
+	private final List<EntityData> entityData = new ArrayList<>();
 
-	public int spectatingClientEntityId = -1;
+	public Integer spectatingClientEntityId;
 	private int clientEntityGameMode;
 
 	public EntityTracker1_8(UserConnection connection) {
@@ -87,10 +84,14 @@ public class EntityTracker1_8 extends EntityTrackerBase {
 
 	@Override
 	public void setClientEntityId(int entityId) {
-		if (this.hasClientEntityId() && this.spectatingClientEntityId == this.clientEntityId()) {
+		if (Objects.equals(this.spectatingClientEntityId, clientEntityIdOrNull())) {
 			this.spectatingClientEntityId = entityId;
 		}
 		super.setClientEntityId(entityId);
+	}
+
+	public Integer clientEntityIdOrNull() {
+		return this.hasClientEntityId() ? this.clientEntityId() : null;
 	}
 
 	public void addPlayer(final int entityId, final UUID uuid) {

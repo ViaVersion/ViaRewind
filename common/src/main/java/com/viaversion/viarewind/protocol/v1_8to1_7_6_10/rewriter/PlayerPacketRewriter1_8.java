@@ -50,6 +50,7 @@ import io.netty.buffer.Unpooled;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 public class PlayerPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6_10> {
@@ -164,7 +165,7 @@ public class PlayerPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6_10>
 					wrapper.write(Types.BOOLEAN, playerSession.onGround);
 
 					final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_7_6_10.class);
-					if (tracker.spectatingClientEntityId != tracker.clientEntityId()) {
+					if (!Objects.equals(tracker.spectatingClientEntityId, tracker.clientEntityIdOrNull())) {
 						wrapper.cancel();
 					}
 				});

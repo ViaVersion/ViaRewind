@@ -48,7 +48,7 @@ public abstract class VREntityRewriter<C extends ClientboundPacketType, T extend
 				map(Types.UNSIGNED_BYTE); // Game mode
 				map(Types.BYTE); // Dimension
 				handler(playerTrackerHandler());
-				handler(wrapper -> wrapper.user().getClientWorld(protocol.getClass()).setEnvironment(wrapper.get(Types.BYTE, 0)));
+				handler(getDimensionHandler());
 			}
 		});
 	}
