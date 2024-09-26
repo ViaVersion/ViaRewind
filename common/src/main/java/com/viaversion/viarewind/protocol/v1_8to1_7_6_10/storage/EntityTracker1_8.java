@@ -189,13 +189,13 @@ public class EntityTracker1_8 extends EntityTrackerBase {
 	}
 
 	public void updateEntityData(List<EntityData> entityData) {
-		entityData.removeIf(first -> entityData.stream().anyMatch(second -> first.id() == second.id()));
+		this.entityData.removeIf(first -> entityData.stream().anyMatch(second -> first.id() == second.id()));
 		for (final EntityData data : entityData) {
 			final Object value = data.value();
 			if (value instanceof Item item) {
-				entityData.add(new EntityData(data.id(), data.dataType(), item.copy()));
+				this.entityData.add(new EntityData(data.id(), data.dataType(), item.copy()));
 			} else {
-				entityData.add(new EntityData(data.id(), data.dataType(), value));
+				this.entityData.add(new EntityData(data.id(), data.dataType(), value));
 			}
 		}
 	}
