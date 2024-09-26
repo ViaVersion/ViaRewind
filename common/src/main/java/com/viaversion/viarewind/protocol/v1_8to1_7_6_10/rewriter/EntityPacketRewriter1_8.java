@@ -122,7 +122,7 @@ public class EntityPacketRewriter1_8 extends VREntityRewriter<ClientboundPackets
 						wrapper.cancel();
 					}
 					if (tracker.clientEntityId() == entityId) {
-						tracker.updateEntityData(entityData);
+						tracker.updateEntityData();
 					}
 				});
 			}
