@@ -17,6 +17,7 @@ dependencies {
     publishInclude project(":viarewind-common")
     publishInclude project(":viarewind-bukkit")
     publishInclude project(":viarewind-fabric")
+    publishInclude project(":viarewind-sponge")
     publishInclude project(":viarewind-velocity")
 }
 

@@ -5,6 +5,7 @@ includeBuild("build-logic")
 setupViaSubproject("common")
 setupViaSubproject("bukkit")
 setupViaSubproject("fabric")
+setupViaSubproject("sponge")
 setupViaSubproject("velocity")
 
 void setupViaSubproject(String name) {
