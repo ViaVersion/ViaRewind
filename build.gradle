@@ -52,41 +52,32 @@ idea {
 // -----------------------------------------------------
 // Publishing
 
-def latestCommitHash() {
-    def byteOut = new ByteArrayOutputStream()
-    exec {
-        commandLine 'git', 'rev-parse', '--short', 'HEAD'
-        standardOutput = byteOut
-    }
-    return byteOut.toString('UTF-8').trim()
+Provider<String> latestCommitHash() {
+    return providers.exec {
+        commandLine = ["git", "rev-parse", "--short", "HEAD"]
+    }.standardOutput.getAsText().map(String::trim)
 }
 
-def latestCommitMessage() {
-    def byteOut = new ByteArrayOutputStream()
-    exec {
-        commandLine 'git', 'log', '-1', '--pretty=%B'
-        standardOutput = byteOut
-    }
-    return byteOut.toString('UTF-8').trim()
+Provider<String> latestCommitMessage() {
+    return providers.exec {
+        commandLine = ["git", "log", "-1", "--pretty=%B"]
+    }.standardOutput.getAsText().map(String::trim)
 }
 
-def branchName() {
-    def byteOut = new ByteArrayOutputStream()
-    exec {
-        commandLine 'git', 'rev-parse', '--abbrev-ref', 'HEAD'
-        standardOutput = byteOut
-    }
-    return byteOut.toString('UTF-8').trim()
+Provider<String> branchName() {
+    return providers.exec {
+        commandLine = ["git", "rev-parse", "--abbrev-ref", "HEAD"]
+    }.standardOutput.getAsText().map(String::trim)
 }
 
-def branch = branchName()
+def branch = branchName().get()
 def baseVersion = project.maven_version
 def isRelease = !baseVersion.contains('-')
 def isMainBranch = branch == "master"
 if (!isRelease || isMainBranch) { // Only publish releases from the main branch
     def suffixedVersion = isRelease ? baseVersion : baseVersion + "+" + System.getenv("GITHUB_RUN_NUMBER")
-    def commitHash = latestCommitHash()
-    def changelogContent = "[${commitHash}](https://github.com/ViaVersion/ViaRewind/commit/${commitHash}) ${latestCommitMessage()}"
+    def commitHash = latestCommitHash().get()
+    def changelogContent = "[${commitHash}](https://github.com/ViaVersion/ViaRewind/commit/${commitHash}) ${latestCommitMessage().get()}"
     modrinth {
         def mcVersions = project.mcVersions
                 .split(',')
