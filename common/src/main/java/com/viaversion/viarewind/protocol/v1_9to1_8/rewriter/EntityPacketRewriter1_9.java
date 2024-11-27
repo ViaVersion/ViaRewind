@@ -409,11 +409,7 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
 			final int vehicle = wrapper.read(Types.VAR_INT);
 			final IntList oldPassengers = tracker.getPassengers(vehicle);
 
-			final int count = wrapper.read(Types.VAR_INT);
-			final IntList passengers = new IntArrayList();
-			for (int i = 0; i < count; i++) {
-				passengers.add(wrapper.read(Types.VAR_INT));
-			}
+			final IntList passengers = new IntArrayList(wrapper.read(Types.VAR_INT_ARRAY_PRIMITIVE));
 			tracker.setPassengers(vehicle, passengers);
 
 			if (!oldPassengers.isEmpty()) {
@@ -425,7 +421,7 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
 					detach.scheduleSend(Protocol1_9To1_8.class);
 				}
 			}
-			for (int i = 0; i < count; i++) {
+			for (int i = 0; i < passengers.size(); i++) {
 				final int attachedEntityId = passengers.getInt(i);
 				final int holdingEntityId = i == 0 ? vehicle : passengers.getInt(i - 1);
 
