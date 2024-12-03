@@ -134,7 +134,7 @@ public class BlockItemPacketRewriter1_8 extends VRBlockItemRewriter<ClientboundP
 						Item[] old = items;
 						items = new Item[old.length - 1];
 						items[0] = old[0];
-						System.arraycopy(old, 2, items, 1, old.length - 3);
+						System.arraycopy(old, 2, items, 1, old.length - 2);
 					}
 					for (int i = 0; i < items.length; i++) {
 						items[i] = handleItemToClient(wrapper.user(), items[i]);
