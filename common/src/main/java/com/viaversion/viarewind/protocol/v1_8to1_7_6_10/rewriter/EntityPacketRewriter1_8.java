@@ -146,6 +146,9 @@ public class EntityPacketRewriter1_8 extends VREntityRewriter<ClientboundPackets
 				handler(wrapper -> {
 					final int entityId = wrapper.get(Types.VAR_INT, 0);
 					final EntityTypes1_8.EntityType type = EntityTypes1_8.getTypeFromId(wrapper.get(Types.BYTE, 0), true);
+					if (type == null) {
+						return;
+					}
 
 					int x = wrapper.get(Types.INT, 0);
 					int y = wrapper.get(Types.INT, 1);
@@ -184,7 +187,7 @@ public class EntityPacketRewriter1_8 extends VREntityRewriter<ClientboundPackets
 						hologram.setPosition(x / 32.0, y / 32.0, z / 32.0);
 						hologram.setRotation(yaw * 360f / 256, pitch * 360f / 256);
 						hologram.setHeadYaw(yaw * 360f / 256);
-					} else if (type != null && type.isOrHasParent(EntityTypes1_8.EntityType.FALLING_BLOCK)) {
+					} else if (type.isOrHasParent(EntityTypes1_8.EntityType.FALLING_BLOCK)) {
 						int blockId = data & 0xFFF;
 						int blockData = data >> 12 & 0xF;
 						final IdAndData replace = protocol.getItemRewriter().handleBlock(blockId, blockData);

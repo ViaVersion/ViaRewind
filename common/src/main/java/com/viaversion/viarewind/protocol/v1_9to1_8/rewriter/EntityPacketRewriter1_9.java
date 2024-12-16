@@ -100,7 +100,7 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
 					final EntityTypes1_9.EntityType type = EntityTypes1_9.getTypeFromId(entityType, true);
 
 					// Cancel new entities which can't be handled properly
-					if (type == EntityTypes1_9.EntityType.AREA_EFFECT_CLOUD || type == EntityTypes1_9.EntityType.SPECTRAL_ARROW || type == EntityTypes1_9.EntityType.DRAGON_FIREBALL) {
+					if (type == null || type == EntityTypes1_9.EntityType.AREA_EFFECT_CLOUD || type == EntityTypes1_9.EntityType.SPECTRAL_ARROW || type == EntityTypes1_9.EntityType.DRAGON_FIREBALL) {
 						wrapper.cancel();
 						return;
 					}
