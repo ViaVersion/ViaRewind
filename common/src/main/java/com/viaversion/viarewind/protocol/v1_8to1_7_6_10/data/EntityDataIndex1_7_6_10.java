@@ -45,7 +45,7 @@ public enum EntityDataIndex1_7_6_10 {
 
 	LIVING_ENTITY_AI(LIVING_ENTITY, -1, null, 15, EntityDataTypes1_8.BYTE),
 
-	ABSTRACT_AGEABLE_AGE(ABSTRACT_AGEABLE, 12, EntityDataTypes1_7_6_10.INT, EntityDataTypes1_8.BYTE),
+	ABSTRACT_AGEABLE_AGE(ABSTRACT_AGEABLE, 12, EntityDataTypes1_7_6_10.INT, EntityDataTypes1_8.INT),
 
 	ARMOR_STAND_FLAGS(ARMOR_STAND, -1, null, 10, EntityDataTypes1_8.BYTE),
 	ARMOR_STAND_HEAD_POSITION(ARMOR_STAND, -1, null, 11, EntityDataTypes1_8.ROTATIONS),
