@@ -145,7 +145,8 @@ public class EntityPacketRewriter1_8 extends VREntityRewriter<ClientboundPackets
 
 				handler(wrapper -> {
 					final int entityId = wrapper.get(Types.VAR_INT, 0);
-					final EntityTypes1_8.EntityType type = EntityTypes1_8.getTypeFromId(wrapper.get(Types.BYTE, 0), true);
+					int data = wrapper.get(Types.INT, 3);
+					final EntityTypes1_8.EntityType type = EntityTypes1_8.ObjectType.getEntityType(wrapper.get(Types.BYTE, 0), data);
 					if (type == null) {
 						return;
 					}
@@ -156,8 +157,6 @@ public class EntityPacketRewriter1_8 extends VREntityRewriter<ClientboundPackets
 
 					byte pitch = wrapper.get(Types.BYTE, 1);
 					byte yaw = wrapper.get(Types.BYTE, 2);
-
-					int data = wrapper.get(Types.INT, 3);
 
 					if (type == EntityTypes1_8.ObjectType.ITEM_FRAME.getType()) {
 						yaw = switch (yaw) {
@@ -267,7 +266,7 @@ public class EntityPacketRewriter1_8 extends VREntityRewriter<ClientboundPackets
 				handler(wrapper -> {
 					final short typeId = wrapper.get(Types.UNSIGNED_BYTE, 0);
 
-					final EntityTypes1_8.EntityType type = EntityTypes1_8.getTypeFromId(typeId, false);
+					final EntityTypes1_8.EntityType type = EntityTypes1_8.EntityType.findById(typeId);
 					if (type == EntityTypes1_8.EntityType.ARMOR_STAND) {
 						wrapper.cancel();
 						final int entityId = wrapper.get(Types.VAR_INT, 0);
@@ -698,11 +697,11 @@ public class EntityPacketRewriter1_8 extends VREntityRewriter<ClientboundPackets
 
 	@Override
 	public EntityTypes1_8.EntityType typeFromId(int type) {
-		return EntityTypes1_8.getTypeFromId(type, false);
+		return EntityTypes1_8.EntityType.findById(type);
 	}
 
 	@Override
-	public EntityTypes1_8.EntityType objectTypeFromId(int type) {
-		return EntityTypes1_8.getTypeFromId(type, true);
+	public EntityTypes1_8.EntityType objectTypeFromId(int type, int data) {
+		return EntityTypes1_8.ObjectType.getEntityType(type, data);
 	}
 }

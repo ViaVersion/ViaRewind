@@ -97,7 +97,8 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
 				handler(wrapper -> {
 					final int entityId = wrapper.get(Types.VAR_INT, 0);
 					final int entityType = wrapper.get(Types.BYTE, 0);
-					final EntityTypes1_9.EntityType type = EntityTypes1_9.getTypeFromId(entityType, true);
+					int data = wrapper.get(Types.INT, 0);
+					final EntityTypes1_9.EntityType type = EntityTypes1_9.ObjectType.getEntityType(entityType, data);
 
 					// Cancel new entities which can't be handled properly
 					if (type == null || type == EntityTypes1_9.EntityType.AREA_EFFECT_CLOUD || type == EntityTypes1_9.EntityType.SPECTRAL_ARROW || type == EntityTypes1_9.EntityType.DRAGON_FIREBALL) {
@@ -114,8 +115,6 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
 						y += 10;
 						wrapper.set(Types.INT, 1, y);
 					}
-
-					int data = wrapper.get(Types.INT, 3);
 
 					if (type.isOrHasParent(EntityTypes1_9.EntityType.ARROW) && data != 0) {
 						wrapper.set(Types.INT, 3, --data);
@@ -623,11 +622,11 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
 
 	@Override
 	public EntityTypes1_9.EntityType typeFromId(int type) {
-		return EntityTypes1_9.getTypeFromId(type, false);
+		return EntityTypes1_9.EntityType.findById(type);
 	}
 
 	@Override
-	public EntityTypes1_9.EntityType objectTypeFromId(int type) {
-		return EntityTypes1_9.getTypeFromId(type, true);
+	public EntityTypes1_9.EntityType objectTypeFromId(int type, int data) {
+		return EntityTypes1_9.ObjectType.getEntityType(type, data);
 	}
 }
