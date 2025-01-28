@@ -26,18 +26,24 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelPipeline;
 
 public class TrackingCompressionHandlerProvider extends CompressionHandlerProvider {
-	public static final String COMPRESS_HANDLER_NAME = "compress";
-	public static final String DECOMPRESS_HANDLER_NAME = "decompress";
 
 	@Override
 	public void onHandleLoginCompressionPacket(UserConnection user, int threshold) {
 		final ChannelPipeline pipeline = user.getChannel().pipeline();
 		if (user.isClientSide()) {
-			pipeline.addBefore(Via.getManager().getInjector().getEncoderName(), COMPRESS_HANDLER_NAME, getEncoder(threshold));
-			pipeline.addBefore(Via.getManager().getInjector().getDecoderName(), DECOMPRESS_HANDLER_NAME, getDecoder(threshold));
+			pipeline.addBefore(Via.getManager().getInjector().getEncoderName(), compressHandlerName(), getEncoder(threshold));
+			pipeline.addBefore(Via.getManager().getInjector().getDecoderName(), decompressHandlerName(), getDecoder(threshold));
 		} else {
 			setCompressionEnabled(user, true); // We need to remove compression for 1.7 clients
 		}
+	}
+
+	public String compressHandlerName() {
+		return "compress";
+	}
+
+	public String decompressHandlerName() {
+		return "decompress";
 	}
 
 	@Override
@@ -47,9 +53,9 @@ public class TrackingCompressionHandlerProvider extends CompressionHandlerProvid
 
 			String compressor = null;
 			String decompressor = null;
-			if (pipeline.get(COMPRESS_HANDLER_NAME) != null) { // ViaVersion
-				compressor = COMPRESS_HANDLER_NAME;
-				decompressor = DECOMPRESS_HANDLER_NAME;
+			if (pipeline.get(compressHandlerName()) != null) { // ViaVersion
+				compressor = compressHandlerName();
+				decompressor = decompressHandlerName();
 			} else if (pipeline.get("compression-encoder") != null) { // Velocity
 				compressor = "compression-encoder";
 				decompressor = "compression-decoder";
