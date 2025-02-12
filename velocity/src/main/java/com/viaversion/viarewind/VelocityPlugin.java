@@ -68,4 +68,15 @@ public class VelocityPlugin implements ViaRewindPlatform {
 	public Logger getLogger() {
 		return this.logger;
 	}
+
+	@Override
+	public String compressHandlerName() {
+		return "compression-encoder";
+	}
+
+	@Override
+	public String decompressHandlerName() {
+		return "compression-decoder";
+	}
+
 }

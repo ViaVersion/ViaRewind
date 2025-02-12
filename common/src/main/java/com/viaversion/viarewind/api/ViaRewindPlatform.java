@@ -70,4 +70,23 @@ public interface ViaRewindPlatform {
 	 * @return data folder
 	 */
 	File getDataFolder();
+
+	/**
+	 * Returns the platform's compression handler name. Only used in the 1.8 -> 1.7 protocol.
+	 *
+	 * @return the compression handler name
+	 */
+	default String compressHandlerName() {
+		return "compress";
+	}
+
+	/**
+	 * Returns the platform's decompression handler name. Only used in the 1.8 -> 1.7 protocol.
+	 *
+	 * @return the decompression handler name
+	 */
+	default String decompressHandlerName() {
+		return "decompress";
+	}
+
 }

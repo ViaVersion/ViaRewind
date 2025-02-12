@@ -17,6 +17,7 @@
  */
 package com.viaversion.viarewind.protocol.v1_8to1_7_6_10.provider.compression;
 
+import com.viaversion.viarewind.ViaRewind;
 import com.viaversion.viarewind.api.minecraft.netty.EmptyChannelHandler;
 import com.viaversion.viarewind.api.minecraft.netty.ForwardMessageToByteEncoder;
 import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.provider.CompressionHandlerProvider;
@@ -31,19 +32,11 @@ public class TrackingCompressionHandlerProvider extends CompressionHandlerProvid
 	public void onHandleLoginCompressionPacket(UserConnection user, int threshold) {
 		final ChannelPipeline pipeline = user.getChannel().pipeline();
 		if (user.isClientSide()) {
-			pipeline.addBefore(Via.getManager().getInjector().getEncoderName(), compressHandlerName(), getEncoder(threshold));
-			pipeline.addBefore(Via.getManager().getInjector().getDecoderName(), decompressHandlerName(), getDecoder(threshold));
+			pipeline.addBefore(Via.getManager().getInjector().getEncoderName(), ViaRewind.getPlatform().compressHandlerName(), getEncoder(threshold));
+			pipeline.addBefore(Via.getManager().getInjector().getDecoderName(), ViaRewind.getPlatform().decompressHandlerName(), getDecoder(threshold));
 		} else {
 			setCompressionEnabled(user, true); // We need to remove compression for 1.7 clients
 		}
-	}
-
-	public String compressHandlerName() {
-		return "compress";
-	}
-
-	public String decompressHandlerName() {
-		return "decompress";
 	}
 
 	@Override
@@ -53,12 +46,9 @@ public class TrackingCompressionHandlerProvider extends CompressionHandlerProvid
 
 			String compressor = null;
 			String decompressor = null;
-			if (pipeline.get(compressHandlerName()) != null) { // ViaVersion
-				compressor = compressHandlerName();
-				decompressor = decompressHandlerName();
-			} else if (pipeline.get("compression-encoder") != null) { // Velocity
-				compressor = "compression-encoder";
-				decompressor = "compression-decoder";
+			if (pipeline.get(ViaRewind.getPlatform().compressHandlerName()) != null) {
+				compressor = ViaRewind.getPlatform().compressHandlerName();
+				decompressor = ViaRewind.getPlatform().decompressHandlerName();
 			}
 
 			if (compressor != null) { // We can neutralize the effect of compressor to the client
