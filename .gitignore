@@ -111,3 +111,6 @@ nb-configuration.xml
 ### Git ###
 # Don't exclude the .gitignore itself
 !/.gitignore
+
+### Run Folder (ViaProxy) ###
+common/run/
