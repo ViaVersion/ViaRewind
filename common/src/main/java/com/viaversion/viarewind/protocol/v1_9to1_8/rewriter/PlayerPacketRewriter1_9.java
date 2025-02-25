@@ -280,14 +280,14 @@ public class PlayerPacketRewriter1_9 extends RewriterBase<Protocol1_9To1_8> {
 				map(Types.DOUBLE); // Z
 				map(Types.BOOLEAN); // On ground
 				handler(wrapper -> {
-					wrapper.user().get(PlayerPositionTracker.class).sendAnimations();
-
-					final PlayerPositionTracker pos = wrapper.user().get(PlayerPositionTracker.class);
-					if (pos.getConfirmId() != -1) {
+					final PlayerPositionTracker storage = wrapper.user().get(PlayerPositionTracker.class);
+					storage.sendAnimations();
+					if (storage.getConfirmId() != -1) {
 						return;
 					}
-					pos.setPos(wrapper.get(Types.DOUBLE, 0), wrapper.get(Types.DOUBLE, 1), wrapper.get(Types.DOUBLE, 2));
-					pos.setOnGround(wrapper.get(Types.BOOLEAN, 0));
+
+					storage.setPos(wrapper.get(Types.DOUBLE, 0), wrapper.get(Types.DOUBLE, 1), wrapper.get(Types.DOUBLE, 2));
+					storage.setOnGround(wrapper.get(Types.BOOLEAN, 0));
 				});
 				handler(wrapper -> wrapper.user().get(BossBarStorage.class).updateLocation());
 			}
@@ -300,13 +300,15 @@ public class PlayerPacketRewriter1_9 extends RewriterBase<Protocol1_9To1_8> {
 				map(Types.FLOAT); // Pitch
 				map(Types.BOOLEAN); // On ground
 				handler(wrapper -> {
-					wrapper.user().get(PlayerPositionTracker.class).sendAnimations();
+					final PlayerPositionTracker storage = wrapper.user().get(PlayerPositionTracker.class);
+					storage.sendAnimations();
+					if (storage.getConfirmId() != -1) {
+						return;
+					}
 
-					PlayerPositionTracker pos = wrapper.user().get(PlayerPositionTracker.class);
-					if (pos.getConfirmId() != -1) return;
-					pos.setYaw(wrapper.get(Types.FLOAT, 0));
-					pos.setPitch(wrapper.get(Types.FLOAT, 1));
-					pos.setOnGround(wrapper.get(Types.BOOLEAN, 0));
+					storage.setYaw(wrapper.get(Types.FLOAT, 0));
+					storage.setPitch(wrapper.get(Types.FLOAT, 1));
+					storage.setOnGround(wrapper.get(Types.BOOLEAN, 0));
 				});
 				handler(wrapper -> wrapper.user().get(BossBarStorage.class).updateLocation());
 			}
@@ -320,7 +322,7 @@ public class PlayerPacketRewriter1_9 extends RewriterBase<Protocol1_9To1_8> {
 			final float pitch = wrapper.passthrough(Types.FLOAT);
 			final boolean onGround = wrapper.passthrough(Types.BOOLEAN);
 
-			PlayerPositionTracker storage = wrapper.user().get(PlayerPositionTracker.class);
+			final PlayerPositionTracker storage = wrapper.user().get(PlayerPositionTracker.class);
 			storage.sendAnimations();
 			if (storage.getConfirmId() != -1) {
 				if (storage.getPosX() == x && storage.getPosY() == y && storage.getPosZ() == z && storage.getYaw() == yaw && storage.getPitch() == pitch) {
