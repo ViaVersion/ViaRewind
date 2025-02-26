@@ -421,9 +421,9 @@ public class PlayerPacketRewriter1_9 extends RewriterBase<Protocol1_9To1_8> {
 			final float forward = wrapper.passthrough(Types.FLOAT);
 
 			final EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
-			final int vehicle = tracker.getVehicle(tracker.clientEntityId());
+			final Integer vehicle = tracker.getVehicle(tracker.clientEntityId());
 
-			if (vehicle != -1 && tracker.entityType(vehicle) == EntityTypes1_9.EntityType.BOAT) {
+			if (vehicle != null && tracker.entityType(vehicle) == EntityTypes1_9.EntityType.BOAT) {
 				final PacketWrapper paddleBoat = PacketWrapper.create(ServerboundPackets1_9.PADDLE_BOAT, wrapper.user());
 				paddleBoat.write(Types.BOOLEAN, forward != 0.0f || sideways < 0.0f);
 				paddleBoat.write(Types.BOOLEAN, forward != 0.0f || sideways > 0.0f);

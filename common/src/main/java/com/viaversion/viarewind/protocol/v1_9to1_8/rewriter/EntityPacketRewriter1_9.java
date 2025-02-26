@@ -324,11 +324,12 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
 			public void register() {
 				handler(wrapper -> {
 					final EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
-					final int vehicle = tracker.getVehicle(tracker.clientEntityId());
-					if (vehicle == -1) {
+					final Integer vehicle = tracker.getVehicle(tracker.clientEntityId());
+					if (vehicle == null) {
 						wrapper.cancel();
-					}
-					wrapper.write(Types.VAR_INT, vehicle);
+					} else {
+                        wrapper.write(Types.VAR_INT, vehicle);
+                    }
 				});
 				map(Types.DOUBLE, Protocol1_9To1_8.DOUBLE_TO_INT_TIMES_32); // X
 				map(Types.DOUBLE, Protocol1_9To1_8.DOUBLE_TO_INT_TIMES_32); // Y
@@ -339,6 +340,7 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
 					if (wrapper.isCancelled()) {
 						return;
 					}
+
 					final PlayerPositionTracker storage = wrapper.user().get(PlayerPositionTracker.class);
 					double x = wrapper.get(Types.INT, 0) / 32d;
 					double y = wrapper.get(Types.INT, 1) / 32d;
@@ -347,6 +349,10 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
 				});
 				create(Types.BOOLEAN, true);
 				handler(wrapper -> {
+                    if (wrapper.isCancelled()) {
+                        return;
+                    }
+
 					final int entityId = wrapper.get(Types.VAR_INT, 0);
 					final EntityType type = wrapper.user().getEntityTracker(Protocol1_9To1_8.class).entityType(entityId);
 					if (type == EntityTypes1_9.EntityType.BOAT) {

@@ -74,11 +74,11 @@ public class EntityTracker1_9 extends EntityTrackerBase {
 		return false;
 	}
 
-	public int getVehicle(final int passenger) {
+	public Integer getVehicle(final int passenger) {
 		for (Map.Entry<Integer, IntList> vehicle : vehicles.int2ObjectEntrySet()) {
 			if (vehicle.getValue().contains(passenger)) return vehicle.getKey();
 		}
-		return -1;
+		return null;
 	}
 
 	public Int2IntMap getStatus() {
