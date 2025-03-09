@@ -97,7 +97,7 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
 				handler(wrapper -> {
 					final int entityId = wrapper.get(Types.VAR_INT, 0);
 					final int entityType = wrapper.get(Types.BYTE, 0);
-					int data = wrapper.get(Types.INT, 0);
+					int data = wrapper.get(Types.INT, 3);
 					final EntityTypes1_9.EntityType type = EntityTypes1_9.ObjectType.getEntityType(entityType, data);
 
 					// Cancel new entities which can't be handled properly
