@@ -103,7 +103,7 @@ public class WindowTracker extends StoredObject {
 		Item[] items = user.get(WindowTracker.class).getBrewingItems(windowId);
 		for (int i = 0; i < items.length; i++) {
 			PacketWrapper setSlot = PacketWrapper.create(ClientboundPackets1_8.CONTAINER_SET_SLOT, user);
-			setSlot.write(Types.UNSIGNED_BYTE, windowId);
+			setSlot.write(Types.BYTE, (byte) windowId);
 			setSlot.write(Types.SHORT, (short) i);
 			setSlot.write(Types.ITEM1_8, items[i]);
 			setSlot.scheduleSend(Protocol1_9To1_8.class);

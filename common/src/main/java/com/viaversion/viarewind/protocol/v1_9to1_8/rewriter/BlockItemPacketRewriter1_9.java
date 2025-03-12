@@ -107,7 +107,7 @@ public class BlockItemPacketRewriter1_9 extends VRBlockItemRewriter<ClientboundP
 		});
 
 		protocol.registerClientbound(ClientboundPackets1_9.CONTAINER_SET_SLOT, wrapper -> {
-			final byte windowId = wrapper.passthrough(Types.UNSIGNED_BYTE).byteValue();
+			final byte windowId = wrapper.passthrough(Types.BYTE);
 			final short slot = wrapper.passthrough(Types.SHORT);
 			final Item item = wrapper.passthrough(Types.ITEM1_8);
 
@@ -138,7 +138,7 @@ public class BlockItemPacketRewriter1_9 extends VRBlockItemRewriter<ClientboundP
 		protocol.registerServerbound(ServerboundPackets1_8.CONTAINER_CLICK, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Types.UNSIGNED_BYTE); // Window id
+				map(Types.BYTE); // Window id
 				map(Types.SHORT); // Slot
 				map(Types.BYTE); // Button
 				map(Types.SHORT); // Action number
@@ -146,7 +146,7 @@ public class BlockItemPacketRewriter1_9 extends VRBlockItemRewriter<ClientboundP
 				map(Types.ITEM1_8); // Clicked item
 				handler(wrapper -> handleItemToServer(wrapper.user(), wrapper.get(Types.ITEM1_8, 0)));
 				handler(wrapper -> {
-					final short windowId = wrapper.get(Types.UNSIGNED_BYTE, 0);
+					final byte windowId = wrapper.get(Types.BYTE, 0);
 					final String windowType = wrapper.user().get(WindowTracker.class).get(windowId);
 
 					if (windowType != null && windowType.equalsIgnoreCase("minecraft:brewing_stand")) {

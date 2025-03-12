@@ -81,11 +81,11 @@ public class BlockItemPacketRewriter1_8 extends VRBlockItemRewriter<ClientboundP
 		protocol.registerClientbound(ClientboundPackets1_8.CONTAINER_SET_SLOT, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Types.UNSIGNED_BYTE); // Window id
+				map(Types.BYTE); // Window id
 				map(Types.SHORT); // Slot
 
 				handler(wrapper -> {
-					final short windowType = wrapper.user().get(InventoryTracker.class).get(wrapper.get(Types.UNSIGNED_BYTE, 0));
+					final short windowType = wrapper.user().get(InventoryTracker.class).get(wrapper.get(Types.BYTE, 0));
 					final short slot = wrapper.get(Types.SHORT, 0);
 					if (windowType == 4) { // Enchantment Table
 						if (slot == 1) {
@@ -100,7 +100,7 @@ public class BlockItemPacketRewriter1_8 extends VRBlockItemRewriter<ClientboundP
 				handler(wrapper -> handleItemToClient(wrapper.user(), wrapper.get(RewindTypes.COMPRESSED_NBT_ITEM, 0)));
 
 				handler(wrapper -> {
-					final short windowId = wrapper.get(Types.UNSIGNED_BYTE, 0);
+					final byte windowId = wrapper.get(Types.BYTE, 0);
 					if (windowId != 0) {
 						return;
 					}
@@ -232,10 +232,10 @@ public class BlockItemPacketRewriter1_8 extends VRBlockItemRewriter<ClientboundP
 		protocol.registerServerbound(ServerboundPackets1_7_2_5.CONTAINER_CLICK, new PacketHandlers() {
 			@Override
 			public void register() {
-				map(Types.BYTE, Types.UNSIGNED_BYTE); // Window id
+				map(Types.BYTE); // Window id
 				map(Types.SHORT); // Slot
 				handler(wrapper -> {
-					final short windowId = wrapper.get(Types.UNSIGNED_BYTE, 0); // Window id
+					final byte windowId = wrapper.get(Types.BYTE, 0); // Window id
 					final short slot = wrapper.get(Types.SHORT, 0);
 
 					final short windowType = wrapper.user().get(InventoryTracker.class).get(windowId);
