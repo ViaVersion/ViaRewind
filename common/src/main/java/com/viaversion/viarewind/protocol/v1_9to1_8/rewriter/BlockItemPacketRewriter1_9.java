@@ -131,7 +131,7 @@ public class BlockItemPacketRewriter1_9 extends VRBlockItemRewriter<ClientboundP
 		});
 
 		protocol.registerServerbound(ServerboundPackets1_8.CONTAINER_CLOSE, wrapper -> {
-			final short windowId = wrapper.passthrough(Types.UNSIGNED_BYTE);
+			final byte windowId = wrapper.passthrough(Types.BYTE);
 			wrapper.user().get(WindowTracker.class).remove(windowId);
 		});
 
