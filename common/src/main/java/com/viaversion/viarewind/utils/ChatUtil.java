@@ -24,7 +24,7 @@ import com.viaversion.viaversion.libs.gson.JsonElement;
 import com.viaversion.viaversion.libs.gson.JsonObject;
 import com.viaversion.viaversion.libs.gson.JsonParser;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.Protocol1_12_2To1_13;
-import com.viaversion.viaversion.rewriter.ComponentRewriter;
+import com.viaversion.viaversion.rewriter.text.JsonNBTComponentRewriter;
 import com.viaversion.viaversion.util.ComponentUtil;
 
 import java.util.logging.Level;
@@ -33,7 +33,7 @@ import java.util.regex.Pattern;
 @Deprecated
 public class ChatUtil {
 	private static final Pattern UNUSED_COLOR_PATTERN = Pattern.compile("(?>(?>§[0-fk-or])*(§r|\\Z))|(?>(?>§[0-f])*(§[0-f]))");
-	private static final ComponentRewriter<ClientboundPacketType> LEGACY_REWRITER = new ComponentRewriter<ClientboundPacketType>(null, ComponentRewriter.ReadType.JSON) {
+	private static final JsonNBTComponentRewriter<ClientboundPacketType> LEGACY_REWRITER = new JsonNBTComponentRewriter<>(null, JsonNBTComponentRewriter.ReadType.JSON) {
 		@Override
 		protected void handleTranslate(JsonObject object, String translate) {
 			String text = Protocol1_12_2To1_13.MAPPINGS.getMojangTranslation().get(translate);
