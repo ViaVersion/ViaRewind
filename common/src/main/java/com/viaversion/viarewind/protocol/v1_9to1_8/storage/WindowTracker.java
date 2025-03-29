@@ -24,8 +24,8 @@ import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Types;
-import com.viaversion.viaversion.libs.mcstructs.core.TextFormatting;
-import com.viaversion.viaversion.libs.mcstructs.text.ATextComponent;
+import com.viaversion.viaversion.libs.mcstructs.text.TextComponent;
+import com.viaversion.viaversion.libs.mcstructs.text.TextFormatting;
 import com.viaversion.viaversion.libs.mcstructs.text.components.StringComponent;
 import com.viaversion.viaversion.libs.mcstructs.text.components.TranslationComponent;
 import com.viaversion.viaversion.libs.mcstructs.text.serializer.TextComponentSerializer;
@@ -90,7 +90,7 @@ public class WindowTracker extends StoredObject {
 		openWindow.write(Types.UNSIGNED_BYTE, windowId);
 		openWindow.write(Types.STRING, "minecraft:brewing_stand");
 
-		ATextComponent title = new StringComponent().
+		TextComponent title = new StringComponent().
 			append(new TranslationComponent("container.brewing")).
 			append(new StringComponent(": " + TextFormatting.DARK_GRAY)).
 			append(new StringComponent(amount + " " + TextFormatting.DARK_RED)).

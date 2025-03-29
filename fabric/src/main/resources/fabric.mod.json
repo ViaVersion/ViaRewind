@@ -24,7 +24,7 @@
   },
   "depends": {
     "viafabric": ">=0.4.14",
-    "viabackwards": ">=5.3.0"
+    "viabackwards": ">=5.3.1-SNAPSHOT"
   },
   "custom": {
     "modmenu:api": true,
