@@ -23,9 +23,11 @@ import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.util.Pair;
 import io.netty.buffer.ByteBuf;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.zip.Deflater;
+
+import static com.viaversion.viaversion.api.minecraft.chunks.ChunkSection.SIZE;
+import static com.viaversion.viaversion.api.minecraft.chunks.ChunkSectionLight.LIGHT_LENGTH;
 
 public class ChunkType1_7_6 extends Type<Chunk> {
 
@@ -94,58 +96,41 @@ public class ChunkType1_7_6 extends Type<Chunk> {
 			}
 		}
 
-        int totalSize = 0;
-
-        for (int i = 0; i < storageArrays.length; i++) {
-            if ((chunk.getBitmask() & 1 << i) != 0) {
-                totalSize += 4096; // Block lsb array
-                totalSize += 2048; // Block metadata array
-                totalSize += 2048; // Block light array
-
-                if (storageArrays[i].getSkyLightArray() != null) {
-                    totalSize += 2048;
-                }
-
-                if (storageArrays[i].hasBlockMSBArray()) {
-                    totalSize += 2048;
-                }
-            }
-        }
-
-        boolean biomePresent = chunk.isFullChunk() && chunk.getBiomeData() != null;
-
-        if (biomePresent) {
-            totalSize += 256;
-        }
+        final boolean biomes = chunk.isFullChunk() && chunk.getBiomeData() != null;
+        final int totalSize = calculateSize(storageArrays, chunk.getBitmask(), biomes);
 
 		final byte[] output = new byte[totalSize];
         int index = 0;
 
 		for (int i = 0; i < storageArrays.length; i++) {
 			if ((chunk.getBitmask() & 1 << i) != 0) {
-                System.arraycopy(storageArrays[i].getBlockLSBArray(), 0, output, index, 4096);
-                index += 4096;
+                final byte[] blockLSBArray = storageArrays[i].getBlockLSBArray();
+                System.arraycopy(blockLSBArray, 0, output, index, blockLSBArray.length);
+                index += blockLSBArray.length;
 			}
 		}
 
 		for (int i = 0; i < storageArrays.length; i++) {
 			if ((chunk.getBitmask() & 1 << i) != 0) {
-                System.arraycopy(storageArrays[i].getBlockMetadataArray().getHandle(), 0, output, index, 2048);
-                index += 2048;
+                final byte[] blockMetadataArray = storageArrays[i].getBlockMetadataArray().getHandle();
+                System.arraycopy(blockMetadataArray, 0, output, index, blockMetadataArray.length);
+                index += blockMetadataArray.length;
 			}
 		}
 
 		for (int i = 0; i < storageArrays.length; i++) {
 			if ((chunk.getBitmask() & 1 << i) != 0) {
-                System.arraycopy(storageArrays[i].getBlockLightArray().getHandle(), 0, output, index, 2048);
-                index += 2048;
+                final byte[] blockLightArray = storageArrays[i].getBlockLightArray().getHandle();
+                System.arraycopy(blockLightArray, 0, output, index, blockLightArray.length);
+                index += blockLightArray.length;
 			}
 		}
 
 		for (int i = 0; i < storageArrays.length; i++) {
 			if ((chunk.getBitmask() & 1 << i) != 0 && storageArrays[i].getSkyLightArray() != null) {
-                System.arraycopy(storageArrays[i].getSkyLightArray().getHandle(), 0, output, index, 2048);
-                index += 2048;
+                final byte[] skyLightArray = storageArrays[i].getSkyLightArray().getHandle();
+                System.arraycopy(skyLightArray, 0, output, index, skyLightArray.length);
+                index += skyLightArray.length;
 			}
 		}
 
@@ -153,12 +138,13 @@ public class ChunkType1_7_6 extends Type<Chunk> {
 		for (int i = 0; i < storageArrays.length; i++) {
 			if ((chunk.getBitmask() & 1 << i) != 0 && storageArrays[i].hasBlockMSBArray()) {
 				additionalBitMask |= (short) (1 << i);
-                System.arraycopy(storageArrays[i].getOrCreateBlockMSBArray().getHandle(), 0, output, index, 2048);
-                index += 2048;
+                final byte[] blockMSBArray = storageArrays[i].getOrCreateBlockMSBArray().getHandle();
+                System.arraycopy(blockMSBArray, 0, output, index, blockMSBArray.length);
+                index += blockMSBArray.length;
 			}
 		}
 
-		if (biomePresent) {
+		if (biomes) {
 			for (int biome : chunk.getBiomeData()) {
 				output[index++] = (byte) biome;
 			}
@@ -166,4 +152,28 @@ public class ChunkType1_7_6 extends Type<Chunk> {
 
 		return new Pair<>(output, additionalBitMask);
 	}
+
+    private static int calculateSize(final ExtendedBlockStorage[] storageArrays, final int bitmask, final boolean biomes) {
+        int totalSize = 0;
+        for (int i = 0; i < storageArrays.length; i++) {
+            if ((bitmask & 1 << i) != 0) {
+                totalSize += SIZE; // Block lsb array
+                totalSize += SIZE / 2; // Block metadata array
+                totalSize += LIGHT_LENGTH; // Block light array
+
+                if (storageArrays[i].getSkyLightArray() != null) {
+                    totalSize += LIGHT_LENGTH;
+                }
+
+                if (storageArrays[i].hasBlockMSBArray()) {
+                    totalSize += SIZE / 2; // Block msb array
+                }
+            }
+        }
+        if (biomes) {
+            totalSize += 256;
+        }
+        return totalSize;
+    }
+
 }

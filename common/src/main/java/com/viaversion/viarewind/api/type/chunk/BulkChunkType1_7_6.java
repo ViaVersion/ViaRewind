@@ -46,7 +46,7 @@ public class BulkChunkType1_7_6 extends Type<Chunk[]> {
 		final short[] primaryBitMask = new short[chunkCount];
 		final short[] additionalBitMask = new short[chunkCount];
 
-        byte[][] dataArrays = new byte[chunkCount][];
+        final byte[][] dataArrays = new byte[chunkCount][];
         int dataSize = 0;
 
 		for (int i = 0; i < chunkCount; i++) {
@@ -54,7 +54,7 @@ public class BulkChunkType1_7_6 extends Type<Chunk[]> {
 			Pair<byte[], Short> chunkData;
 			try {
 				chunkData = ChunkType1_7_6.serialize(chunk);
-                byte[] data = chunkData.key();
+                final byte[] data = chunkData.key();
                 dataArrays[i] = data;
                 dataSize += data.length;
 			} catch (Exception e) {
@@ -66,10 +66,9 @@ public class BulkChunkType1_7_6 extends Type<Chunk[]> {
 			additionalBitMask[i] = chunkData.value();
 		}
 
-        byte[] data = new byte[dataSize];
-
+        final byte[] data = new byte[dataSize];
         int destPos = 0;
-        for (byte[] array : dataArrays) {
+        for (final byte[] array : dataArrays) {
             System.arraycopy(array, 0, data, destPos, array.length);
             destPos += array.length;
         }
