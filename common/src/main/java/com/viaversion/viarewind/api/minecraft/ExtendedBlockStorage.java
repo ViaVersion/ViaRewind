@@ -21,7 +21,7 @@ import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.minecraft.chunks.NibbleArray;
 
 public class ExtendedBlockStorage {
-	private final byte[] blockLSBArray = new byte[4096];
+	private final byte[] blockLSBArray = new byte[ChunkSection.SIZE];
 
 	private final NibbleArray blockMetadataArray = new NibbleArray(this.blockLSBArray.length);
 	private final NibbleArray blockLightArray = new NibbleArray(this.blockLSBArray.length);
