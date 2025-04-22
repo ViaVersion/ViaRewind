@@ -94,29 +94,58 @@ public class ChunkType1_7_6 extends Type<Chunk> {
 			}
 		}
 
-		final ByteArrayOutputStream output = new ByteArrayOutputStream();
+        int totalSize = 0;
+
+        for (int i = 0; i < storageArrays.length; i++) {
+            if ((chunk.getBitmask() & 1 << i) != 0) {
+                totalSize += 4096; // Block lsb array
+                totalSize += 2048; // Block metadata array
+                totalSize += 2048; // Block light array
+
+                if (storageArrays[i].getSkyLightArray() != null) {
+                    totalSize += 2048;
+                }
+
+                if (storageArrays[i].hasBlockMSBArray()) {
+                    totalSize += 2048;
+                }
+            }
+        }
+
+        boolean biomePresent = chunk.isFullChunk() && chunk.getBiomeData() != null;
+
+        if (biomePresent) {
+            totalSize += 256;
+        }
+
+		final byte[] output = new byte[totalSize];
+        int index = 0;
 
 		for (int i = 0; i < storageArrays.length; i++) {
 			if ((chunk.getBitmask() & 1 << i) != 0) {
-				output.write(storageArrays[i].getBlockLSBArray());
+                System.arraycopy(storageArrays[i].getBlockLSBArray(), 0, output, index, 4096);
+                index += 4096;
 			}
 		}
 
 		for (int i = 0; i < storageArrays.length; i++) {
 			if ((chunk.getBitmask() & 1 << i) != 0) {
-				output.write(storageArrays[i].getBlockMetadataArray().getHandle());
+                System.arraycopy(storageArrays[i].getBlockMetadataArray().getHandle(), 0, output, index, 2048);
+                index += 2048;
 			}
 		}
 
 		for (int i = 0; i < storageArrays.length; i++) {
 			if ((chunk.getBitmask() & 1 << i) != 0) {
-				output.write(storageArrays[i].getBlockLightArray().getHandle());
+                System.arraycopy(storageArrays[i].getBlockLightArray().getHandle(), 0, output, index, 2048);
+                index += 2048;
 			}
 		}
 
 		for (int i = 0; i < storageArrays.length; i++) {
 			if ((chunk.getBitmask() & 1 << i) != 0 && storageArrays[i].getSkyLightArray() != null) {
-				output.write(storageArrays[i].getSkyLightArray().getHandle());
+                System.arraycopy(storageArrays[i].getSkyLightArray().getHandle(), 0, output, index, 2048);
+                index += 2048;
 			}
 		}
 
@@ -124,16 +153,17 @@ public class ChunkType1_7_6 extends Type<Chunk> {
 		for (int i = 0; i < storageArrays.length; i++) {
 			if ((chunk.getBitmask() & 1 << i) != 0 && storageArrays[i].hasBlockMSBArray()) {
 				additionalBitMask |= (short) (1 << i);
-				output.write(storageArrays[i].getOrCreateBlockMSBArray().getHandle());
+                System.arraycopy(storageArrays[i].getOrCreateBlockMSBArray().getHandle(), 0, output, index, 2048);
+                index += 2048;
 			}
 		}
 
-		if (chunk.isFullChunk() && chunk.getBiomeData() != null) {
+		if (biomePresent) {
 			for (int biome : chunk.getBiomeData()) {
-				output.write(biome);
+				output[index++] = (byte) biome;
 			}
 		}
 
-		return new Pair<>(output.toByteArray(), additionalBitMask);
+		return new Pair<>(output, additionalBitMask);
 	}
 }

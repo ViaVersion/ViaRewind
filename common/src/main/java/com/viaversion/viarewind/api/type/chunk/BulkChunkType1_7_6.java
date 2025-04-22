@@ -23,7 +23,6 @@ import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.util.Pair;
 import io.netty.buffer.ByteBuf;
 
-import java.io.ByteArrayOutputStream;
 import java.util.zip.Deflater;
 
 public class BulkChunkType1_7_6 extends Type<Chunk[]> {
@@ -42,18 +41,22 @@ public class BulkChunkType1_7_6 extends Type<Chunk[]> {
 	@Override
 	public void write(ByteBuf byteBuf, Chunk[] chunks) {
 		final int chunkCount = chunks.length;
-		final ByteArrayOutputStream output = new ByteArrayOutputStream();
 		final int[] chunkX = new int[chunkCount];
 		final int[] chunkZ = new int[chunkCount];
 		final short[] primaryBitMask = new short[chunkCount];
 		final short[] additionalBitMask = new short[chunkCount];
+
+        byte[][] dataArrays = new byte[chunkCount][];
+        int dataSize = 0;
 
 		for (int i = 0; i < chunkCount; i++) {
 			final Chunk chunk = chunks[i];
 			Pair<byte[], Short> chunkData;
 			try {
 				chunkData = ChunkType1_7_6.serialize(chunk);
-				output.write(chunkData.key());
+                byte[] data = chunkData.key();
+                dataArrays[i] = data;
+                dataSize += data.length;
 			} catch (Exception e) {
 				throw new RuntimeException("Unable to serialize chunk", e);
 			}
@@ -62,7 +65,14 @@ public class BulkChunkType1_7_6 extends Type<Chunk[]> {
 			primaryBitMask[i] = (short) chunk.getBitmask();
 			additionalBitMask[i] = chunkData.value();
 		}
-		final byte[] data = output.toByteArray();
+
+        byte[] data = new byte[dataSize];
+
+        int destPos = 0;
+        for (byte[] array : dataArrays) {
+            System.arraycopy(array, 0, data, destPos, array.length);
+            destPos += array.length;
+        }
 
 		final Deflater deflater = new Deflater();
 		byte[] compressedData;
