@@ -123,7 +123,7 @@ public class PlayerPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6_10>
 					}
 					// 1.8 clients do keep entity data after respawn, 1.7 clients don't
 					final PacketWrapper setEntityData = PacketWrapper.create(ClientboundPackets1_7_2_5.SET_ENTITY_DATA, wrapper.user());
-					setEntityData.write(Types.VAR_INT, tracker.clientEntityId());
+					setEntityData.write(Types.INT, tracker.clientEntityId());
 					setEntityData.write(Types1_7_6_10.ENTITY_DATA_LIST, tracker.getEntityData());
 					setEntityData.send(Protocol1_8To1_7_6_10.class);
 				});
