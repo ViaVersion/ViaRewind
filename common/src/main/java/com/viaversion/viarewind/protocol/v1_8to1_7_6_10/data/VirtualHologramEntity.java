@@ -30,6 +30,7 @@ import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
 import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes1_8;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.api.type.types.version.Types1_8;
 import com.viaversion.viaversion.data.entity.TrackedEntityImpl;
 import com.viaversion.viaversion.rewriter.entitydata.EntityDataHandlerEvent;
 import com.viaversion.viaversion.rewriter.entitydata.EntityDataHandlerEventImpl;
@@ -38,288 +39,313 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class VirtualHologramEntity {
-	private final List<EntityData> entityDataTracker = new ArrayList<>();
-	private double locX, locY, locZ;
+    private final List<EntityData> entityDataTracker = new ArrayList<>();
+    private double locX, locY, locZ;
 
-	private final UserConnection user;
-	private final int entityId;
+    private final UserConnection user;
+    private final int entityId;
 
-	private int[] entityIds = null;
-	private State currentState = null;
-	private String name = null;
-	private float yaw, pitch;
-	private float headYaw;
-	private boolean small = false;
-	private boolean marker = false;
+    private int[] entityIds = null;
+    private State currentState = null;
+    private String name = null;
+    private float yaw, pitch;
+    private float headYaw;
+    private boolean small = false;
+    private boolean marker = false;
 
-	public VirtualHologramEntity(final UserConnection user, final int entityId) {
-		this.user = user;
-		this.entityId = entityId;
-	}
+    public VirtualHologramEntity(final UserConnection user, final int entityId) {
+        this.user = user;
+        this.entityId = entityId;
+    }
 
-	public void setPosition(final double x, final double y, final double z) {
-		if (x == this.locX && y == this.locY && z == this.locZ) return;
-		this.locX = x;
-		this.locY = y;
-		this.locZ = z;
+    public void setPosition(final double x, final double y, final double z) {
+        if (x == this.locX && y == this.locY && z == this.locZ) return;
+        this.locX = x;
+        this.locY = y;
+        this.locZ = z;
 
-		updateLocation(false);
-	}
+        updateLocation(false);
+    }
 
-	public void setRelativePosition(final double x, final double y, final double z) {
-		if (x == 0.0 && y == 0.0 && z == 0.0) return;
-		this.locX += x;
-		this.locY += y;
-		this.locZ += z;
+    public void setRelativePosition(final double x, final double y, final double z) {
+        if (x == 0.0 && y == 0.0 && z == 0.0) return;
+        this.locX += x;
+        this.locY += y;
+        this.locZ += z;
 
-		updateLocation(false);
-	}
+        updateLocation(false);
+    }
 
-	public void setRotation(final float yaw, final float pitch) {
-		if (this.yaw == yaw || this.headYaw == yaw || this.pitch == pitch) return;
-		this.yaw = yaw;
-		this.headYaw = yaw;
-		this.pitch = pitch;
+    public void setRotation(final float yaw, final float pitch) {
+        if (this.yaw == yaw || this.headYaw == yaw || this.pitch == pitch) return;
+        this.yaw = yaw;
+        this.headYaw = yaw;
+        this.pitch = pitch;
 
-		updateLocation(false);
-	}
+        updateLocation(false);
+    }
 
-	public void setHeadYaw(float yaw) {
-		if (this.headYaw == yaw) return;
-		this.headYaw = yaw;
+    public void setHeadYaw(float yaw) {
+        if (this.headYaw == yaw) return;
+        this.headYaw = yaw;
 
-		updateLocation(false);
-	}
+        updateLocation(false);
+    }
 
-	public void syncState(final EntityPacketRewriter1_8 entityRewriter, final List<EntityData> entityDataList) {
-		// Merge entity data updates into current tracker
-		for (EntityData entityData : entityDataList) {
-			entityDataTracker.removeIf(m -> m.id() == entityData.id());
-			entityDataTracker.add(entityData);
-		}
+    public void syncState(final EntityPacketRewriter1_8 entityRewriter, final List<EntityData> entityDataList) {
+        // Merge entity data updates into current tracker
+        for (EntityData entityData : entityDataList) {
+            entityDataTracker.removeIf(m -> m.id() == entityData.id());
+            entityDataTracker.add(entityData);
+        }
 
-		// Filter armor stand data to calculate emulation
-		byte flags = 0;
-		byte armorStandFlags = 0;
-		for (EntityData entityData : entityDataTracker) {
-			if (entityData.id() == 0 && entityData.dataType() == EntityDataTypes1_8.BYTE) {
-				flags = ((Number) entityData.getValue()).byteValue();
-			} else if (entityData.id() == 2 && entityData.dataType() == EntityDataTypes1_8.STRING) {
-				name = entityData.getValue().toString();
-				if (name != null && name.isEmpty()) name = null;
-			} else if (entityData.id() == 10 && entityData.dataType() == EntityDataTypes1_8.BYTE) {
-				armorStandFlags = ((Number) entityData.getValue()).byteValue();
-			}
-		}
-		final boolean invisible = (flags & 0x20) != 0;
-		small = (armorStandFlags & 0x01) != 0;
-		marker = (armorStandFlags & 0x10) != 0;
+        // Filter armor stand data to calculate emulation
+        byte flags = 0;
+        byte armorStandFlags = 0;
+        for (EntityData entityData : entityDataTracker) {
+            if (entityData.id() == 0 && entityData.dataType() == EntityDataTypes1_8.BYTE) {
+                flags = ((Number) entityData.getValue()).byteValue();
+            } else if (entityData.id() == 2 && entityData.dataType() == EntityDataTypes1_8.STRING) {
+                name = entityData.getValue().toString();
+                if (name != null && name.isEmpty()) name = null;
+            } else if (entityData.id() == 10 && entityData.dataType() == EntityDataTypes1_8.BYTE) {
+                armorStandFlags = ((Number) entityData.getValue()).byteValue();
+            }
+        }
+        final boolean invisible = (flags & 0x20) != 0;
+        small = (armorStandFlags & 0x01) != 0;
+        marker = (armorStandFlags & 0x10) != 0;
 
-		State prevState = currentState;
-		if (invisible && name != null) {
-			currentState = State.HOLOGRAM;
-		} else {
-			currentState = State.ZOMBIE;
-		}
+        State prevState = currentState;
+        if (invisible && name != null) {
+            currentState = State.HOLOGRAM;
+        } else {
+            currentState = State.ZOMBIE;
+        }
 
-		if (currentState != prevState) {
-			deleteEntity();
-			sendSpawnPacket(entityRewriter);
-		} else {
-			sendEntityDataUpdate(entityRewriter);
-			updateLocation(false);
-		}
-	}
+        if (currentState != prevState) {
+            deleteEntity();
+            sendSpawnPacket(entityRewriter);
+        } else {
+            sendEntityDataUpdate(entityRewriter);
+            updateLocation(false);
+        }
+    }
 
-	private void updateLocation(final boolean remount) {
-		if (entityIds == null) {
-			return;
-		}
-		if (currentState == State.ZOMBIE) {
-			teleportEntity(entityId, locX, locY, locZ, yaw, pitch);
+    private void updateLocation(final boolean remount) {
+        if (entityIds == null) {
+            return;
+        }
+        if (currentState == State.ZOMBIE) {
+            teleportEntity(entityId, locX, locY, locZ, yaw, pitch);
 
-			final PacketWrapper entityHeadLook = PacketWrapper.create(ClientboundPackets1_7_2_5.ROTATE_HEAD, user);
+            final PacketWrapper entityHeadLook = PacketWrapper.create(ClientboundPackets1_7_2_5.ROTATE_HEAD, user);
 
-			entityHeadLook.write(Types.INT, entityId);
-			entityHeadLook.write(Types.BYTE, (byte) ((headYaw / 360f) * 256));
+            entityHeadLook.write(Types.INT, entityId);
+            entityHeadLook.write(Types.BYTE, (byte) ((headYaw / 360f) * 256));
 
-			entityHeadLook.send(Protocol1_8To1_7_6_10.class);
-		} else if (currentState == State.HOLOGRAM) {
-			if (remount) {
-				PacketWrapper detach = PacketWrapper.create(ClientboundPackets1_7_2_5.SET_ENTITY_LINK, user);
-				detach.write(Types.INT, entityIds[1]);
-				detach.write(Types.INT, -1);
-				detach.write(Types.BOOLEAN, false);
-				detach.send(Protocol1_8To1_7_6_10.class);
-			}
+            entityHeadLook.send(Protocol1_8To1_7_6_10.class);
+        } else if (currentState == State.HOLOGRAM) {
+            if (remount) {
+                PacketWrapper detach = PacketWrapper.create(ClientboundPackets1_7_2_5.SET_ENTITY_LINK, user);
+                detach.write(Types.INT, entityIds[1]);
+                detach.write(Types.INT, -1);
+                detach.write(Types.BOOLEAN, false);
+                detach.send(Protocol1_8To1_7_6_10.class);
+            }
 
-			// Don't ask me where this offset is coming from
-			teleportEntity(entityIds[0], locX, (locY + (marker ? 54.85 : small ? 56 : 57) - 0.16), locZ, 0, 0); // Skull
+            // Don't ask me where this offset is coming from
+            teleportEntity(entityIds[0], locX, (locY + (marker ? 54.3625 : small ? 56 : 57) - 0.16), locZ, 0, 0); // Skull
 
-			if (remount) {
-				teleportEntity(entityIds[1], locX, locY + 56.75, locZ, 0, 0); // Horse
+            if (remount) {
+                teleportEntity(entityIds[1], locX, locY + 56.75, locZ, 0, 0); // Horse
 
-				PacketWrapper attach = PacketWrapper.create(ClientboundPackets1_7_2_5.SET_ENTITY_LINK, null, user);
-				attach.write(Types.INT, entityIds[1]);
-				attach.write(Types.INT, entityIds[0]);
-				attach.write(Types.BOOLEAN, false);
-				attach.send(Protocol1_8To1_7_6_10.class);
-			}
-		}
-	}
+                PacketWrapper attach = PacketWrapper.create(ClientboundPackets1_7_2_5.SET_ENTITY_LINK, null, user);
+                attach.write(Types.INT, entityIds[1]);
+                attach.write(Types.INT, entityIds[0]);
+                attach.write(Types.BOOLEAN, false);
+                attach.send(Protocol1_8To1_7_6_10.class);
+            }
+        }
+    }
 
-	protected void teleportEntity(final int entityId, final double x, final double y, final double z, final float yaw, final float pitch) {
-		final PacketWrapper entityTeleport = PacketWrapper.create(ClientboundPackets1_7_2_5.TELEPORT_ENTITY, user);
+    protected void teleportEntity(final int entityId, final double x, final double y, final double z, final float yaw, final float pitch) {
+        final PacketWrapper entityTeleport = PacketWrapper.create(ClientboundPackets1_7_2_5.TELEPORT_ENTITY, user);
 
-		entityTeleport.write(Types.INT, entityId); // entity id
-		entityTeleport.write(Types.INT, (int) (x * 32.0)); // x
-		entityTeleport.write(Types.INT, (int) (y * 32.0)); // y
-		entityTeleport.write(Types.INT, (int) (z * 32.0)); // z
-		entityTeleport.write(Types.BYTE, (byte) ((yaw / 360f) * 256)); // yaw
-		entityTeleport.write(Types.BYTE, (byte) ((pitch / 360f) * 256)); // pitch
+        entityTeleport.write(Types.INT, entityId); // entity id
+        entityTeleport.write(Types.INT, (int) (x * 32.0)); // x
+        entityTeleport.write(Types.INT, (int) (y * 32.0)); // y
+        entityTeleport.write(Types.INT, (int) (z * 32.0)); // z
+        entityTeleport.write(Types.BYTE, (byte) ((yaw / 360f) * 256)); // yaw
+        entityTeleport.write(Types.BYTE, (byte) ((pitch / 360f) * 256)); // pitch
 
-		entityTeleport.send(Protocol1_8To1_7_6_10.class);
-	}
+        entityTeleport.send(Protocol1_8To1_7_6_10.class);
+    }
 
-	protected void spawnEntity(final int entityId, final int type, final double locX, final double locY, final double locZ) {
-		final PacketWrapper addMob = PacketWrapper.create(ClientboundPackets1_7_2_5.ADD_MOB, user);
+    protected void spawnEntity(final int entityId, final int type, final double locX, final double locY, final double locZ) {
+        final PacketWrapper addMob = PacketWrapper.create(ClientboundPackets1_7_2_5.ADD_MOB, user);
 
-		addMob.write(Types.VAR_INT, entityId); // Entity id
-		addMob.write(Types.UNSIGNED_BYTE, (short) type); // Entity type
-		addMob.write(Types.INT, (int) (locX * 32.0)); // X
-		addMob.write(Types.INT, (int) (locY * 32.0)); // Y
-		addMob.write(Types.INT, (int) (locZ * 32.0)); // Z
-		addMob.write(Types.BYTE, (byte) 0); // Yaw
-		addMob.write(Types.BYTE, (byte) 0); // Pitch
-		addMob.write(Types.BYTE, (byte) 0); // Head pitch
-		addMob.write(Types.SHORT, (short) 0); // Velocity x
-		addMob.write(Types.SHORT, (short) 0); // Velocity y
-		addMob.write(Types.SHORT, (short) 0); // Velocity z
-		addMob.write(Types1_7_6_10.ENTITY_DATA_LIST, new ArrayList<>()); // Entity data
+        addMob.write(Types.VAR_INT, entityId); // Entity id
+        addMob.write(Types.UNSIGNED_BYTE, (short) type); // Entity type
+        addMob.write(Types.INT, (int) (locX * 32.0)); // X
+        addMob.write(Types.INT, (int) (locY * 32.0)); // Y
+        addMob.write(Types.INT, (int) (locZ * 32.0)); // Z
+        addMob.write(Types.BYTE, (byte) 0); // Yaw
+        addMob.write(Types.BYTE, (byte) 0); // Pitch
+        addMob.write(Types.BYTE, (byte) 0); // Head pitch
+        addMob.write(Types.SHORT, (short) 0); // Velocity x
+        addMob.write(Types.SHORT, (short) 0); // Velocity y
+        addMob.write(Types.SHORT, (short) 0); // Velocity z
+        addMob.write(Types1_7_6_10.ENTITY_DATA_LIST, new ArrayList<>()); // Entity data
 
-		addMob.send(Protocol1_8To1_7_6_10.class);
-	}
+        addMob.send(Protocol1_8To1_7_6_10.class);
+    }
 
-	public void sendEntityDataUpdate(final EntityPacketRewriter1_8 entityRewriter) {
-		if (entityIds == null) {
-			return;
-		}
-		final PacketWrapper setEntityData = PacketWrapper.create(ClientboundPackets1_7_2_5.SET_ENTITY_DATA, user);
+    protected void spawnEntitySquid(final int entityId, final int type, final double locX, final double locY, final double locZ) {
+        final PacketWrapper addMob = PacketWrapper.create(ClientboundPackets1_7_2_5.ADD_MOB, user);
 
-		if (currentState == State.ZOMBIE) {
-			writeZombieMeta(entityRewriter, setEntityData);
-		} else if (currentState == State.HOLOGRAM) {
-			writeHologramMeta(setEntityData);
-		} else {
-			return;
-		}
-		setEntityData.send(Protocol1_8To1_7_6_10.class);
-	}
+        addMob.write(Types.VAR_INT, entityId); // Entity id
+        addMob.write(Types.UNSIGNED_BYTE, (short) type); // Entity type
+        addMob.write(Types.INT, (int) (locX * 32.0)); // X
+        addMob.write(Types.INT, (int) (locY * 32.0)); // Y
+        addMob.write(Types.INT, (int) (locZ * 32.0)); // Z
+        addMob.write(Types.BYTE, (byte) 0); // Yaw
+        addMob.write(Types.BYTE, (byte) 0); // Pitch
+        addMob.write(Types.BYTE, (byte) 0); // Head pitch
+        addMob.write(Types.SHORT, (short) 0); // Velocity x
+        addMob.write(Types.SHORT, (short) 0); // Velocity y
+        addMob.write(Types.SHORT, (short) 0); // Velocity z
 
-	private void writeZombieMeta(final EntityPacketRewriter1_8 entityRewriter, PacketWrapper wrapper) {
-		wrapper.write(Types.INT, entityIds[0]);
+        final List<com.viaversion.viaversion.api.minecraft.entitydata.EntityData> entityData = new ArrayList<>();
+        entityData.add(new com.viaversion.viaversion.api.minecraft.entitydata.EntityData(0, EntityDataTypes1_8.BYTE, (byte) 0x20));
+        addMob.write(Types1_8.ENTITY_DATA_LIST, entityData);
 
-		// Filter entity data sent by the server and convert them together with our custom entity data
-		final List<EntityData> entityDataList = new ArrayList<>();
-		for (EntityData entityData : entityDataTracker) {
-			// Remove non existent entityData
-			if (entityData.id() < 0 || entityData.id() > 9) {
-				continue;
-			}
-			entityDataList.add(new EntityData(entityData.id(), entityData.dataType(), entityData.getValue()));
-		}
-		if (small) {
-			entityDataList.add(new EntityData(12, EntityDataTypes1_8.BYTE, (byte) 1));
-		}
+        addMob.send(Protocol1_8To1_7_6_10.class);
+    }
 
-		// Push entity data from the server through entity data conversion 1.7->1.8
-		for (EntityData entityData : entityDataList.toArray(new EntityData[0])) {
-			final EntityDataHandlerEvent event = new EntityDataHandlerEventImpl(wrapper.user(), new TrackedEntityImpl(EntityTypes1_8.EntityType.ZOMBIE), -1, entityData, entityDataList);
-			try {
-				entityRewriter.handleEntityData(event, entityData);
-			} catch (Exception e) {
-				entityDataList.remove(entityData);
-				break;
-			}
-			if (event.cancelled()) {
-				entityDataList.remove(entityData);
-				break;
-			}
-		}
-		wrapper.write(Types1_7_6_10.ENTITY_DATA_LIST, entityDataList);
-	}
+    public void sendEntityDataUpdate(final EntityPacketRewriter1_8 entityRewriter) {
+        if (entityIds == null) {
+            return;
+        }
+        final PacketWrapper setEntityData = PacketWrapper.create(ClientboundPackets1_7_2_5.SET_ENTITY_DATA, user);
 
-	private void writeHologramMeta(PacketWrapper wrapper) {
-		wrapper.write(Types.INT, entityIds[1]);
+        if (currentState == State.ZOMBIE) {
+            writeZombieMeta(entityRewriter, setEntityData);
+        } else if (currentState == State.HOLOGRAM) {
+            writeHologramMeta(setEntityData);
+        } else {
+            return;
+        }
+        setEntityData.send(Protocol1_8To1_7_6_10.class);
+    }
 
-		// Directly write 1.7 entity data here since we are making them up
-		final List<EntityData> entityDataList = new ArrayList<>();
-		entityDataList.add(new EntityData(EntityDataIndex1_7_6_10.ABSTRACT_AGEABLE_AGE.getIndex(), EntityDataTypes1_7_6_10.INT, -1700000));
-		entityDataList.add(new EntityData(EntityDataIndex1_7_6_10.LIVING_ENTITY_BASE_NAME_TAG.getIndex(), EntityDataTypes1_7_6_10.STRING, name));
-		entityDataList.add(new EntityData(EntityDataIndex1_7_6_10.LIVING_ENTITY_BASE_NAME_TAG_VISIBILITY.getIndex(), EntityDataTypes1_7_6_10.BYTE, (byte) 1));
+    private void writeZombieMeta(final EntityPacketRewriter1_8 entityRewriter, PacketWrapper wrapper) {
+        wrapper.write(Types.INT, entityIds[0]);
 
-		wrapper.write(Types1_7_6_10.ENTITY_DATA_LIST, entityDataList);
-	}
+        // Filter entity data sent by the server and convert them together with our custom entity data
+        final List<EntityData> entityDataList = new ArrayList<>();
+        for (EntityData entityData : entityDataTracker) {
+            // Remove non existent entityData
+            if (entityData.id() < 0 || entityData.id() > 9) {
+                continue;
+            }
+            entityDataList.add(new EntityData(entityData.id(), entityData.dataType(), entityData.getValue()));
+        }
+        if (small) {
+            entityDataList.add(new EntityData(12, EntityDataTypes1_8.BYTE, (byte) 1));
+        }
 
-	public void sendSpawnPacket(final EntityPacketRewriter1_8 entityRewriter) {
-		if (entityIds != null) {
-			deleteEntity();
-		}
-		if (currentState == State.ZOMBIE) {
-			spawnEntity(entityId, EntityTypes1_8.EntityType.ZOMBIE.getId(), locX, locY, locZ);
+        // Push entity data from the server through entity data conversion 1.7->1.8
+        for (EntityData entityData : entityDataList.toArray(new EntityData[0])) {
+            final EntityDataHandlerEvent event = new EntityDataHandlerEventImpl(wrapper.user(), new TrackedEntityImpl(EntityTypes1_8.EntityType.ZOMBIE), -1, entityData, entityDataList);
+            try {
+                entityRewriter.handleEntityData(event, entityData);
+            } catch (Exception e) {
+                entityDataList.remove(entityData);
+                break;
+            }
+            if (event.cancelled()) {
+                entityDataList.remove(entityData);
+                break;
+            }
+        }
+        wrapper.write(Types1_7_6_10.ENTITY_DATA_LIST, entityDataList);
+    }
 
-			entityIds = new int[]{entityId};
-		} else if (currentState == State.HOLOGRAM) {
-			final int[] entityIds = { entityId, additionalEntityId() };
+    private void writeHologramMeta(PacketWrapper wrapper) {
+        wrapper.write(Types.INT, entityIds[1]);
 
-			final PacketWrapper spawnSkull = PacketWrapper.create(ClientboundPackets1_7_2_5.ADD_ENTITY, user);
-			spawnSkull.write(Types.VAR_INT, entityIds[0]);
-			spawnSkull.write(Types.BYTE, (byte) 66);
-			spawnSkull.write(Types.INT, (int) (locX * 32.0));
-			spawnSkull.write(Types.INT, (int) (locY * 32.0));
-			spawnSkull.write(Types.INT, (int) (locZ * 32.0));
-			spawnSkull.write(Types.BYTE, (byte) 0);
-			spawnSkull.write(Types.BYTE, (byte) 0);
-			spawnSkull.write(Types.INT, 0);
-			spawnSkull.send(Protocol1_8To1_7_6_10.class);
+        // Directly write 1.7 entity data here since we are making them up
+        final List<EntityData> entityDataList = new ArrayList<>();
+        //entityDataList.add(new EntityData(EntityDataIndex1_7_6_10.ENTITY_FLAGS.getIndex(), EntityDataTypes1_7_6_10.BYTE, (byte) 2));
+        entityDataList.add(new EntityData(EntityDataIndex1_7_6_10.ABSTRACT_AGEABLE_AGE.getIndex(), EntityDataTypes1_7_6_10.INT, -1700000));
+        entityDataList.add(new EntityData(EntityDataIndex1_7_6_10.LIVING_ENTITY_BASE_NAME_TAG.getIndex(), EntityDataTypes1_7_6_10.STRING, name));
+        entityDataList.add(new EntityData(EntityDataIndex1_7_6_10.LIVING_ENTITY_BASE_NAME_TAG_VISIBILITY.getIndex(), EntityDataTypes1_7_6_10.BYTE, (byte) 1));
 
-			spawnEntity(entityIds[1], EntityTypes1_8.EntityType.HORSE.getId(), locX, locY, locZ); // Horse
 
-			this.entityIds = entityIds;
-		}
+        wrapper.write(Types1_7_6_10.ENTITY_DATA_LIST, entityDataList);
+    }
 
-		sendEntityDataUpdate(entityRewriter);
-		updateLocation(true);
-	}
+    public void sendSpawnPacket(final EntityPacketRewriter1_8 entityRewriter) {
+        if (entityIds != null) {
+            deleteEntity();
+        }
+        if (currentState == State.ZOMBIE) {
+            spawnEntity(entityId, EntityTypes1_8.EntityType.ZOMBIE.getId(), locX, locY, locZ);
 
-	public AABB getBoundingBox() {
-		final double width = this.small ? 0.25 : 0.5;
-		final double height = this.small ? 0.9875 : 1.975;
+            entityIds = new int[]{entityId};
+        } else if (currentState == State.HOLOGRAM) {
+            final int[] entityIds = { entityId, additionalEntityId() };
 
-		final Vector3d min = new Vector3d(this.locX - width / 2, this.locY, this.locZ - width / 2);
-		final Vector3d max = new Vector3d(this.locX + width / 2, this.locY + height, this.locZ + width / 2);
+            final PacketWrapper spawnSkull = PacketWrapper.create(ClientboundPackets1_7_2_5.ADD_ENTITY, user);
+            spawnSkull.write(Types.VAR_INT, entityIds[0]);
+            spawnSkull.write(Types.BYTE, (byte) 66);
+            spawnSkull.write(Types.INT, (int) (locX * 32.0));
+            spawnSkull.write(Types.INT, (int) (locY * 32.0));
+            spawnSkull.write(Types.INT, (int) (locZ * 32.0));
+            spawnSkull.write(Types.BYTE, (byte) 0);
+            spawnSkull.write(Types.BYTE, (byte) 0);
+            spawnSkull.write(Types.INT, 0);
+            spawnSkull.send(Protocol1_8To1_7_6_10.class);
 
-		return new AABB(min, max);
-	}
+            spawnEntitySquid(entityIds[0], EntityTypes1_8.EntityType.SQUID.getId(), locX, locY, locZ);
+            spawnEntity(entityIds[1], EntityTypes1_8.EntityType.HORSE.getId(), locX, locY, locZ); // Horse
 
-	private int additionalEntityId() {
-		return Integer.MAX_VALUE - 16000 - entityId;
-	}
+            this.entityIds = entityIds;
+        }
 
-	public void deleteEntity() {
-		if (entityIds == null) {
-			return;
-		}
-		final PacketWrapper despawn = PacketWrapper.create(ClientboundPackets1_7_2_5.REMOVE_ENTITIES, user);
-		despawn.write(Types.BYTE, (byte) entityIds.length);
-		for (int id : entityIds) {
-			despawn.write(Types.INT, id);
-		}
-		entityIds = null;
-		despawn.send(Protocol1_8To1_7_6_10.class);
-	}
+        sendEntityDataUpdate(entityRewriter);
+        updateLocation(true);
+    }
 
-	private enum State {
-		HOLOGRAM, ZOMBIE
-	}
+    public AABB getBoundingBox() {
+        final double width = this.small ? 0.25 : 0.5;
+        final double height = this.small ? 0.9875 : 1.975;
+
+        final Vector3d min = new Vector3d(this.locX - width / 2, this.locY, this.locZ - width / 2);
+        final Vector3d max = new Vector3d(this.locX + width / 2, this.locY + height, this.locZ + width / 2);
+
+        return new AABB(min, max);
+    }
+
+    private int additionalEntityId() {
+        return Integer.MAX_VALUE - 16000 - entityId;
+    }
+
+    public void deleteEntity() {
+        if (entityIds == null) {
+            return;
+        }
+        final PacketWrapper despawn = PacketWrapper.create(ClientboundPackets1_7_2_5.REMOVE_ENTITIES, user);
+        despawn.write(Types.BYTE, (byte) entityIds.length);
+        for (int id : entityIds) {
+            despawn.write(Types.INT, id);
+        }
+        entityIds = null;
+        despawn.send(Protocol1_8To1_7_6_10.class);
+    }
+
+    private enum State {
+        HOLOGRAM, ZOMBIE
+    }
 }
