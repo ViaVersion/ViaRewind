@@ -68,9 +68,8 @@ public class EntityTracker1_8 extends EntityTrackerBase {
     public void removeEntity(int entityId) {
         super.removeEntity(entityId);
 
-        if (holograms.containsKey(entityId)) {
-            VirtualHologramEntity hologram = holograms.get(entityId);
-
+        VirtualHologramEntity hologram = holograms.get(entityId);
+        if (hologram != null) {
             hologram.deleteEntity();
             holograms.remove(entityId);
         }

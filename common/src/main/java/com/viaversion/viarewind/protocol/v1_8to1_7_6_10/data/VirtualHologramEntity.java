@@ -182,7 +182,7 @@ public class VirtualHologramEntity {
         entityTeleport.send(Protocol1_8To1_7_6_10.class);
     }
 
-    protected void spawnEntity(final int entityId, final int type, final double locX, final double locY, final double locZ) {
+    protected void spawnEntity(final int entityId, final int type, final double locX, final double locY, final double locZ, List<EntityData> entityData) {
         final PacketWrapper addMob = PacketWrapper.create(ClientboundPackets1_7_2_5.ADD_MOB, user);
 
         addMob.write(Types.VAR_INT, entityId); // Entity id
@@ -196,29 +196,7 @@ public class VirtualHologramEntity {
         addMob.write(Types.SHORT, (short) 0); // Velocity x
         addMob.write(Types.SHORT, (short) 0); // Velocity y
         addMob.write(Types.SHORT, (short) 0); // Velocity z
-        addMob.write(Types1_7_6_10.ENTITY_DATA_LIST, new ArrayList<>()); // Entity data
-
-        addMob.send(Protocol1_8To1_7_6_10.class);
-    }
-
-    protected void spawnEntitySquid(final int entityId, final int type, final double locX, final double locY, final double locZ) {
-        final PacketWrapper addMob = PacketWrapper.create(ClientboundPackets1_7_2_5.ADD_MOB, user);
-
-        addMob.write(Types.VAR_INT, entityId); // Entity id
-        addMob.write(Types.UNSIGNED_BYTE, (short) type); // Entity type
-        addMob.write(Types.INT, (int) (locX * 32.0)); // X
-        addMob.write(Types.INT, (int) (locY * 32.0)); // Y
-        addMob.write(Types.INT, (int) (locZ * 32.0)); // Z
-        addMob.write(Types.BYTE, (byte) 0); // Yaw
-        addMob.write(Types.BYTE, (byte) 0); // Pitch
-        addMob.write(Types.BYTE, (byte) 0); // Head pitch
-        addMob.write(Types.SHORT, (short) 0); // Velocity x
-        addMob.write(Types.SHORT, (short) 0); // Velocity y
-        addMob.write(Types.SHORT, (short) 0); // Velocity z
-
-        final List<com.viaversion.viaversion.api.minecraft.entitydata.EntityData> entityData = new ArrayList<>();
-        entityData.add(new com.viaversion.viaversion.api.minecraft.entitydata.EntityData(0, EntityDataTypes1_8.BYTE, (byte) 0x20));
-        addMob.write(Types1_8.ENTITY_DATA_LIST, entityData);
+        addMob.write(Types1_7_6_10.ENTITY_DATA_LIST, entityData); // Entity data
 
         addMob.send(Protocol1_8To1_7_6_10.class);
     }
@@ -277,11 +255,9 @@ public class VirtualHologramEntity {
 
         // Directly write 1.7 entity data here since we are making them up
         final List<EntityData> entityDataList = new ArrayList<>();
-        //entityDataList.add(new EntityData(EntityDataIndex1_7_6_10.ENTITY_FLAGS.getIndex(), EntityDataTypes1_7_6_10.BYTE, (byte) 2));
         entityDataList.add(new EntityData(EntityDataIndex1_7_6_10.ABSTRACT_AGEABLE_AGE.getIndex(), EntityDataTypes1_7_6_10.INT, -1700000));
         entityDataList.add(new EntityData(EntityDataIndex1_7_6_10.LIVING_ENTITY_BASE_NAME_TAG.getIndex(), EntityDataTypes1_7_6_10.STRING, name));
         entityDataList.add(new EntityData(EntityDataIndex1_7_6_10.LIVING_ENTITY_BASE_NAME_TAG_VISIBILITY.getIndex(), EntityDataTypes1_7_6_10.BYTE, (byte) 1));
-
 
         wrapper.write(Types1_7_6_10.ENTITY_DATA_LIST, entityDataList);
     }
@@ -291,7 +267,7 @@ public class VirtualHologramEntity {
             deleteEntity();
         }
         if (currentState == State.ZOMBIE) {
-            spawnEntity(entityId, EntityTypes1_8.EntityType.ZOMBIE.getId(), locX, locY, locZ);
+            spawnEntity(entityId, EntityTypes1_8.EntityType.ZOMBIE.getId(), locX, locY, locZ, new ArrayList<>());
 
             entityIds = new int[]{entityId};
         } else if (currentState == State.HOLOGRAM) {
@@ -308,8 +284,11 @@ public class VirtualHologramEntity {
             spawnSkull.write(Types.INT, 0);
             spawnSkull.send(Protocol1_8To1_7_6_10.class);
 
-            spawnEntitySquid(entityIds[0], EntityTypes1_8.EntityType.SQUID.getId(), locX, locY, locZ);
-            spawnEntity(entityIds[1], EntityTypes1_8.EntityType.HORSE.getId(), locX, locY, locZ); // Horse
+            final List<EntityData> squidEntityData = new ArrayList<>();
+            squidEntityData.add(new EntityData(0, EntityDataTypes1_8.BYTE, (byte) 0x20));
+
+            spawnEntity(entityIds[0], EntityTypes1_8.EntityType.SQUID.getId(), locX, locY, locZ, squidEntityData); // Squid
+            spawnEntity(entityIds[1], EntityTypes1_8.EntityType.HORSE.getId(), locX, locY, locZ, new ArrayList<>()); // Horse
 
             this.entityIds = entityIds;
         }
