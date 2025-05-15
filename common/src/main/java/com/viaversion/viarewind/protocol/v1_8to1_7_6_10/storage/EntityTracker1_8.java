@@ -42,166 +42,172 @@ import java.util.logging.Level;
 
 public class EntityTracker1_8 extends EntityTrackerBase {
 
-	private final Int2ObjectMap<VirtualHologramEntity> holograms = new Int2ObjectArrayMap<>();
-	private final Int2IntMap vehicles = new Int2IntArrayMap();
-	private final Int2ObjectMap<UUID> entityIdToUUID = new Int2ObjectArrayMap<>();
-	private final Object2IntMap<UUID> entityUUIDToId = new Object2IntOpenHashMap<>();
+    private final Int2ObjectMap<VirtualHologramEntity> holograms = new Int2ObjectArrayMap<>();
+    private final Int2IntMap vehicles = new Int2IntArrayMap();
+    private final Int2ObjectMap<UUID> entityIdToUUID = new Int2ObjectArrayMap<>();
+    private final Object2IntMap<UUID> entityUUIDToId = new Object2IntOpenHashMap<>();
 
-	private final List<EntityData> entityData = new ArrayList<>();
+    private final List<EntityData> entityData = new ArrayList<>();
 
-	public Integer spectatingClientEntityId;
-	private int clientEntityGameMode;
+    public Integer spectatingClientEntityId;
+    private int clientEntityGameMode;
 
-	public EntityTracker1_8(UserConnection connection) {
-		super(connection, EntityTypes1_8.EntityType.PLAYER);
-	}
+    public EntityTracker1_8(UserConnection connection) {
+        super(connection, EntityTypes1_8.EntityType.PLAYER);
+    }
 
-	@Override
-	public void addEntity(int id, EntityType type) {
-		super.addEntity(id, type);
-		if (type == EntityTypes1_8.EntityType.ARMOR_STAND) {
-			holograms.put(id, new VirtualHologramEntity(user(), id));
-		}
-	}
+    @Override
+    public void addEntity(int id, EntityType type) {
+        super.addEntity(id, type);
+        if (type == EntityTypes1_8.EntityType.ARMOR_STAND) {
+            holograms.put(id, new VirtualHologramEntity(user(), id));
+        }
+    }
 
-	@Override
-	public void removeEntity(int entityId) {
-		super.removeEntity(entityId);
+    @Override
+    public void removeEntity(int entityId) {
+        super.removeEntity(entityId);
 
-		if (entityIdToUUID.containsKey(entityId)) {
-			final UUID playerId = entityIdToUUID.remove(entityId);
+        VirtualHologramEntity hologram = holograms.get(entityId);
+        if (hologram != null) {
+            hologram.deleteEntity();
+            holograms.remove(entityId);
+        }
 
-			entityUUIDToId.removeInt(playerId);
-			user().get(PlayerSessionStorage.class).getPlayerEquipment().remove(playerId);
-		}
-	}
+        if (entityIdToUUID.containsKey(entityId)) {
+            final UUID playerId = entityIdToUUID.remove(entityId);
 
-	@Override
-	public void clearEntities() {
-		super.clearEntities();
-		vehicles.clear();
-	}
+            entityUUIDToId.removeInt(playerId);
+            user().get(PlayerSessionStorage.class).getPlayerEquipment().remove(playerId);
+        }
+    }
 
-	@Override
-	public void setClientEntityId(int entityId) {
-		if (Objects.equals(this.spectatingClientEntityId, clientEntityIdOrNull())) {
-			this.spectatingClientEntityId = entityId;
-		}
-		super.setClientEntityId(entityId);
-	}
+    @Override
+    public void clearEntities() {
+        super.clearEntities();
+        vehicles.clear();
+    }
 
-	public Integer clientEntityIdOrNull() {
-		return this.hasClientEntityId() ? this.clientEntityId() : null;
-	}
+    @Override
+    public void setClientEntityId(int entityId) {
+        if (Objects.equals(this.spectatingClientEntityId, clientEntityIdOrNull())) {
+            this.spectatingClientEntityId = entityId;
+        }
+        super.setClientEntityId(entityId);
+    }
 
-	public void addPlayer(final int entityId, final UUID uuid) {
-		entityUUIDToId.put(uuid, entityId);
-		entityIdToUUID.put(entityId, uuid);
-	}
+    public Integer clientEntityIdOrNull() {
+        return this.hasClientEntityId() ? this.clientEntityId() : null;
+    }
 
-	public UUID getPlayerUUID(final int entityId) {
-		return entityIdToUUID.get(entityId);
-	}
+    public void addPlayer(final int entityId, final UUID uuid) {
+        entityUUIDToId.put(uuid, entityId);
+        entityIdToUUID.put(entityId, uuid);
+    }
 
-	public int getPlayerEntityId(final UUID uuid) {
-		return entityUUIDToId.getOrDefault(uuid, -1);
-	}
+    public UUID getPlayerUUID(final int entityId) {
+        return entityIdToUUID.get(entityId);
+    }
 
-	public int getVehicle(final int passengerId) {
-		for (Map.Entry<Integer, Integer> vehicle : vehicles.entrySet()) {
-			if (vehicle.getValue() == passengerId) {
-				return vehicle.getValue();
-			}
-		}
-		return -1;
-	}
+    public int getPlayerEntityId(final UUID uuid) {
+        return entityUUIDToId.getOrDefault(uuid, -1);
+    }
 
-	public int getPassenger(int vehicleId) {
-		return vehicles.getOrDefault(vehicleId, -1);
-	}
+    public int getVehicle(final int passengerId) {
+        for (Map.Entry<Integer, Integer> vehicle : vehicles.entrySet()) {
+            if (vehicle.getValue() == passengerId) {
+                return vehicle.getValue();
+            }
+        }
+        return -1;
+    }
 
-	protected void startSneaking() {
-		try {
-			final PacketWrapper entityAction = PacketWrapper.create(ServerboundPackets1_7_2_5.PLAYER_COMMAND, user());
-			entityAction.write(Types.VAR_INT, this.clientEntityId()); // Entity id
-			entityAction.write(Types.VAR_INT, 0); // Action id
-			entityAction.write(Types.VAR_INT, 0); // Jump boost
+    public int getPassenger(int vehicleId) {
+        return vehicles.getOrDefault(vehicleId, -1);
+    }
 
-			entityAction.sendToServer(Protocol1_8To1_7_6_10.class);
-		} catch (Exception e) {
-			ViaRewind.getPlatform().getLogger().log(Level.SEVERE, "Failed to send sneak packet", e);
-		}
-	}
+    protected void startSneaking() {
+        try {
+            final PacketWrapper entityAction = PacketWrapper.create(ServerboundPackets1_7_2_5.PLAYER_COMMAND, user());
+            entityAction.write(Types.VAR_INT, this.clientEntityId()); // Entity id
+            entityAction.write(Types.VAR_INT, 0); // Action id
+            entityAction.write(Types.VAR_INT, 0); // Jump boost
 
-	public void setPassenger(final int vehicleId, final int passengerId) {
-		if (vehicleId == this.spectatingClientEntityId && this.spectatingClientEntityId != this.clientEntityId()) {
-			startSneaking();
-			setSpectating(this.clientEntityId());
-		}
+            entityAction.sendToServer(Protocol1_8To1_7_6_10.class);
+        } catch (Exception e) {
+            ViaRewind.getPlatform().getLogger().log(Level.SEVERE, "Failed to send sneak packet", e);
+        }
+    }
 
-		if (vehicleId == -1) {
-			vehicles.remove(getVehicle(passengerId));
-		} else if (passengerId == -1) {
-			vehicles.remove(vehicleId);
-		} else {
-			vehicles.put(vehicleId, passengerId);
-		}
-	}
+    public void setPassenger(final int vehicleId, final int passengerId) {
+        if (vehicleId == this.spectatingClientEntityId && this.spectatingClientEntityId != this.clientEntityId()) {
+            startSneaking();
+            setSpectating(this.clientEntityId());
+        }
 
-	protected void attachEntity(final int target) {
-		try {
-			final PacketWrapper attachEntity = PacketWrapper.create(ClientboundPackets1_8.SET_ENTITY_LINK, user());
-			attachEntity.write(Types.INT, this.clientEntityId()); // vehicle id
-			attachEntity.write(Types.INT, target); // passenger id
-			attachEntity.write(Types.BOOLEAN, false); // leash
+        if (vehicleId == -1) {
+            vehicles.remove(getVehicle(passengerId));
+        } else if (passengerId == -1) {
+            vehicles.remove(vehicleId);
+        } else {
+            vehicles.put(vehicleId, passengerId);
+        }
+    }
 
-			attachEntity.scheduleSend(Protocol1_8To1_7_6_10.class);
-		} catch (Exception e) {
-			ViaRewind.getPlatform().getLogger().log(Level.SEVERE, "Failed to send attach packet", e);
-		}
-	}
+    protected void attachEntity(final int target) {
+        try {
+            final PacketWrapper attachEntity = PacketWrapper.create(ClientboundPackets1_8.SET_ENTITY_LINK, user());
+            attachEntity.write(Types.INT, this.clientEntityId()); // vehicle id
+            attachEntity.write(Types.INT, target); // passenger id
+            attachEntity.write(Types.BOOLEAN, false); // leash
 
-	public void setSpectating(int spectating) {
-		if (spectating != this.clientEntityId() && getPassenger(spectating) != -1) {
-			startSneaking();
-			setSpectating(this.clientEntityId());
-			return;
-		}
-		if (this.spectatingClientEntityId != spectating && this.spectatingClientEntityId != this.clientEntityId()) {
-			attachEntity(-1);
-		}
-		this.spectatingClientEntityId = spectating;
-		if (spectating != this.clientEntityId()) {
-			attachEntity(this.spectatingClientEntityId);
-		}
-	}
+            attachEntity.scheduleSend(Protocol1_8To1_7_6_10.class);
+        } catch (Exception e) {
+            ViaRewind.getPlatform().getLogger().log(Level.SEVERE, "Failed to send attach packet", e);
+        }
+    }
 
-	public Int2ObjectMap<VirtualHologramEntity> getHolograms() {
-		return holograms;
-	}
+    public void setSpectating(int spectating) {
+        if (spectating != this.clientEntityId() && getPassenger(spectating) != -1) {
+            startSneaking();
+            setSpectating(this.clientEntityId());
+            return;
+        }
+        if (this.spectatingClientEntityId != spectating && this.spectatingClientEntityId != this.clientEntityId()) {
+            attachEntity(-1);
+        }
+        this.spectatingClientEntityId = spectating;
+        if (spectating != this.clientEntityId()) {
+            attachEntity(this.spectatingClientEntityId);
+        }
+    }
 
-	public boolean isSpectator() {
-		return clientEntityGameMode == 3;
-	}
+    public Int2ObjectMap<VirtualHologramEntity> getHolograms() {
+        return holograms;
+    }
 
-	public void setClientEntityGameMode(int clientEntityGameMode) {
-		this.clientEntityGameMode = clientEntityGameMode;
-	}
+    public boolean isSpectator() {
+        return clientEntityGameMode == 3;
+    }
 
-	public void updateEntityData(List<EntityData> entityData) {
-		this.entityData.removeIf(first -> entityData.stream().anyMatch(second -> first.id() == second.id()));
-		for (final EntityData data : entityData) {
-			final Object value = data.value();
-			if (value instanceof Item item) {
-				this.entityData.add(new EntityData(data.id(), data.dataType(), item.copy()));
-			} else {
-				this.entityData.add(new EntityData(data.id(), data.dataType(), value));
-			}
-		}
-	}
+    public void setClientEntityGameMode(int clientEntityGameMode) {
+        this.clientEntityGameMode = clientEntityGameMode;
+    }
 
-	public List<EntityData> getEntityData() {
-		return entityData;
-	}
+    public void updateEntityData(List<EntityData> entityData) {
+        this.entityData.removeIf(first -> entityData.stream().anyMatch(second -> first.id() == second.id()));
+        for (final EntityData data : entityData) {
+            final Object value = data.value();
+            if (value instanceof Item item) {
+                this.entityData.add(new EntityData(data.id(), data.dataType(), item.copy()));
+            } else {
+                this.entityData.add(new EntityData(data.id(), data.dataType(), value));
+            }
+        }
+    }
+
+    public List<EntityData> getEntityData() {
+        return entityData;
+    }
 
 }
