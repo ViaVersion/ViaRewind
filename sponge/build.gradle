@@ -1,9 +1,0 @@
-plugins {
-    id "vr.platform-conventions"
-}
-
-processResources {
-    filesMatching("META-INF/sponge_plugins.json") {
-        expand("version": project.version, "description": project.description)
-    }
-}

@@ -1,7 +1,0 @@
-plugins {
-    id "vr.base-conventions"
-}
-
-dependencies {
-    compileOnly project(":viarewind-common")
-}
