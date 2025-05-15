@@ -68,7 +68,7 @@ public class EntityTracker1_8 extends EntityTrackerBase {
     public void removeEntity(int entityId) {
         super.removeEntity(entityId);
 
-        VirtualHologramEntity hologram = holograms.get(entityId);
+        final VirtualHologramEntity hologram = holograms.get(entityId);
         if (hologram != null) {
             hologram.deleteEntity();
             holograms.remove(entityId);
@@ -114,7 +114,7 @@ public class EntityTracker1_8 extends EntityTrackerBase {
     }
 
     public int getVehicle(final int passengerId) {
-        for (Map.Entry<Integer, Integer> vehicle : vehicles.entrySet()) {
+        for (Map.Entry<Integer, Integer> vehicle : vehicles.int2IntEntrySet()) {
             if (vehicle.getValue() == passengerId) {
                 return vehicle.getValue();
             }

@@ -17,34 +17,30 @@
  */
 package com.viaversion.viarewind.protocol.v1_8to1_7_6_10.data;
 
+import com.viaversion.viarewind.api.minecraft.entitydata.EntityDataTypes1_7_6_10;
+import com.viaversion.viarewind.api.minecraft.math.AABB;
+import com.viaversion.viarewind.api.minecraft.math.Vector3d;
 import com.viaversion.viarewind.api.type.version.Types1_7_6_10;
 import com.viaversion.viarewind.protocol.v1_7_6_10to1_7_2_5.packet.ClientboundPackets1_7_2_5;
 import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.Protocol1_8To1_7_6_10;
-import com.viaversion.viarewind.api.minecraft.entitydata.EntityDataTypes1_7_6_10;
 import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.rewriter.EntityPacketRewriter1_8;
-import com.viaversion.viarewind.api.minecraft.math.AABB;
-import com.viaversion.viarewind.api.minecraft.math.Vector3d;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_8;
 import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
 import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes1_8;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Types;
-import com.viaversion.viaversion.api.type.types.version.Types1_8;
 import com.viaversion.viaversion.data.entity.TrackedEntityImpl;
 import com.viaversion.viaversion.rewriter.entitydata.EntityDataHandlerEvent;
 import com.viaversion.viaversion.rewriter.entitydata.EntityDataHandlerEventImpl;
-
 import java.util.ArrayList;
 import java.util.List;
 
 public class VirtualHologramEntity {
     private final List<EntityData> entityDataTracker = new ArrayList<>();
-    private double locX, locY, locZ;
-
     private final UserConnection user;
     private final int entityId;
-
+    private double locX, locY, locZ;
     private int[] entityIds = null;
     private State currentState = null;
     private String name = null;
@@ -182,7 +178,7 @@ public class VirtualHologramEntity {
         entityTeleport.send(Protocol1_8To1_7_6_10.class);
     }
 
-    protected void spawnEntity(final int entityId, final int type, final double locX, final double locY, final double locZ, List<EntityData> entityData) {
+    protected void spawnEntity(final int entityId, final int type, final double locX, final double locY, final double locZ, final List<EntityData> entityData) {
         final PacketWrapper addMob = PacketWrapper.create(ClientboundPackets1_7_2_5.ADD_MOB, user);
 
         addMob.write(Types.VAR_INT, entityId); // Entity id
@@ -217,7 +213,7 @@ public class VirtualHologramEntity {
         setEntityData.send(Protocol1_8To1_7_6_10.class);
     }
 
-    private void writeZombieMeta(final EntityPacketRewriter1_8 entityRewriter, PacketWrapper wrapper) {
+    private void writeZombieMeta(final EntityPacketRewriter1_8 entityRewriter, final PacketWrapper wrapper) {
         wrapper.write(Types.INT, entityIds[0]);
 
         // Filter entity data sent by the server and convert them together with our custom entity data
@@ -271,7 +267,7 @@ public class VirtualHologramEntity {
 
             entityIds = new int[]{entityId};
         } else if (currentState == State.HOLOGRAM) {
-            final int[] entityIds = { entityId, additionalEntityId() };
+            final int[] entityIds = {entityId, additionalEntityId()};
 
             final PacketWrapper spawnSkull = PacketWrapper.create(ClientboundPackets1_7_2_5.ADD_ENTITY, user);
             spawnSkull.write(Types.VAR_INT, entityIds[0]);
@@ -285,10 +281,10 @@ public class VirtualHologramEntity {
             spawnSkull.send(Protocol1_8To1_7_6_10.class);
 
             final List<EntityData> squidEntityData = new ArrayList<>();
-            squidEntityData.add(new EntityData(0, EntityDataTypes1_8.BYTE, (byte) 0x20));
+            squidEntityData.add(new EntityData(0, EntityDataTypes1_8.BYTE, (byte) 32));
 
-            spawnEntity(entityIds[0], EntityTypes1_8.EntityType.SQUID.getId(), locX, locY, locZ, squidEntityData); // Squid
-            spawnEntity(entityIds[1], EntityTypes1_8.EntityType.HORSE.getId(), locX, locY, locZ, new ArrayList<>()); // Horse
+            spawnEntity(entityIds[0], EntityTypes1_8.EntityType.SQUID.getId(), locX, locY, locZ, squidEntityData);
+            spawnEntity(entityIds[1], EntityTypes1_8.EntityType.HORSE.getId(), locX, locY, locZ, new ArrayList<>());
 
             this.entityIds = entityIds;
         }
