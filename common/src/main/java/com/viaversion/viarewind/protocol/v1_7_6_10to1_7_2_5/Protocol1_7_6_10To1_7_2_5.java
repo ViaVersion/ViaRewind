@@ -17,7 +17,7 @@
  */
 package com.viaversion.viarewind.protocol.v1_7_6_10to1_7_2_5;
 
-import com.viaversion.viarewind.api.type.version.Types1_7_6_10;
+import com.viaversion.viarewind.api.type.RewindTypes;
 import com.viaversion.viarewind.protocol.v1_7_6_10to1_7_2_5.packet.ClientboundPackets1_7_2_5;
 import com.viaversion.viarewind.protocol.v1_7_6_10to1_7_2_5.packet.ServerboundPackets1_7_2_5;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
@@ -75,7 +75,7 @@ public class Protocol1_7_6_10To1_7_2_5 extends AbstractProtocol<ClientboundPacke
 				map(Types.BYTE); // Yaw
 				map(Types.BYTE); // Pitch
 				map(Types.SHORT); // Item in hand
-				map(Types1_7_6_10.ENTITY_DATA_LIST); // Entity data
+				map(RewindTypes.ENTITY_DATA_LIST1_7); // Entity data
 			}
 		});
 

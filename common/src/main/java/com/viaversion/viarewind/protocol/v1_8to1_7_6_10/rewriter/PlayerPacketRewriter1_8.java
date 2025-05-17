@@ -18,7 +18,6 @@
 package com.viaversion.viarewind.protocol.v1_8to1_7_6_10.rewriter;
 
 import com.viaversion.viarewind.ViaRewind;
-import com.viaversion.viarewind.api.type.version.Types1_7_6_10;
 import com.viaversion.viarewind.protocol.v1_7_6_10to1_7_2_5.packet.ClientboundPackets1_7_2_5;
 import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.Protocol1_8To1_7_6_10;
 import com.viaversion.viarewind.protocol.v1_7_6_10to1_7_2_5.packet.ServerboundPackets1_7_2_5;
@@ -124,7 +123,7 @@ public class PlayerPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6_10>
 					// 1.8 clients do keep entity data after respawn, 1.7 clients don't
 					final PacketWrapper setEntityData = PacketWrapper.create(ClientboundPackets1_7_2_5.SET_ENTITY_DATA, wrapper.user());
 					setEntityData.write(Types.INT, tracker.clientEntityId());
-					setEntityData.write(Types1_7_6_10.ENTITY_DATA_LIST, tracker.getEntityData());
+					setEntityData.write(RewindTypes.ENTITY_DATA_LIST1_7, tracker.getEntityData());
 					setEntityData.send(Protocol1_8To1_7_6_10.class);
 				});
 			}

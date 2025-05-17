@@ -30,7 +30,6 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.rewriter.RewriterBase;
 import com.viaversion.viaversion.api.type.Types;
-import com.viaversion.viaversion.api.type.types.version.Types1_8;
 import com.viaversion.viaversion.libs.gson.JsonElement;
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.ListTag;
@@ -470,7 +469,7 @@ public class PlayerPacketRewriter1_9 extends RewriterBase<Protocol1_9To1_8> {
 					final List<EntityData> entityData = new ArrayList<>();
 					entityData.add(new EntityData(10, EntityDataTypes1_8.BYTE, (byte) flags));
 
-					updateSkin.write(Types1_8.ENTITY_DATA_LIST, entityData);
+					updateSkin.write(Types.ENTITY_DATA_LIST1_8, entityData);
 					updateSkin.scheduleSend(Protocol1_9To1_8.class);
 				});
 			}

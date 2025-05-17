@@ -20,7 +20,7 @@ package com.viaversion.viarewind.protocol.v1_8to1_7_6_10.data;
 import com.viaversion.viarewind.api.minecraft.entitydata.EntityDataTypes1_7_6_10;
 import com.viaversion.viarewind.api.minecraft.math.AABB;
 import com.viaversion.viarewind.api.minecraft.math.Vector3d;
-import com.viaversion.viarewind.api.type.version.Types1_7_6_10;
+import com.viaversion.viarewind.api.type.RewindTypes;
 import com.viaversion.viarewind.protocol.v1_7_6_10to1_7_2_5.packet.ClientboundPackets1_7_2_5;
 import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.Protocol1_8To1_7_6_10;
 import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.rewriter.EntityPacketRewriter1_8;
@@ -192,7 +192,7 @@ public class VirtualHologramEntity {
         addMob.write(Types.SHORT, (short) 0); // Velocity x
         addMob.write(Types.SHORT, (short) 0); // Velocity y
         addMob.write(Types.SHORT, (short) 0); // Velocity z
-        addMob.write(Types1_7_6_10.ENTITY_DATA_LIST, entityData); // Entity data
+        addMob.write(RewindTypes.ENTITY_DATA_LIST1_7, entityData); // Entity data
 
         addMob.send(Protocol1_8To1_7_6_10.class);
     }
@@ -243,7 +243,7 @@ public class VirtualHologramEntity {
                 break;
             }
         }
-        wrapper.write(Types1_7_6_10.ENTITY_DATA_LIST, entityDataList);
+        wrapper.write(RewindTypes.ENTITY_DATA_LIST1_7, entityDataList);
     }
 
     private void writeHologramMeta(PacketWrapper wrapper) {
@@ -255,7 +255,7 @@ public class VirtualHologramEntity {
         entityDataList.add(new EntityData(EntityDataIndex1_7_6_10.LIVING_ENTITY_BASE_NAME_TAG.getIndex(), EntityDataTypes1_7_6_10.STRING, name));
         entityDataList.add(new EntityData(EntityDataIndex1_7_6_10.LIVING_ENTITY_BASE_NAME_TAG_VISIBILITY.getIndex(), EntityDataTypes1_7_6_10.BYTE, (byte) 1));
 
-        wrapper.write(Types1_7_6_10.ENTITY_DATA_LIST, entityDataList);
+        wrapper.write(RewindTypes.ENTITY_DATA_LIST1_7, entityDataList);
     }
 
     public void sendSpawnPacket(final EntityPacketRewriter1_8 entityRewriter) {

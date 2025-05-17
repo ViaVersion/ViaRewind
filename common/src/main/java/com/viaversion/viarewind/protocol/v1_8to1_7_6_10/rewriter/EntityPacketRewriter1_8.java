@@ -23,7 +23,6 @@ import com.viaversion.viarewind.ViaRewind;
 import com.viaversion.viarewind.api.rewriter.VREntityRewriter;
 import com.viaversion.viarewind.api.type.RewindTypes;
 import com.viaversion.viarewind.api.minecraft.entitydata.EntityDataTypes1_7_6_10;
-import com.viaversion.viarewind.api.type.version.Types1_7_6_10;
 import com.viaversion.viarewind.protocol.v1_7_6_10to1_7_2_5.packet.ClientboundPackets1_7_2_5;
 import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.Protocol1_8To1_7_6_10;
 import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.data.EntityDataIndex1_7_6_10;
@@ -41,7 +40,6 @@ import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes1
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Types;
-import com.viaversion.viaversion.api.type.types.version.Types1_8;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_8;
 import com.viaversion.viaversion.rewriter.entitydata.EntityDataHandlerEvent;
 import com.viaversion.viaversion.util.IdAndData;
@@ -108,11 +106,11 @@ public class EntityPacketRewriter1_8 extends VREntityRewriter<ClientboundPackets
 			@Override
 			public void register() {
 				map(Types.VAR_INT, Types.INT); // Entity id
-				map(Types1_8.ENTITY_DATA_LIST, Types1_7_6_10.ENTITY_DATA_LIST); // Entity data
+				map(Types.ENTITY_DATA_LIST1_8, RewindTypes.ENTITY_DATA_LIST1_7); // Entity data
 				handler(wrapper -> {
 					final EntityTracker1_8 tracker = tracker(wrapper.user());
 					final int entityId = wrapper.get(Types.INT, 0);
-					final List<EntityData> entityData = wrapper.get(Types1_7_6_10.ENTITY_DATA_LIST, 0);
+					final List<EntityData> entityData = wrapper.get(RewindTypes.ENTITY_DATA_LIST1_7, 0);
 					if (tracker.getHolograms().containsKey(entityId)) {
 						wrapper.cancel();
 						tracker.getHolograms().get(entityId).syncState(EntityPacketRewriter1_8.this, entityData);
@@ -258,7 +256,7 @@ public class EntityPacketRewriter1_8 extends VREntityRewriter<ClientboundPackets
 				map(Types.SHORT); // Velocity x
 				map(Types.SHORT); // Velocity y
 				map(Types.SHORT); // Velocity z
-				map(Types1_8.ENTITY_DATA_LIST, Types1_7_6_10.ENTITY_DATA_LIST); // Entity data
+				map(Types.ENTITY_DATA_LIST1_8, RewindTypes.ENTITY_DATA_LIST1_7); // Entity data
 
 				handler(getTrackerHandler(Types.UNSIGNED_BYTE, 0));
 
@@ -284,10 +282,10 @@ public class EntityPacketRewriter1_8 extends VREntityRewriter<ClientboundPackets
 						hologram.setPosition(x / 32.0, y / 32.0, z / 32.0);
 						hologram.setRotation(yaw * 360f / 256, pitch * 360f / 256);
 						hologram.setHeadYaw(headYaw * 360f / 256);
-						hologram.syncState(protocol().getEntityRewriter(), wrapper.get(Types1_7_6_10.ENTITY_DATA_LIST, 0));
+						hologram.syncState(protocol().getEntityRewriter(), wrapper.get(RewindTypes.ENTITY_DATA_LIST1_7, 0));
 					}
 				});
-				handler(getMobSpawnRewriter(Types1_7_6_10.ENTITY_DATA_LIST));
+				handler(getMobSpawnRewriter(RewindTypes.ENTITY_DATA_LIST1_7));
 			}
 		});
 		protocol.registerClientbound(ClientboundPackets1_8.ADD_PLAYER, new PacketHandlers() {
@@ -337,9 +335,9 @@ public class EntityPacketRewriter1_8 extends VREntityRewriter<ClientboundPackets
 				map(Types.BYTE); // Yaw
 				map(Types.BYTE); // Pitch
 				map(Types.SHORT); // Current item
-				map(Types1_8.ENTITY_DATA_LIST, Types1_7_6_10.ENTITY_DATA_LIST); // Entity data
+				map(Types.ENTITY_DATA_LIST1_8, RewindTypes.ENTITY_DATA_LIST1_7); // Entity data
 
-				handler(getTrackerAndDataHandler(Types1_7_6_10.ENTITY_DATA_LIST, EntityTypes1_8.EntityType.PLAYER));
+				handler(getTrackerAndDataHandler(RewindTypes.ENTITY_DATA_LIST1_7, EntityTypes1_8.EntityType.PLAYER));
 			}
 		});
 		protocol.registerClientbound(ClientboundPackets1_8.SET_EQUIPPED_ITEM, new PacketHandlers() {

@@ -28,7 +28,6 @@ import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
 import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes1_8;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Types;
-import com.viaversion.viaversion.api.type.types.version.Types1_8;
 
 import java.util.*;
 
@@ -204,7 +203,7 @@ public class WitherBossBar implements BossBar {
 		entityData.add(new EntityData(3, EntityDataTypes1_8.BYTE, (byte) 1));
 		entityData.add(new EntityData(6, EntityDataTypes1_8.FLOAT, health * 300f));
 
-		addMob.write(Types1_8.ENTITY_DATA_LIST, entityData);
+		addMob.write(Types.ENTITY_DATA_LIST1_8, entityData);
 		addMob.scheduleSend(Protocol1_9To1_8.class);
 	}
 
@@ -228,7 +227,7 @@ public class WitherBossBar implements BossBar {
 		entityData.add(new EntityData(2, EntityDataTypes1_8.STRING, title));
 		entityData.add(new EntityData(6, EntityDataTypes1_8.FLOAT, health * 300f));
 
-		setEntityData.write(Types1_8.ENTITY_DATA_LIST, entityData);
+		setEntityData.write(Types.ENTITY_DATA_LIST1_8, entityData);
 		setEntityData.scheduleSend(Protocol1_9To1_8.class);
 	}
 

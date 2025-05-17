@@ -47,4 +47,7 @@ public class RewindTypes {
 	public static final Type<Item> COMPRESSED_NBT_ITEM = new ItemType();
 	public static final Type<Item[]> COMPRESSED_NBT_ITEM_ARRAY = new ItemArrayType();
 
+    public static final Type<EntityData> ENTITY_DATA1_7 = new EntityDataType();
+    public static final Type<List<EntityData>> ENTITY_DATA_LIST1_7 = new EntityDataListType(ENTITY_DATA1_7);
+
 }

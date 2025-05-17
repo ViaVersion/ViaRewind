@@ -36,8 +36,6 @@ import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes1
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Types;
-import com.viaversion.viaversion.api.type.types.version.Types1_8;
-import com.viaversion.viaversion.api.type.types.version.Types1_9;
 import com.viaversion.viaversion.libs.fastutil.ints.IntArrayList;
 import com.viaversion.viaversion.libs.fastutil.ints.IntList;
 import com.viaversion.viaversion.protocols.v1_8to1_9.data.EntityDataIndex1_9;
@@ -71,10 +69,10 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
 				wrapper.cancel();
 				return;
 			}
-			final List<EntityData> entityData = wrapper.read(Types1_9.ENTITY_DATA_LIST);
+			final List<EntityData> entityData = wrapper.read(Types.ENTITY_DATA_LIST1_9);
 			handleEntityData(entityId, entityData, wrapper.user());
 
-			wrapper.write(Types1_8.ENTITY_DATA_LIST, entityData);
+			wrapper.write(Types.ENTITY_DATA_LIST1_8, entityData);
 		});
 
 		protocol.registerClientbound(ClientboundPackets1_9.ADD_ENTITY, new PacketHandlers() {
@@ -193,10 +191,10 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
 				map(Types.SHORT); // Velocity x
 				map(Types.SHORT); // Velocity y
 				map(Types.SHORT); // Velocity z
-				map(Types1_9.ENTITY_DATA_LIST, Types1_8.ENTITY_DATA_LIST); // Entity data
+				map(Types.ENTITY_DATA_LIST1_9, Types.ENTITY_DATA_LIST1_8); // Entity data
 
 				handler(getTrackerHandler(Types.UNSIGNED_BYTE, 0));
-				handler(getMobSpawnRewriter(Types1_8.ENTITY_DATA_LIST));
+				handler(getMobSpawnRewriter(Types.ENTITY_DATA_LIST1_8));
 			}
 		});
 
@@ -226,9 +224,9 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
 				map(Types.BYTE); // Yaw
 				map(Types.BYTE); // Pitch
 				create(Types.SHORT, (short) 0); // Current item
-				map(Types1_9.ENTITY_DATA_LIST, Types1_8.ENTITY_DATA_LIST); // Entity data
+				map(Types.ENTITY_DATA_LIST1_9, Types.ENTITY_DATA_LIST1_8); // Entity data
 
-				handler(getTrackerAndDataHandler(Types1_8.ENTITY_DATA_LIST, EntityTypes1_9.EntityType.PLAYER));
+				handler(getTrackerAndDataHandler(Types.ENTITY_DATA_LIST1_8, EntityTypes1_9.EntityType.PLAYER));
 			}
 		});
 
