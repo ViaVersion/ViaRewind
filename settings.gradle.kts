@@ -7,7 +7,7 @@ pluginManagement {
     plugins {
         id("de.florianmichael.baseproject.BaseProject") version "1.0.4"
         id("io.papermc.hangar-publish-plugin") version "0.1.3"
-        id("net.raphimc.class-token-replacer") version "1.1.5"
+        id("net.raphimc.class-token-replacer") version "1.1.6"
         id("com.modrinth.minotaur") version "2.+"
     }
 }

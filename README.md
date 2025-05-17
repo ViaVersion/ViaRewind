@@ -3,7 +3,7 @@
 [![Build Status](https://github.com/ViaVersion/ViaRewind/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/ViaVersion/ViaRewind/actions)
 [![Discord](https://img.shields.io/badge/chat-on%20discord-blue.svg)](https://viaversion.com/discord)
 
-**ViaBackwards addon to allow 1.8.x and 1.7.x clients on newer server versions.** <br>
+**ViaVersion addon to allow 1.8.x and 1.7.x clients on newer server versions.** <br>
 Runs on 1.9-latest servers or 1.8 clients and lower.
 
 **You can override the included version in [ViaFabric](https://modrinth.com/mod/viafabric) or [ViaProxy](https://github.com/ViaVersion/ViaProxy):**

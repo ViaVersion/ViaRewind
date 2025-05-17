@@ -17,6 +17,8 @@ dependencies {
 
 sourceSets.configureEach {
     classTokenReplacer {
+        replaceInPlace.set(true)
+
         property("\${version}", project.version)
         property("\${impl_version}", "git-ViaRewind-${project.version}:${latestCommitHash()}")
     }
