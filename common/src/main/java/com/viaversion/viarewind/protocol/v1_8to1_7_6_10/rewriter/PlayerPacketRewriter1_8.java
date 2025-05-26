@@ -30,6 +30,7 @@ import com.viaversion.viarewind.api.minecraft.math.Ray3d;
 import com.viaversion.viarewind.api.minecraft.math.RayTracing;
 import com.viaversion.viarewind.api.minecraft.math.Vector3d;
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.minecraft.GameProfile;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
@@ -240,13 +241,10 @@ public class PlayerPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6_10>
 					GameProfileStorage.GameProfile gameProfile = gameProfileStorage.get(uuid);
 					if (gameProfile == null) gameProfile = gameProfileStorage.put(uuid, name);
 
-					int propertyCount = wrapper.read(Types.VAR_INT);
-					while (propertyCount-- > 0) {
-						String propertyName = wrapper.read(Types.STRING);
-						String propertyValue = wrapper.read(Types.STRING);
-						String propertySignature = wrapper.read(Types.OPTIONAL_STRING);
-						gameProfile.properties.add(new GameProfileStorage.Property(propertyName, propertyValue, propertySignature));
-					}
+                    GameProfile.Property[] properties = wrapper.read(Types.PROFILE_PROPERTY_ARRAY);
+                    for (GameProfile.Property property : properties) {
+                        gameProfile.properties.add(new GameProfileStorage.Property(property.name(), property.value(), property.signature()));
+                    }
 
 					int gamemode = wrapper.read(Types.VAR_INT);
 					int ping = wrapper.read(Types.VAR_INT);
