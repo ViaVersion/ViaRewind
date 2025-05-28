@@ -354,7 +354,7 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
 					final int entityId = wrapper.get(Types.VAR_INT, 0);
 					final EntityType type = wrapper.user().getEntityTracker(Protocol1_9To1_8.class).entityType(entityId);
 					if (type == EntityTypes1_9.EntityType.BOAT) {
-						byte yaw = wrapper.get(Types.BYTE, 1);
+						byte yaw = wrapper.get(Types.BYTE, 0);
 						yaw -= 64;
 						wrapper.set(Types.BYTE, 0, yaw);
 						int y = wrapper.get(Types.INT, 1);
@@ -433,6 +433,15 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
 				attach.write(Types.INT, holdingEntityId);
 				attach.write(Types.BOOLEAN, false); // Leash
 				attach.scheduleSend(Protocol1_9To1_8.class);
+
+				// Fix movement when the client is riding a boat.
+				if (tracker.clientEntityId() == attachedEntityId && tracker.entityType(holdingEntityId) == EntityTypes1_9.EntityType.BOAT) {
+					final PacketWrapper fakeAttach = PacketWrapper.create(ClientboundPackets1_8.SET_ENTITY_LINK, wrapper.user());
+					fakeAttach.write(Types.INT, -1);
+					fakeAttach.write(Types.INT, holdingEntityId);
+					fakeAttach.write(Types.BOOLEAN, false);
+					fakeAttach.scheduleSend(Protocol1_9To1_8.class);
+				}
 			}
 		});
 
@@ -451,7 +460,7 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
 
 					final EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
 					if (tracker.entityType(entityId) == EntityTypes1_9.EntityType.BOAT) {
-						byte yaw = wrapper.get(Types.BYTE, 1);
+						byte yaw = wrapper.get(Types.BYTE, 0);
 						yaw -= 64;
 						wrapper.set(Types.BYTE, 0, yaw);
 
