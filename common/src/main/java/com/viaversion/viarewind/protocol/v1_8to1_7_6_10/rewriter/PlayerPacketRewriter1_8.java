@@ -654,10 +654,10 @@ public class PlayerPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6_10>
 				handler(wrapper -> {
 					final boolean jump = wrapper.read(Types.BOOLEAN);
 					final boolean unmount = wrapper.read(Types.BOOLEAN);
-					short flags = 0;
+					byte flags = 0;
 					if (jump) flags += 0x01;
 					if (unmount) flags += 0x02;
-					wrapper.write(Types.UNSIGNED_BYTE, flags);
+					wrapper.write(Types.BYTE, flags);
 
 					if (!unmount) {
 						return;
