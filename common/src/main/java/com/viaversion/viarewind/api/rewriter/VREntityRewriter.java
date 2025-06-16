@@ -26,7 +26,6 @@ import com.viaversion.viaversion.api.minecraft.entitydata.EntityDataType;
 import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes1_8;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
-import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 
@@ -38,19 +37,6 @@ public abstract class VREntityRewriter<C extends ClientboundPacketType, T extend
 
 	public VREntityRewriter(T protocol, EntityDataType displayType, EntityDataType displayVisibilityType) {
 		super(protocol, displayType, displayVisibilityType);
-	}
-
-	protected void registerJoinGame1_8(final C packetType) {
-		protocol.registerClientbound(packetType, new PacketHandlers() {
-			@Override
-			protected void register() {
-				map(Types.INT); // Entity id
-				map(Types.UNSIGNED_BYTE); // Game mode
-				map(Types.BYTE); // Dimension
-				handler(playerTrackerHandler());
-				handler(getDimensionHandler());
-			}
-		});
 	}
 
 	protected void removeEntities(final UserConnection connection, final int[] entities) {

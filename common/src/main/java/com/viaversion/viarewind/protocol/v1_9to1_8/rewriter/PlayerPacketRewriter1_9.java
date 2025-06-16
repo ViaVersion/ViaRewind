@@ -21,6 +21,7 @@ import com.viaversion.viarewind.ViaRewind;
 import com.viaversion.viarewind.protocol.v1_9to1_8.Protocol1_9To1_8;
 import com.viaversion.viarewind.protocol.v1_9to1_8.storage.*;
 import com.viaversion.viarewind.utils.ChatUtil;
+import com.viaversion.viaversion.api.data.entity.EntityTracker;
 import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_9;
 import com.viaversion.viaversion.api.minecraft.item.Item;
@@ -175,7 +176,8 @@ public class PlayerPacketRewriter1_9 extends RewriterBase<Protocol1_9To1_8> {
 					final int dimension = wrapper.get(Types.INT, 0);
 
 					if (world.setEnvironment(dimension)) {
-						protocol.getEntityRewriter().clearEntities(wrapper.user());
+                        final EntityTracker tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
+                        tracker.clearEntities();
 						wrapper.user().get(BossBarStorage.class).reset();
 					}
 				});

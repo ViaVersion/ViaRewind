@@ -26,6 +26,7 @@ import com.viaversion.viarewind.protocol.v1_9to1_8.storage.EntityTracker1_9;
 import com.viaversion.viarewind.protocol.v1_9to1_8.storage.LevitationStorage;
 import com.viaversion.viarewind.protocol.v1_9to1_8.storage.PlayerPositionTracker;
 import com.viaversion.viaversion.api.minecraft.BlockPosition;
+import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.minecraft.EulerAngle;
 import com.viaversion.viaversion.api.minecraft.Vector;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
@@ -60,9 +61,17 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
 
 	@Override
 	protected void registerPackets() {
-		registerJoinGame1_8(ClientboundPackets1_9.LOGIN);
 		registerRemoveEntities(ClientboundPackets1_9.REMOVE_ENTITIES);
 
+        protocol.registerClientbound(ClientboundPackets1_9.LOGIN, wrapper -> {
+            final int entityId = wrapper.passthrough(Types.INT);
+            wrapper.passthrough(Types.UNSIGNED_BYTE); // Game mode
+            final int dimension = wrapper.passthrough(Types.BYTE);
+
+            trackPlayer(wrapper.user(), entityId);
+            final ClientWorld clientWorld = wrapper.user().getClientWorld(Protocol1_9To1_8.class);
+            clientWorld.setEnvironment(dimension);
+        });
 		protocol.registerClientbound(ClientboundPackets1_9.SET_ENTITY_DATA, wrapper -> {
 			final int entityId = wrapper.passthrough(Types.VAR_INT);
 			if (!tracker(wrapper.user()).hasEntity(entityId)) {
