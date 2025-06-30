@@ -442,6 +442,15 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
 				attach.write(Types.INT, holdingEntityId);
 				attach.write(Types.BOOLEAN, false); // Leash
 				attach.scheduleSend(Protocol1_9To1_8.class);
+
+				// Fix movement when the client is riding a boat.
+				if (tracker.clientEntityId() == attachedEntityId && tracker.entityType(holdingEntityId) == EntityTypes1_9.EntityType.BOAT) {
+					final PacketWrapper fakeAttach = PacketWrapper.create(ClientboundPackets1_8.SET_ENTITY_LINK, wrapper.user());
+					fakeAttach.write(Types.INT, -1);
+					fakeAttach.write(Types.INT, holdingEntityId);
+					fakeAttach.write(Types.BOOLEAN, false);
+					fakeAttach.scheduleSend(Protocol1_9To1_8.class);
+				}
 			}
 		});
 
