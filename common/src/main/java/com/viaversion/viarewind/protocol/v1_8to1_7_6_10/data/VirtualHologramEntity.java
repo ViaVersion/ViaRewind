@@ -113,9 +113,9 @@ public class VirtualHologramEntity {
             }
         }
         final boolean invisible = (flags & 0x20) != 0;
+        sneaking = (flags & 0x02) != 0;
         small = (armorStandFlags & 0x01) != 0;
         marker = (armorStandFlags & 0x10) != 0;
-        sneaking = (flags & 0x02) != 0;
 
         State prevState = currentState;
         if (invisible && name != null) {
@@ -279,21 +279,20 @@ public class VirtualHologramEntity {
         }
 
         sendEntityDataUpdate(entityRewriter);
-        if (entityIds != null) {
-            switch (currentState) {
-                case ZOMBIE -> updateLocation();
-                case HOLOGRAM -> sendAttachPacket(entityIds[1], entityIds[0], false);
-            }
+        if (entityIds == null) {
+            return;
         }
 
-    }
+        if (currentState == State.ZOMBIE) {
+            updateLocation();
+        } else {
+            final PacketWrapper attach = PacketWrapper.create(ClientboundPackets1_7_2_5.SET_ENTITY_LINK, user);
+            attach.write(Types.INT, entityIds[1]);
+            attach.write(Types.INT, entityIds[0]);
+            attach.write(Types.BOOLEAN, false);
 
-    private void sendAttachPacket(int topEntityId, int bottomEntityId, boolean leash) {
-        PacketWrapper attach = PacketWrapper.create(ClientboundPackets1_7_2_5.SET_ENTITY_LINK, null, user);
-        attach.write(Types.INT, topEntityId);
-        attach.write(Types.INT, bottomEntityId);
-        attach.write(Types.BOOLEAN, leash);
-        attach.send(Protocol1_8To1_7_6_10.class);
+            attach.send(Protocol1_8To1_7_6_10.class);
+        }
     }
 
     public AABB getBoundingBox() {
