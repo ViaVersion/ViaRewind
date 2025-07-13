@@ -48,6 +48,7 @@ public class VirtualHologramEntity {
     private float headYaw;
     private boolean small = false;
     private boolean marker = false;
+    private boolean sneaking = false;
     private byte alwaysShowNametag;
 
     public VirtualHologramEntity(final UserConnection user, final int entityId) {
@@ -61,7 +62,7 @@ public class VirtualHologramEntity {
         this.locY = y;
         this.locZ = z;
 
-        updateLocation(false);
+        updateLocation();
     }
 
     public void setRelativePosition(final double x, final double y, final double z) {
@@ -70,7 +71,7 @@ public class VirtualHologramEntity {
         this.locY += y;
         this.locZ += z;
 
-        updateLocation(false);
+        updateLocation();
     }
 
     public void setRotation(final float yaw, final float pitch) {
@@ -79,14 +80,14 @@ public class VirtualHologramEntity {
         this.headYaw = yaw;
         this.pitch = pitch;
 
-        updateLocation(false);
+        updateLocation();
     }
 
     public void setHeadYaw(float yaw) {
         if (this.headYaw == yaw) return;
         this.headYaw = yaw;
 
-        updateLocation(false);
+        updateLocation();
     }
 
     public void syncState(final EntityPacketRewriter1_8 entityRewriter, final List<EntityData> entityDataList) {
@@ -112,6 +113,7 @@ public class VirtualHologramEntity {
             }
         }
         final boolean invisible = (flags & 0x20) != 0;
+        sneaking = (flags & 0x02) != 0;
         small = (armorStandFlags & 0x01) != 0;
         marker = (armorStandFlags & 0x10) != 0;
 
@@ -127,11 +129,11 @@ public class VirtualHologramEntity {
             sendSpawnPacket(entityRewriter);
         } else {
             sendEntityDataUpdate(entityRewriter);
-            updateLocation(false);
+            updateLocation();
         }
     }
 
-    private void updateLocation(final boolean remount) {
+    private void updateLocation() {
         if (entityIds == null) {
             return;
         }
@@ -145,26 +147,8 @@ public class VirtualHologramEntity {
 
             entityHeadLook.send(Protocol1_8To1_7_6_10.class);
         } else if (currentState == State.HOLOGRAM) {
-            if (remount) {
-                PacketWrapper detach = PacketWrapper.create(ClientboundPackets1_7_2_5.SET_ENTITY_LINK, user);
-                detach.write(Types.INT, entityIds[1]);
-                detach.write(Types.INT, -1);
-                detach.write(Types.BOOLEAN, false);
-                detach.send(Protocol1_8To1_7_6_10.class);
-            }
-
             // Don't ask me where this offset is coming from
             teleportEntity(entityIds[0], locX, (locY + (marker ? 54.3625 : small ? 56 : 57) - 0.16), locZ, 0, 0); // Skull
-
-            if (remount) {
-                teleportEntity(entityIds[1], locX, locY + 56.75, locZ, 0, 0); // Horse
-
-                PacketWrapper attach = PacketWrapper.create(ClientboundPackets1_7_2_5.SET_ENTITY_LINK, null, user);
-                attach.write(Types.INT, entityIds[1]);
-                attach.write(Types.INT, entityIds[0]);
-                attach.write(Types.BOOLEAN, false);
-                attach.send(Protocol1_8To1_7_6_10.class);
-            }
         }
     }
 
@@ -254,6 +238,7 @@ public class VirtualHologramEntity {
 
         // Directly write 1.7 entity data here since we are making them up
         final List<EntityData> entityDataList = new ArrayList<>();
+        entityDataList.add(new EntityData(EntityDataIndex1_7_6_10.ENTITY_FLAGS.getIndex(), EntityDataTypes1_7_6_10.BYTE, (byte) (sneaking ? 2 : 0)));
         entityDataList.add(new EntityData(EntityDataIndex1_7_6_10.ABSTRACT_AGEABLE_AGE.getIndex(), EntityDataTypes1_7_6_10.INT, -1700000));
         entityDataList.add(new EntityData(EntityDataIndex1_7_6_10.LIVING_ENTITY_BASE_NAME_TAG.getIndex(), EntityDataTypes1_7_6_10.STRING, name));
         entityDataList.add(new EntityData(EntityDataIndex1_7_6_10.LIVING_ENTITY_BASE_NAME_TAG_VISIBILITY.getIndex(), EntityDataTypes1_7_6_10.BYTE, alwaysShowNametag));
@@ -271,12 +256,13 @@ public class VirtualHologramEntity {
             entityIds = new int[]{entityId};
         } else if (currentState == State.HOLOGRAM) {
             final int[] entityIds = {entityId, additionalEntityId()};
+            final double offsetY = (locY + (marker ? 54.3625 : small ? 56 : 57)) - 0.16;
 
             final PacketWrapper spawnSkull = PacketWrapper.create(ClientboundPackets1_7_2_5.ADD_ENTITY, user);
             spawnSkull.write(Types.VAR_INT, entityIds[0]);
             spawnSkull.write(Types.BYTE, (byte) 66);
             spawnSkull.write(Types.INT, (int) (locX * 32.0));
-            spawnSkull.write(Types.INT, (int) (locY * 32.0));
+            spawnSkull.write(Types.INT, (int) (offsetY * 32.0));
             spawnSkull.write(Types.INT, (int) (locZ * 32.0));
             spawnSkull.write(Types.BYTE, (byte) 0);
             spawnSkull.write(Types.BYTE, (byte) 0);
@@ -286,14 +272,27 @@ public class VirtualHologramEntity {
             final List<EntityData> squidEntityData = new ArrayList<>();
             squidEntityData.add(new EntityData(0, EntityDataTypes1_8.BYTE, (byte) 32));
 
-            spawnEntity(entityIds[0], EntityTypes1_8.EntityType.SQUID.getId(), locX, locY, locZ, squidEntityData);
-            spawnEntity(entityIds[1], EntityTypes1_8.EntityType.HORSE.getId(), locX, locY, locZ, new ArrayList<>());
+            spawnEntity(entityIds[0], EntityTypes1_8.EntityType.SQUID.getId(), locX, offsetY, locZ, squidEntityData);
+            spawnEntity(entityIds[1], EntityTypes1_8.EntityType.HORSE.getId(), locX, offsetY + 0.74, locZ, new ArrayList<>());
 
             this.entityIds = entityIds;
         }
 
         sendEntityDataUpdate(entityRewriter);
-        updateLocation(true);
+        if (entityIds == null) {
+            return;
+        }
+
+        if (currentState == State.ZOMBIE) {
+            updateLocation();
+        } else {
+            final PacketWrapper attach = PacketWrapper.create(ClientboundPackets1_7_2_5.SET_ENTITY_LINK, user);
+            attach.write(Types.INT, entityIds[1]);
+            attach.write(Types.INT, entityIds[0]);
+            attach.write(Types.BOOLEAN, false);
+
+            attach.send(Protocol1_8To1_7_6_10.class);
+        }
     }
 
     public AABB getBoundingBox() {
