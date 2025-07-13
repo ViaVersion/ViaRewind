@@ -49,6 +49,7 @@ public class VirtualHologramEntity {
     private boolean small = false;
     private boolean marker = false;
     private boolean sneaking = false;
+    private byte alwaysShowNametag;
 
     public VirtualHologramEntity(final UserConnection user, final int entityId) {
         this.user = user;
@@ -105,6 +106,8 @@ public class VirtualHologramEntity {
             } else if (entityData.id() == 2 && entityData.dataType() == EntityDataTypes1_8.STRING) {
                 name = entityData.getValue().toString();
                 if (name != null && name.isEmpty()) name = null;
+            } else if (entityData.id() == 3 && entityData.dataType() == EntityDataTypes1_8.BYTE) {
+                alwaysShowNametag = ((Number) entityData.getValue()).byteValue();
             } else if (entityData.id() == 10 && entityData.dataType() == EntityDataTypes1_8.BYTE) {
                 armorStandFlags = ((Number) entityData.getValue()).byteValue();
             }
@@ -238,7 +241,7 @@ public class VirtualHologramEntity {
         entityDataList.add(new EntityData(EntityDataIndex1_7_6_10.ENTITY_FLAGS.getIndex(), EntityDataTypes1_7_6_10.BYTE, (byte) (sneaking ? 2 : 0)));
         entityDataList.add(new EntityData(EntityDataIndex1_7_6_10.ABSTRACT_AGEABLE_AGE.getIndex(), EntityDataTypes1_7_6_10.INT, -1700000));
         entityDataList.add(new EntityData(EntityDataIndex1_7_6_10.LIVING_ENTITY_BASE_NAME_TAG.getIndex(), EntityDataTypes1_7_6_10.STRING, name));
-        entityDataList.add(new EntityData(EntityDataIndex1_7_6_10.LIVING_ENTITY_BASE_NAME_TAG_VISIBILITY.getIndex(), EntityDataTypes1_7_6_10.BYTE, (byte) 1));
+        entityDataList.add(new EntityData(EntityDataIndex1_7_6_10.LIVING_ENTITY_BASE_NAME_TAG_VISIBILITY.getIndex(), EntityDataTypes1_7_6_10.BYTE, alwaysShowNametag));
 
         wrapper.write(RewindTypes.ENTITY_DATA_LIST1_7, entityDataList);
     }
