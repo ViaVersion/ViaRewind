@@ -300,15 +300,9 @@ public class PlayerPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6_10>
 					if (gameProfile == null) {
 						continue;
 					}
-					PacketWrapper packet = PacketWrapper.create(ClientboundPackets1_7_2_5.PLAYER_INFO, wrapper.user());
-					packet.write(Types.STRING, gameProfile.getDisplayName());
-					packet.write(Types.BOOLEAN, false);
-					packet.write(Types.SHORT, (short) gameProfile.ping);
-					packet.scheduleSend(Protocol1_8To1_7_6_10.class);
-
 					gameProfile.ping = ping;
 
-					packet = PacketWrapper.create(ClientboundPackets1_7_2_5.PLAYER_INFO, wrapper.user());
+                    PacketWrapper packet = PacketWrapper.create(ClientboundPackets1_7_2_5.PLAYER_INFO, wrapper.user());
 					packet.write(Types.STRING, gameProfile.getDisplayName());
 					packet.write(Types.BOOLEAN, true);
 					packet.write(Types.SHORT, (short) ping);
