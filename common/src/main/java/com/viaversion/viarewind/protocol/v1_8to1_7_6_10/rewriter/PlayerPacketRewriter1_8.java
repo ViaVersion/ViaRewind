@@ -124,10 +124,10 @@ public class PlayerPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6_10>
 					if (tracker.getEntityData().isEmpty()) {
 						return;
 					}
-                    // Client doesn't care about their own health level unless its 0 (Will show respawn screen)
+
+                    // TODO figure out why this is needed
                     final List<EntityData> entityDataList = new ArrayList<>(tracker.getEntityData());
                     entityDataList.removeIf(entityData -> entityData.id() == 6);
-                    entityDataList.add(new EntityData(6, EntityDataTypes1_7_6_10.FLOAT, 1.0f));
 
                     // 1.8 clients do keep entity data after respawn, 1.7 clients don't
 					final PacketWrapper setEntityData = PacketWrapper.create(ClientboundPackets1_7_2_5.SET_ENTITY_DATA, wrapper.user());
