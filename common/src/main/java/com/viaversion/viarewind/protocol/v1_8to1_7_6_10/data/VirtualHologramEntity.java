@@ -148,7 +148,19 @@ public class VirtualHologramEntity {
             entityHeadLook.send(Protocol1_8To1_7_6_10.class);
         } else if (currentState == State.HOLOGRAM) {
             // Don't ask me where this offset is coming from
-            teleportEntity(entityIds[0], locX, (locY + (marker ? 54.3625 : small ? 56 : 57) - 0.16), locZ, 0, 0); // Skull
+            teleportEntity(entityIds[0], locX, (locY + getOffset()), locZ, 0, 0); // Skull
+        }
+    }
+
+    private double getOffset() {
+        double baseOffset = 54.35;
+
+        if (marker) {
+            return baseOffset;
+        } else if (small) {
+            return baseOffset + 0.9875;
+        } else {
+            return baseOffset + (0.9875 * 2);
         }
     }
 
@@ -256,13 +268,12 @@ public class VirtualHologramEntity {
             entityIds = new int[]{entityId};
         } else if (currentState == State.HOLOGRAM) {
             final int[] entityIds = {entityId, additionalEntityId()};
-            final double offsetY = (locY + (marker ? 54.3625 : small ? 56 : 57)) - 0.16;
 
             final PacketWrapper spawnSkull = PacketWrapper.create(ClientboundPackets1_7_2_5.ADD_ENTITY, user);
             spawnSkull.write(Types.VAR_INT, entityIds[0]);
             spawnSkull.write(Types.BYTE, (byte) 66);
             spawnSkull.write(Types.INT, (int) (locX * 32.0));
-            spawnSkull.write(Types.INT, (int) (offsetY * 32.0));
+            spawnSkull.write(Types.INT, (int) ((locY + getOffset()) * 32.0));
             spawnSkull.write(Types.INT, (int) (locZ * 32.0));
             spawnSkull.write(Types.BYTE, (byte) 0);
             spawnSkull.write(Types.BYTE, (byte) 0);
@@ -272,8 +283,8 @@ public class VirtualHologramEntity {
             final List<EntityData> squidEntityData = new ArrayList<>();
             squidEntityData.add(new EntityData(0, EntityDataTypes1_8.BYTE, (byte) 32));
 
-            spawnEntity(entityIds[0], EntityTypes1_8.EntityType.SQUID.getId(), locX, offsetY, locZ, squidEntityData);
-            spawnEntity(entityIds[1], EntityTypes1_8.EntityType.HORSE.getId(), locX, offsetY + 0.74, locZ, new ArrayList<>());
+            spawnEntity(entityIds[0], EntityTypes1_8.EntityType.SQUID.getId(), locX, locY + getOffset(), locZ, squidEntityData);
+            spawnEntity(entityIds[1], EntityTypes1_8.EntityType.HORSE.getId(), locX, locY + (getOffset() + 0.68), locZ, new ArrayList<>());
 
             this.entityIds = entityIds;
         }
