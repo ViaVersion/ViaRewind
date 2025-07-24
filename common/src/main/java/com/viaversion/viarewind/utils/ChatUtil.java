@@ -66,7 +66,10 @@ public class ChatUtil {
 			try {
 				LEGACY_REWRITER.processText(null, component);
 				String legacy = ComponentUtil.jsonToLegacy(component);
-				while (legacy.startsWith("§f")) legacy = legacy.substring(2);
+                int attempts = 0;
+                while (legacy.startsWith("§f") && attempts++ < 10) {
+                    legacy = legacy.substring(2);
+                }
 				return legacy;
 			} catch (Exception ex) {
 				if (!Via.getConfig().isSuppressConversionWarnings()) {
