@@ -201,7 +201,7 @@ public class WitherBossBar implements BossBar {
 		entityData.add(new EntityData(0, EntityDataTypes1_8.BYTE, (byte) 0x20));
 		entityData.add(new EntityData(2, EntityDataTypes1_8.STRING, title));
 		entityData.add(new EntityData(3, EntityDataTypes1_8.BYTE, (byte) 1));
-		entityData.add(new EntityData(6, EntityDataTypes1_8.FLOAT, health * 300f));
+		entityData.add(new EntityData(6, EntityDataTypes1_8.FLOAT, Math.max(health * 300f, 1f))); // the wither will just die if the health is too low
         entityData.add(new EntityData(20, EntityDataTypes1_8.INT, 880));
 
 		addMob.write(Types.ENTITY_DATA_LIST1_8, entityData);
