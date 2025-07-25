@@ -244,35 +244,34 @@ public class PlayerPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6_10>
             final int count = wrapper.read(Types.VAR_INT);
             for (int i = 0; i < count; i++) {
                 UUID uuid = wrapper.read(Types.UUID);
-                if (action == 0) {
+                if (action == 0) { // Add player
                     String name = wrapper.read(Types.STRING);
-
-                    GameProfileStorage.GameProfile gameProfile = gameProfileStorage.get(uuid);
-                    if (gameProfile == null) gameProfile = gameProfileStorage.put(uuid, name);
-
                     GameProfile.Property[] properties = wrapper.read(Types.PROFILE_PROPERTY_ARRAY);
+                    int gamemode = wrapper.read(Types.VAR_INT);
+                    int ping = wrapper.read(Types.VAR_INT);
+                    JsonElement displayNameComponent = wrapper.read(Types.OPTIONAL_COMPONENT);
+                    String displayName = displayNameComponent != null ? ChatUtil.jsonToLegacy(displayNameComponent) : null;
+
+                    GameProfileStorage.GameProfile gameProfile = gameProfileStorage.put(uuid, name, displayName, ping, gamemode);
+
                     for (GameProfile.Property property : properties) {
                         gameProfile.properties.add(new GameProfileStorage.Property(property.name(), property.value(), property.signature()));
                     }
 
-                    int gamemode = wrapper.read(Types.VAR_INT);
-                    int ping = wrapper.read(Types.VAR_INT);
-                    gameProfile.ping = ping;
-                    gameProfile.gamemode = gamemode;
-                    JsonElement displayName = wrapper.read(Types.OPTIONAL_COMPONENT);
-                    if (displayName != null) {
-                        gameProfile.setDisplayName(ChatUtil.jsonToLegacy(displayName));
-                    }
-
                     final PacketWrapper playerInfo = PacketWrapper.create(ClientboundPackets1_7_2_5.PLAYER_INFO, wrapper.user());
-                    playerInfo.write(Types.STRING, gameProfile.getDisplayName());
+                    playerInfo.write(Types.STRING, gameProfile.getLegacyDisplayName());
                     playerInfo.write(Types.BOOLEAN, true);
                     playerInfo.write(Types.SHORT, (short) ping);
                     playerInfo.scheduleSend(Protocol1_8To1_7_6_10.class);
-                } else if (action == 1) {
+                } else if (action == 1) { // Update game mode
                     final int gamemode = wrapper.read(Types.VAR_INT);
                     GameProfileStorage.GameProfile gameProfile = gameProfileStorage.get(uuid);
-                    if (gameProfile == null || gameProfile.gamemode == gamemode) {
+
+                    if (gameProfile == null) {
+                        continue;
+                    }
+
+                    if (gameProfile.gamemode == gamemode) {
                         continue;
                     }
 
@@ -302,52 +301,61 @@ public class PlayerPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6_10>
                     }
 
                     gameProfile.gamemode = gamemode;
-                } else if (action == 2) {
+                } else if (action == 2) { // Update latency
                     final int ping = wrapper.read(Types.VAR_INT);
 
                     final GameProfileStorage.GameProfile gameProfile = gameProfileStorage.get(uuid);
+
                     if (gameProfile == null) {
                         continue;
                     }
+
                     gameProfile.ping = ping;
 
                     PacketWrapper packet = PacketWrapper.create(ClientboundPackets1_7_2_5.PLAYER_INFO, wrapper.user());
-                    packet.write(Types.STRING, gameProfile.getDisplayName());
+                    packet.write(Types.STRING, gameProfile.getLegacyDisplayName());
                     packet.write(Types.BOOLEAN, true);
                     packet.write(Types.SHORT, (short) ping);
                     packet.scheduleSend(Protocol1_8To1_7_6_10.class);
-                } else if (action == 3) {
+                } else if (action == 3) { // Update display name
+                    GameProfileStorage.GameProfile gameProfile = gameProfileStorage.get(uuid);
+
+                    if (gameProfile == null) {
+                        continue;
+                    }
+
                     JsonElement displayNameComponent = wrapper.read(Types.OPTIONAL_COMPONENT);
                     String displayName = displayNameComponent != null ? ChatUtil.jsonToLegacy(displayNameComponent) : null;
 
-                    GameProfileStorage.GameProfile gameProfile = gameProfileStorage.get(uuid);
-                    if (gameProfile == null || gameProfile.displayName == null && displayName == null) continue;
-
-                    PacketWrapper playerInfo = PacketWrapper.create(ClientboundPackets1_7_2_5.PLAYER_INFO, wrapper.user());
-                    playerInfo.write(Types.STRING, gameProfile.getDisplayName());
-                    playerInfo.write(Types.BOOLEAN, false);
-                    playerInfo.write(Types.SHORT, (short) gameProfile.ping);
-                    playerInfo.scheduleSend(Protocol1_8To1_7_6_10.class);
-
-                    if (gameProfile.displayName == null && displayName != null || gameProfile.displayName != null && displayName == null || !gameProfile.displayName.equals(displayName)) {
-                        gameProfile.setDisplayName(displayName);
+                    // Don't update if display name is the same
+                    if (Objects.equals(gameProfile.displayName, displayName)) {
+                        continue;
                     }
 
+                    PacketWrapper playerInfo = PacketWrapper.create(ClientboundPackets1_7_2_5.PLAYER_INFO, wrapper.user());
+                    playerInfo.write(Types.STRING, gameProfile.getLegacyDisplayName());
+                    playerInfo.write(Types.BOOLEAN, false);
+                    playerInfo.write(Types.SHORT, (short) 0);
+                    playerInfo.scheduleSend(Protocol1_8To1_7_6_10.class);
+
+                    gameProfile.setDisplayName(displayName);
+
                     playerInfo = PacketWrapper.create(ClientboundPackets1_7_2_5.PLAYER_INFO, wrapper.user());
-                    playerInfo.write(Types.STRING, gameProfile.getDisplayName());
+                    playerInfo.write(Types.STRING, gameProfile.getLegacyDisplayName());
                     playerInfo.write(Types.BOOLEAN, true);
                     playerInfo.write(Types.SHORT, (short) gameProfile.ping);
                     playerInfo.scheduleSend(Protocol1_8To1_7_6_10.class);
-                } else if (action == 4) {
+                } else if (action == 4) { // Remove player
                     final GameProfileStorage.GameProfile gameProfile = gameProfileStorage.remove(uuid);
+
                     if (gameProfile == null) {
                         continue;
                     }
 
                     final PacketWrapper playerInfo = PacketWrapper.create(ClientboundPackets1_7_2_5.PLAYER_INFO, wrapper.user());
-                    playerInfo.write(Types.STRING, gameProfile.getDisplayName());
+                    playerInfo.write(Types.STRING, gameProfile.getLegacyDisplayName());
                     playerInfo.write(Types.BOOLEAN, false);
-                    playerInfo.write(Types.SHORT, (short) gameProfile.ping);
+                    playerInfo.write(Types.SHORT, (short) 0);
                     playerInfo.scheduleSend(Protocol1_8To1_7_6_10.class);
                 }
             }
