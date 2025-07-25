@@ -310,6 +310,10 @@ public class PlayerPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6_10>
                         continue;
                     }
 
+                    if (gameProfile.ping == ping) {
+                        continue;
+                    }
+
                     gameProfile.ping = ping;
 
                     PacketWrapper packet = PacketWrapper.create(ClientboundPackets1_7_2_5.PLAYER_INFO, wrapper.user());
