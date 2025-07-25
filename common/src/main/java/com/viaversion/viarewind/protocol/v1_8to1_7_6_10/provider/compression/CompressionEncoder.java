@@ -27,9 +27,13 @@ import java.util.zip.Deflater;
 public class CompressionEncoder extends MessageToByteEncoder<ByteBuf> {
     private final Deflater deflater = new Deflater();
 
-    private final int threshold;
+    private int threshold;
 
     public CompressionEncoder(final int threshold) {
+        this.threshold = threshold;
+    }
+
+    public void setThreshold(final int threshold) {
         this.threshold = threshold;
     }
 

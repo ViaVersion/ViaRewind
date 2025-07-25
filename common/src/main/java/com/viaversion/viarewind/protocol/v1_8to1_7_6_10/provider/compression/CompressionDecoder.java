@@ -29,9 +29,13 @@ import java.util.zip.Inflater;
 public class CompressionDecoder extends MessageToMessageDecoder<ByteBuf> {
     private final Inflater inflater = new Inflater();
 
-    private final int threshold;
+    private int threshold;
 
     public CompressionDecoder(final int threshold) {
+        this.threshold = threshold;
+    }
+
+    public void setThreshold(final int threshold) {
         this.threshold = threshold;
     }
 
