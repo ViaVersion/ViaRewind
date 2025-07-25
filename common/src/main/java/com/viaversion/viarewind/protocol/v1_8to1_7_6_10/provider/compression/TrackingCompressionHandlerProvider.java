@@ -29,19 +29,36 @@ import io.netty.channel.ChannelPipeline;
 public class TrackingCompressionHandlerProvider extends CompressionHandlerProvider {
 
     @Override
-    public void onHandleLoginCompressionPacket(UserConnection user, int threshold) {
+    public void setCompressionThreshold(UserConnection user, int threshold) {
         final ChannelPipeline pipeline = user.getChannel().pipeline();
-        if (user.isClientSide()) {
-            pipeline.addBefore(Via.getManager().getInjector().getEncoderName(), ViaRewind.getPlatform().compressHandlerName(), getEncoder(threshold));
-            pipeline.addBefore(Via.getManager().getInjector().getDecoderName(), ViaRewind.getPlatform().decompressHandlerName(), getDecoder(threshold));
+        if (user.isClientSide() && threshold > 0) {
+            String compressHandlerName = ViaRewind.getPlatform().compressHandlerName();
+            String decompressHandlerName = ViaRewind.getPlatform().decompressHandlerName();
+
+            ChannelHandler encoderHandler = pipeline.get(compressHandlerName);
+            ChannelHandler decoderHandler = pipeline.get(decompressHandlerName);
+
+            if (encoderHandler != null) {
+                CompressionEncoder encoder = (CompressionEncoder) encoderHandler;
+                encoder.setThreshold(threshold);
+            } else {
+                pipeline.addBefore(Via.getManager().getInjector().getEncoderName(), compressHandlerName, getEncoder(threshold));
+            }
+
+            if (decoderHandler != null) {
+                CompressionDecoder decoder = (CompressionDecoder) decoderHandler;
+                decoder.setThreshold(threshold);
+            } else {
+                pipeline.addBefore(Via.getManager().getInjector().getDecoderName(), decompressHandlerName, getDecoder(threshold));
+            }
         } else {
-            setCompressionEnabled(user, true); // We need to remove compression for 1.7 clients
+            setRemoveCompression(user, true); // We need to remove compression for 1.7 clients
         }
     }
 
     @Override
     public void onTransformPacket(UserConnection user) {
-        if (isCompressionEnabled(user)) {
+        if (isRemoveCompression(user)) {
             final ChannelPipeline pipeline = user.getChannel().pipeline();
 
             String compressor = null;
@@ -58,7 +75,7 @@ public class TrackingCompressionHandlerProvider extends CompressionHandlerProvid
                 throw new IllegalStateException("Couldn't remove compression for 1.7!");
             }
 
-            setCompressionEnabled(user, false);
+            setRemoveCompression(user, false);
         }
     }
 

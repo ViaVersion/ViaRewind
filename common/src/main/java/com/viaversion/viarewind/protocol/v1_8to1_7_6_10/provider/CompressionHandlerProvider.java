@@ -24,7 +24,7 @@ import io.netty.channel.ChannelHandler;
 
 public abstract class CompressionHandlerProvider implements Provider {
 
-    public abstract void onHandleLoginCompressionPacket(UserConnection user, int threshold);
+    public abstract void setCompressionThreshold(UserConnection user, int threshold);
 
     public abstract void onTransformPacket(UserConnection user);
 
@@ -32,11 +32,11 @@ public abstract class CompressionHandlerProvider implements Provider {
 
     public abstract ChannelHandler getDecoder(int threshold);
 
-    public boolean isCompressionEnabled(UserConnection user) {
+    public boolean isRemoveCompression(UserConnection user) {
         return user.get(CompressionStatusTracker.class).removeCompression;
     }
 
-    public void setCompressionEnabled(UserConnection user, boolean enabled) {
+    public void setRemoveCompression(UserConnection user, boolean enabled) {
         user.get(CompressionStatusTracker.class).removeCompression = enabled;
     }
 }

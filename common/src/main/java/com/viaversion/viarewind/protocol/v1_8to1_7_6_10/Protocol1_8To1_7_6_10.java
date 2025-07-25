@@ -87,12 +87,22 @@ public class Protocol1_8To1_7_6_10 extends BackwardsProtocol<ClientboundPackets1
                 handler(wrapper -> {
                     final int threshold = wrapper.read(Types.VAR_INT);
 
-                    Via.getManager().getProviders().get(CompressionHandlerProvider.class).onHandleLoginCompressionPacket(wrapper.user(), threshold);
+                    Via.getManager().getProviders().get(CompressionHandlerProvider.class).setCompressionThreshold(wrapper.user(), threshold);
                     wrapper.cancel();
                 });
             }
         });
-        this.cancelClientbound(ClientboundPackets1_8.SET_COMPRESSION); // unused
+        this.registerClientbound(ClientboundPackets1_8.SET_COMPRESSION, null, new PacketHandlers() {
+            @Override
+            public void register() {
+                handler(wrapper -> {
+                    final int threshold = wrapper.read(Types.VAR_INT);
+
+                    Via.getManager().getProviders().get(CompressionHandlerProvider.class).setCompressionThreshold(wrapper.user(), threshold);
+                    wrapper.cancel();
+                });
+            }
+        });
         this.registerClientbound(ClientboundPackets1_8.KEEP_ALIVE, new PacketHandlers() {
             @Override
             public void register() {
