@@ -245,15 +245,14 @@ public class PlayerPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6_10>
             for (int i = 0; i < count; i++) {
                 UUID uuid = wrapper.read(Types.UUID);
                 if (action == 0) { // Add player
-                    String name = wrapper.read(Types.STRING);
-                    GameProfile.Property[] properties = wrapper.read(Types.PROFILE_PROPERTY_ARRAY);
-                    int gamemode = wrapper.read(Types.VAR_INT);
-                    int ping = wrapper.read(Types.VAR_INT);
-                    JsonElement displayNameComponent = wrapper.read(Types.OPTIONAL_COMPONENT);
-                    String displayName = displayNameComponent != null ? ChatUtil.jsonToLegacy(displayNameComponent) : null;
+                    final String name = wrapper.read(Types.STRING);
+                    final GameProfile.Property[] properties = wrapper.read(Types.PROFILE_PROPERTY_ARRAY);
+                    final int gamemode = wrapper.read(Types.VAR_INT);
+                    final int ping = wrapper.read(Types.VAR_INT);
+                    final JsonElement displayNameComponent = wrapper.read(Types.OPTIONAL_COMPONENT);
+                    final String displayName = displayNameComponent != null ? ChatUtil.jsonToLegacy(displayNameComponent) : null;
 
-                    GameProfileStorage.GameProfile gameProfile = gameProfileStorage.put(uuid, name, displayName, ping, gamemode);
-
+                    final GameProfileStorage.GameProfile gameProfile = gameProfileStorage.put(uuid, name, displayName, ping, gamemode);
                     for (GameProfile.Property property : properties) {
                         gameProfile.properties.add(new GameProfileStorage.Property(property.name(), property.value(), property.signature()));
                     }
@@ -265,13 +264,9 @@ public class PlayerPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6_10>
                     playerInfo.scheduleSend(Protocol1_8To1_7_6_10.class);
                 } else if (action == 1) { // Update game mode
                     final int gamemode = wrapper.read(Types.VAR_INT);
-                    GameProfileStorage.GameProfile gameProfile = gameProfileStorage.get(uuid);
 
-                    if (gameProfile == null) {
-                        continue;
-                    }
-
-                    if (gameProfile.gamemode == gamemode) {
+                    final GameProfileStorage.GameProfile gameProfile = gameProfileStorage.get(uuid);
+                    if (gameProfile == null || gameProfile.gamemode == gamemode) {
                         continue;
                     }
 
@@ -305,12 +300,7 @@ public class PlayerPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6_10>
                     final int ping = wrapper.read(Types.VAR_INT);
 
                     final GameProfileStorage.GameProfile gameProfile = gameProfileStorage.get(uuid);
-
-                    if (gameProfile == null) {
-                        continue;
-                    }
-
-                    if (gameProfile.ping == ping) {
+                    if (gameProfile == null || gameProfile.ping == ping) {
                         continue;
                     }
 
