@@ -18,6 +18,7 @@
 package com.viaversion.viarewind.protocol.v1_9to1_8.rewriter;
 
 import com.viaversion.viarewind.ViaRewind;
+import com.viaversion.viarewind.api.type.RewindTypes;
 import com.viaversion.viarewind.protocol.v1_9to1_8.Protocol1_9To1_8;
 import com.viaversion.viarewind.protocol.v1_9to1_8.storage.*;
 import com.viaversion.viarewind.utils.ChatUtil;
@@ -36,10 +37,12 @@ import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.viaversion.api.minecraft.ClientWorld;
+import com.viaversion.viaversion.libs.gson.JsonParser;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ServerboundPackets1_8;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ServerboundPackets1_9;
+import com.viaversion.viaversion.util.StringUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -438,7 +441,12 @@ public class PlayerPacketRewriter1_9 extends RewriterBase<Protocol1_9To1_8> {
 				map(Types.BLOCK_POSITION1_8); // Position
 				handler(wrapper -> {
 					for (int i = 0; i < 4; i++) {
-						wrapper.write(Types.STRING, ChatUtil.jsonToLegacy(wrapper.read(Types.COMPONENT)));
+                        final JsonElement json = JsonParser.parseString(wrapper.read(RewindTypes.SIGN_STRING));
+                        if (!json.isJsonPrimitive()) {
+                            throw new IllegalStateException("Invalid sign text: " + StringUtil.forLogging(json));
+                        }
+
+						wrapper.write(Types.STRING, ChatUtil.jsonToLegacy(json));
 					}
 				});
 			}
