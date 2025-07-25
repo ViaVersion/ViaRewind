@@ -31,28 +31,25 @@ public class TrackingCompressionHandlerProvider extends CompressionHandlerProvid
     @Override
     public void setCompressionThreshold(UserConnection user, int threshold) {
         final ChannelPipeline pipeline = user.getChannel().pipeline();
-        if (user.isClientSide() && threshold > 0) {
-            String compressHandlerName = ViaRewind.getPlatform().compressHandlerName();
-            String decompressHandlerName = ViaRewind.getPlatform().decompressHandlerName();
-
-            ChannelHandler encoderHandler = pipeline.get(compressHandlerName);
-            ChannelHandler decoderHandler = pipeline.get(decompressHandlerName);
-
-            if (encoderHandler != null) {
-                CompressionEncoder encoder = (CompressionEncoder) encoderHandler;
-                encoder.setThreshold(threshold);
-            } else {
-                pipeline.addBefore(Via.getManager().getInjector().getEncoderName(), compressHandlerName, getEncoder(threshold));
-            }
-
-            if (decoderHandler != null) {
-                CompressionDecoder decoder = (CompressionDecoder) decoderHandler;
-                decoder.setThreshold(threshold);
-            } else {
-                pipeline.addBefore(Via.getManager().getInjector().getDecoderName(), decompressHandlerName, getDecoder(threshold));
-            }
-        } else {
+        if (!user.isClientSide() || threshold < 0) {
             setRemoveCompression(user, true); // We need to remove compression for 1.7 clients
+            return;
+        }
+
+        final String compressHandlerName = ViaRewind.getPlatform().compressHandlerName();
+        final CompressionEncoder encoder = (CompressionEncoder) pipeline.get(compressHandlerName);
+        if (encoder != null) {
+            encoder.setThreshold(threshold);
+        } else {
+            pipeline.addBefore(Via.getManager().getInjector().getEncoderName(), compressHandlerName, getEncoder(threshold));
+        }
+
+        final String decompressHandlerName = ViaRewind.getPlatform().decompressHandlerName();
+        final CompressionDecoder decoder = (CompressionDecoder) pipeline.get(decompressHandlerName);
+        if (decoder != null) {
+            decoder.setThreshold(threshold);
+        } else {
+            pipeline.addBefore(Via.getManager().getInjector().getDecoderName(), decompressHandlerName, getDecoder(threshold));
         }
     }
 

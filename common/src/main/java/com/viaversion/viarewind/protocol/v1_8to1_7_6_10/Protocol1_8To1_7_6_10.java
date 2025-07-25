@@ -81,28 +81,8 @@ public class Protocol1_8To1_7_6_10 extends BackwardsProtocol<ClientboundPackets1
                 map(Types.BYTE_ARRAY_PRIMITIVE, Types.SHORT_BYTE_ARRAY); // verification token
             }
         });
-        this.registerClientbound(State.LOGIN, ClientboundLoginPackets.LOGIN_COMPRESSION, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    final int threshold = wrapper.read(Types.VAR_INT);
-
-                    Via.getManager().getProviders().get(CompressionHandlerProvider.class).setCompressionThreshold(wrapper.user(), threshold);
-                    wrapper.cancel();
-                });
-            }
-        });
-        this.registerClientbound(ClientboundPackets1_8.SET_COMPRESSION, null, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    final int threshold = wrapper.read(Types.VAR_INT);
-
-                    Via.getManager().getProviders().get(CompressionHandlerProvider.class).setCompressionThreshold(wrapper.user(), threshold);
-                    wrapper.cancel();
-                });
-            }
-        });
+        this.registerClientbound(State.LOGIN, ClientboundLoginPackets.LOGIN_COMPRESSION, this::handleCompression);
+        this.registerClientbound(ClientboundPackets1_8.SET_COMPRESSION, null, this::handleCompression);
         this.registerClientbound(ClientboundPackets1_8.KEEP_ALIVE, new PacketHandlers() {
             @Override
             public void register() {
@@ -124,6 +104,13 @@ public class Protocol1_8To1_7_6_10 extends BackwardsProtocol<ClientboundPackets1
                 map(Types.INT, Types.VAR_INT); // id
             }
         });
+    }
+
+    private void handleCompression(final PacketWrapper wrapper) {
+        wrapper.cancel();
+        final int threshold = wrapper.read(Types.VAR_INT);
+
+        Via.getManager().getProviders().get(CompressionHandlerProvider.class).setCompressionThreshold(wrapper.user(), threshold);
     }
 
     @Override
