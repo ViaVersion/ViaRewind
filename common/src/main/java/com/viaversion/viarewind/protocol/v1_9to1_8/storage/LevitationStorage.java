@@ -21,22 +21,22 @@ import com.viaversion.viaversion.api.connection.StorableObject;
 
 public class LevitationStorage implements StorableObject {
 
-	private boolean active;
-	private int amplifier;
+    private boolean active;
+    private int amplifier;
 
-	public boolean isActive() {
-		return active;
-	}
+    public boolean isActive() {
+        return active;
+    }
 
-	public void setActive(boolean active) {
-		this.active = active;
-	}
+    public void setActive(boolean active) {
+        this.active = active;
+    }
 
-	public int getAmplifier() {
-		return amplifier;
-	}
+    public int getAmplifier() {
+        return amplifier;
+    }
 
-	public void setAmplifier(int amplifier) {
-		this.amplifier = amplifier;
-	}
+    public void setAmplifier(int amplifier) {
+        this.amplifier = amplifier;
+    }
 }

@@ -20,65 +20,64 @@ package com.viaversion.viarewind.protocol.v1_9to1_8.storage;
 import com.viaversion.viarewind.protocol.v1_9to1_8.data.WitherBossBar;
 import com.viaversion.viaversion.api.connection.StoredObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
 public class BossBarStorage extends StoredObject {
 
-	private final Map<UUID, WitherBossBar> bossBars = new HashMap<>();
+    private final Map<UUID, WitherBossBar> bossBars = new HashMap<>();
 
-	public BossBarStorage(UserConnection user) {
-		super(user);
-	}
+    public BossBarStorage(UserConnection user) {
+        super(user);
+    }
 
-	public void reset() {
-		updateLocation();
-		changeWorld();
-	}
+    public void reset() {
+        updateLocation();
+        changeWorld();
+    }
 
-	public void add(UUID uuid, String title, float health) {
-		WitherBossBar bossBar = new WitherBossBar(this.getUser(), uuid, title, health);
-		PlayerPositionTracker playerPositionTracker = this.getUser().get(PlayerPositionTracker.class);
-		bossBar.setPlayerLocation(playerPositionTracker.getPosX(), playerPositionTracker.getPosY(), playerPositionTracker.getPosZ(), playerPositionTracker.getYaw(), playerPositionTracker.getPitch());
-		bossBar.show();
-		bossBars.put(uuid, bossBar);
-	}
+    public void add(UUID uuid, String title, float health) {
+        WitherBossBar bossBar = new WitherBossBar(this.getUser(), uuid, title, health);
+        PlayerPositionTracker playerPositionTracker = this.getUser().get(PlayerPositionTracker.class);
+        bossBar.setPlayerLocation(playerPositionTracker.getPosX(), playerPositionTracker.getPosY(), playerPositionTracker.getPosZ(), playerPositionTracker.getYaw(), playerPositionTracker.getPitch());
+        bossBar.show();
+        bossBars.put(uuid, bossBar);
+    }
 
-	public void remove(UUID uuid) {
-		WitherBossBar bossBar = bossBars.remove(uuid);
-		if (bossBar == null) return;
-		bossBar.hide();
-	}
+    public void remove(UUID uuid) {
+        WitherBossBar bossBar = bossBars.remove(uuid);
+        if (bossBar == null) return;
+        bossBar.hide();
+    }
 
-	public void updateLocation() {
-		PlayerPositionTracker playerPositionTracker = this.getUser().get(PlayerPositionTracker.class);
-		bossBars.values().forEach(bossBar -> {
-			try {
-				bossBar.setPlayerLocation(playerPositionTracker.getPosX(), playerPositionTracker.getPosY(), playerPositionTracker.getPosZ(), playerPositionTracker.getYaw(), playerPositionTracker.getPitch());
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
-		});
-	}
+    public void updateLocation() {
+        PlayerPositionTracker playerPositionTracker = this.getUser().get(PlayerPositionTracker.class);
+        bossBars.values().forEach(bossBar -> {
+            try {
+                bossBar.setPlayerLocation(playerPositionTracker.getPosX(), playerPositionTracker.getPosY(), playerPositionTracker.getPosZ(), playerPositionTracker.getYaw(), playerPositionTracker.getPitch());
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
 
-	public void changeWorld() {
-		bossBars.values().forEach(bossBar -> {
-			bossBar.hide();
-			bossBar.show();
-		});
-	}
+    public void changeWorld() {
+        bossBars.values().forEach(bossBar -> {
+            bossBar.hide();
+            bossBar.show();
+        });
+    }
 
-	public void updateHealth(UUID uuid, float health) {
-		WitherBossBar bossBar = bossBars.get(uuid);
-		if (bossBar == null) return;
-		bossBar.setHealth(health);
-	}
+    public void updateHealth(UUID uuid, float health) {
+        WitherBossBar bossBar = bossBars.get(uuid);
+        if (bossBar == null) return;
+        bossBar.setHealth(health);
+    }
 
-	public void updateTitle(UUID uuid, String title) {
-		WitherBossBar bossBar = bossBars.get(uuid);
-		if (bossBar == null) return;
-		bossBar.setTitle(title);
-	}
+    public void updateTitle(UUID uuid, String title) {
+        WitherBossBar bossBar = bossBars.get(uuid);
+        if (bossBar == null) return;
+        bossBar.setTitle(title);
+    }
 }

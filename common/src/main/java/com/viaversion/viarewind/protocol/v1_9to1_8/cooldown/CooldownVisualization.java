@@ -22,44 +22,43 @@ import com.viaversion.viarewind.api.ViaRewindConfig.CooldownIndicator;
 import com.viaversion.viaversion.api.connection.UserConnection;
 
 public interface CooldownVisualization {
-	void show(double progress) throws Exception;
+    int MAX_PROGRESS_TEXT_LENGTH = 10;
 
-	void hide() throws Exception;
+    static String buildProgressText(String symbol, double cooldown) {
+        int green = (int) Math.floor(((double) MAX_PROGRESS_TEXT_LENGTH) * cooldown);
+        int grey = MAX_PROGRESS_TEXT_LENGTH - green;
+        StringBuilder builder = new StringBuilder("§8");
+        while (green-- > 0) builder.append(symbol);
+        builder.append("§7");
+        while (grey-- > 0) builder.append(symbol);
+        return builder.toString();
+    }
 
+    void show(double progress) throws Exception;
 
-	int MAX_PROGRESS_TEXT_LENGTH = 10;
+    void hide() throws Exception;
 
-	static String buildProgressText(String symbol, double cooldown) {
-		int green = (int) Math.floor(((double) MAX_PROGRESS_TEXT_LENGTH) * cooldown);
-		int grey = MAX_PROGRESS_TEXT_LENGTH - green;
-		StringBuilder builder = new StringBuilder("§8");
-		while (green-- > 0) builder.append(symbol);
-		builder.append("§7");
-		while (grey-- > 0) builder.append(symbol);
-		return builder.toString();
-	}
+    interface Factory {
+        Factory DISABLED = user -> new DisabledCooldownVisualization();
 
-	interface Factory {
-		CooldownVisualization create(UserConnection user);
+        static Factory fromConfiguration() {
+            try {
+                return fromIndicator(ViaRewind.getConfig().getCooldownIndicator());
+            } catch (IllegalArgumentException e) {
+                ViaRewind.getPlatform().getLogger().warning("Invalid cooldown-indicator setting");
+                return DISABLED;
+            }
+        }
 
-		static Factory fromConfiguration() {
-			try {
-				return fromIndicator(ViaRewind.getConfig().getCooldownIndicator());
-			} catch (IllegalArgumentException e) {
-				ViaRewind.getPlatform().getLogger().warning("Invalid cooldown-indicator setting");
-				return DISABLED;
-			}
-		}
+        static Factory fromIndicator(CooldownIndicator indicator) {
+            return switch (indicator) {
+                case TITLE -> TitleCooldownVisualization::new;
+                case BOSS_BAR -> BossBarVisualization::new;
+                case ACTION_BAR -> ActionBarVisualization::new;
+                case DISABLED -> DISABLED;
+            };
+        }
 
-		static Factory fromIndicator(CooldownIndicator indicator) {
-			return switch (indicator) {
-				case TITLE -> TitleCooldownVisualization::new;
-				case BOSS_BAR -> BossBarVisualization::new;
-				case ACTION_BAR -> ActionBarVisualization::new;
-				case DISABLED -> DISABLED;
-			};
-		}
-
-		Factory DISABLED = user -> new DisabledCooldownVisualization();
-	}
+        CooldownVisualization create(UserConnection user);
+    }
 }

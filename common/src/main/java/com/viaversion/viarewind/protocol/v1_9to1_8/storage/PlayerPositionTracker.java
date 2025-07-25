@@ -20,77 +20,76 @@ package com.viaversion.viarewind.protocol.v1_9to1_8.storage;
 import com.viaversion.viarewind.protocol.v1_9to1_8.Protocol1_9To1_8;
 import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class PlayerPositionTracker implements StorableObject {
 
-	private final Queue<PacketWrapper> animations = new ConcurrentLinkedQueue<>();
-	private double posX, posY, posZ;
-	private float yaw, pitch;
-	private boolean onGround;
-	private int confirmId = -1;
+    private final Queue<PacketWrapper> animations = new ConcurrentLinkedQueue<>();
+    private double posX, posY, posZ;
+    private float yaw, pitch;
+    private boolean onGround;
+    private int confirmId = -1;
 
-	public void setPos(double x, double y, double z) {
-		this.posX = x;
-		this.posY = y;
-		this.posZ = z;
-	}
+    public void setPos(double x, double y, double z) {
+        this.posX = x;
+        this.posY = y;
+        this.posZ = z;
+    }
 
-	public void sendAnimations() {
-		PacketWrapper wrapper;
-		while ((wrapper = animations.poll()) != null) {
-			wrapper.sendToServer(Protocol1_9To1_8.class);
-		}
-	}
+    public void sendAnimations() {
+        PacketWrapper wrapper;
+        while ((wrapper = animations.poll()) != null) {
+            wrapper.sendToServer(Protocol1_9To1_8.class);
+        }
+    }
 
-	public void queueAnimation(final PacketWrapper wrapper) {
-		animations.add(wrapper);
-	}
+    public void queueAnimation(final PacketWrapper wrapper) {
+        animations.add(wrapper);
+    }
 
-	public void setYaw(float yaw) {
-		this.yaw = yaw % 360f;
-	}
+    public double getPosX() {
+        return this.posX;
+    }
 
-	public void setPitch(float pitch) {
-		this.pitch = pitch % 360f;
-	}
+    public double getPosY() {
+        return this.posY;
+    }
 
-	public double getPosX() {
-		return this.posX;
-	}
+    public double getPosZ() {
+        return this.posZ;
+    }
 
-	public double getPosY() {
-		return this.posY;
-	}
+    public float getYaw() {
+        return this.yaw;
+    }
 
-	public double getPosZ() {
-		return this.posZ;
-	}
+    public void setYaw(float yaw) {
+        this.yaw = yaw % 360f;
+    }
 
-	public float getYaw() {
-		return this.yaw;
-	}
+    public float getPitch() {
+        return this.pitch;
+    }
 
-	public float getPitch() {
-		return this.pitch;
-	}
+    public void setPitch(float pitch) {
+        this.pitch = pitch % 360f;
+    }
 
-	public boolean isOnGround() {
-		return this.onGround;
-	}
+    public boolean isOnGround() {
+        return this.onGround;
+    }
 
-	public int getConfirmId() {
-		return this.confirmId;
-	}
+    public void setOnGround(boolean onGround) {
+        this.onGround = onGround;
+    }
 
-	public void setOnGround(boolean onGround) {
-		this.onGround = onGround;
-	}
+    public int getConfirmId() {
+        return this.confirmId;
+    }
 
-	public void setConfirmId(int confirmId) {
-		this.confirmId = confirmId;
-	}
+    public void setConfirmId(int confirmId) {
+        this.confirmId = confirmId;
+    }
 
 }

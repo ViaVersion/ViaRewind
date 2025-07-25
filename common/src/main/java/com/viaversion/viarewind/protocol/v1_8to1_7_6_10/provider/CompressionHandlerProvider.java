@@ -24,17 +24,19 @@ import io.netty.channel.ChannelHandler;
 
 public abstract class CompressionHandlerProvider implements Provider {
 
-	public abstract void onHandleLoginCompressionPacket(UserConnection user, int threshold);
-	public abstract void onTransformPacket(UserConnection user);
+    public abstract void onHandleLoginCompressionPacket(UserConnection user, int threshold);
 
-	public abstract ChannelHandler getEncoder(int threshold);
-	public abstract ChannelHandler getDecoder(int threshold);
+    public abstract void onTransformPacket(UserConnection user);
 
-	public boolean isCompressionEnabled(UserConnection user) {
-		return user.get(CompressionStatusTracker.class).removeCompression;
-	}
+    public abstract ChannelHandler getEncoder(int threshold);
 
-	public void setCompressionEnabled(UserConnection user, boolean enabled) {
-		user.get(CompressionStatusTracker.class).removeCompression = enabled;
-	}
+    public abstract ChannelHandler getDecoder(int threshold);
+
+    public boolean isCompressionEnabled(UserConnection user) {
+        return user.get(CompressionStatusTracker.class).removeCompression;
+    }
+
+    public void setCompressionEnabled(UserConnection user, boolean enabled) {
+        user.get(CompressionStatusTracker.class).removeCompression = enabled;
+    }
 }

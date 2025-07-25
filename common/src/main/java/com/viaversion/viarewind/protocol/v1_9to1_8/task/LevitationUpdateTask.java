@@ -25,32 +25,31 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_8;
-
 import java.util.logging.Level;
 
 public class LevitationUpdateTask implements Runnable {
 
-	@Override
-	public void run() {
-		if (!ViaRewind.getConfig().emulateLevitationEffect()) {
-			return;
-		}
-		for (UserConnection connection : Via.getManager().getConnectionManager().getConnections()) {
-			final LevitationStorage levitation = connection.get(LevitationStorage.class);
-			if (!levitation.isActive()) {
-				continue;
-			}
+    @Override
+    public void run() {
+        if (!ViaRewind.getConfig().emulateLevitationEffect()) {
+            return;
+        }
+        for (UserConnection connection : Via.getManager().getConnectionManager().getConnections()) {
+            final LevitationStorage levitation = connection.get(LevitationStorage.class);
+            if (!levitation.isActive()) {
+                continue;
+            }
 
-			final PacketWrapper velocityPacket = PacketWrapper.create(ClientboundPackets1_8.SET_ENTITY_MOTION, connection);
-			velocityPacket.write(Types.VAR_INT, connection.getEntityTracker(Protocol1_9To1_8.class).clientEntityId());
-			velocityPacket.write(Types.SHORT, (short) 0);
-			velocityPacket.write(Types.SHORT, (short) ((levitation.getAmplifier() + 1) * 360));
-			velocityPacket.write(Types.SHORT, (short) 0);
-			try {
-				velocityPacket.scheduleSend(Protocol1_9To1_8.class);
-			} catch (Exception e) {
-				ViaRewind.getPlatform().getLogger().log(Level.SEVERE, "Failed to send levitation packet", e);
-			}
-		}
-	}
+            final PacketWrapper velocityPacket = PacketWrapper.create(ClientboundPackets1_8.SET_ENTITY_MOTION, connection);
+            velocityPacket.write(Types.VAR_INT, connection.getEntityTracker(Protocol1_9To1_8.class).clientEntityId());
+            velocityPacket.write(Types.SHORT, (short) 0);
+            velocityPacket.write(Types.SHORT, (short) ((levitation.getAmplifier() + 1) * 360));
+            velocityPacket.write(Types.SHORT, (short) 0);
+            try {
+                velocityPacket.scheduleSend(Protocol1_9To1_8.class);
+            } catch (Exception e) {
+                ViaRewind.getPlatform().getLogger().log(Level.SEVERE, "Failed to send levitation packet", e);
+            }
+        }
+    }
 }

@@ -30,12 +30,12 @@ public class LoggerWrapper extends Logger {
         this.base = logger;
     }
 
-	@Override
+    @Override
     public void log(LogRecord record) {
         this.log(record.getLevel(), record.getMessage());
     }
 
-	@Override
+    @Override
     public void log(Level level, String msg) {
         if (level == Level.FINE) {
             this.base.debug(msg);
@@ -51,7 +51,7 @@ public class LoggerWrapper extends Logger {
 
     }
 
-	@Override
+    @Override
     public void log(Level level, String msg, Object param1) {
         if (level == Level.FINE) {
             this.base.debug(msg, param1);
@@ -67,12 +67,12 @@ public class LoggerWrapper extends Logger {
 
     }
 
-	@Override
+    @Override
     public void log(Level level, String msg, Object[] params) {
         log(level, MessageFormat.format(msg, params));
     }
 
-	@Override
+    @Override
     public void log(Level level, String msg, Throwable params) {
         if (level == Level.FINE) {
             this.base.debug(msg, params);

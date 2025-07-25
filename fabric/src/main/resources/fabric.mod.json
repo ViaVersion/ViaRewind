@@ -29,7 +29,9 @@
   "custom": {
     "modmenu:api": true,
     "modmenu": {
-      "badges": [ "library" ],
+      "badges": [
+        "library"
+      ],
       "parent": "viafabric"
     }
   }

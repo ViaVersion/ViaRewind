@@ -24,9 +24,9 @@ import com.viaversion.viaversion.api.connection.UserConnection;
  * @see com.viaversion.viarewind.protocol.v1_8to1_7_6_10.provider.CompressionHandlerProvider
  */
 public class CompressionStatusTracker extends StoredObject {
-	public boolean removeCompression = false;
+    public boolean removeCompression = false;
 
-	public CompressionStatusTracker(UserConnection user) {
-		super(user);
-	}
+    public CompressionStatusTracker(UserConnection user) {
+        super(user);
+    }
 }

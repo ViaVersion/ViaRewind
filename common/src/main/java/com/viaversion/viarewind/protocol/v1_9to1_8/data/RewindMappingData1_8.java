@@ -17,32 +17,32 @@
  */
 package com.viaversion.viarewind.protocol.v1_9to1_8.data;
 
+import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.viarewind.api.data.RewindMappingDataLoader;
 import com.viaversion.viaversion.libs.fastutil.objects.ObjectArrayList;
 import com.viaversion.viaversion.libs.fastutil.objects.ObjectList;
 import com.viaversion.viaversion.libs.gson.JsonArray;
 import com.viaversion.viaversion.libs.gson.JsonElement;
-import com.viaversion.nbt.tag.CompoundTag;
 
 public final class RewindMappingData1_8 extends com.viaversion.viarewind.api.data.RewindMappingData {
 
-	private final ObjectList<String> sounds = new ObjectArrayList<>();
+    private final ObjectList<String> sounds = new ObjectArrayList<>();
 
-	public RewindMappingData1_8() {
-		super("1.9.4", "1.8");
-	}
+    public RewindMappingData1_8() {
+        super("1.9.4", "1.8");
+    }
 
-	@Override
-	protected void loadExtras(CompoundTag data) {
-		super.loadExtras(data);
+    @Override
+    protected void loadExtras(CompoundTag data) {
+        super.loadExtras(data);
 
-		final JsonArray sounds = RewindMappingDataLoader.INSTANCE.loadData("sounds-1.9.json").getAsJsonArray("sounds");
-		for (final JsonElement sound : sounds) {
-			this.sounds.add(sound.getAsString());
-		}
-	}
+        final JsonArray sounds = RewindMappingDataLoader.INSTANCE.loadData("sounds-1.9.json").getAsJsonArray("sounds");
+        for (final JsonElement sound : sounds) {
+            this.sounds.add(sound.getAsString());
+        }
+    }
 
-	public String soundName(final int soundId) {
-		return sounds.get(soundId);
-	}
+    public String soundName(final int soundId) {
+        return sounds.get(soundId);
+    }
 }

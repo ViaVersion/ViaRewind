@@ -18,19 +18,19 @@
 package com.viaversion.viarewind.api.minecraft.math;
 
 public class Ray3d {
-	Vector3d start;
-	Vector3d dir;
+    Vector3d start;
+    Vector3d dir;
 
-	public Ray3d(Vector3d start, Vector3d dir) {
-		this.start = start;
-		this.dir = dir;
-	}
+    public Ray3d(Vector3d start, Vector3d dir) {
+        this.start = start;
+        this.dir = dir;
+    }
 
-	public Vector3d getStart() {
-		return this.start;
-	}
+    public Vector3d getStart() {
+        return this.start;
+    }
 
-	public Vector3d getDir() {
-		return this.dir;
-	}
+    public Vector3d getDir() {
+        return this.dir;
+    }
 }

@@ -22,101 +22,100 @@ import com.viaversion.viarewind.protocol.v1_9to1_8.cooldown.CooldownVisualizatio
 import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.util.Pair;
-
 import java.util.List;
 import java.util.logging.Level;
 
 public class CooldownStorage implements StorableObject {
 
-	private CooldownVisualization.Factory visualizationFactory = CooldownVisualization.Factory.fromConfiguration();
-	private CooldownVisualization current;
+    private CooldownVisualization.Factory visualizationFactory = CooldownVisualization.Factory.fromConfiguration();
+    private CooldownVisualization current;
 
-	private double attackSpeed = 4.0;
-	private long lastHit = 0;
+    private double attackSpeed = 4.0;
+    private long lastHit = 0;
 
-	public void tick(final UserConnection connection) {
-		if (!hasCooldown()) {
-			endCurrentVisualization();
-			return;
-		}
-		BlockPlaceDestroyTracker tracker = connection.get(BlockPlaceDestroyTracker.class);
-		if (tracker.isMining()) {
-			lastHit = 0;
-			endCurrentVisualization();
-			return;
-		}
-		if (current == null) {
-			current = visualizationFactory.create(connection);
-		}
-		try {
-			current.show(getCooldown());
-		} catch (Exception exception) {
-			ViaRewind.getPlatform().getLogger().log(Level.WARNING, "Unable to show cooldown visualization", exception);
-		}
-	}
+    public void tick(final UserConnection connection) {
+        if (!hasCooldown()) {
+            endCurrentVisualization();
+            return;
+        }
+        BlockPlaceDestroyTracker tracker = connection.get(BlockPlaceDestroyTracker.class);
+        if (tracker.isMining()) {
+            lastHit = 0;
+            endCurrentVisualization();
+            return;
+        }
+        if (current == null) {
+            current = visualizationFactory.create(connection);
+        }
+        try {
+            current.show(getCooldown());
+        } catch (Exception exception) {
+            ViaRewind.getPlatform().getLogger().log(Level.WARNING, "Unable to show cooldown visualization", exception);
+        }
+    }
 
-	private void endCurrentVisualization() {
-		if (current != null) {
-			try {
-				current.hide();
-			} catch (Exception exception) {
-				ViaRewind.getPlatform().getLogger().log(Level.WARNING, "Unable to hide cooldown visualization", exception);
-			}
-			current = null;
-		}
-	}
+    private void endCurrentVisualization() {
+        if (current != null) {
+            try {
+                current.hide();
+            } catch (Exception exception) {
+                ViaRewind.getPlatform().getLogger().log(Level.WARNING, "Unable to hide cooldown visualization", exception);
+            }
+            current = null;
+        }
+    }
 
-	public boolean hasCooldown() {
-		long time = System.currentTimeMillis() - lastHit;
-		double cooldown = restrain(((double) time) * attackSpeed / 1000d, 1.5);
-		return cooldown > 0.1 && cooldown < 1.1;
-	}
+    public boolean hasCooldown() {
+        long time = System.currentTimeMillis() - lastHit;
+        double cooldown = restrain(((double) time) * attackSpeed / 1000d, 1.5);
+        return cooldown > 0.1 && cooldown < 1.1;
+    }
 
-	public double getCooldown() {
-		long time = System.currentTimeMillis() - lastHit;
-		return restrain(((double) time) * attackSpeed / 1000d, 1);
-	}
+    public double getCooldown() {
+        long time = System.currentTimeMillis() - lastHit;
+        return restrain(((double) time) * attackSpeed / 1000d, 1);
+    }
 
-	private double restrain(double x, double b) {
-		if (x < 0) return 0;
-		return Math.min(x, b);
-	}
+    private double restrain(double x, double b) {
+        if (x < 0) return 0;
+        return Math.min(x, b);
+    }
 
-	public void setAttackSpeed(double base, List<Pair<Byte, Double>> modifiers) {
-		attackSpeed = base;
-		for (int j = 0; j < modifiers.size(); j++) {
-			if (modifiers.get(j).key() == 0) {
-				attackSpeed += modifiers.get(j).value();
-				modifiers.remove(j--);
-			}
-		}
-		for (int j = 0; j < modifiers.size(); j++) {
-			if (modifiers.get(j).key() == 1) {
-				attackSpeed += base * modifiers.get(j).value();
-				modifiers.remove(j--);
-			}
-		}
-		for (int j = 0; j < modifiers.size(); j++) {
-			if (modifiers.get(j).key() == 2) {
-				attackSpeed *= (1.0 + modifiers.get(j).value());
-				modifiers.remove(j--);
-			}
-		}
-	}
+    public void setAttackSpeed(double base, List<Pair<Byte, Double>> modifiers) {
+        attackSpeed = base;
+        for (int j = 0; j < modifiers.size(); j++) {
+            if (modifiers.get(j).key() == 0) {
+                attackSpeed += modifiers.get(j).value();
+                modifiers.remove(j--);
+            }
+        }
+        for (int j = 0; j < modifiers.size(); j++) {
+            if (modifiers.get(j).key() == 1) {
+                attackSpeed += base * modifiers.get(j).value();
+                modifiers.remove(j--);
+            }
+        }
+        for (int j = 0; j < modifiers.size(); j++) {
+            if (modifiers.get(j).key() == 2) {
+                attackSpeed *= (1.0 + modifiers.get(j).value());
+                modifiers.remove(j--);
+            }
+        }
+    }
 
-	public void hit() {
-		lastHit = System.currentTimeMillis();
-	}
+    public void hit() {
+        lastHit = System.currentTimeMillis();
+    }
 
-	public void setLastHit(long lastHit) {
-		this.lastHit = lastHit;
-	}
+    public void setLastHit(long lastHit) {
+        this.lastHit = lastHit;
+    }
 
-	public CooldownVisualization.Factory getVisualizationFactory() {
-		return visualizationFactory;
-	}
+    public CooldownVisualization.Factory getVisualizationFactory() {
+        return visualizationFactory;
+    }
 
-	public void setVisualizationFactory(CooldownVisualization.Factory visualizationFactory) {
-		this.visualizationFactory = visualizationFactory;
-	}
+    public void setVisualizationFactory(CooldownVisualization.Factory visualizationFactory) {
+        this.visualizationFactory = visualizationFactory;
+    }
 }

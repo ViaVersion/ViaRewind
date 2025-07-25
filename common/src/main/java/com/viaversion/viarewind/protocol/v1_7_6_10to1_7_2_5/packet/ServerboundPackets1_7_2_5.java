@@ -20,38 +20,38 @@ package com.viaversion.viarewind.protocol.v1_7_6_10to1_7_2_5.packet;
 import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
 
 public enum ServerboundPackets1_7_2_5 implements ServerboundPacketType {
-	KEEP_ALIVE, // 0x00
-	CHAT, // 0x01
-	INTERACT, // 0x02
-	MOVE_PLAYER_STATUS_ONLY, // 0x03
-	MOVE_PLAYER_POS, // 0x04
-	MOVE_PLAYER_ROT, // 0x05
-	MOVE_PLAYER_POS_ROT, // 0x06
-	PLAYER_ACTION, // 0x07
-	USE_ITEM_ON, // 0x08
-	SET_CARRIED_ITEM, // 0x09
-	SWING, // 0x0A
-	PLAYER_COMMAND, // 0x0B
-	PLAYER_INPUT, // 0x0C
-	CONTAINER_CLOSE, // 0x0D
-	CONTAINER_CLICK, // 0x0E
-	CONTAINER_ACK, // 0x0F
-	SET_CREATIVE_MODE_SLOT, // 0x10
-	CONTAINER_BUTTON_CLICK, // 0x11
-	SIGN_UPDATE, // 0x12
-	PLAYER_ABILITIES, // 0x13
-	COMMAND_SUGGESTION, // 0x14
-	CLIENT_INFORMATION, // 0x15
-	CLIENT_COMMAND, // 0x16
-	CUSTOM_PAYLOAD; // 0x17
+    KEEP_ALIVE, // 0x00
+    CHAT, // 0x01
+    INTERACT, // 0x02
+    MOVE_PLAYER_STATUS_ONLY, // 0x03
+    MOVE_PLAYER_POS, // 0x04
+    MOVE_PLAYER_ROT, // 0x05
+    MOVE_PLAYER_POS_ROT, // 0x06
+    PLAYER_ACTION, // 0x07
+    USE_ITEM_ON, // 0x08
+    SET_CARRIED_ITEM, // 0x09
+    SWING, // 0x0A
+    PLAYER_COMMAND, // 0x0B
+    PLAYER_INPUT, // 0x0C
+    CONTAINER_CLOSE, // 0x0D
+    CONTAINER_CLICK, // 0x0E
+    CONTAINER_ACK, // 0x0F
+    SET_CREATIVE_MODE_SLOT, // 0x10
+    CONTAINER_BUTTON_CLICK, // 0x11
+    SIGN_UPDATE, // 0x12
+    PLAYER_ABILITIES, // 0x13
+    COMMAND_SUGGESTION, // 0x14
+    CLIENT_INFORMATION, // 0x15
+    CLIENT_COMMAND, // 0x16
+    CUSTOM_PAYLOAD; // 0x17
 
-	@Override
-	public int getId() {
-		return ordinal();
-	}
+    @Override
+    public int getId() {
+        return ordinal();
+    }
 
-	@Override
-	public String getName() {
-		return name();
-	}
+    @Override
+    public String getName() {
+        return name();
+    }
 }

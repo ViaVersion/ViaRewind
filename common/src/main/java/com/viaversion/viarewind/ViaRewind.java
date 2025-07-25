@@ -23,21 +23,21 @@ import com.viaversion.viarewind.api.ViaRewindPlatform;
 
 public class ViaRewind {
 
-	private static ViaRewindPlatform platform;
-	private static ViaRewindConfig config;
+    private static ViaRewindPlatform platform;
+    private static ViaRewindConfig config;
 
-	public static void init(ViaRewindPlatform platform, ViaRewindConfig config) {
-		Preconditions.checkArgument(ViaRewind.platform == null, "ViaRewind is already initialized");
+    public static void init(ViaRewindPlatform platform, ViaRewindConfig config) {
+        Preconditions.checkArgument(ViaRewind.platform == null, "ViaRewind is already initialized");
 
-		ViaRewind.platform = platform;
-		ViaRewind.config = config;
-	}
+        ViaRewind.platform = platform;
+        ViaRewind.config = config;
+    }
 
-	public static ViaRewindPlatform getPlatform() {
-		return ViaRewind.platform;
-	}
+    public static ViaRewindPlatform getPlatform() {
+        return ViaRewind.platform;
+    }
 
-	public static ViaRewindConfig getConfig() {
-		return ViaRewind.config;
-	}
+    public static ViaRewindConfig getConfig() {
+        return ViaRewind.config;
+    }
 }

@@ -31,36 +31,36 @@ import com.viaversion.viaversion.data.entity.EntityTrackerBase;
 
 public abstract class VREntityRewriter<C extends ClientboundPacketType, T extends BackwardsProtocol<C, ?, ?, ?>> extends LegacyEntityRewriter<C, T> {
 
-	public VREntityRewriter(T protocol) {
-		super(protocol, EntityDataTypes1_8.STRING, EntityDataTypes1_8.BYTE);
-	}
+    public VREntityRewriter(T protocol) {
+        super(protocol, EntityDataTypes1_8.STRING, EntityDataTypes1_8.BYTE);
+    }
 
-	public VREntityRewriter(T protocol, EntityDataType displayType, EntityDataType displayVisibilityType) {
-		super(protocol, displayType, displayVisibilityType);
-	}
+    public VREntityRewriter(T protocol, EntityDataType displayType, EntityDataType displayVisibilityType) {
+        super(protocol, displayType, displayVisibilityType);
+    }
 
-	protected void removeEntities(final UserConnection connection, final int[] entities) {
-		final EntityTrackerBase tracker = tracker(connection);
-		for (int entityId : entities) {
-			tracker.removeEntity(entityId);
-		}
-	}
+    protected void removeEntities(final UserConnection connection, final int[] entities) {
+        final EntityTrackerBase tracker = tracker(connection);
+        for (int entityId : entities) {
+            tracker.removeEntity(entityId);
+        }
+    }
 
-	protected PacketHandler getDimensionHandler() {
-		return wrapper -> {
-			final int dimension = wrapper.get(Types.BYTE, 0);
-			final ClientWorld clientWorld = wrapper.user().getClientWorld(protocol.getClass());
-			clientWorld.setEnvironment(dimension);
-		};
-	}
+    protected PacketHandler getDimensionHandler() {
+        return wrapper -> {
+            final int dimension = wrapper.get(Types.BYTE, 0);
+            final ClientWorld clientWorld = wrapper.user().getClientWorld(protocol.getClass());
+            clientWorld.setEnvironment(dimension);
+        };
+    }
 
-	@Override
-	protected Object getDisplayVisibilityDataValue() {
-		return (byte) 1;
-	}
+    @Override
+    protected Object getDisplayVisibilityDataValue() {
+        return (byte) 1;
+    }
 
-	@Override
-	protected boolean alwaysShowOriginalMobName() {
-		return ViaRewind.getConfig().alwaysShowOriginalMobName();
-	}
+    @Override
+    protected boolean alwaysShowOriginalMobName() {
+        return ViaRewind.getConfig().alwaysShowOriginalMobName();
+    }
 }

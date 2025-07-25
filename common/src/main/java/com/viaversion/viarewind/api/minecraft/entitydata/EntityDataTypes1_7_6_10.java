@@ -23,33 +23,33 @@ import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 
 public enum EntityDataTypes1_7_6_10 implements EntityDataType {
-	BYTE(0, Types.BYTE),
-	SHORT(1, Types.SHORT),
-	INT(2, Types.INT),
-	FLOAT(3, Types.FLOAT),
-	STRING(4, Types.STRING),
-	ITEM(5, RewindTypes.COMPRESSED_NBT_ITEM),
-	POSITION(6, Types.VECTOR);
+    BYTE(0, Types.BYTE),
+    SHORT(1, Types.SHORT),
+    INT(2, Types.INT),
+    FLOAT(3, Types.FLOAT),
+    STRING(4, Types.STRING),
+    ITEM(5, RewindTypes.COMPRESSED_NBT_ITEM),
+    POSITION(6, Types.VECTOR);
 
-	private final int typeID;
-	private final Type<?> type;
+    private final int typeID;
+    private final Type<?> type;
 
-	EntityDataTypes1_7_6_10(int typeID, Type<?> type) {
-		this.typeID = typeID;
-		this.type = type;
-	}
+    EntityDataTypes1_7_6_10(int typeID, Type<?> type) {
+        this.typeID = typeID;
+        this.type = type;
+    }
 
-	public static EntityDataTypes1_7_6_10 byId(int id) {
-		return values()[id];
-	}
+    public static EntityDataTypes1_7_6_10 byId(int id) {
+        return values()[id];
+    }
 
-	@Override
-	public int typeId() {
-		return this.typeID;
-	}
+    @Override
+    public int typeId() {
+        return this.typeID;
+    }
 
-	@Override
-	public Type<?> type() {
-		return this.type;
-	}
+    @Override
+    public Type<?> type() {
+        return this.type;
+    }
 }

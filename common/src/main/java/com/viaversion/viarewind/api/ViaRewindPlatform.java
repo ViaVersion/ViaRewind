@@ -25,7 +25,6 @@ import com.viaversion.viarewind.protocol.v1_9to1_8.Protocol1_9To1_8;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.protocol.ProtocolManager;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
-
 import java.io.File;
 import java.util.logging.Logger;
 
@@ -34,59 +33,59 @@ import java.util.logging.Logger;
  */
 public interface ViaRewindPlatform {
 
-	String VERSION = "${version}";
-	String IMPL_VERSION = "${impl_version}";
+    String VERSION = "${version}";
+    String IMPL_VERSION = "${impl_version}";
 
-	/**
-	 * Initialize ViaRewind
-	 */
-	default void init(final File configFile) {
-		ViaRewindConfig config = new ViaRewindConfig(configFile, getLogger());
-		config.reload();
-		Via.getManager().getConfigurationProvider().register(config);
+    /**
+     * Initialize ViaRewind
+     */
+    default void init(final File configFile) {
+        ViaRewindConfig config = new ViaRewindConfig(configFile, getLogger());
+        config.reload();
+        Via.getManager().getConfigurationProvider().register(config);
 
-		ViaRewind.init(this, config);
+        ViaRewind.init(this, config);
 
-		Via.getManager().getSubPlatforms().add(IMPL_VERSION);
+        Via.getManager().getSubPlatforms().add(IMPL_VERSION);
 
-		getLogger().info("Registering protocols...");
-		final ProtocolManager protocolManager = Via.getManager().getProtocolManager();
-		protocolManager.registerProtocol(new Protocol1_7_6_10To1_7_2_5(), ProtocolVersion.v1_7_2, ProtocolVersion.v1_7_6);
-		protocolManager.registerProtocol(new Protocol1_8To1_7_6_10(), ProtocolVersion.v1_7_6, ProtocolVersion.v1_8);
+        getLogger().info("Registering protocols...");
+        final ProtocolManager protocolManager = Via.getManager().getProtocolManager();
+        protocolManager.registerProtocol(new Protocol1_7_6_10To1_7_2_5(), ProtocolVersion.v1_7_2, ProtocolVersion.v1_7_6);
+        protocolManager.registerProtocol(new Protocol1_8To1_7_6_10(), ProtocolVersion.v1_7_6, ProtocolVersion.v1_8);
 
-		protocolManager.registerProtocol(new Protocol1_9To1_8(), ProtocolVersion.v1_8, ProtocolVersion.v1_9);
-	}
+        protocolManager.registerProtocol(new Protocol1_9To1_8(), ProtocolVersion.v1_8, ProtocolVersion.v1_9);
+    }
 
-	/**
-	 * Get the platform logger
-	 *
-	 * @return the logger
-	 */
-	Logger getLogger();
+    /**
+     * Get the platform logger
+     *
+     * @return the logger
+     */
+    Logger getLogger();
 
-	/**
-	 * Returns ViaRewind's data folder.
-	 *
-	 * @return data folder
-	 */
-	File getDataFolder();
+    /**
+     * Returns ViaRewind's data folder.
+     *
+     * @return data folder
+     */
+    File getDataFolder();
 
-	/**
-	 * Returns the platform's compression handler name. Only used in the 1.8 -> 1.7 protocol.
-	 *
-	 * @return the compression handler name
-	 */
-	default String compressHandlerName() {
-		return "compress";
-	}
+    /**
+     * Returns the platform's compression handler name. Only used in the 1.8 -> 1.7 protocol.
+     *
+     * @return the compression handler name
+     */
+    default String compressHandlerName() {
+        return "compress";
+    }
 
-	/**
-	 * Returns the platform's decompression handler name. Only used in the 1.8 -> 1.7 protocol.
-	 *
-	 * @return the decompression handler name
-	 */
-	default String decompressHandlerName() {
-		return "decompress";
-	}
+    /**
+     * Returns the platform's decompression handler name. Only used in the 1.8 -> 1.7 protocol.
+     *
+     * @return the decompression handler name
+     */
+    default String decompressHandlerName() {
+        return "decompress";
+    }
 
 }

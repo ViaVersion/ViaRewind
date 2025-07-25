@@ -28,224 +28,225 @@ import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
 import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes1_8;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Types;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 public class WitherBossBar implements BossBar {
 
-	private static int highestId = Integer.MAX_VALUE - 10000;
+    private static int highestId = Integer.MAX_VALUE - 10000;
 
-	private final UUID uuid;
-	private String title;
-	private float health;
-	private boolean visible = false;
+    private final UUID uuid;
+    private final UserConnection connection;
+    private final int entityId = highestId++;
+    private String title;
+    private float health;
+    private boolean visible = false;
+    private double locX, locY, locZ;
 
-	private final UserConnection connection;
+    public WitherBossBar(UserConnection connection, UUID uuid, String title, float health) {
+        this.connection = connection;
+        this.uuid = uuid;
+        this.title = title;
+        this.health = health;
+    }
 
-	private final int entityId = highestId++;
-	private double locX, locY, locZ;
+    @Override
+    public String getTitle() {
+        return title;
+    }
 
-	public WitherBossBar(UserConnection connection, UUID uuid, String title, float health) {
-		this.connection = connection;
-		this.uuid = uuid;
-		this.title = title;
-		this.health = health;
-	}
+    @Override
+    public BossBar setTitle(String title) {
+        this.title = title;
+        if (this.visible) {
+            updateEntityData();
+        }
+        return this;
+    }
 
-	@Override
-	public String getTitle() {
-		return title;
-	}
+    @Override
+    public float getHealth() {
+        return health;
+    }
 
-	@Override
-	public BossBar setTitle(String title) {
-		this.title = title;
-		if (this.visible) {
-			updateEntityData();
-		}
-		return this;
-	}
+    @Override
+    public BossBar setHealth(float health) {
+        this.health = health;
+        if (this.health <= 0) {
+            this.health = 0.0001f;
+        }
+        if (this.visible) {
+            updateEntityData();
+        }
+        return this;
+    }
 
-	@Override
-	public float getHealth() {
-		return health;
-	}
+    @Override
+    public BossColor getColor() {
+        return null;
+    }
 
-	@Override
-	public BossBar setHealth(float health) {
-		this.health = health;
-		if (this.health <= 0) {
-			this.health = 0.0001f;
-		}
-		if (this.visible) {
-			updateEntityData();
-		}
-		return this;
-	}
+    @Override
+    public BossBar setColor(BossColor bossColor) {
+        throw new UnsupportedOperationException(this.getClass().getName() + " does not support color");
+    }
 
-	@Override
-	public BossColor getColor() {
-		return null;
-	}
+    @Override
+    public BossStyle getStyle() {
+        return null;
+    }
 
-	@Override
-	public BossBar setColor(BossColor bossColor) {
-		throw new UnsupportedOperationException(this.getClass().getName() + " does not support color");
-	}
+    @Override
+    public BossBar setStyle(BossStyle bossStyle) {
+        throw new UnsupportedOperationException(this.getClass().getName() + " does not support styles");
+    }
 
-	@Override
-	public BossStyle getStyle() {
-		return null;
-	}
+    @Override
+    public BossBar addPlayer(UUID uuid) {
+        throw new UnsupportedOperationException(this.getClass().getName() + " is only for one UserConnection!");
+    }
 
-	@Override
-	public BossBar setStyle(BossStyle bossStyle) {
-		throw new UnsupportedOperationException(this.getClass().getName() + " does not support styles");
-	}
+    @Override
+    public BossBar addConnection(UserConnection userConnection) {
+        throw new UnsupportedOperationException(this.getClass().getName() + " is only for one UserConnection!");
+    }
 
-	@Override
-	public BossBar addPlayer(UUID uuid) {
-		throw new UnsupportedOperationException(this.getClass().getName() + " is only for one UserConnection!");
-	}
+    @Override
+    public BossBar removePlayer(UUID uuid) {
+        throw new UnsupportedOperationException(this.getClass().getName() + " is only for one UserConnection!");
+    }
 
-	@Override
-	public BossBar addConnection(UserConnection userConnection) {
-		throw new UnsupportedOperationException(this.getClass().getName() + " is only for one UserConnection!");
-	}
+    @Override
+    public BossBar removeConnection(UserConnection userConnection) {
+        throw new UnsupportedOperationException(this.getClass().getName() + " is only for one UserConnection!");
+    }
 
-	@Override
-	public BossBar removePlayer(UUID uuid) {
-		throw new UnsupportedOperationException(this.getClass().getName() + " is only for one UserConnection!");
-	}
+    @Override
+    public BossBar addFlag(BossFlag bossFlag) {
+        throw new UnsupportedOperationException(this.getClass().getName() + " does not support flags");
+    }
 
-	@Override
-	public BossBar removeConnection(UserConnection userConnection) {
-		throw new UnsupportedOperationException(this.getClass().getName() + " is only for one UserConnection!");
-	}
+    @Override
+    public BossBar removeFlag(BossFlag bossFlag) {
+        throw new UnsupportedOperationException(this.getClass().getName() + " does not support flags");
+    }
 
-	@Override
-	public BossBar addFlag(BossFlag bossFlag) {
-		throw new UnsupportedOperationException(this.getClass().getName() + " does not support flags");
-	}
+    @Override
+    public boolean hasFlag(BossFlag bossFlag) {
+        return false;
+    }
 
-	@Override
-	public BossBar removeFlag(BossFlag bossFlag) {
-		throw new UnsupportedOperationException(this.getClass().getName() + " does not support flags");
-	}
+    @Override
+    public Set<UUID> getPlayers() {
+        return Collections.singleton(connection.getProtocolInfo().getUuid());
+    }
 
-	@Override
-	public boolean hasFlag(BossFlag bossFlag) {
-		return false;
-	}
+    @Override
+    public Set<UserConnection> getConnections() {
+        throw new UnsupportedOperationException(this.getClass().getName() + " is only for one UserConnection!");
+    }
 
-	@Override
-	public Set<UUID> getPlayers() {
-		return Collections.singleton(connection.getProtocolInfo().getUuid());
-	}
+    @Override
+    public BossBar show() {
+        if (!this.visible) {
+            addWither();
+            this.visible = true;
+        }
+        return this;
+    }
 
-	@Override
-	public Set<UserConnection> getConnections() {
-		throw new UnsupportedOperationException(this.getClass().getName() + " is only for one UserConnection!");
-	}
+    @Override
+    public BossBar hide() {
+        if (this.visible) {
+            removeWither();
+            this.visible = false;
+        }
+        return this;
+    }
 
-	@Override
-	public BossBar show() {
-		if (!this.visible) {
-			addWither();
-			this.visible = true;
-		}
-		return this;
-	}
+    @Override
+    public boolean isVisible() {
+        return visible;
+    }
 
-	@Override
-	public BossBar hide() {
-		if (this.visible) {
-			removeWither();
-			this.visible = false;
-		}
-		return this;
-	}
+    @Override
+    public UUID getId() {
+        return this.uuid;
+    }
 
-	@Override
-	public boolean isVisible() {
-		return visible;
-	}
+    public void setLocation(double x, double y, double z) {
+        locX = x;
+        locY = y;
+        locZ = z;
+        updateLocation();
+    }
 
-	@Override
-	public UUID getId() {
-		return this.uuid;
-	}
+    private void addWither() {
+        final PacketWrapper addMob = PacketWrapper.create(ClientboundPackets1_7_2_5.ADD_MOB, this.connection);
+        addMob.write(Types.VAR_INT, entityId);
+        addMob.write(Types.UNSIGNED_BYTE, (short) 64);
+        addMob.write(Types.INT, (int) (locX * 32D));
+        addMob.write(Types.INT, (int) (locY * 32D));
+        addMob.write(Types.INT, (int) (locZ * 32D));
+        addMob.write(Types.BYTE, (byte) 0);
+        addMob.write(Types.BYTE, (byte) 0);
+        addMob.write(Types.BYTE, (byte) 0);
+        addMob.write(Types.SHORT, (short) 0);
+        addMob.write(Types.SHORT, (short) 0);
+        addMob.write(Types.SHORT, (short) 0);
 
-	public void setLocation(double x, double y, double z) {
-		locX = x;
-		locY = y;
-		locZ = z;
-		updateLocation();
-	}
+        final List<EntityData> entityData = new ArrayList<>();
+        entityData.add(new EntityData(0, EntityDataTypes1_8.BYTE, (byte) 0x20));
+        entityData.add(new EntityData(2, EntityDataTypes1_8.STRING, title));
+        entityData.add(new EntityData(3, EntityDataTypes1_8.BYTE, (byte) 1));
+        entityData.add(new EntityData(6, EntityDataTypes1_8.FLOAT, health * 300f));
 
-	private void addWither() {
-		final PacketWrapper addMob = PacketWrapper.create(ClientboundPackets1_7_2_5.ADD_MOB, this.connection);
-		addMob.write(Types.VAR_INT, entityId);
-		addMob.write(Types.UNSIGNED_BYTE, (short) 64);
-		addMob.write(Types.INT, (int) (locX * 32D));
-		addMob.write(Types.INT, (int) (locY * 32D));
-		addMob.write(Types.INT, (int) (locZ * 32D));
-		addMob.write(Types.BYTE, (byte) 0);
-		addMob.write(Types.BYTE, (byte) 0);
-		addMob.write(Types.BYTE, (byte) 0);
-		addMob.write(Types.SHORT, (short) 0);
-		addMob.write(Types.SHORT, (short) 0);
-		addMob.write(Types.SHORT, (short) 0);
+        addMob.write(Types.ENTITY_DATA_LIST1_8, entityData);
+        addMob.scheduleSend(Protocol1_9To1_8.class);
+    }
 
-		final List<EntityData> entityData = new ArrayList<>();
-		entityData.add(new EntityData(0, EntityDataTypes1_8.BYTE, (byte) 0x20));
-		entityData.add(new EntityData(2, EntityDataTypes1_8.STRING, title));
-		entityData.add(new EntityData(3, EntityDataTypes1_8.BYTE, (byte) 1));
-		entityData.add(new EntityData(6, EntityDataTypes1_8.FLOAT, health * 300f));
+    private void updateLocation() {
+        final PacketWrapper teleportEntity = PacketWrapper.create(ClientboundPackets1_7_2_5.TELEPORT_ENTITY, this.connection);
+        teleportEntity.write(Types.VAR_INT, entityId);
+        teleportEntity.write(Types.INT, (int) (locX * 32D));
+        teleportEntity.write(Types.INT, (int) (locY * 32D));
+        teleportEntity.write(Types.INT, (int) (locZ * 32D));
+        teleportEntity.write(Types.BYTE, (byte) 0);
+        teleportEntity.write(Types.BYTE, (byte) 0);
+        teleportEntity.write(Types.BOOLEAN, false);
+        teleportEntity.scheduleSend(Protocol1_9To1_8.class);
+    }
 
-		addMob.write(Types.ENTITY_DATA_LIST1_8, entityData);
-		addMob.scheduleSend(Protocol1_9To1_8.class);
-	}
+    private void updateEntityData() {
+        final PacketWrapper setEntityData = PacketWrapper.create(ClientboundPackets1_7_2_5.SET_ENTITY_DATA, this.connection);
+        setEntityData.write(Types.VAR_INT, entityId);
 
-	private void updateLocation() {
-		final PacketWrapper teleportEntity = PacketWrapper.create(ClientboundPackets1_7_2_5.TELEPORT_ENTITY, this.connection);
-		teleportEntity.write(Types.VAR_INT, entityId);
-		teleportEntity.write(Types.INT, (int) (locX * 32D));
-		teleportEntity.write(Types.INT, (int) (locY * 32D));
-		teleportEntity.write(Types.INT, (int) (locZ * 32D));
-		teleportEntity.write(Types.BYTE, (byte) 0);
-		teleportEntity.write(Types.BYTE, (byte) 0);
-		teleportEntity.write(Types.BOOLEAN, false);
-		teleportEntity.scheduleSend(Protocol1_9To1_8.class);
-	}
+        final List<EntityData> entityData = new ArrayList<>();
+        entityData.add(new EntityData(2, EntityDataTypes1_8.STRING, title));
+        entityData.add(new EntityData(6, EntityDataTypes1_8.FLOAT, health * 300f));
 
-	private void updateEntityData() {
-		final PacketWrapper setEntityData = PacketWrapper.create(ClientboundPackets1_7_2_5.SET_ENTITY_DATA, this.connection);
-		setEntityData.write(Types.VAR_INT, entityId);
+        setEntityData.write(Types.ENTITY_DATA_LIST1_8, entityData);
+        setEntityData.scheduleSend(Protocol1_9To1_8.class);
+    }
 
-		final List<EntityData> entityData = new ArrayList<>();
-		entityData.add(new EntityData(2, EntityDataTypes1_8.STRING, title));
-		entityData.add(new EntityData(6, EntityDataTypes1_8.FLOAT, health * 300f));
+    private void removeWither() {
+        final PacketWrapper removeEntity = PacketWrapper.create(ClientboundPackets1_7_2_5.REMOVE_ENTITIES, this.connection);
+        removeEntity.write(Types.VAR_INT_ARRAY_PRIMITIVE, new int[]{entityId});
+        removeEntity.scheduleSend(Protocol1_9To1_8.class);
+    }
 
-		setEntityData.write(Types.ENTITY_DATA_LIST1_8, entityData);
-		setEntityData.scheduleSend(Protocol1_9To1_8.class);
-	}
+    public void setPlayerLocation(double posX, double posY, double posZ, float yaw, float pitch) {
+        double yawR = Math.toRadians(yaw);
+        double pitchR = Math.toRadians(pitch);
 
-	private void removeWither() {
-		final PacketWrapper removeEntity = PacketWrapper.create(ClientboundPackets1_7_2_5.REMOVE_ENTITIES, this.connection);
-		removeEntity.write(Types.VAR_INT_ARRAY_PRIMITIVE, new int[]{entityId});
-		removeEntity.scheduleSend(Protocol1_9To1_8.class);
-	}
+        posX -= Math.cos(pitchR) * Math.sin(yawR) * 48;
+        posY -= Math.sin(pitchR) * 48;
+        posZ += Math.cos(pitchR) * Math.cos(yawR) * 48;
 
-	public void setPlayerLocation(double posX, double posY, double posZ, float yaw, float pitch) {
-		double yawR = Math.toRadians(yaw);
-		double pitchR = Math.toRadians(pitch);
-
-		posX -= Math.cos(pitchR) * Math.sin(yawR) * 48;
-		posY -= Math.sin(pitchR) * 48;
-		posZ += Math.cos(pitchR) * Math.cos(yawR) * 48;
-
-		setLocation(posX, posY, posZ);
-	}
+        setLocation(posX, posY, posZ);
+    }
 
 }

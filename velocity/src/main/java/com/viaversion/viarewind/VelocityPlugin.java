@@ -24,59 +24,58 @@ import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.plugin.Dependency;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
+import com.viaversion.viarewind.api.ViaRewindPlatform;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.velocity.util.LoggerWrapper;
-import com.viaversion.viarewind.api.ViaRewindPlatform;
-
 import java.io.File;
 import java.nio.file.Path;
 import java.util.logging.Logger;
 
 @Plugin(id = "viarewind",
-	name = "ViaRewind",
-	version = ViaRewindPlatform.VERSION,
-	authors = { "FlorianMichael/EnZaXD", "Gerrygames", "creeper123123321"},
-	description = "ViaVersion addon to allow 1.8.x and 1.7.x clients on newer server versions.",
-	dependencies = {
-		@Dependency(id = "viaversion"),
-		@Dependency(id = "viabackwards")
-	},
-	url = "https://viaversion.com/rewind"
+    name = "ViaRewind",
+    version = ViaRewindPlatform.VERSION,
+    authors = {"FlorianMichael/EnZaXD", "Gerrygames", "creeper123123321"},
+    description = "ViaVersion addon to allow 1.8.x and 1.7.x clients on newer server versions.",
+    dependencies = {
+        @Dependency(id = "viaversion"),
+        @Dependency(id = "viabackwards")
+    },
+    url = "https://viaversion.com/rewind"
 )
 public class VelocityPlugin implements ViaRewindPlatform {
-	private Logger logger;
+    private Logger logger;
 
-	@Inject
-	private org.slf4j.Logger loggerSlf4j;
+    @Inject
+    private org.slf4j.Logger loggerSlf4j;
 
-	@Inject
-	@DataDirectory
-	private Path configPath;
+    @Inject
+    @DataDirectory
+    private Path configPath;
 
-	@Subscribe(order = PostOrder.LATE)
-	public void onProxyStart(ProxyInitializeEvent e) {
-		this.logger = new LoggerWrapper(loggerSlf4j);
-		Via.getManager().addEnableListener(() -> this.init(new File(getDataFolder(), "config.yml")));
-	}
+    @Subscribe(order = PostOrder.LATE)
+    public void onProxyStart(ProxyInitializeEvent e) {
+        this.logger = new LoggerWrapper(loggerSlf4j);
+        Via.getManager().addEnableListener(() -> this.init(new File(getDataFolder(), "config.yml")));
+    }
 
-	@Override
-	public File getDataFolder() {
-		return configPath.toFile();
-	}
+    @Override
+    public File getDataFolder() {
+        return configPath.toFile();
+    }
 
-	@Override
-	public Logger getLogger() {
-		return this.logger;
-	}
+    @Override
+    public Logger getLogger() {
+        return this.logger;
+    }
 
-	@Override
-	public String compressHandlerName() {
-		return "compression-encoder";
-	}
+    @Override
+    public String compressHandlerName() {
+        return "compression-encoder";
+    }
 
-	@Override
-	public String decompressHandlerName() {
-		return "compression-decoder";
-	}
+    @Override
+    public String decompressHandlerName() {
+        return "compression-decoder";
+    }
 
 }

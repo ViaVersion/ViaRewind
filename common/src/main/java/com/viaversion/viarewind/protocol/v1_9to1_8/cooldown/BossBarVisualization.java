@@ -23,46 +23,45 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.libs.gson.JsonPrimitive;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_9;
-
 import java.util.UUID;
 
 public class BossBarVisualization implements CooldownVisualization {
-	private final UserConnection user;
-	private UUID bossUUID;
+    private final UserConnection user;
+    private UUID bossUUID;
 
-	public BossBarVisualization(UserConnection user) {
-		this.user = user;
-	}
+    public BossBarVisualization(UserConnection user) {
+        this.user = user;
+    }
 
-	@Override
-	public void show(double progress) throws Exception {
-		final PacketWrapper setBossbar = PacketWrapper.create(ClientboundPackets1_9.BOSS_EVENT, user);
-		if (bossUUID == null) {
-			bossUUID = UUID.randomUUID();
-			setBossbar.write(Types.UUID, bossUUID);
-			setBossbar.write(Types.VAR_INT, 0); // Action - add
-			setBossbar.write(Types.COMPONENT, new JsonPrimitive(" ")); // Title
-			setBossbar.write(Types.FLOAT, (float) progress); // Health
-			setBossbar.write(Types.VAR_INT, 0); // Color
-			setBossbar.write(Types.VAR_INT, 0); // Division
-			setBossbar.write(Types.UNSIGNED_BYTE, (short) 0); // Flags
-		} else {
-			setBossbar.write(Types.UUID, bossUUID);
-			setBossbar.write(Types.VAR_INT, 2); // Action - update health
-			setBossbar.write(Types.FLOAT, (float) progress); // Health
-		}
-		setBossbar.send(Protocol1_9To1_8.class, false);
-	}
+    @Override
+    public void show(double progress) throws Exception {
+        final PacketWrapper setBossbar = PacketWrapper.create(ClientboundPackets1_9.BOSS_EVENT, user);
+        if (bossUUID == null) {
+            bossUUID = UUID.randomUUID();
+            setBossbar.write(Types.UUID, bossUUID);
+            setBossbar.write(Types.VAR_INT, 0); // Action - add
+            setBossbar.write(Types.COMPONENT, new JsonPrimitive(" ")); // Title
+            setBossbar.write(Types.FLOAT, (float) progress); // Health
+            setBossbar.write(Types.VAR_INT, 0); // Color
+            setBossbar.write(Types.VAR_INT, 0); // Division
+            setBossbar.write(Types.UNSIGNED_BYTE, (short) 0); // Flags
+        } else {
+            setBossbar.write(Types.UUID, bossUUID);
+            setBossbar.write(Types.VAR_INT, 2); // Action - update health
+            setBossbar.write(Types.FLOAT, (float) progress); // Health
+        }
+        setBossbar.send(Protocol1_9To1_8.class, false);
+    }
 
-	@Override
-	public void hide() throws Exception {
-		if (bossUUID == null) {
-			return;
-		}
-		final PacketWrapper removeBossbar = PacketWrapper.create(ClientboundPackets1_9.BOSS_EVENT, user);
-		removeBossbar.write(Types.UUID, bossUUID);
-		removeBossbar.write(Types.VAR_INT, 1); // Action - remove
-		removeBossbar.send(Protocol1_9To1_8.class, false);
-		bossUUID = null;
-	}
+    @Override
+    public void hide() throws Exception {
+        if (bossUUID == null) {
+            return;
+        }
+        final PacketWrapper removeBossbar = PacketWrapper.create(ClientboundPackets1_9.BOSS_EVENT, user);
+        removeBossbar.write(Types.UUID, bossUUID);
+        removeBossbar.write(Types.VAR_INT, 1); // Action - remove
+        removeBossbar.send(Protocol1_9To1_8.class, false);
+        bossUUID = null;
+    }
 }

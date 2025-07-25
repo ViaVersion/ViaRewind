@@ -22,49 +22,48 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
-
 import java.util.zip.Deflater;
 
 public class CompressionEncoder extends MessageToByteEncoder<ByteBuf> {
-	private final Deflater deflater = new Deflater();
+    private final Deflater deflater = new Deflater();
 
-	private final int threshold;
+    private final int threshold;
 
-	public CompressionEncoder(final int threshold) {
-		this.threshold = threshold;
-	}
+    public CompressionEncoder(final int threshold) {
+        this.threshold = threshold;
+    }
 
-	@Override
-	protected void encode(ChannelHandlerContext ctx, ByteBuf in, ByteBuf out) throws Exception {
-		int frameLength = in.readableBytes();
-		if (frameLength < this.threshold) {
-			out.writeByte(0); // VarInt
-			out.writeBytes(in);
-			return;
-		}
+    @Override
+    protected void encode(ChannelHandlerContext ctx, ByteBuf in, ByteBuf out) throws Exception {
+        int frameLength = in.readableBytes();
+        if (frameLength < this.threshold) {
+            out.writeByte(0); // VarInt
+            out.writeBytes(in);
+            return;
+        }
 
-		Types.VAR_INT.writePrimitive(out, frameLength);
+        Types.VAR_INT.writePrimitive(out, frameLength);
 
-		ByteBuf temp = in;
-		if (!in.hasArray()) {
-			temp = ByteBufAllocator.DEFAULT.heapBuffer().writeBytes(in);
-		} else {
-			in.retain();
-		}
-		ByteBuf output = ByteBufAllocator.DEFAULT.heapBuffer();
-		try {
-			this.deflater.setInput(temp.array(), temp.arrayOffset() + temp.readerIndex(), temp.readableBytes());
-			deflater.finish();
+        ByteBuf temp = in;
+        if (!in.hasArray()) {
+            temp = ByteBufAllocator.DEFAULT.heapBuffer().writeBytes(in);
+        } else {
+            in.retain();
+        }
+        ByteBuf output = ByteBufAllocator.DEFAULT.heapBuffer();
+        try {
+            this.deflater.setInput(temp.array(), temp.arrayOffset() + temp.readerIndex(), temp.readableBytes());
+            deflater.finish();
 
-			while (!deflater.finished()) {
-				output.ensureWritable(4096);
-				output.writerIndex(output.writerIndex() + this.deflater.deflate(output.array(), output.arrayOffset() + output.writerIndex(), output.writableBytes()));
-			}
-			out.writeBytes(output);
-		} finally {
-			output.release();
-			temp.release();
-			this.deflater.reset();
-		}
-	}
+            while (!deflater.finished()) {
+                output.ensureWritable(4096);
+                output.writerIndex(output.writerIndex() + this.deflater.deflate(output.array(), output.arrayOffset() + output.writerIndex(), output.writableBytes()));
+            }
+            out.writeBytes(output);
+        } finally {
+            output.release();
+            temp.release();
+            this.deflater.reset();
+        }
+    }
 }

@@ -18,7 +18,6 @@
 package com.viaversion.viarewind;
 
 import com.viaversion.viaversion.util.Config;
-
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
@@ -29,105 +28,105 @@ import java.util.logging.Logger;
 
 public class ViaRewindConfig extends Config implements com.viaversion.viarewind.api.ViaRewindConfig {
 
-	private CooldownIndicator cooldownIndicator;
-	private boolean replaceAdventureMode;
-	private boolean replaceParticles;
-	private int maxBookPages;
-	private int maxBookPageSize;
-	private boolean emulateWorldBorder;
-	private boolean alwaysShowOriginalMobName;
-	private String worldBorderParticle;
-	private boolean enableOffhand;
-	private String offhandCommand;
-	private boolean emulateLevitationEffect;
-	private boolean handlePlayerCombatPacket;
+    private CooldownIndicator cooldownIndicator;
+    private boolean replaceAdventureMode;
+    private boolean replaceParticles;
+    private int maxBookPages;
+    private int maxBookPageSize;
+    private boolean emulateWorldBorder;
+    private boolean alwaysShowOriginalMobName;
+    private String worldBorderParticle;
+    private boolean enableOffhand;
+    private String offhandCommand;
+    private boolean emulateLevitationEffect;
+    private boolean handlePlayerCombatPacket;
 
     public ViaRewindConfig(File configFile, Logger logger) {
         super(configFile, logger);
     }
 
-	@Override
-	public void reload() {
-		super.reload();
-		loadFields();
-	}
+    @Override
+    public void reload() {
+        super.reload();
+        loadFields();
+    }
 
-	private void loadFields() {
-		cooldownIndicator = CooldownIndicator.valueOf(getString("cooldown-indicator", "TITLE").toUpperCase());
-		replaceAdventureMode = getBoolean("replace-adventure", false);
-		replaceParticles = getBoolean("replace-particles", false);
-		maxBookPages = getInt("max-book-pages", 100);
-		maxBookPageSize = getInt("max-book-page-length", 5000);
-		emulateWorldBorder = getBoolean("emulate-world-border", true);
-		alwaysShowOriginalMobName = getBoolean("always-show-original-mob-name", true);
-		worldBorderParticle = getString("world-border-particle", "fireworksSpark");
-		enableOffhand = getBoolean("enable-offhand", true);
-		offhandCommand = getString("offhand-command", "/offhand");
-		emulateLevitationEffect = getBoolean("emulate-levitation-effect", true);
-		handlePlayerCombatPacket = getBoolean("handle-player-combat-packet", true);
-	}
+    private void loadFields() {
+        cooldownIndicator = CooldownIndicator.valueOf(getString("cooldown-indicator", "TITLE").toUpperCase());
+        replaceAdventureMode = getBoolean("replace-adventure", false);
+        replaceParticles = getBoolean("replace-particles", false);
+        maxBookPages = getInt("max-book-pages", 100);
+        maxBookPageSize = getInt("max-book-page-length", 5000);
+        emulateWorldBorder = getBoolean("emulate-world-border", true);
+        alwaysShowOriginalMobName = getBoolean("always-show-original-mob-name", true);
+        worldBorderParticle = getString("world-border-particle", "fireworksSpark");
+        enableOffhand = getBoolean("enable-offhand", true);
+        offhandCommand = getString("offhand-command", "/offhand");
+        emulateLevitationEffect = getBoolean("emulate-levitation-effect", true);
+        handlePlayerCombatPacket = getBoolean("handle-player-combat-packet", true);
+    }
 
-	@Override
+    @Override
     public CooldownIndicator getCooldownIndicator() {
-		return cooldownIndicator;
+        return cooldownIndicator;
     }
 
     @Override
     public boolean isReplaceAdventureMode() {
-		return replaceAdventureMode;
+        return replaceAdventureMode;
     }
 
     @Override
     public boolean isReplaceParticles() {
-		return replaceParticles;
+        return replaceParticles;
     }
 
     @Override
     public int getMaxBookPages() {
-		return maxBookPages;
+        return maxBookPages;
     }
 
     @Override
     public int getMaxBookPageSize() {
-		return maxBookPageSize;
+        return maxBookPageSize;
     }
 
-	@Override
-	public boolean isEmulateWorldBorder() {
-		return emulateWorldBorder;
-	}
+    @Override
+    public boolean isEmulateWorldBorder() {
+        return emulateWorldBorder;
+    }
 
-	@Override
-	public boolean alwaysShowOriginalMobName() {
-		return alwaysShowOriginalMobName;
-	}
+    @Override
+    public boolean alwaysShowOriginalMobName() {
+        return alwaysShowOriginalMobName;
+    }
 
-	@Override
-	public String getWorldBorderParticle() {
-		return worldBorderParticle;
-	}
+    @Override
+    public String getWorldBorderParticle() {
+        return worldBorderParticle;
+    }
 
-	@Override
-	public boolean isEnableOffhand() {
-		return enableOffhand;
-	}
+    @Override
+    public boolean isEnableOffhand() {
+        return enableOffhand;
+    }
 
-	@Override
-	public String getOffhandCommand() {
-		return offhandCommand;
-	}
+    @Override
+    public String getOffhandCommand() {
+        return offhandCommand;
+    }
 
-	@Override
-	public boolean emulateLevitationEffect() {
-		return emulateLevitationEffect;
-	}
+    @Override
+    public boolean emulateLevitationEffect() {
+        return emulateLevitationEffect;
+    }
 
-	@Override
-	public boolean handlePlayerCombatPacket() {
-		return handlePlayerCombatPacket;
-	}
+    @Override
+    public boolean handlePlayerCombatPacket() {
+        return handlePlayerCombatPacket;
+    }
 
-	@Override
+    @Override
     public URL getDefaultConfigURL() {
         return getClass().getClassLoader().getResource("assets/viarewind/config.yml");
     }
