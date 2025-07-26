@@ -126,11 +126,12 @@ public class PlayerPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6_10>
                         return;
                     }
 
-                    // TODO figure out why this is needed
+                    // On 1.8 clients when the player respawns it keeps all metadata and sets player back to max HP
+                    // 1.7 clients do not copy the metadata but do set the health to max HP
+                    // to match the same client logic we remove the HP metadata as otherwise the client would be set to their old HP before respawning
                     final List<EntityData> entityDataList = new ArrayList<>(tracker.getEntityData());
                     entityDataList.removeIf(entityData -> entityData.id() == 6);
 
-                    // 1.8 clients do keep entity data after respawn, 1.7 clients don't
                     final PacketWrapper setEntityData = PacketWrapper.create(ClientboundPackets1_7_2_5.SET_ENTITY_DATA, wrapper.user());
                     setEntityData.write(Types.INT, tracker.clientEntityId());
                     setEntityData.write(RewindTypes.ENTITY_DATA_LIST1_7, entityDataList);
