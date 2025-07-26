@@ -49,6 +49,7 @@ public class VirtualHologramEntity {
     private boolean small = false;
     private boolean marker = false;
     private boolean sneaking = false;
+    private boolean gravity = false;
     private byte alwaysShowNametag;
 
     public VirtualHologramEntity(final UserConnection user, final int entityId) {
@@ -116,12 +117,15 @@ public class VirtualHologramEntity {
         sneaking = (flags & 0x02) != 0;
         small = (armorStandFlags & 0x01) != 0;
         marker = (armorStandFlags & 0x10) != 0;
+        gravity = (armorStandFlags & 0x02) == 0;
 
         State prevState = currentState;
         if (invisible && name != null) {
             currentState = State.HOLOGRAM;
-        } else {
+        } else if (gravity) {
             currentState = State.ZOMBIE;
+        } else {
+            currentState = State.ZOMBIE_NO_GRAVITY;
         }
 
         if (currentState != prevState) {
@@ -146,21 +150,25 @@ public class VirtualHologramEntity {
             entityHeadLook.write(Types.BYTE, (byte) ((headYaw / 360f) * 256));
 
             entityHeadLook.send(Protocol1_8To1_7_6_10.class);
-        } else if (currentState == State.HOLOGRAM) {
+        } else if (currentState == State.HOLOGRAM || currentState == State.ZOMBIE_NO_GRAVITY) {
             // Don't ask me where this offset is coming from
-            teleportEntity(entityIds[0], locX, (locY + getOffset()), locZ, 0, 0); // Skull
+            teleportEntity(entityIds[1], locX, (locY + getOffset()), locZ, 0, 0); // Squid
         }
     }
 
     private double getOffset() {
-        double baseOffset = 54.35;
+        if (currentState == State.HOLOGRAM) {
+            double baseOffset = 54.35;
 
-        if (marker) {
-            return baseOffset;
-        } else if (small) {
-            return baseOffset + 0.9875;
+            if (marker) {
+                return baseOffset;
+            } else if (small) {
+                return baseOffset + 0.9875;
+            } else {
+                return baseOffset + (0.9875 * 2);
+            }
         } else {
-            return baseOffset + (0.9875 * 2);
+            return -0.4;
         }
     }
 
@@ -202,7 +210,7 @@ public class VirtualHologramEntity {
         }
         final PacketWrapper setEntityData = PacketWrapper.create(ClientboundPackets1_7_2_5.SET_ENTITY_DATA, user);
 
-        if (currentState == State.ZOMBIE) {
+        if (currentState == State.ZOMBIE || currentState == State.ZOMBIE_NO_GRAVITY) {
             writeZombieMeta(entityRewriter, setEntityData);
         } else if (currentState == State.HOLOGRAM) {
             writeHologramMeta(setEntityData);
@@ -246,7 +254,7 @@ public class VirtualHologramEntity {
     }
 
     private void writeHologramMeta(PacketWrapper wrapper) {
-        wrapper.write(Types.INT, entityIds[1]);
+        wrapper.write(Types.INT, entityIds[0]);
 
         // Directly write 1.7 entity data here since we are making them up
         final List<EntityData> entityDataList = new ArrayList<>();
@@ -266,25 +274,19 @@ public class VirtualHologramEntity {
             spawnEntity(entityId, EntityTypes1_8.EntityType.ZOMBIE.getId(), locX, locY, locZ, new ArrayList<>());
 
             entityIds = new int[]{entityId};
-        } else if (currentState == State.HOLOGRAM) {
+        } else if (currentState == State.ZOMBIE_NO_GRAVITY || currentState == State.HOLOGRAM) {
             final int[] entityIds = {entityId, additionalEntityId()};
-
-            final PacketWrapper spawnSkull = PacketWrapper.create(ClientboundPackets1_7_2_5.ADD_ENTITY, user);
-            spawnSkull.write(Types.VAR_INT, entityIds[0]);
-            spawnSkull.write(Types.BYTE, (byte) 66);
-            spawnSkull.write(Types.INT, (int) (locX * 32.0));
-            spawnSkull.write(Types.INT, (int) ((locY + getOffset()) * 32.0));
-            spawnSkull.write(Types.INT, (int) (locZ * 32.0));
-            spawnSkull.write(Types.BYTE, (byte) 0);
-            spawnSkull.write(Types.BYTE, (byte) 0);
-            spawnSkull.write(Types.INT, 0);
-            spawnSkull.send(Protocol1_8To1_7_6_10.class);
 
             final List<EntityData> squidEntityData = new ArrayList<>();
             squidEntityData.add(new EntityData(0, EntityDataTypes1_8.BYTE, (byte) 32));
 
-            spawnEntity(entityIds[0], EntityTypes1_8.EntityType.SQUID.getId(), locX, locY + getOffset(), locZ, squidEntityData);
-            spawnEntity(entityIds[1], EntityTypes1_8.EntityType.HORSE.getId(), locX, locY + (getOffset() + 0.68), locZ, new ArrayList<>());
+            if (currentState == State.HOLOGRAM) {
+                spawnEntity(entityIds[0], EntityTypes1_8.EntityType.HORSE.getId(), locX, locY + (getOffset() + 0.68), locZ, new ArrayList<>());
+            } else {
+                spawnEntity(entityIds[0], EntityTypes1_8.EntityType.ZOMBIE.getId(), locX, locY, locZ, new ArrayList<>());
+            }
+
+            spawnEntity(entityIds[1], EntityTypes1_8.EntityType.SQUID.getId(), locX, locY + getOffset(), locZ, squidEntityData);
 
             this.entityIds = entityIds;
         }
@@ -298,8 +300,8 @@ public class VirtualHologramEntity {
             updateLocation();
         } else {
             final PacketWrapper attach = PacketWrapper.create(ClientboundPackets1_7_2_5.SET_ENTITY_LINK, user);
-            attach.write(Types.INT, entityIds[1]);
             attach.write(Types.INT, entityIds[0]);
+            attach.write(Types.INT, entityIds[1]);
             attach.write(Types.BOOLEAN, false);
 
             attach.send(Protocol1_8To1_7_6_10.class);
@@ -334,6 +336,6 @@ public class VirtualHologramEntity {
     }
 
     private enum State {
-        HOLOGRAM, ZOMBIE
+        HOLOGRAM, ZOMBIE, ZOMBIE_NO_GRAVITY
     }
 }
