@@ -39,8 +39,8 @@ public class GameProfileStorage extends StoredObject {
         super(user);
     }
 
-    public GameProfile put(UUID uuid, String name) {
-        GameProfile gameProfile = new GameProfile(uuid, name);
+    public GameProfile put(UUID uuid, String name, String displayName, int ping, int gamemode) {
+        GameProfile gameProfile = new GameProfile(uuid, name, displayName, ping, gamemode);
         properties.put(uuid, gameProfile);
         return gameProfile;
     }
@@ -86,16 +86,19 @@ public class GameProfileStorage extends StoredObject {
 
 
     public static class GameProfile {
-        public final String name;
         public final UUID uuid;
+        public final String name;
         public String displayName;
-        public int ping;
         public List<Property> properties = new ArrayList<>();
+        public int ping;
         public int gamemode = 0;
 
-        public GameProfile(UUID uuid, String name) {
-            this.name = name;
+        public GameProfile(UUID uuid, String name, String displayName, int ping, int gamemode) {
             this.uuid = uuid;
+            this.name = name;
+            this.displayName = displayName;
+            this.ping = ping;
+            this.gamemode = gamemode;
         }
 
         public Item getSkull() {
@@ -121,7 +124,7 @@ public class GameProfileStorage extends StoredObject {
             return new DataItem(397, (byte) 1, (short) 3, tag);
         }
 
-        public String getDisplayName() {
+        public String getLegacyDisplayName() {
             String displayName = this.displayName == null ? name : this.displayName;
             if (displayName.length() > 16) displayName = ChatUtil.removeUnusedColor(displayName, 'f');
             if (displayName.length() > 16) displayName = ChatColorUtil.stripColor(displayName);
