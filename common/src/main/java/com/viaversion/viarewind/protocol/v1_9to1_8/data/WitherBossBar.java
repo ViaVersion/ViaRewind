@@ -203,6 +203,7 @@ public class WitherBossBar implements BossBar {
         entityData.add(new EntityData(2, EntityDataTypes1_8.STRING, title));
         entityData.add(new EntityData(3, EntityDataTypes1_8.BYTE, (byte) 1));
         entityData.add(new EntityData(6, EntityDataTypes1_8.FLOAT, health * 300f));
+        entityData.add(new EntityData(20, EntityDataTypes1_8.INT, 880));
 
         addMob.write(Types.ENTITY_DATA_LIST1_8, entityData);
         addMob.scheduleSend(Protocol1_9To1_8.class);
