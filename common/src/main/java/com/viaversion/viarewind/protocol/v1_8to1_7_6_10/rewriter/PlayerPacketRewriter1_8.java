@@ -29,6 +29,7 @@ import com.viaversion.viarewind.api.type.RewindTypes;
 import com.viaversion.viarewind.protocol.v1_7_6_10to1_7_2_5.packet.ClientboundPackets1_7_2_5;
 import com.viaversion.viarewind.protocol.v1_7_6_10to1_7_2_5.packet.ServerboundPackets1_7_2_5;
 import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.Protocol1_8To1_7_6_10;
+import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.data.ChatItemRewriter;
 import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.provider.TitleRenderProvider;
 import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.storage.EntityTracker1_8;
 import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.storage.GameProfileStorage;
@@ -70,6 +71,9 @@ public class PlayerPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6_10>
             public void register() {
                 map(Types.COMPONENT); // Chat message
                 handler(wrapper -> {
+                    final JsonElement json = wrapper.get(Types.COMPONENT, 0);
+                    ChatItemRewriter.toClient(protocol, wrapper.user(), json);
+
                     final int position = wrapper.read(Types.BYTE);
                     if (position == 2) { // Above hotbar
                         wrapper.cancel();
