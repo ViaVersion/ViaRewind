@@ -17,7 +17,6 @@
  */
 package com.viaversion.viarewind.protocol.v1_8to1_7_6_10.rewriter;
 
-import com.viaversion.nbt.stringified.SNBT;
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.nbt.tag.StringTag;
@@ -30,6 +29,7 @@ import com.viaversion.viarewind.api.type.RewindTypes;
 import com.viaversion.viarewind.protocol.v1_7_6_10to1_7_2_5.packet.ClientboundPackets1_7_2_5;
 import com.viaversion.viarewind.protocol.v1_7_6_10to1_7_2_5.packet.ServerboundPackets1_7_2_5;
 import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.Protocol1_8To1_7_6_10;
+import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.data.ChatItemRewriter;
 import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.provider.TitleRenderProvider;
 import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.storage.EntityTracker1_8;
 import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.storage.GameProfileStorage;
@@ -37,18 +37,15 @@ import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.storage.InventoryTracker
 import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.storage.PlayerSessionStorage;
 import com.viaversion.viarewind.utils.ChatUtil;
 import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.minecraft.GameProfile;
 import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
-import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.rewriter.RewriterBase;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.libs.gson.JsonElement;
-import com.viaversion.viaversion.libs.gson.JsonObject;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ServerboundPackets1_8;
 import com.viaversion.viaversion.util.ComponentUtil;
@@ -72,10 +69,10 @@ public class PlayerPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6_10>
         protocol.registerClientbound(ClientboundPackets1_8.CHAT, new PacketHandlers() {
             @Override
             public void register() {
+                map(Types.COMPONENT); // Chat message
                 handler(wrapper -> {
-                    final JsonElement json = wrapper.read(Types.COMPONENT);
-                    convertHoverItemToLegacy(wrapper.user(), json);
-                    wrapper.write(Types.COMPONENT, json);
+                    final JsonElement json = wrapper.get(Types.COMPONENT, 0);
+                    ChatItemRewriter.toClient(protocol, wrapper.user(), json);
 
                     final int position = wrapper.read(Types.BYTE);
                     if (position == 2) { // Above hotbar
@@ -801,68 +798,6 @@ public class PlayerPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6_10>
                 });
             }
         });
-    }
-
-    private void convertHoverItemToLegacy(UserConnection connection, JsonElement element) {
-        if (element.isJsonObject()) {
-            JsonObject obj = element.getAsJsonObject();
-
-            if (obj.has("hoverEvent")) {
-                JsonObject hoverEvent = obj.getAsJsonObject("hoverEvent");
-
-                String action = hoverEvent.get("action").getAsString();
-
-                if (action.equals("show_item")) {
-                    String value = hoverEvent.get("value").getAsString();
-
-                    hoverEvent.addProperty("value", convertHoverItemToLegacy(connection, value));
-                }
-            }
-
-            if (obj.has("extra")) {
-                obj.getAsJsonArray("extra").forEach(item -> convertHoverItemToLegacy(connection, item));
-            }
-        }
-    }
-
-    private String convertHoverItemToLegacy(UserConnection connection, String value) {
-        try {
-            CompoundTag tag = SNBT.deserializeCompoundTag(value);
-
-            String idTag = tag.getString("id");
-
-            short id;
-            if (idTag != null) {
-                id = (short) protocol.getMappingData().getByNameOrId(idTag);
-            } else {
-                id = tag.getShort("id", (short) 0); // 1.8 falls back to reading the id as short
-            }
-
-            byte amount = tag.getByte("Count", (byte) 0);
-            short data = tag.getShort("Damage", (short) 0);
-
-            CompoundTag nbt = tag.getCompoundTag("tag");
-
-            DataItem item = new DataItem(id, amount, data, nbt);
-            item = (DataItem) protocol.getItemRewriter().handleItemToClient(connection, item);
-
-            tag.putShort("id", (short) item.identifier());
-            tag.putByte("Count", (byte) item.amount());
-            tag.putShort("Damage", item.data());
-
-            CompoundTag rewrittenNBT = item.tag();
-
-            if (rewrittenNBT != null) {
-                tag.put("tag", item.tag());
-            }
-
-
-            return SNBT.serialize(tag);
-        } catch (Exception ignored) {
-            // The client also silently fails and shows "Invalid item!" if the data is incorrect
-            return value;
-        }
-
     }
 
 }

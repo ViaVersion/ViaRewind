@@ -22,7 +22,6 @@ import com.viaversion.viarewind.ViaRewind;
 import com.viaversion.viarewind.api.data.RewindMappingData;
 import com.viaversion.viarewind.protocol.v1_7_6_10to1_7_2_5.packet.ClientboundPackets1_7_2_5;
 import com.viaversion.viarewind.protocol.v1_7_6_10to1_7_2_5.packet.ServerboundPackets1_7_2_5;
-import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.data.RewindMappingData1_8;
 import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.provider.CompressionHandlerProvider;
 import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.provider.compression.TrackingCompressionHandlerProvider;
 import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.rewriter.BlockItemPacketRewriter1_8;
@@ -56,7 +55,7 @@ import java.util.concurrent.TimeUnit;
 
 public class Protocol1_8To1_7_6_10 extends BackwardsProtocol<ClientboundPackets1_8, ClientboundPackets1_7_2_5, ServerboundPackets1_8, ServerboundPackets1_7_2_5> {
 
-    public static final RewindMappingData1_8 MAPPINGS = new RewindMappingData1_8();
+    public static final RewindMappingData MAPPINGS = new RewindMappingData("1.8", "1.7.10");
 
     private final BlockItemPacketRewriter1_8 itemRewriter = new BlockItemPacketRewriter1_8(this);
     private final EntityPacketRewriter1_8 entityRewriter = new EntityPacketRewriter1_8(this);
@@ -147,7 +146,7 @@ public class Protocol1_8To1_7_6_10 extends BackwardsProtocol<ClientboundPackets1
     }
 
     @Override
-    public RewindMappingData1_8 getMappingData() {
+    public RewindMappingData getMappingData() {
         return MAPPINGS;
     }
 
