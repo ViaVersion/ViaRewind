@@ -33,7 +33,7 @@ subprojects {
             val projectVersion = project.version
             val projectDescription = project.description
             filesMatching(listOf("plugin.yml", "fabric.mod.json", "META-INF/sponge_plugins.json")) {
-                expand("version" to projectVersion, "description" to projectDescription)
+                expand(mapOf("version" to projectVersion, "description" to projectDescription))
             }
         }
     }
