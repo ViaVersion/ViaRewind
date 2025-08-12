@@ -2,8 +2,8 @@
 
 ## Reporting a Vulnerability
 
-If you discover a **security vulnerability**, please **do not** open a public issue. Instead, use one of the following *
-*confidential contact methods**:
+If you discover a **security vulnerability**, please **do not** open a public issue. Instead, use one of the following 
+**confidential contact methods**:
 
 * **Email:** [security@viaversion.com](mailto:security@viaversion.com)
 * **Discord:** Join our [Discord server](https://discord.gg/viaversion) and visit
