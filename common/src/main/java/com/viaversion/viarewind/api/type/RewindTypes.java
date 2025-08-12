@@ -28,7 +28,7 @@ import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
-import com.viaversion.viaversion.api.type.types.StringType;
+import com.viaversion.viaversion.libs.gson.JsonElement;
 import java.util.List;
 
 /**
@@ -36,7 +36,7 @@ import java.util.List;
  */
 public class RewindTypes {
 
-    public static final Type<String> SIGN_STRING = new StringType(384);
+    public static final Type<JsonElement> SIGN_COMPONENT = new SignComponentType();
     public static final Type<int[]> INT_ARRAY = new IntArrayType(); // Integer array with byte as length indicator
 
     public static final Type<BlockPosition> SHORT_POSITION = new PositionVarYType<>(Types.SHORT, value -> (short) value);
