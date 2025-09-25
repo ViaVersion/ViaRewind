@@ -44,7 +44,7 @@ base {
     archivesName.set("ViaRewind")
 }
 
-val shade = configureShadedDependencies()
+val shade = configureShadedDependencies(false) // Only shade, don't add them as dependency
 
 dependencies {
     subprojects.forEach {
