@@ -237,7 +237,7 @@ public class EntityPacketRewriter1_8 extends VREntityRewriter<ClientboundPackets
                             break;
                     }
                     wrapper.set(RewindTypes.INT_POSITION, 0, new BlockPosition(position.x() + modX, position.y(), position.z() + modZ));
-                    addTrackedEntity(wrapper, entityId, EntityTypes1_8.EntityType.PAINTING);
+                    tracker(wrapper.user()).addEntity(entityId, EntityTypes1_8.EntityType.PAINTING);
                 });
             }
         });
