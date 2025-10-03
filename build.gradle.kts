@@ -24,8 +24,8 @@ allprojects {
 subprojects {
 
     dependencies {
-        compileOnly("com.viaversion:viaversion:5.5.0-SNAPSHOT")
-        compileOnly("com.viaversion:viabackwards:5.4.3-SNAPSHOT")
+        compileOnly("com.viaversion:viaversion:5.5.0")
+        compileOnly("com.viaversion:viabackwards:5.5.0")
     }
 
     tasks {
