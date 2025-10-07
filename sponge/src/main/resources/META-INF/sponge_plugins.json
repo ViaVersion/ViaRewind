@@ -36,11 +36,11 @@
       },
       {
         "id": "viaversion",
-        "version": "[5.5.0,)"
+        "version": "[5.5.1-SNAPSHOT,)"
       },
       {
         "id": "viabackwards",
-        "version": "[5.5.0,)"
+        "version": "[5.5.1-SNAPSHOT,)"
       }
     ]
   },
