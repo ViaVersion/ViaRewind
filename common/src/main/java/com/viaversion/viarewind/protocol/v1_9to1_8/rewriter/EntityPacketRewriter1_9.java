@@ -118,7 +118,7 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
                         wrapper.set(Types.BYTE, 1, yaw);
 
                         int y = wrapper.get(Types.INT, 1);
-                        y += 10;
+                        y += 6;
                         wrapper.set(Types.INT, 1, y);
                     }
 
@@ -366,7 +366,7 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
                         yaw -= 64;
                         wrapper.set(Types.BYTE, 0, yaw);
                         int y = wrapper.get(Types.INT, 1);
-                        y += 10;
+                        y += 6;
                         wrapper.set(Types.INT, 1, y);
                     }
                 });
@@ -464,7 +464,7 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
                         wrapper.set(Types.BYTE, 0, yaw);
 
                         int y = wrapper.get(Types.INT, 1);
-                        y += 10;
+                        y += 6;
                         wrapper.set(Types.INT, 1, y);
                     }
                     tracker.resetEntityOffset(entityId);
