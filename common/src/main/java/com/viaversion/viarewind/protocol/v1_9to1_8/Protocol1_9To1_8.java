@@ -18,7 +18,7 @@
 package com.viaversion.viarewind.protocol.v1_9to1_8;
 
 import com.viaversion.viabackwards.api.BackwardsProtocol;
-import com.viaversion.viarewind.protocol.v1_9to1_8.data.RewindMappingData1_8;
+import com.viaversion.viarewind.api.data.RewindMappingData;
 import com.viaversion.viarewind.protocol.v1_9to1_8.rewriter.BlockItemPacketRewriter1_9;
 import com.viaversion.viarewind.protocol.v1_9to1_8.rewriter.EntityPacketRewriter1_9;
 import com.viaversion.viarewind.protocol.v1_9to1_8.rewriter.PlayerPacketRewriter1_9;
@@ -60,7 +60,7 @@ public class Protocol1_9To1_8 extends BackwardsProtocol<ClientboundPackets1_9, C
         }
     };
 
-    public static final RewindMappingData1_8 MAPPINGS = new RewindMappingData1_8();
+    public static final RewindMappingData MAPPINGS = new RewindMappingData("1.9.4", "1.8");
 
     private final BlockItemPacketRewriter1_9 itemRewriter = new BlockItemPacketRewriter1_9(this);
     private final EntityPacketRewriter1_9 entityRewriter = new EntityPacketRewriter1_9(this);
@@ -97,7 +97,7 @@ public class Protocol1_9To1_8 extends BackwardsProtocol<ClientboundPackets1_9, C
     }
 
     @Override
-    public RewindMappingData1_8 getMappingData() {
+    public RewindMappingData getMappingData() {
         return MAPPINGS;
     }
 

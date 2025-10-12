@@ -251,11 +251,11 @@ public class WorldPacketRewriter1_9 extends RewriterBase<Protocol1_9To1_8> {
             public void register() {
                 handler(wrapper -> {
                     final int soundId = wrapper.read(Types.VAR_INT);
-                    final String soundName = protocol.getMappingData().soundName(soundId);
-                    if (soundName == null) {
+                    final int mappedSoundId = protocol.getMappingData().getFullSoundMappings().getNewId(soundId);
+                    if (mappedSoundId == -1) {
                         wrapper.cancel();
                     } else {
-                        wrapper.write(Types.STRING, protocol.getMappingData().getMappedNamedSound(soundName));
+                        wrapper.write(Types.STRING, protocol.getMappingData().getFullSoundMappings().mappedIdentifier(mappedSoundId));
                     }
                 });
                 read(Types.VAR_INT); // Sound category
