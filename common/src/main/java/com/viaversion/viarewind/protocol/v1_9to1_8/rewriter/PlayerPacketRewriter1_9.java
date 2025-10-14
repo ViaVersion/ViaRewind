@@ -412,12 +412,6 @@ public class PlayerPacketRewriter1_9 extends RewriterBase<Protocol1_9To1_8> {
                     final int action = wrapper.get(Types.VAR_INT, 1);
                     if (action == 6) { // Jump with horse
                         wrapper.set(Types.VAR_INT, 1, 7);
-                    } else if (action == 0 && !tracker.isOnGround()) { // Start sneaking
-                        final PacketWrapper elytra = PacketWrapper.create(ServerboundPackets1_9.PLAYER_COMMAND, wrapper.user());
-                        elytra.write(Types.VAR_INT, wrapper.get(Types.VAR_INT, 0));
-                        elytra.write(Types.VAR_INT, 8);
-                        elytra.write(Types.VAR_INT, 0);
-                        elytra.scheduleSendToServer(Protocol1_9To1_8.class);
                     }
                 });
             }
