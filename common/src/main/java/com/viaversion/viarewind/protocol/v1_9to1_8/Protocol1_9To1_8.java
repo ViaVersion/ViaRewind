@@ -19,6 +19,7 @@ package com.viaversion.viarewind.protocol.v1_9to1_8;
 
 import com.viaversion.viabackwards.api.BackwardsProtocol;
 import com.viaversion.viarewind.api.data.RewindMappingData;
+import com.viaversion.viarewind.protocol.v1_9to1_8.provider.InventoryProvider;
 import com.viaversion.viarewind.protocol.v1_9to1_8.rewriter.BlockItemPacketRewriter1_9;
 import com.viaversion.viarewind.protocol.v1_9to1_8.rewriter.EntityPacketRewriter1_9;
 import com.viaversion.viarewind.protocol.v1_9to1_8.rewriter.PlayerPacketRewriter1_9;
@@ -92,6 +93,8 @@ public class Protocol1_9To1_8 extends BackwardsProtocol<ClientboundPackets1_9, C
 
     @Override
     public void register(ViaProviders providers) {
+        providers.register(InventoryProvider.class, new InventoryProvider());
+
         Via.getManager().getScheduler().scheduleRepeating(new LevitationUpdateTask(), 0L, 50L, TimeUnit.MILLISECONDS);
         Via.getManager().getScheduler().scheduleRepeating(new CooldownIndicatorTask(), 0L, 50L, TimeUnit.MILLISECONDS);
     }
