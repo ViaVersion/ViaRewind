@@ -23,12 +23,14 @@ import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.viarewind.ViaRewind;
 import com.viaversion.viarewind.api.type.RewindTypes;
 import com.viaversion.viarewind.protocol.v1_9to1_8.Protocol1_9To1_8;
+import com.viaversion.viarewind.protocol.v1_9to1_8.provider.InventoryProvider;
 import com.viaversion.viarewind.protocol.v1_9to1_8.storage.BlockPlaceDestroyTracker;
 import com.viaversion.viarewind.protocol.v1_9to1_8.storage.BossBarStorage;
 import com.viaversion.viarewind.protocol.v1_9to1_8.storage.CooldownStorage;
 import com.viaversion.viarewind.protocol.v1_9to1_8.storage.EntityTracker1_9;
 import com.viaversion.viarewind.protocol.v1_9to1_8.storage.PlayerPositionTracker;
 import com.viaversion.viarewind.utils.ChatUtil;
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.data.entity.EntityTracker;
 import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.minecraft.ClientWorld;
@@ -409,10 +411,11 @@ public class PlayerPacketRewriter1_9 extends RewriterBase<Protocol1_9To1_8> {
                 map(Types.VAR_INT); // Action parameter
                 handler(wrapper -> {
                     final PlayerPositionTracker tracker = wrapper.user().get(PlayerPositionTracker.class);
+                    final InventoryProvider provider = Via.getManager().getProviders().get(InventoryProvider.class);
                     final int action = wrapper.get(Types.VAR_INT, 1);
                     if (action == 6) { // Jump with horse
                         wrapper.set(Types.VAR_INT, 1, 7);
-                    } else if (action == 0 && !tracker.isOnGround()) { // Start sneaking
+                    } else if (action == 0 && provider.hasElytra(wrapper.user()) && !tracker.isOnGround()) { // Start sneaking
                         final PacketWrapper elytra = PacketWrapper.create(ServerboundPackets1_9.PLAYER_COMMAND, wrapper.user());
                         elytra.write(Types.VAR_INT, wrapper.get(Types.VAR_INT, 0));
                         elytra.write(Types.VAR_INT, 8);

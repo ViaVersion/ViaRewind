@@ -15,25 +15,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viarewind;
+package com.viaversion.viarewind.provider;
 
-import com.viaversion.viarewind.api.ViaRewindPlatform;
 import com.viaversion.viarewind.protocol.v1_9to1_8.provider.InventoryProvider;
-import com.viaversion.viarewind.provider.BukkitInventoryProvider;
-import com.viaversion.viaversion.api.Via;
-import java.io.File;
-import com.viaversion.viaversion.api.platform.providers.ViaProviders;
-import org.bukkit.plugin.java.JavaPlugin;
+import com.viaversion.viaversion.api.connection.UserConnection;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
-public class BukkitPlugin extends JavaPlugin implements ViaRewindPlatform {
-
-    public BukkitPlugin() {
-        Via.getManager().addEnableListener(() -> this.init(new File(getDataFolder(), "config.yml")));
-    }
+public final class BukkitInventoryProvider extends InventoryProvider {
 
     @Override
-    public void onEnable() {
-        final ViaProviders providers = Via.getManager().getProviders();
-        providers.use(InventoryProvider.class, new BukkitInventoryProvider());
+    public boolean hasElytra(final UserConnection connection) {
+        final Player player = Bukkit.getPlayer(connection.getProtocolInfo().getUuid());
+        final ItemStack chestplate = player.getInventory().getChestplate();
+        return chestplate != null && chestplate.getType() == Material.ELYTRA;
     }
+
 }
