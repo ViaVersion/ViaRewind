@@ -36,11 +36,14 @@ public interface ViaRewindPlatform {
     String VERSION = "${version}";
     String IMPL_VERSION = "${impl_version}";
 
+    default void init(final File configFile) {
+        init(new ViaRewindConfig(configFile, getLogger()));
+    }
+
     /**
      * Initialize ViaRewind
      */
-    default void init(final File configFile) {
-        ViaRewindConfig config = new ViaRewindConfig(configFile, getLogger());
+    default void init(final ViaRewindConfig config) {
         config.reload();
         Via.getManager().getConfigurationProvider().register(config);
 
