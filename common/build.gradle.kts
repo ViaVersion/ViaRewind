@@ -10,6 +10,8 @@ dependencies {
     compileOnly("io.netty:netty-all:4.0.20.Final")
     compileOnly("com.google.guava:guava:17.0")
 
+    implementation("com.velocitypowered:velocity-native:3.4.0-SNAPSHOT")
+
     viaProxy("net.raphimc:ViaProxy:[3.0.0,4.0.0)") {
         isTransitive = false
     }

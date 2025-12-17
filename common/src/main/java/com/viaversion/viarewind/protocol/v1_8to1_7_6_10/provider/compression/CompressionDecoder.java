@@ -17,9 +17,9 @@
  */
 package com.viaversion.viarewind.protocol.v1_8to1_7_6_10.provider.compression;
 
+import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.Protocol1_8To1_7_6_10;
 import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.DecoderException;
 import io.netty.handler.codec.MessageToMessageDecoder;
@@ -55,21 +55,12 @@ public class CompressionDecoder extends MessageToMessageDecoder<ByteBuf> {
             throw new DecoderException("Badly compressed packet - size of " + outLength + " is larger than protocol maximum of " + 2097152);
         }
 
-        ByteBuf temp = in;
-        if (!in.hasArray()) {
-            temp = ByteBufAllocator.DEFAULT.heapBuffer().writeBytes(in);
-        } else {
-            in.retain();
-        }
-        ByteBuf output = ByteBufAllocator.DEFAULT.heapBuffer(outLength, outLength);
+        ByteBuf output = ctx.alloc().buffer(outLength);
         try {
-            this.inflater.setInput(temp.array(), temp.arrayOffset() + temp.readerIndex(), temp.readableBytes());
-            output.writerIndex(output.writerIndex() + this.inflater.inflate(output.array(), output.arrayOffset(), outLength));
+            Protocol1_8To1_7_6_10.COMPRESSOR_THREAD_LOCAL.get().inflate(in, output, outLength);
             out.add(output.retain());
         } finally {
             output.release();
-            temp.release();
-            this.inflater.reset();
         }
     }
 }

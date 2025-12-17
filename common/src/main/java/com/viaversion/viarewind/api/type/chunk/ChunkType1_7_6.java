@@ -18,14 +18,17 @@
 package com.viaversion.viarewind.api.type.chunk;
 
 import com.viaversion.viarewind.api.minecraft.ExtendedBlockStorage;
+import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.Protocol1_8To1_7_6_10;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.util.Pair;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+
 import java.io.IOException;
-import java.util.zip.Deflater;
+import java.util.zip.DataFormatException;
 
 import static com.viaversion.viaversion.api.minecraft.chunks.ChunkSection.SIZE;
 import static com.viaversion.viaversion.api.minecraft.chunks.ChunkSectionLight.LIGHT_LENGTH;
@@ -156,25 +159,26 @@ public class ChunkType1_7_6 extends Type<Chunk> {
         final byte[] data = chunkData.key();
         final short additionalBitMask = chunkData.value();
 
-        final Deflater deflater = new Deflater();
-        byte[] compressedData;
-        int compressedSize;
-        try {
-            deflater.setInput(data, 0, data.length);
-            deflater.finish();
-            compressedData = new byte[data.length];
-            compressedSize = deflater.deflate(compressedData);
-        } finally {
-            deflater.end();
-        }
-
         output.writeInt(chunk.getX());
         output.writeInt(chunk.getZ());
         output.writeBoolean(chunk.isFullChunk());
         output.writeShort(chunk.getBitmask());
         output.writeShort(additionalBitMask);
-        output.writeInt(compressedSize);
-        output.writeBytes(compressedData, 0, compressedSize);
+
+        final int sizeIndex = output.writerIndex();
+        output.writerIndex(sizeIndex + 4); // Will be written after compression is done
+
+        final int startCompressIndex = output.writerIndex();
+        try {
+            Protocol1_8To1_7_6_10.COMPRESSOR_THREAD_LOCAL.get().deflate(Unpooled.wrappedBuffer(data), output);
+        } catch (DataFormatException e) {
+            throw new RuntimeException(e);
+        }
+
+        final int endCompressIndex = output.writerIndex();
+        final int compressedSize = endCompressIndex - startCompressIndex;
+
+        output.setInt(sizeIndex, compressedSize);
     }
 
 }

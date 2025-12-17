@@ -17,16 +17,13 @@
  */
 package com.viaversion.viarewind.protocol.v1_8to1_7_6_10.provider.compression;
 
+import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.Protocol1_8To1_7_6_10;
 import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
-import java.util.zip.Deflater;
 
 public class CompressionEncoder extends MessageToByteEncoder<ByteBuf> {
-    private final Deflater deflater = new Deflater();
-
     private int threshold;
 
     public CompressionEncoder(final int threshold) {
@@ -48,26 +45,6 @@ public class CompressionEncoder extends MessageToByteEncoder<ByteBuf> {
 
         Types.VAR_INT.writePrimitive(out, frameLength);
 
-        ByteBuf temp = in;
-        if (!in.hasArray()) {
-            temp = ByteBufAllocator.DEFAULT.heapBuffer().writeBytes(in);
-        } else {
-            in.retain();
-        }
-        ByteBuf output = ByteBufAllocator.DEFAULT.heapBuffer();
-        try {
-            this.deflater.setInput(temp.array(), temp.arrayOffset() + temp.readerIndex(), temp.readableBytes());
-            deflater.finish();
-
-            while (!deflater.finished()) {
-                output.ensureWritable(4096);
-                output.writerIndex(output.writerIndex() + this.deflater.deflate(output.array(), output.arrayOffset() + output.writerIndex(), output.writableBytes()));
-            }
-            out.writeBytes(output);
-        } finally {
-            output.release();
-            temp.release();
-            this.deflater.reset();
-        }
+        Protocol1_8To1_7_6_10.COMPRESSOR_THREAD_LOCAL.get().deflate(in, out);
     }
 }

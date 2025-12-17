@@ -17,12 +17,15 @@
  */
 package com.viaversion.viarewind.api.type.chunk;
 
+import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.Protocol1_8To1_7_6_10;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.util.Pair;
 import io.netty.buffer.ByteBuf;
-import java.util.zip.Deflater;
+import io.netty.buffer.Unpooled;
+
+import java.util.zip.DataFormatException;
 
 public class BulkChunkType1_7_6 extends Type<Chunk[]> {
 
@@ -72,20 +75,9 @@ public class BulkChunkType1_7_6 extends Type<Chunk[]> {
             destPos += array.length;
         }
 
-        final Deflater deflater = new Deflater();
-        byte[] compressedData;
-        int compressedSize;
-        try {
-            deflater.setInput(data, 0, data.length);
-            deflater.finish();
-            compressedData = new byte[data.length];
-            compressedSize = deflater.deflate(compressedData);
-        } finally {
-            deflater.end();
-        }
-
         byteBuf.writeShort(chunkCount);
-        byteBuf.writeInt(compressedSize);
+        final int sizeIndex = byteBuf.writerIndex();
+        byteBuf.writerIndex(sizeIndex + 4);
 
         boolean skyLight = false;
         for (Chunk chunk : chunks) {
@@ -96,9 +88,18 @@ public class BulkChunkType1_7_6 extends Type<Chunk[]> {
                 }
             }
         }
+        byteBuf.writeBoolean(skyLight);
 
-        byteBuf.writeBoolean(skyLight); // hasSkyLight
-        byteBuf.writeBytes(compressedData, 0, compressedSize);
+        final int startCompressIndex = byteBuf.writerIndex();
+        try {
+            Protocol1_8To1_7_6_10.COMPRESSOR_THREAD_LOCAL.get().deflate(Unpooled.wrappedBuffer(data), byteBuf);
+        } catch (DataFormatException e) {
+            throw new RuntimeException(e);
+        }
+
+        final int endCompressIndex = byteBuf.writerIndex();
+        final int compressedSize = endCompressIndex - startCompressIndex;
+        byteBuf.setInt(sizeIndex, compressedSize);
 
         for (int i = 0; i < chunkCount; i++) {
             byteBuf.writeInt(chunkX[i]);
