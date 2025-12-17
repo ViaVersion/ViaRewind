@@ -17,8 +17,6 @@
  */
 package com.viaversion.viarewind.protocol.v1_8to1_7_6_10;
 
-import com.velocitypowered.natives.compression.VelocityCompressor;
-import com.velocitypowered.natives.util.Natives;
 import com.viaversion.viabackwards.api.BackwardsProtocol;
 import com.viaversion.viarewind.ViaRewind;
 import com.viaversion.viarewind.api.data.RewindMappingData;
@@ -56,10 +54,6 @@ import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ServerboundPackets1_
 import java.util.concurrent.TimeUnit;
 
 public class Protocol1_8To1_7_6_10 extends BackwardsProtocol<ClientboundPackets1_8, ClientboundPackets1_7_2_5, ServerboundPackets1_8, ServerboundPackets1_7_2_5> {
-
-    public static final ThreadLocal<VelocityCompressor> COMPRESSOR_THREAD_LOCAL = ThreadLocal.withInitial(
-            () -> Natives.compress.get().create(-1)
-    );
     public static final RewindMappingData MAPPINGS = new RewindMappingData("1.8", "1.7.10");
 
     private final BlockItemPacketRewriter1_8 itemRewriter = new BlockItemPacketRewriter1_8(this);

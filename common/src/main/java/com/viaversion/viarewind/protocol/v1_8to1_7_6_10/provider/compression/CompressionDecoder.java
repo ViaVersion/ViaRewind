@@ -17,18 +17,15 @@
  */
 package com.viaversion.viarewind.protocol.v1_8to1_7_6_10.provider.compression;
 
-import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.Protocol1_8To1_7_6_10;
+import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.provider.compression.compressor.CompressorUtil;
 import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.DecoderException;
 import io.netty.handler.codec.MessageToMessageDecoder;
 import java.util.List;
-import java.util.zip.Inflater;
 
 public class CompressionDecoder extends MessageToMessageDecoder<ByteBuf> {
-    private final Inflater inflater = new Inflater();
-
     private int threshold;
 
     public CompressionDecoder(final int threshold) {
@@ -57,7 +54,7 @@ public class CompressionDecoder extends MessageToMessageDecoder<ByteBuf> {
 
         ByteBuf output = ctx.alloc().buffer(outLength);
         try {
-            Protocol1_8To1_7_6_10.COMPRESSOR_THREAD_LOCAL.get().inflate(in, output, outLength);
+            CompressorUtil.getCompressor().inflate(in, output, outLength);
             out.add(output.retain());
         } finally {
             output.release();

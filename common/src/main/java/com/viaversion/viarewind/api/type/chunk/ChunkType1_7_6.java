@@ -17,7 +17,7 @@
  */
 package com.viaversion.viarewind.api.type.chunk;
 
-import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.Protocol1_8To1_7_6_10;
+import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.provider.compression.compressor.CompressorUtil;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
@@ -67,7 +67,7 @@ public class ChunkType1_7_6 extends Type<Chunk> {
 
         final int startCompressIndex = buffer.writerIndex();
         try {
-            Protocol1_8To1_7_6_10.COMPRESSOR_THREAD_LOCAL.get().deflate(Unpooled.wrappedBuffer(data), buffer);
+            CompressorUtil.getCompressor().deflate(Unpooled.wrappedBuffer(data), buffer);
         } catch (DataFormatException e) {
             throw new RuntimeException(e);
         }
