@@ -27,6 +27,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 
 import java.util.zip.DataFormatException;
+import java.util.zip.Deflater;
 
 import static com.viaversion.viaversion.api.minecraft.chunks.ChunkSection.SIZE;
 import static com.viaversion.viaversion.api.minecraft.chunks.ChunkSectionLight.LIGHT_LENGTH;
@@ -62,20 +63,20 @@ public class ChunkType1_7_6 extends Type<Chunk> {
         buffer.writeShort(bitmask);
         buffer.writeShort(addBitmask);
 
-        final int sizeIndex = buffer.writerIndex();
-        buffer.writerIndex(sizeIndex + 4);
-
-        final int startCompressIndex = buffer.writerIndex();
+        final Deflater deflater = new Deflater();
+        byte[] compressedData;
+        int compressedSize;
         try {
-            CompressorUtil.getCompressor().deflate(Unpooled.wrappedBuffer(data), buffer);
-        } catch (DataFormatException e) {
-            throw new RuntimeException(e);
+            deflater.setInput(data, 0, data.length);
+            deflater.finish();
+            compressedData = new byte[data.length];
+            compressedSize = deflater.deflate(compressedData);
+        } finally {
+            deflater.end();
         }
 
-        final int endCompressIndex = buffer.writerIndex();
-        final int compressedSize = endCompressIndex - startCompressIndex;
-
-        buffer.setInt(sizeIndex, compressedSize);
+        buffer.writeInt(compressedSize);
+        buffer.writeBytes(compressedData, 0, compressedSize);
     }
 
     public static int serialize(Chunk chunk, byte[] output, int offset, int addBitmask, boolean writeSkyLight, boolean biomes) {

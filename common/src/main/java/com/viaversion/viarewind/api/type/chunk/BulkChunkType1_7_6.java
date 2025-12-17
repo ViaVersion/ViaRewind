@@ -24,6 +24,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 
 import java.util.zip.DataFormatException;
+import java.util.zip.Deflater;
 
 public class BulkChunkType1_7_6 extends Type<Chunk[]> {
 
@@ -83,21 +84,22 @@ public class BulkChunkType1_7_6 extends Type<Chunk[]> {
         }
 
         buffer.writeShort(chunkCount);
-        final int sizeIndex = buffer.writerIndex();
-        buffer.writerIndex(sizeIndex + 4);
 
-        buffer.writeBoolean(anySkyLight);
-
-        final int startCompressIndex = buffer.writerIndex();
+        final Deflater deflater = new Deflater();
+        byte[] compressedData;
+        int compressedSize;
         try {
-            CompressorUtil.getCompressor().deflate(Unpooled.wrappedBuffer(data), buffer);
-        } catch (DataFormatException e) {
-            throw new RuntimeException(e);
+            deflater.setInput(data, 0, data.length);
+            deflater.finish();
+            compressedData = new byte[data.length];
+            compressedSize = deflater.deflate(compressedData);
+        } finally {
+            deflater.end();
         }
-        final int endCompressIndex = buffer.writerIndex();
-        final int compressedSize = endCompressIndex - startCompressIndex;
 
-        buffer.setInt(sizeIndex, compressedSize);
+        buffer.writeInt(compressedSize);
+        buffer.writeBoolean(anySkyLight);
+        buffer.writeBytes(compressedData, 0, compressedSize);;
 
         for (int i = 0; i < chunkCount; i++) {
             Chunk chunk = chunks[i];
