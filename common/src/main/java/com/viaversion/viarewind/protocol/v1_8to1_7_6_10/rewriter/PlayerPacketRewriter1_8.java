@@ -590,6 +590,7 @@ public class PlayerPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6_10>
             protected void register() {
                 map(Types.VAR_INT); // Status
                 map(RewindTypes.U_BYTE_POSITION, Types.BLOCK_POSITION1_8); // Position
+                map(Types.BYTE, Types.UNSIGNED_BYTE, face -> face == -1 ? (short) 0 : (short) (face & 0xFF));
             }
         });
 
@@ -599,7 +600,6 @@ public class PlayerPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6_10>
                 map(RewindTypes.U_BYTE_POSITION, Types.BLOCK_POSITION1_8); // Position
                 map(Types.BYTE); // Direction
                 map(RewindTypes.COMPRESSED_NBT_ITEM, Types.ITEM1_8); // Item
-
                 handler(wrapper -> protocol.getItemRewriter().handleItemToServer(wrapper.user(), wrapper.get(Types.ITEM1_8, 0)));
             }
         });
