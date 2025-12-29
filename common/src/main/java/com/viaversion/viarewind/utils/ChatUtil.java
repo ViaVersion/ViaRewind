@@ -49,7 +49,7 @@ public class ChatUtil {
         try {
             return jsonToLegacy(JsonParser.parseString(json));
         } catch (Exception e) {
-            if (!Via.getConfig().isSuppressConversionWarnings()) {
+            if (Via.getConfig().logTextComponentConversionErrors()) {
                 ViaRewind.getPlatform().getLogger().log(Level.WARNING, "Could not convert component to legacy text: " + json, e);
             }
         }
@@ -71,7 +71,7 @@ public class ChatUtil {
                 }
                 return legacy;
             } catch (Exception ex) {
-                if (!Via.getConfig().isSuppressConversionWarnings()) {
+                if (Via.getConfig().logTextComponentConversionErrors()) {
                     ViaRewind.getPlatform().getLogger().log(Level.WARNING, "Could not convert component to legacy text: " + component, ex);
                 }
             }
