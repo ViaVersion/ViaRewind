@@ -43,7 +43,7 @@ public interface ViaRewindPlatform {
     /**
      * Initialize ViaRewind
      */
-    default void init(final ViaRewindConfig config) {
+    default void init(final com.viaversion.viarewind.api.ViaRewindConfig config) {
         config.reload();
         Via.getManager().getConfigurationProvider().register(config);
 
