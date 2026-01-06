@@ -17,16 +17,12 @@
  */
 package com.viaversion.viarewind.api.type.chunk;
 
-import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.provider.compression.compressor.CompressorUtil;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
 import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.type.Type;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
-
-import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 
 import static com.viaversion.viaversion.api.minecraft.chunks.ChunkSection.SIZE;

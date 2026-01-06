@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaRewind - https://github.com/ViaVersion/ViaRewind
- * Copyright (C) 2018-2025 ViaVersion and contributors
+ * Copyright (C) 2018-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,14 +15,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.viaversion.viarewind.protocol.v1_8to1_7_6_10.provider.compression.compressor;
+package com.viaversion.viarewind.protocol.v1_8to1_7_6_10.provider.compression.velocity;
 
+import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.provider.compression.CompressionEncoder;
 import io.netty.buffer.ByteBuf;
-
 import java.util.zip.DataFormatException;
 
-public interface Compressor {
-    void inflate(ByteBuf source, ByteBuf destination, int uncompressedSize) throws DataFormatException;
+public final class VelocityCompressionEncoder extends CompressionEncoder {
 
-    void deflate(ByteBuf source, ByteBuf destination) throws DataFormatException;
+    public VelocityCompressionEncoder(final int threshold) {
+        super(threshold);
+    }
+
+    @Override
+    protected void deflate(final ByteBuf source, final ByteBuf destination) throws DataFormatException {
+        VelocityCompressionDecoder.COMPRESSOR.deflate(source, destination);
+    }
+
 }

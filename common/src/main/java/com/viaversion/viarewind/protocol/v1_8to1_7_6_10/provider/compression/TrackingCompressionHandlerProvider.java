@@ -21,12 +21,27 @@ import com.viaversion.viarewind.ViaRewind;
 import com.viaversion.viarewind.api.minecraft.netty.EmptyChannelHandler;
 import com.viaversion.viarewind.api.minecraft.netty.ForwardMessageToByteEncoder;
 import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.provider.CompressionHandlerProvider;
+import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.provider.compression.velocity.VelocityCompressionDecoder;
+import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.provider.compression.velocity.VelocityCompressionEncoder;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelPipeline;
 
 public class TrackingCompressionHandlerProvider extends CompressionHandlerProvider {
+
+    // Use Velocity's compression backend if ViaRewind is loaded on a Velocity server or a custom server software
+    // is shipping them in the classpath.
+    private static boolean velocityNatives;
+
+    static {
+        try {
+            Class.forName("com.velocitypowered.natives.compression.VelocityCompressor");
+            velocityNatives = true;
+        } catch (final ClassNotFoundException ignored) {
+            velocityNatives = false;
+        }
+    }
 
     @Override
     public void setCompressionThreshold(UserConnection user, int threshold) {
@@ -78,11 +93,22 @@ public class TrackingCompressionHandlerProvider extends CompressionHandlerProvid
 
     @Override
     public ChannelHandler getEncoder(int threshold) {
-        return new CompressionEncoder(threshold);
+        System.out.println(velocityNatives + " " + threshold);
+        if (velocityNatives) {
+            return new VelocityCompressionEncoder(threshold);
+        } else {
+            return new CompressionEncoder(threshold);
+        }
     }
 
     @Override
     public ChannelHandler getDecoder(int threshold) {
-        return new CompressionDecoder(threshold);
+        System.out.println(velocityNatives + " " + threshold + " d");
+        if (velocityNatives) {
+            return new VelocityCompressionDecoder(threshold);
+        } else {
+            return new CompressionDecoder(threshold);
+        }
     }
+
 }

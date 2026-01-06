@@ -17,15 +17,19 @@
  */
 package com.viaversion.viarewind.protocol.v1_8to1_7_6_10.provider.compression;
 
-import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.provider.compression.compressor.CompressorUtil;
 import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.DecoderException;
 import io.netty.handler.codec.MessageToMessageDecoder;
 import java.util.List;
+import java.util.zip.DataFormatException;
+import java.util.zip.Inflater;
 
 public class CompressionDecoder extends MessageToMessageDecoder<ByteBuf> {
+    private final Inflater inflater = new Inflater();
+
     private int threshold;
 
     public CompressionDecoder(final int threshold) {
@@ -38,7 +42,9 @@ public class CompressionDecoder extends MessageToMessageDecoder<ByteBuf> {
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
-        if (!in.isReadable()) return;
+        if (!in.isReadable()) {
+            return;
+        }
 
         int outLength = Types.VAR_INT.readPrimitive(in);
         if (outLength == 0) {
@@ -52,12 +58,26 @@ public class CompressionDecoder extends MessageToMessageDecoder<ByteBuf> {
             throw new DecoderException("Badly compressed packet - size of " + outLength + " is larger than protocol maximum of " + 2097152);
         }
 
-        ByteBuf output = ctx.alloc().buffer(outLength);
+        inflate(ctx, in, outLength, out);
+    }
+
+    protected void inflate(final ChannelHandlerContext ctx, final ByteBuf source, final int outLength, final List<Object> out) throws DataFormatException {
+        ByteBuf temp = source;
+        if (!source.hasArray()) {
+            temp = ByteBufAllocator.DEFAULT.heapBuffer().writeBytes(source);
+        } else {
+            source.retain();
+        }
+        ByteBuf output = ByteBufAllocator.DEFAULT.heapBuffer(outLength, outLength);
         try {
-            CompressorUtil.getCompressor().inflate(in, output, outLength);
+            this.inflater.setInput(temp.array(), temp.arrayOffset() + temp.readerIndex(), temp.readableBytes());
+            output.writerIndex(output.writerIndex() + this.inflater.inflate(output.array(), output.arrayOffset(), outLength));
             out.add(output.retain());
         } finally {
             output.release();
+            temp.release();
+            this.inflater.reset();
         }
     }
+
 }

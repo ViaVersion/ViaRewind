@@ -17,13 +17,10 @@
  */
 package com.viaversion.viarewind.api.type.chunk;
 
-import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.provider.compression.compressor.CompressorUtil;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.type.Type;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 
-import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 
 public class BulkChunkType1_7_6 extends Type<Chunk[]> {
@@ -59,10 +56,10 @@ public class BulkChunkType1_7_6 extends Type<Chunk[]> {
             boolean biomes = chunk.isFullChunk() && chunk.getBiomeData() != null;
 
             totalSize += ChunkType1_7_6.calcSize(
-                    chunk.getBitmask(),
-                    addBitMasks[i],
-                    anySkyLight,
-                    biomes
+                chunk.getBitmask(),
+                addBitMasks[i],
+                anySkyLight,
+                biomes
             );
         }
 
@@ -74,12 +71,12 @@ public class BulkChunkType1_7_6 extends Type<Chunk[]> {
             boolean biomes = chunk.isFullChunk() && chunk.getBiomeData() != null;
 
             offset = ChunkType1_7_6.serialize(
-                    chunk,
-                    data,
-                    offset,
-                    addBitMasks[i],
-                    anySkyLight,
-                    biomes
+                chunk,
+                data,
+                offset,
+                addBitMasks[i],
+                anySkyLight,
+                biomes
             );
         }
 
@@ -99,7 +96,7 @@ public class BulkChunkType1_7_6 extends Type<Chunk[]> {
 
         buffer.writeInt(compressedSize);
         buffer.writeBoolean(anySkyLight);
-        buffer.writeBytes(compressedData, 0, compressedSize);;
+        buffer.writeBytes(compressedData, 0, compressedSize);
 
         for (int i = 0; i < chunkCount; i++) {
             Chunk chunk = chunks[i];
