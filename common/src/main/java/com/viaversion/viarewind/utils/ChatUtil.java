@@ -1,6 +1,6 @@
 /*
  * This file is part of ViaRewind - https://github.com/ViaVersion/ViaRewind
- * Copyright (C) 2018-2025 ViaVersion and contributors
+ * Copyright (C) 2018-2026 ViaVersion and contributors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@ public class ChatUtil {
         try {
             return jsonToLegacy(JsonParser.parseString(json));
         } catch (Exception e) {
-            if (!Via.getConfig().isSuppressConversionWarnings()) {
+            if (Via.getConfig().logTextComponentConversionErrors()) {
                 ViaRewind.getPlatform().getLogger().log(Level.WARNING, "Could not convert component to legacy text: " + json, e);
             }
         }
@@ -71,7 +71,7 @@ public class ChatUtil {
                 }
                 return legacy;
             } catch (Exception ex) {
-                if (!Via.getConfig().isSuppressConversionWarnings()) {
+                if (Via.getConfig().logTextComponentConversionErrors()) {
                     ViaRewind.getPlatform().getLogger().log(Level.WARNING, "Could not convert component to legacy text: " + component, ex);
                 }
             }
