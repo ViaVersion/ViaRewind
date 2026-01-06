@@ -24,6 +24,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.DecoderException;
 import io.netty.handler.codec.MessageToMessageDecoder;
 import java.util.List;
+import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 
 public class CompressionDecoder extends MessageToMessageDecoder<ByteBuf> {
@@ -41,7 +42,9 @@ public class CompressionDecoder extends MessageToMessageDecoder<ByteBuf> {
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
-        if (!in.isReadable()) return;
+        if (!in.isReadable()) {
+            return;
+        }
 
         int outLength = Types.VAR_INT.readPrimitive(in);
         if (outLength == 0) {
@@ -55,11 +58,15 @@ public class CompressionDecoder extends MessageToMessageDecoder<ByteBuf> {
             throw new DecoderException("Badly compressed packet - size of " + outLength + " is larger than protocol maximum of " + 2097152);
         }
 
-        ByteBuf temp = in;
-        if (!in.hasArray()) {
-            temp = ByteBufAllocator.DEFAULT.heapBuffer().writeBytes(in);
+        inflate(ctx, in, outLength, out);
+    }
+
+    protected void inflate(final ChannelHandlerContext ctx, final ByteBuf source, final int outLength, final List<Object> out) throws DataFormatException {
+        ByteBuf temp = source;
+        if (!source.hasArray()) {
+            temp = ByteBufAllocator.DEFAULT.heapBuffer().writeBytes(source);
         } else {
-            in.retain();
+            source.retain();
         }
         ByteBuf output = ByteBufAllocator.DEFAULT.heapBuffer(outLength, outLength);
         try {
@@ -72,4 +79,5 @@ public class CompressionDecoder extends MessageToMessageDecoder<ByteBuf> {
             this.inflater.reset();
         }
     }
+
 }

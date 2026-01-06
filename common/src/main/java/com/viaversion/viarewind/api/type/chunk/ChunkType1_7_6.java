@@ -17,14 +17,12 @@
  */
 package com.viaversion.viarewind.api.type.chunk;
 
-import com.viaversion.viarewind.api.minecraft.ExtendedBlockStorage;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
+import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
 import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.util.Pair;
 import io.netty.buffer.ByteBuf;
-import java.io.IOException;
 import java.util.zip.Deflater;
 
 import static com.viaversion.viaversion.api.minecraft.chunks.ChunkSection.SIZE;
@@ -38,123 +36,28 @@ public class ChunkType1_7_6 extends Type<Chunk> {
         super(Chunk.class);
     }
 
-    public static Pair<byte[], Short> serialize(final Chunk chunk) throws IOException {
-        final ExtendedBlockStorage[] storageArrays = new ExtendedBlockStorage[16];
-        for (int i = 0; i < storageArrays.length; i++) {
-            final ChunkSection section = chunk.getSections()[i];
-            if (section != null) {
-                final ExtendedBlockStorage storage = storageArrays[i] = new ExtendedBlockStorage(section.getLight().hasSkyLight());
-                for (int x = 0; x < 16; x++) {
-                    for (int z = 0; z < 16; z++) {
-                        for (int y = 0; y < 16; y++) {
-                            final int flatBlock = section.palette(PaletteType.BLOCKS).idAt(x, y, z);
-                            storage.setBlockId(x, y, z, flatBlock >> 4);
-                            storage.setBlockMetadata(x, y, z, flatBlock & 15);
-                        }
-                    }
-                }
-                storage.getBlockLightArray().setHandle(section.getLight().getBlockLight());
-                if (section.getLight().hasSkyLight()) {
-                    storage.getSkyLightArray().setHandle(section.getLight().getSkyLight());
-                }
-            }
-        }
-
-        final boolean biomes = chunk.isFullChunk() && chunk.getBiomeData() != null;
-        final int totalSize = calculateSize(storageArrays, chunk.getBitmask(), biomes);
-
-        final byte[] output = new byte[totalSize];
-        int index = 0;
-
-        for (int i = 0; i < storageArrays.length; i++) {
-            if ((chunk.getBitmask() & 1 << i) != 0) {
-                final byte[] blockLSBArray = storageArrays[i].getBlockLSBArray();
-                System.arraycopy(blockLSBArray, 0, output, index, blockLSBArray.length);
-                index += blockLSBArray.length;
-            }
-        }
-
-        for (int i = 0; i < storageArrays.length; i++) {
-            if ((chunk.getBitmask() & 1 << i) != 0) {
-                final byte[] blockMetadataArray = storageArrays[i].getBlockMetadataArray().getHandle();
-                System.arraycopy(blockMetadataArray, 0, output, index, blockMetadataArray.length);
-                index += blockMetadataArray.length;
-            }
-        }
-
-        for (int i = 0; i < storageArrays.length; i++) {
-            if ((chunk.getBitmask() & 1 << i) != 0) {
-                final byte[] blockLightArray = storageArrays[i].getBlockLightArray().getHandle();
-                System.arraycopy(blockLightArray, 0, output, index, blockLightArray.length);
-                index += blockLightArray.length;
-            }
-        }
-
-        for (int i = 0; i < storageArrays.length; i++) {
-            if ((chunk.getBitmask() & 1 << i) != 0 && storageArrays[i].getSkyLightArray() != null) {
-                final byte[] skyLightArray = storageArrays[i].getSkyLightArray().getHandle();
-                System.arraycopy(skyLightArray, 0, output, index, skyLightArray.length);
-                index += skyLightArray.length;
-            }
-        }
-
-        short additionalBitMask = 0;
-        for (int i = 0; i < storageArrays.length; i++) {
-            if ((chunk.getBitmask() & 1 << i) != 0 && storageArrays[i].hasBlockMSBArray()) {
-                additionalBitMask |= (short) (1 << i);
-                final byte[] blockMSBArray = storageArrays[i].getOrCreateBlockMSBArray().getHandle();
-                System.arraycopy(blockMSBArray, 0, output, index, blockMSBArray.length);
-                index += blockMSBArray.length;
-            }
-        }
-
-        if (biomes) {
-            for (int biome : chunk.getBiomeData()) {
-                output[index++] = (byte) biome;
-            }
-        }
-
-        return new Pair<>(output, additionalBitMask);
-    }
-
-    private static int calculateSize(final ExtendedBlockStorage[] storageArrays, final int bitmask, final boolean biomes) {
-        int totalSize = 0;
-        for (int i = 0; i < storageArrays.length; i++) {
-            if ((bitmask & 1 << i) != 0) {
-                totalSize += SIZE; // Block lsb array
-                totalSize += SIZE / 2; // Block metadata array
-                totalSize += LIGHT_LENGTH; // Block light array
-
-                if (storageArrays[i].getSkyLightArray() != null) {
-                    totalSize += LIGHT_LENGTH;
-                }
-
-                if (storageArrays[i].hasBlockMSBArray()) {
-                    totalSize += SIZE / 2; // Block msb array
-                }
-            }
-        }
-        if (biomes) {
-            totalSize += 256;
-        }
-        return totalSize;
-    }
-
     @Override
     public Chunk read(ByteBuf byteBuf) {
         throw new UnsupportedOperationException(); // Not needed, see https://github.com/ViaVersion/ViaLegacy/blob/main/src/main/java/net/raphimc/vialegacy/protocols/release/protocol1_8to1_7_6_10/types/Chunk1_7_6Type.java
     }
 
     @Override
-    public void write(ByteBuf output, Chunk chunk) {
-        Pair<byte[], Short> chunkData;
-        try {
-            chunkData = serialize(chunk);
-        } catch (IOException e) {
-            throw new RuntimeException("Unable to serialize chunk", e);
-        }
-        final byte[] data = chunkData.key();
-        final short additionalBitMask = chunkData.value();
+    public void write(ByteBuf buffer, Chunk chunk) {
+        final int bitmask = chunk.getBitmask();
+        final int addBitmask = getAddBitMask(chunk);
+        final boolean hasSkyLight = hasSkyLight(chunk);
+        final boolean biomes = chunk.isFullChunk() && chunk.getBiomeData() != null;
+
+        final int size = calcSize(bitmask, addBitmask, hasSkyLight, biomes);
+        final byte[] data = new byte[size];
+
+        serialize(chunk, data, 0, addBitmask, hasSkyLight, biomes);
+
+        buffer.writeInt(chunk.getX());
+        buffer.writeInt(chunk.getZ());
+        buffer.writeBoolean(chunk.isFullChunk());
+        buffer.writeShort(bitmask);
+        buffer.writeShort(addBitmask);
 
         final Deflater deflater = new Deflater();
         byte[] compressedData;
@@ -168,13 +71,128 @@ public class ChunkType1_7_6 extends Type<Chunk> {
             deflater.end();
         }
 
-        output.writeInt(chunk.getX());
-        output.writeInt(chunk.getZ());
-        output.writeBoolean(chunk.isFullChunk());
-        output.writeShort(chunk.getBitmask());
-        output.writeShort(additionalBitMask);
-        output.writeInt(compressedSize);
-        output.writeBytes(compressedData, 0, compressedSize);
+        buffer.writeInt(compressedSize);
+        buffer.writeBytes(compressedData, 0, compressedSize);
     }
 
+    public static int serialize(Chunk chunk, byte[] output, int offset, int addBitmask, boolean writeSkyLight, boolean biomes) {
+        final ChunkSection[] sections = chunk.getSections();
+        final int bitmask = chunk.getBitmask();
+
+        for (int i = 0; i < 16; i++) {
+            if ((bitmask & (1 << i)) != 0) {
+                final ChunkSection section = sections[i];
+                final DataPalette palette = section.palette(PaletteType.BLOCKS);
+                for (int j = 0; j < SIZE; j++) {
+                    final int block = palette.idAt(j);
+                    output[offset++] = (byte) ((block >> 4) & 0xFF);
+                }
+            }
+        }
+
+        for (int i = 0; i < 16; i++) {
+            if ((bitmask & (1 << i)) != 0) {
+                final ChunkSection section = sections[i];
+                final DataPalette palette = section.palette(PaletteType.BLOCKS);
+                for (int j = 0; j < ChunkSection.SIZE; j += 2) {
+                    final int meta1 = palette.idAt(j) & 0xF;
+                    final int meta2 = palette.idAt(j + 1) & 0xF;
+                    output[offset++] = (byte) (meta1 | (meta2 << 4));
+                }
+            }
+        }
+
+        for (int i = 0; i < 16; i++) {
+            if ((bitmask & (1 << i)) != 0) {
+                final byte[] blockLight = sections[i].getLight().getBlockLight();
+                System.arraycopy(blockLight, 0, output, offset, LIGHT_LENGTH);
+                offset += LIGHT_LENGTH;
+            }
+        }
+
+        if (writeSkyLight) {
+            for (int i = 0; i < 16; i++) {
+                if ((bitmask & (1 << i)) != 0) {
+                    if (sections[i].getLight().hasSkyLight()) {
+                        final byte[] skyLight = sections[i].getLight().getSkyLight();
+                        System.arraycopy(skyLight, 0, output, offset, LIGHT_LENGTH);
+                    }
+                    offset += LIGHT_LENGTH;
+                }
+            }
+        }
+
+        if (addBitmask != 0) {
+            for (int i = 0; i < 16; i++) {
+                if ((bitmask & (1 << i)) != 0 && (addBitmask & (1 << i)) != 0) {
+                    final ChunkSection section = sections[i];
+                    final DataPalette palette = section.palette(PaletteType.BLOCKS);
+                    for (int j = 0; j < SIZE; j += 2) {
+                        final int add1 = (palette.idAt(j) >> 12) & 0xF;
+                        final int add2 = (palette.idAt(j + 1) >> 12) & 0xF;
+                        output[offset++] = (byte) (add1 | (add2 << 4));
+                    }
+                }
+            }
+        }
+
+        if (biomes && chunk.getBiomeData() != null) {
+            final int[] biomeData = chunk.getBiomeData();
+            for (int biome : biomeData) {
+                output[offset++] = (byte) biome;
+            }
+        }
+
+        return offset;
+    }
+
+    public static int calcSize(int bitmask, int addBitmask, boolean hasSkyLight, boolean biomes) {
+        int size = 0;
+        int sections = Integer.bitCount(bitmask);
+
+        size += sections * SIZE;
+        size += sections * (SIZE / 2);
+        size += sections * LIGHT_LENGTH;
+
+        if (hasSkyLight) {
+            size += sections * LIGHT_LENGTH;
+        }
+
+        if (addBitmask != 0) {
+            size += Integer.bitCount(addBitmask) * (SIZE / 2);
+        }
+
+        if (biomes) {
+            size += 256;
+        }
+
+        return size;
+    }
+
+    public static int getAddBitMask(Chunk chunk) {
+        int addBitMask = 0;
+        for (int i = 0; i < 16; i++) {
+            if ((chunk.getBitmask() & (1 << i)) != 0) {
+                final ChunkSection section = chunk.getSections()[i];
+                final DataPalette palette = section.palette(PaletteType.BLOCKS);
+                for (int j = 0; j < SIZE; j++) {
+                    final int id = palette.idAt(j);
+                    if ((id >> 12) != 0) {
+                        addBitMask |= (1 << i);
+                        break;
+                    }
+                }
+            }
+        }
+        return addBitMask;
+    }
+
+    public static boolean hasSkyLight(Chunk chunk) {
+        for (ChunkSection section : chunk.getSections()) {
+            if (section != null && section.getLight().hasSkyLight()) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

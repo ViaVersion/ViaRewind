@@ -21,12 +21,27 @@ import com.viaversion.viarewind.ViaRewind;
 import com.viaversion.viarewind.api.minecraft.netty.EmptyChannelHandler;
 import com.viaversion.viarewind.api.minecraft.netty.ForwardMessageToByteEncoder;
 import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.provider.CompressionHandlerProvider;
+import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.provider.compression.velocity.VelocityCompressionDecoder;
+import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.provider.compression.velocity.VelocityCompressionEncoder;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelPipeline;
 
 public class TrackingCompressionHandlerProvider extends CompressionHandlerProvider {
+
+    // Use Velocity's compression backend if ViaRewind is loaded on a Velocity server or a custom server software
+    // is shipping them in the classpath.
+    private static boolean velocityNatives;
+
+    static {
+        try {
+            Class.forName("com.velocitypowered.natives.compression.VelocityCompressor");
+            velocityNatives = true;
+        } catch (final ClassNotFoundException ignored) {
+            velocityNatives = false;
+        }
+    }
 
     @Override
     public void setCompressionThreshold(UserConnection user, int threshold) {
@@ -36,12 +51,17 @@ public class TrackingCompressionHandlerProvider extends CompressionHandlerProvid
             return;
         }
 
+        Object compressor = null;
+        if (velocityNatives) {
+            compressor = com.velocitypowered.natives.util.Natives.compress.get().create(-1);
+        }
+
         final String compressHandlerName = ViaRewind.getPlatform().compressHandlerName();
         final CompressionEncoder encoder = (CompressionEncoder) pipeline.get(compressHandlerName);
         if (encoder != null) {
             encoder.setThreshold(threshold);
         } else {
-            pipeline.addBefore(Via.getManager().getInjector().getEncoderName(), compressHandlerName, getEncoder(threshold));
+            pipeline.addBefore(Via.getManager().getInjector().getEncoderName(), compressHandlerName, getEncoder(compressor, threshold));
         }
 
         final String decompressHandlerName = ViaRewind.getPlatform().decompressHandlerName();
@@ -49,7 +69,7 @@ public class TrackingCompressionHandlerProvider extends CompressionHandlerProvid
         if (decoder != null) {
             decoder.setThreshold(threshold);
         } else {
-            pipeline.addBefore(Via.getManager().getInjector().getDecoderName(), decompressHandlerName, getDecoder(threshold));
+            pipeline.addBefore(Via.getManager().getInjector().getDecoderName(), decompressHandlerName, getDecoder(compressor, threshold));
         }
     }
 
@@ -77,12 +97,21 @@ public class TrackingCompressionHandlerProvider extends CompressionHandlerProvid
     }
 
     @Override
-    public ChannelHandler getEncoder(int threshold) {
-        return new CompressionEncoder(threshold);
+    public ChannelHandler getEncoder(final Object compressor, int threshold) {
+        if (velocityNatives) {
+            return new VelocityCompressionEncoder(threshold, (com.velocitypowered.natives.compression.VelocityCompressor) compressor);
+        } else {
+            return new CompressionEncoder(threshold);
+        }
     }
 
     @Override
-    public ChannelHandler getDecoder(int threshold) {
-        return new CompressionDecoder(threshold);
+    public ChannelHandler getDecoder(final Object compressor, int threshold) {
+        if (velocityNatives) {
+            return new VelocityCompressionDecoder(threshold, (com.velocitypowered.natives.compression.VelocityCompressor) compressor);
+        } else {
+            return new CompressionDecoder(threshold);
+        }
     }
+
 }

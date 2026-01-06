@@ -18,10 +18,9 @@
 package com.viaversion.viarewind.api.type.chunk;
 
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
-import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.util.Pair;
 import io.netty.buffer.ByteBuf;
+
 import java.util.zip.Deflater;
 
 public class BulkChunkType1_7_6 extends Type<Chunk[]> {
@@ -38,39 +37,50 @@ public class BulkChunkType1_7_6 extends Type<Chunk[]> {
     }
 
     @Override
-    public void write(ByteBuf byteBuf, Chunk[] chunks) {
+    public void write(ByteBuf buffer, Chunk[] chunks) {
         final int chunkCount = chunks.length;
-        final int[] chunkX = new int[chunkCount];
-        final int[] chunkZ = new int[chunkCount];
-        final short[] primaryBitMask = new short[chunkCount];
-        final short[] additionalBitMask = new short[chunkCount];
+        final int[] addBitMasks = new int[chunkCount];
+        int totalSize = 0;
+        boolean anySkyLight = false;
 
-        final byte[][] dataArrays = new byte[chunkCount][];
-        int dataSize = 0;
+        for (Chunk chunk : chunks) {
+            if (ChunkType1_7_6.hasSkyLight(chunk)) {
+                anySkyLight = true;
+                break;
+            }
+        }
 
         for (int i = 0; i < chunkCount; i++) {
-            final Chunk chunk = chunks[i];
-            Pair<byte[], Short> chunkData;
-            try {
-                chunkData = ChunkType1_7_6.serialize(chunk);
-                final byte[] data = chunkData.key();
-                dataArrays[i] = data;
-                dataSize += data.length;
-            } catch (Exception e) {
-                throw new RuntimeException("Unable to serialize chunk", e);
-            }
-            chunkX[i] = chunk.getX();
-            chunkZ[i] = chunk.getZ();
-            primaryBitMask[i] = (short) chunk.getBitmask();
-            additionalBitMask[i] = chunkData.value();
+            Chunk chunk = chunks[i];
+            addBitMasks[i] = ChunkType1_7_6.getAddBitMask(chunk);
+            boolean biomes = chunk.isFullChunk() && chunk.getBiomeData() != null;
+
+            totalSize += ChunkType1_7_6.calcSize(
+                chunk.getBitmask(),
+                addBitMasks[i],
+                anySkyLight,
+                biomes
+            );
         }
 
-        final byte[] data = new byte[dataSize];
-        int destPos = 0;
-        for (final byte[] array : dataArrays) {
-            System.arraycopy(array, 0, data, destPos, array.length);
-            destPos += array.length;
+        final byte[] data = new byte[totalSize];
+        int offset = 0;
+
+        for (int i = 0; i < chunkCount; i++) {
+            Chunk chunk = chunks[i];
+            boolean biomes = chunk.isFullChunk() && chunk.getBiomeData() != null;
+
+            offset = ChunkType1_7_6.serialize(
+                chunk,
+                data,
+                offset,
+                addBitMasks[i],
+                anySkyLight,
+                biomes
+            );
         }
+
+        buffer.writeShort(chunkCount);
 
         final Deflater deflater = new Deflater();
         byte[] compressedData;
@@ -84,27 +94,16 @@ public class BulkChunkType1_7_6 extends Type<Chunk[]> {
             deflater.end();
         }
 
-        byteBuf.writeShort(chunkCount);
-        byteBuf.writeInt(compressedSize);
-
-        boolean skyLight = false;
-        for (Chunk chunk : chunks) {
-            for (ChunkSection section : chunk.getSections()) {
-                if (section != null && section.getLight().hasSkyLight()) {
-                    skyLight = true;
-                    break;
-                }
-            }
-        }
-
-        byteBuf.writeBoolean(skyLight); // hasSkyLight
-        byteBuf.writeBytes(compressedData, 0, compressedSize);
+        buffer.writeInt(compressedSize);
+        buffer.writeBoolean(anySkyLight);
+        buffer.writeBytes(compressedData, 0, compressedSize);
 
         for (int i = 0; i < chunkCount; i++) {
-            byteBuf.writeInt(chunkX[i]);
-            byteBuf.writeInt(chunkZ[i]);
-            byteBuf.writeShort(primaryBitMask[i]);
-            byteBuf.writeShort(additionalBitMask[i]);
+            Chunk chunk = chunks[i];
+            buffer.writeInt(chunk.getX());
+            buffer.writeInt(chunk.getZ());
+            buffer.writeShort(chunk.getBitmask());
+            buffer.writeShort(addBitMasks[i]);
         }
     }
 }

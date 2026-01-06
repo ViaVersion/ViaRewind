@@ -22,6 +22,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
+import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 
 public class CompressionEncoder extends MessageToByteEncoder<ByteBuf> {
@@ -48,11 +49,15 @@ public class CompressionEncoder extends MessageToByteEncoder<ByteBuf> {
 
         Types.VAR_INT.writePrimitive(out, frameLength);
 
-        ByteBuf temp = in;
-        if (!in.hasArray()) {
-            temp = ByteBufAllocator.DEFAULT.heapBuffer().writeBytes(in);
+        deflate(in, out);
+    }
+
+    protected void deflate(final ByteBuf source, final ByteBuf destination) throws DataFormatException {
+        ByteBuf temp = source;
+        if (!source.hasArray()) {
+            temp = ByteBufAllocator.DEFAULT.heapBuffer().writeBytes(source);
         } else {
-            in.retain();
+            source.retain();
         }
         ByteBuf output = ByteBufAllocator.DEFAULT.heapBuffer();
         try {
@@ -63,11 +68,12 @@ public class CompressionEncoder extends MessageToByteEncoder<ByteBuf> {
                 output.ensureWritable(4096);
                 output.writerIndex(output.writerIndex() + this.deflater.deflate(output.array(), output.arrayOffset() + output.writerIndex(), output.writableBytes()));
             }
-            out.writeBytes(output);
+            destination.writeBytes(output);
         } finally {
             output.release();
             temp.release();
             this.deflater.reset();
         }
     }
+
 }
