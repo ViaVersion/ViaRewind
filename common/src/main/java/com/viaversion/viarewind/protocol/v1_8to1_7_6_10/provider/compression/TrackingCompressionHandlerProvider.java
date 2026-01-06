@@ -93,7 +93,6 @@ public class TrackingCompressionHandlerProvider extends CompressionHandlerProvid
 
     @Override
     public ChannelHandler getEncoder(int threshold) {
-        System.out.println(velocityNatives + " " + threshold);
         if (velocityNatives) {
             return new VelocityCompressionEncoder(threshold);
         } else {
@@ -103,7 +102,6 @@ public class TrackingCompressionHandlerProvider extends CompressionHandlerProvid
 
     @Override
     public ChannelHandler getDecoder(int threshold) {
-        System.out.println(velocityNatives + " " + threshold + " d");
         if (velocityNatives) {
             return new VelocityCompressionDecoder(threshold);
         } else {
