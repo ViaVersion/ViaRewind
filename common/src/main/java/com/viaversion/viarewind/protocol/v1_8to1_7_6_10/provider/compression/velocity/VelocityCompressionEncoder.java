@@ -17,19 +17,23 @@
  */
 package com.viaversion.viarewind.protocol.v1_8to1_7_6_10.provider.compression.velocity;
 
+import com.velocitypowered.natives.compression.VelocityCompressor;
 import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.provider.compression.CompressionEncoder;
 import io.netty.buffer.ByteBuf;
 import java.util.zip.DataFormatException;
 
 public final class VelocityCompressionEncoder extends CompressionEncoder {
 
-    public VelocityCompressionEncoder(final int threshold) {
+    private final VelocityCompressor compressor;
+
+    public VelocityCompressionEncoder(final int threshold, final VelocityCompressor compressor) {
         super(threshold);
+        this.compressor = compressor;
     }
 
     @Override
     protected void deflate(final ByteBuf source, final ByteBuf destination) throws DataFormatException {
-        VelocityCompressionDecoder.COMPRESSOR.deflate(source, destination);
+        this.compressor.deflate(source, destination);
     }
 
 }

@@ -18,7 +18,6 @@
 package com.viaversion.viarewind.protocol.v1_8to1_7_6_10.provider.compression.velocity;
 
 import com.velocitypowered.natives.compression.VelocityCompressor;
-import com.velocitypowered.natives.util.Natives;
 import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.provider.compression.CompressionDecoder;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -27,17 +26,18 @@ import java.util.zip.DataFormatException;
 
 public final class VelocityCompressionDecoder extends CompressionDecoder {
 
-    public static final VelocityCompressor COMPRESSOR = Natives.compress.get().create(-1);
+    private final VelocityCompressor compressor;
 
-    public VelocityCompressionDecoder(final int threshold) {
+    public VelocityCompressionDecoder(final int threshold, final VelocityCompressor compressor) {
         super(threshold);
+        this.compressor = compressor;
     }
 
     @Override
     protected void inflate(final ChannelHandlerContext ctx, final ByteBuf source, final int outLength, final List<Object> out) throws DataFormatException {
         ByteBuf output = ctx.alloc().buffer(outLength);
         try {
-            COMPRESSOR.inflate(source, output, outLength);
+            this.compressor.inflate(source, output, outLength);
             out.add(output.retain());
         } finally {
             output.release();

@@ -51,12 +51,17 @@ public class TrackingCompressionHandlerProvider extends CompressionHandlerProvid
             return;
         }
 
+        Object compressor = null;
+        if (velocityNatives) {
+            compressor = com.velocitypowered.natives.util.Natives.compress.get().create(-1);
+        }
+
         final String compressHandlerName = ViaRewind.getPlatform().compressHandlerName();
         final CompressionEncoder encoder = (CompressionEncoder) pipeline.get(compressHandlerName);
         if (encoder != null) {
             encoder.setThreshold(threshold);
         } else {
-            pipeline.addBefore(Via.getManager().getInjector().getEncoderName(), compressHandlerName, getEncoder(threshold));
+            pipeline.addBefore(Via.getManager().getInjector().getEncoderName(), compressHandlerName, getEncoder(compressor, threshold));
         }
 
         final String decompressHandlerName = ViaRewind.getPlatform().decompressHandlerName();
@@ -64,7 +69,7 @@ public class TrackingCompressionHandlerProvider extends CompressionHandlerProvid
         if (decoder != null) {
             decoder.setThreshold(threshold);
         } else {
-            pipeline.addBefore(Via.getManager().getInjector().getDecoderName(), decompressHandlerName, getDecoder(threshold));
+            pipeline.addBefore(Via.getManager().getInjector().getDecoderName(), decompressHandlerName, getDecoder(compressor, threshold));
         }
     }
 
@@ -92,18 +97,18 @@ public class TrackingCompressionHandlerProvider extends CompressionHandlerProvid
     }
 
     @Override
-    public ChannelHandler getEncoder(int threshold) {
+    public ChannelHandler getEncoder(final Object compressor, int threshold) {
         if (velocityNatives) {
-            return new VelocityCompressionEncoder(threshold);
+            return new VelocityCompressionEncoder(threshold, (com.velocitypowered.natives.compression.VelocityCompressor) compressor);
         } else {
             return new CompressionEncoder(threshold);
         }
     }
 
     @Override
-    public ChannelHandler getDecoder(int threshold) {
+    public ChannelHandler getDecoder(final Object compressor, int threshold) {
         if (velocityNatives) {
-            return new VelocityCompressionDecoder(threshold);
+            return new VelocityCompressionDecoder(threshold, (com.velocitypowered.natives.compression.VelocityCompressor) compressor);
         } else {
             return new CompressionDecoder(threshold);
         }
