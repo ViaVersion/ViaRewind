@@ -52,6 +52,7 @@ public class VelocityPlugin implements ViaRewindPlatform {
     @DataDirectory
     private Path configPath;
 
+    @SuppressWarnings("deprecation")
     @Subscribe(order = PostOrder.LATE)
     public void onProxyStart(ProxyInitializeEvent e) {
         this.logger = new LoggerWrapper(loggerSlf4j);
