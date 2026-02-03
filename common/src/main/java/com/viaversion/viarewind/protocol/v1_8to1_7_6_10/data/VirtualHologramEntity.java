@@ -120,7 +120,7 @@ public class VirtualHologramEntity {
         gravity = (armorStandFlags & 0x02) == 0;
 
         State prevState = currentState;
-        if (invisible && name != null) {
+        if (invisible && name != null && alwaysShowNametag == 1) {
             currentState = State.HOLOGRAM;
         } else if (gravity) {
             currentState = State.ZOMBIE;
