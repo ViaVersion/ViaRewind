@@ -34,7 +34,7 @@ import java.util.logging.Logger;
 @Plugin(id = "viarewind",
     name = "ViaRewind",
     version = ViaRewindPlatform.VERSION,
-    authors = {"FlorianMichael/EnZaXD", "Gerrygames", "creeper123123321"},
+    authors = {"EnZaXD", "Gerrygames", "creeper123123321"},
     description = "ViaVersion addon to allow 1.8.x and 1.7.x clients on newer server versions.",
     dependencies = {
         @Dependency(id = "viaversion"),

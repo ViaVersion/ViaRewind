@@ -1,6 +1,6 @@
 name: ViaRewind
 main: com.viaversion.viarewind.BukkitPlugin
-authors: [ FlorianMichael/EnZaXD, Gerrygames, creeper123123321 ]
+authors: [ EnZaXD, Gerrygames, creeper123123321 ]
 version: ${version}
 description: ${description}
 website: https://viaversion.com/rewind
