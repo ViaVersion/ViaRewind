@@ -85,12 +85,14 @@ public class PlayerPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6_10>
                     ChatItemRewriter.toClient(protocol, wrapper.user(), json);
                     List<JsonObject> splitComponents = ChatNewlineRewriter.splitChatComponentByNewline(json);
 
-                    wrapper.cancel();
+                    if (splitComponents.size() > 1) {
+                        wrapper.cancel();
 
-                    for (JsonObject split : splitComponents) {
-                        PacketWrapper newWrapper = wrapper.create(ClientboundPackets1_7_2_5.CHAT);
-                        newWrapper.write(Types.COMPONENT, split);
-                        newWrapper.send(Protocol1_8To1_7_6_10.class);
+                        for (JsonObject split : splitComponents) {
+                            PacketWrapper newWrapper = wrapper.create(ClientboundPackets1_7_2_5.CHAT);
+                            newWrapper.write(Types.COMPONENT, split);
+                            newWrapper.send(Protocol1_8To1_7_6_10.class);
+                        }
                     }
                 });
             }
