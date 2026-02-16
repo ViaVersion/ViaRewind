@@ -30,6 +30,7 @@ import com.viaversion.viarewind.protocol.v1_7_6_10to1_7_2_5.packet.ClientboundPa
 import com.viaversion.viarewind.protocol.v1_7_6_10to1_7_2_5.packet.ServerboundPackets1_7_2_5;
 import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.Protocol1_8To1_7_6_10;
 import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.data.ChatItemRewriter;
+import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.data.ChatNewlineRewriter;
 import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.provider.TitleRenderProvider;
 import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.storage.EntityTracker1_8;
 import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.storage.GameProfileStorage;
@@ -46,6 +47,7 @@ import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.rewriter.RewriterBase;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.libs.gson.JsonElement;
+import com.viaversion.viaversion.libs.gson.JsonObject;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ServerboundPackets1_8;
 import com.viaversion.viaversion.util.ComponentUtil;
@@ -70,13 +72,27 @@ public class PlayerPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6_10>
             @Override
             public void register() {
                 map(Types.COMPONENT); // Chat message
+
                 handler(wrapper -> {
                     final JsonElement json = wrapper.get(Types.COMPONENT, 0);
-                    ChatItemRewriter.toClient(protocol, wrapper.user(), json);
-
                     final int position = wrapper.read(Types.BYTE);
+
                     if (position == 2) { // Above hotbar
                         wrapper.cancel();
+                        return;
+                    }
+
+                    ChatItemRewriter.toClient(protocol, wrapper.user(), json);
+                    List<JsonObject> splitComponents = ChatNewlineRewriter.splitChatComponentByNewline(json);
+
+                    if (splitComponents.size() > 1) {
+                        wrapper.cancel();
+
+                        for (JsonObject split : splitComponents) {
+                            PacketWrapper newWrapper = wrapper.create(ClientboundPackets1_7_2_5.CHAT);
+                            newWrapper.write(Types.COMPONENT, split);
+                            newWrapper.send(Protocol1_8To1_7_6_10.class);
+                        }
                     }
                 });
             }
