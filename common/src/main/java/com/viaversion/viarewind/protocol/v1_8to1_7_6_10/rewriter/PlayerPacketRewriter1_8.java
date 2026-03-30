@@ -606,6 +606,19 @@ public class PlayerPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6_10>
             protected void register() {
                 map(Types.VAR_INT); // Status
                 map(RewindTypes.U_BYTE_POSITION, Types.BLOCK_POSITION1_8); // Position
+
+                handler(wrapper -> {
+                    byte facing = wrapper.read(Types.BYTE);
+
+                    final int action = wrapper.get(Types.VAR_INT, 0);
+
+                    // ABORT_DESTROY_BLOCK
+                    if (action == 1) {
+                        facing = (byte) 255;
+                    }
+
+                    wrapper.write(Types.BYTE, facing);
+                });
             }
         });
 
