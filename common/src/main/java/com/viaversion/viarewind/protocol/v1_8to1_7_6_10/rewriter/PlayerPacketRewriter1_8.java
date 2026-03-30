@@ -614,7 +614,7 @@ public class PlayerPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6_10>
 
                     // ABORT_DESTROY_BLOCK
                     if (action == 1) {
-                        facing = (byte) 255;
+                        facing = (byte) -1;
                     }
 
                     wrapper.write(Types.BYTE, facing);
