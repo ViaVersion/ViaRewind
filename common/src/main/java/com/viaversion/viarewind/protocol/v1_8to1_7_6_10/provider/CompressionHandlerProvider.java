@@ -20,7 +20,6 @@ package com.viaversion.viarewind.protocol.v1_8to1_7_6_10.provider;
 import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.storage.CompressionStatusTracker;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.platform.providers.Provider;
-import io.netty.channel.ChannelHandler;
 
 public abstract class CompressionHandlerProvider implements Provider {
 
@@ -28,23 +27,6 @@ public abstract class CompressionHandlerProvider implements Provider {
 
     public abstract void onTransformPacket(UserConnection user);
 
-    /**
-     * Creates the compression encoder
-     *
-     * @param compressor A nullable object that may present a native backend for compression (if available)
-     * @param threshold  The compression threshold
-     * @return The encoder
-     */
-    public abstract ChannelHandler getEncoder(Object compressor, int threshold);
-
-    /**
-     * Creates the compression decoder
-     *
-     * @param compressor A nullable object that may present a native backend for compression (if available)
-     * @param threshold  The compression threshold
-     * @return The decoder
-     */
-    public abstract ChannelHandler getDecoder(Object compressor, int threshold);
 
     public boolean isRemoveCompression(UserConnection user) {
         return user.get(CompressionStatusTracker.class).removeCompression;

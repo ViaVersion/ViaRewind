@@ -17,13 +17,15 @@
  */
 package com.viaversion.viarewind.api.type.chunk;
 
+import com.viaversion.viarewind.api.compression.ThreadLocalCompressionProvider;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
 import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.type.Type;
 import io.netty.buffer.ByteBuf;
-import java.util.zip.Deflater;
+
+import java.util.zip.DataFormatException;
 
 import static com.viaversion.viaversion.api.minecraft.chunks.ChunkSection.SIZE;
 import static com.viaversion.viaversion.api.minecraft.chunks.ChunkSectionLight.LIGHT_LENGTH;
@@ -49,33 +51,41 @@ public class ChunkType1_7_6 extends Type<Chunk> {
         final boolean biomes = chunk.isFullChunk() && chunk.getBiomeData() != null;
 
         final int size = calcSize(bitmask, addBitmask, hasSkyLight, biomes);
-        final byte[] data = new byte[size];
+        final ByteBuf uncompressed = buffer.alloc().buffer(size);
 
-        serialize(chunk, data, 0, addBitmask, hasSkyLight, biomes);
-
-        buffer.writeInt(chunk.getX());
-        buffer.writeInt(chunk.getZ());
-        buffer.writeBoolean(chunk.isFullChunk());
-        buffer.writeShort(bitmask);
-        buffer.writeShort(addBitmask);
-
-        final Deflater deflater = new Deflater();
-        byte[] compressedData;
-        int compressedSize;
         try {
-            deflater.setInput(data, 0, data.length);
-            deflater.finish();
-            compressedData = new byte[data.length];
-            compressedSize = deflater.deflate(compressedData);
-        } finally {
-            deflater.end();
-        }
+            serialize(chunk, uncompressed, addBitmask, hasSkyLight, biomes);
 
-        buffer.writeInt(compressedSize);
-        buffer.writeBytes(compressedData, 0, compressedSize);
+            buffer.writeInt(chunk.getX());
+            buffer.writeInt(chunk.getZ());
+            buffer.writeBoolean(chunk.isFullChunk());
+            buffer.writeShort(bitmask);
+            buffer.writeShort(addBitmask);
+
+            // Reserve 4 bytes for the compressed size
+            final int sizeIndex = buffer.writerIndex();
+            buffer.writeInt(0); // Placeholder for compressed size
+
+            // Write compressed data directly to output buffer
+            final int compressedStart = buffer.writerIndex();
+            try {
+                ThreadLocalCompressionProvider.deflate(uncompressed, buffer);
+            } catch (DataFormatException e) {
+                throw new RuntimeException("Failed to compress chunk data", e);
+            }
+            final int compressedSize = buffer.writerIndex() - compressedStart;
+
+            // Go back and write the compressed size
+            final int endIndex = buffer.writerIndex();
+            buffer.writerIndex(sizeIndex);
+            buffer.writeInt(compressedSize);
+            buffer.writerIndex(endIndex);
+        } finally {
+            uncompressed.release();
+        }
     }
 
-    public static int serialize(Chunk chunk, byte[] output, int offset, int addBitmask, boolean writeSkyLight, boolean biomes) {
+    public static void serialize(Chunk chunk, ByteBuf output, int addBitmask, boolean writeSkyLight, boolean biomes) {
         final ChunkSection[] sections = chunk.getSections();
         final int bitmask = chunk.getBitmask();
 
@@ -85,7 +95,7 @@ public class ChunkType1_7_6 extends Type<Chunk> {
                 final DataPalette palette = section.palette(PaletteType.BLOCKS);
                 for (int j = 0; j < SIZE; j++) {
                     final int block = palette.idAt(j);
-                    output[offset++] = (byte) ((block >> 4) & 0xFF);
+                    output.writeByte((block >> 4) & 0xFF);
                 }
             }
         }
@@ -97,7 +107,7 @@ public class ChunkType1_7_6 extends Type<Chunk> {
                 for (int j = 0; j < ChunkSection.SIZE; j += 2) {
                     final int meta1 = palette.idAt(j) & 0xF;
                     final int meta2 = palette.idAt(j + 1) & 0xF;
-                    output[offset++] = (byte) (meta1 | (meta2 << 4));
+                    output.writeByte(meta1 | (meta2 << 4));
                 }
             }
         }
@@ -105,8 +115,7 @@ public class ChunkType1_7_6 extends Type<Chunk> {
         for (int i = 0; i < 16; i++) {
             if ((bitmask & (1 << i)) != 0) {
                 final byte[] blockLight = sections[i].getLight().getBlockLight();
-                System.arraycopy(blockLight, 0, output, offset, LIGHT_LENGTH);
-                offset += LIGHT_LENGTH;
+                output.writeBytes(blockLight);
             }
         }
 
@@ -115,9 +124,11 @@ public class ChunkType1_7_6 extends Type<Chunk> {
                 if ((bitmask & (1 << i)) != 0) {
                     if (sections[i].getLight().hasSkyLight()) {
                         final byte[] skyLight = sections[i].getLight().getSkyLight();
-                        System.arraycopy(skyLight, 0, output, offset, LIGHT_LENGTH);
+                        output.writeBytes(skyLight);
+                    } else {
+                        // Write empty skylight data
+                        output.writeZero(LIGHT_LENGTH);
                     }
-                    offset += LIGHT_LENGTH;
                 }
             }
         }
@@ -130,7 +141,7 @@ public class ChunkType1_7_6 extends Type<Chunk> {
                     for (int j = 0; j < SIZE; j += 2) {
                         final int add1 = (palette.idAt(j) >> 12) & 0xF;
                         final int add2 = (palette.idAt(j + 1) >> 12) & 0xF;
-                        output[offset++] = (byte) (add1 | (add2 << 4));
+                        output.writeByte(add1 | (add2 << 4));
                     }
                 }
             }
@@ -139,11 +150,9 @@ public class ChunkType1_7_6 extends Type<Chunk> {
         if (biomes && chunk.getBiomeData() != null) {
             final int[] biomeData = chunk.getBiomeData();
             for (int biome : biomeData) {
-                output[offset++] = (byte) biome;
+                output.writeByte(biome);
             }
         }
-
-        return offset;
     }
 
     public static int calcSize(int bitmask, int addBitmask, boolean hasSkyLight, boolean biomes) {
