@@ -117,7 +117,9 @@ public class EntityPacketRewriter1_8 extends VREntityRewriter<ClientboundPackets
                         handleEntityData(entityId, entityData, wrapper.user());
                         // Check invisible flag updates for player entities
                         if (tracker.entityType(entityId) == EntityTypes1_8.EntityType.PLAYER) {
-                            tracker.handlePlayerEntityFlags(entityId, entityData);
+                            if (tracker.handlePlayerEntityFlags(entityId, entityData)) {
+                                tracker.checkNametagVisibility(entityId);;
+                            }
                         }
                     } else {
                         wrapper.cancel();
@@ -346,6 +348,7 @@ public class EntityPacketRewriter1_8 extends VREntityRewriter<ClientboundPackets
                     final List<EntityData> entityData = wrapper.get(RewindTypes.ENTITY_DATA_LIST1_7, 0);
                     final EntityTracker1_8 tracker = tracker(wrapper.user());
                     tracker.handlePlayerEntityFlags(entityId, entityData);
+                    tracker.checkNametagVisibility(entityId);
                 });
             }
         });

@@ -205,8 +205,8 @@ public class EntityTracker1_8 extends EntityTrackerBase {
         }
     }
 
-    public void handlePlayerEntityFlags(final int entityId, final List<EntityData> entityData) {
-        if (!entityIdToUUID.containsKey(entityId)) return;
+    public boolean handlePlayerEntityFlags(final int entityId, final List<EntityData> entityData) {
+        if (!entityIdToUUID.containsKey(entityId)) return false;
         for (EntityData data : entityData) {
             if (data.id() == 0) { // Entity flags
                 final byte flags = ((Number) data.getValue()).byteValue();
@@ -215,10 +215,11 @@ public class EntityTracker1_8 extends EntityTrackerBase {
                 } else {
                     invisiblePlayerEntities.remove(entityId);
                 }
-                checkNametagVisibility(entityId);
-                break;
+                return true;
             }
         }
+
+        return false;
     }
 
     public void checkNametagVisibility(final int entityId) {
