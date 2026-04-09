@@ -167,6 +167,18 @@ public class VirtualHologramEntity {
             } else {
                 return baseOffset + (0.9875 * 2);
             }
+        } else if (currentState == State.ZOMBIE_NO_GRAVITY) {
+            // 1.7 ride stack offset sum: Squid (0.95 * 0.75) + Zombie (1.8 * 0.75) = 2.0625
+            // By starting at -2.0625, we zero out the 1.7 passenger height so we can apply 1.8's offsets.
+            double baseOffset = -2.0625;
+
+            if (marker) {
+                // 1.8 Marker ArmorStand height is 0.0 -> mounted offset 0.0
+                return baseOffset;
+            } else {
+                // 1.8 Normal ArmorStand height is 1.975 -> mounted offset 1.975 * 0.75 = 1.48125
+                return baseOffset + 1.48125;
+            }
         } else {
             return -0.4;
         }
