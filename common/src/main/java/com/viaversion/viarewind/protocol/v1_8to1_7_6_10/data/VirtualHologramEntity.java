@@ -46,6 +46,8 @@ public class VirtualHologramEntity {
     private String name = null;
     private float yaw, pitch;
     private float headYaw;
+    private byte flags = 0;
+    private byte armorStandFlags = 0;
     private boolean small = false;
     private boolean marker = false;
     private boolean sneaking = false;
@@ -99,8 +101,6 @@ public class VirtualHologramEntity {
         }
 
         // Filter armor stand data to calculate emulation
-        byte flags = 0;
-        byte armorStandFlags = 0;
         for (EntityData entityData : entityDataTracker) {
             if (entityData.id() == 0 && entityData.dataType() == EntityDataTypes1_8.BYTE) {
                 flags = ((Number) entityData.getValue()).byteValue();
