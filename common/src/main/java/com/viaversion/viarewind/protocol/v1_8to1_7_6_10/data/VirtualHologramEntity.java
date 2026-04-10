@@ -24,6 +24,7 @@ import com.viaversion.viarewind.api.type.RewindTypes;
 import com.viaversion.viarewind.protocol.v1_7_6_10to1_7_2_5.packet.ClientboundPackets1_7_2_5;
 import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.Protocol1_8To1_7_6_10;
 import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.rewriter.EntityPacketRewriter1_8;
+import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.storage.EntityTracker1_8;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_8;
 import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
@@ -303,6 +304,13 @@ public class VirtualHologramEntity {
             this.entityIds = entityIds;
         }
 
+        for (int extraId : entityIds) {
+            if (extraId != entityId) {
+                ((EntityTracker1_8) user.getEntityTracker(Protocol1_8To1_7_6_10.class)).setExtraHologramId(entityId, extraId);
+            }
+        }
+
+
         sendEntityDataUpdate(entityRewriter);
         if (entityIds == null) {
             return;
@@ -338,6 +346,13 @@ public class VirtualHologramEntity {
         if (entityIds == null) {
             return;
         }
+
+        for (int extraId : entityIds) {
+            if (extraId != entityId) {
+                ((EntityTracker1_8) user.getEntityTracker(Protocol1_8To1_7_6_10.class)).removeExtraHologramId(extraId);
+            }
+        }
+
         final PacketWrapper despawn = PacketWrapper.create(ClientboundPackets1_7_2_5.REMOVE_ENTITIES, user);
         despawn.write(Types.BYTE, (byte) entityIds.length);
         for (int id : entityIds) {

@@ -532,13 +532,15 @@ public class PlayerPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6_10>
                     if (mode != 0) {
                         return;
                     }
-                    final int entityId = wrapper.get(Types.VAR_INT, 0);
                     final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_7_6_10.class);
+                    final int entityId = tracker.getHologramIdWithExtra(wrapper.get(Types.VAR_INT, 0));
                     final PlayerSessionStorage position = wrapper.user().get(PlayerSessionStorage.class);
 
-                    if (!tracker.getHolograms().containsKey(entityId)) {
+                    if (entityId == -1) {
                         return;
                     }
+
+                    wrapper.set(Types.VAR_INT, 0, entityId);
                     final AABB boundingBox = tracker.getHolograms().get(entityId).getBoundingBox();
 
                     Vector3d pos = new Vector3d(position.getPosX(), position.getPosY() + 1.8, position.getPosZ());
