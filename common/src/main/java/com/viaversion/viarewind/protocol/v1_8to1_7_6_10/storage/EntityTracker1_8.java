@@ -55,7 +55,6 @@ public class EntityTracker1_8 extends EntityTrackerBase {
     private final Int2IntMap vehicles = new Int2IntArrayMap();
     private final Int2ObjectMap<UUID> entityIdToUUID = new Int2ObjectArrayMap<>();
     private final Object2IntMap<UUID> entityUUIDToId = new Object2IntOpenHashMap<>();
-    private final Set<Integer> invisiblePlayerEntities = new HashSet<>();
     private final Int2IntMap playerNametagHiderEntities = new Int2IntArrayMap();
 
     private final List<EntityData> entityData = new ArrayList<>();
@@ -88,7 +87,6 @@ public class EntityTracker1_8 extends EntityTrackerBase {
         if (playerNametagHiderEntities.containsKey(entityId)) {
             despawnNametagHiderEntity(entityId);
         }
-        invisiblePlayerEntities.remove(entityId);
 
         if (entityIdToUUID.containsKey(entityId)) {
             final UUID playerId = entityIdToUUID.remove(entityId);
@@ -103,7 +101,6 @@ public class EntityTracker1_8 extends EntityTrackerBase {
         super.clearEntities();
         vehicles.clear();
         playerNametagHiderEntities.clear();
-        invisiblePlayerEntities.clear();
     }
 
     @Override
@@ -205,23 +202,6 @@ public class EntityTracker1_8 extends EntityTrackerBase {
         }
     }
 
-    public boolean handlePlayerEntityFlags(final int entityId, final List<EntityData> entityData) {
-        if (!entityIdToUUID.containsKey(entityId)) return false;
-        for (EntityData data : entityData) {
-            if (data.id() == 0) { // Entity flags
-                final byte flags = ((Number) data.getValue()).byteValue();
-                if ((flags & 0x20) != 0) {
-                    invisiblePlayerEntities.add(entityId);
-                } else {
-                    invisiblePlayerEntities.remove(entityId);
-                }
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     public void checkNametagVisibility(final int entityId) {
         if (!entityIdToUUID.containsKey(entityId)) return;
         final boolean shouldHide = isPlayerNametagHidden(entityId);
@@ -247,7 +227,6 @@ public class EntityTracker1_8 extends EntityTrackerBase {
     }
 
     private boolean isPlayerNametagHidden(final int entityId) {
-        if (invisiblePlayerEntities.contains(entityId)) return true;
         final UUID uuid = entityIdToUUID.get(entityId);
         if (uuid == null) return false;
         final GameProfileStorage profileStorage = user().get(GameProfileStorage.class);

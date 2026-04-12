@@ -115,12 +115,6 @@ public class EntityPacketRewriter1_8 extends VREntityRewriter<ClientboundPackets
                         tracker.getHolograms().get(entityId).syncState(EntityPacketRewriter1_8.this, entityData);
                     } else if (tracker.hasEntity(entityId)) {
                         handleEntityData(entityId, entityData, wrapper.user());
-                        // Check invisible flag updates for player entities
-                        if (tracker.entityType(entityId) == EntityTypes1_8.EntityType.PLAYER) {
-                            if (tracker.handlePlayerEntityFlags(entityId, entityData)) {
-                                tracker.checkNametagVisibility(entityId);;
-                            }
-                        }
                     } else {
                         wrapper.cancel();
                     }
@@ -343,13 +337,6 @@ public class EntityPacketRewriter1_8 extends VREntityRewriter<ClientboundPackets
                 map(Types.ENTITY_DATA_LIST1_8, RewindTypes.ENTITY_DATA_LIST1_7); // Entity data
 
                 handler(getTrackerAndDataHandler(RewindTypes.ENTITY_DATA_LIST1_7, EntityTypes1_8.EntityType.PLAYER));
-                handler(wrapper -> {
-                    final int entityId = wrapper.get(Types.VAR_INT, 0);
-                    final List<EntityData> entityData = wrapper.get(RewindTypes.ENTITY_DATA_LIST1_7, 0);
-                    final EntityTracker1_8 tracker = tracker(wrapper.user());
-                    tracker.handlePlayerEntityFlags(entityId, entityData);
-                    tracker.checkNametagVisibility(entityId);
-                });
             }
         });
         protocol.registerClientbound(ClientboundPackets1_8.SET_EQUIPPED_ITEM, new PacketHandlers() {
