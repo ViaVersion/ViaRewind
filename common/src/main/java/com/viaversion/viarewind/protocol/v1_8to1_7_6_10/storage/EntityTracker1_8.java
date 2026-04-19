@@ -203,7 +203,9 @@ public class EntityTracker1_8 extends EntityTrackerBase {
     }
 
     public void checkNametagVisibility(final int entityId) {
-        if (!entityIdToUUID.containsKey(entityId)) return;
+        if (!entityIdToUUID.containsKey(entityId)) {
+            return;
+        }
         final boolean shouldHide = isPlayerNametagHidden(entityId);
         final boolean hasServerPassenger = getPassenger(entityId) != -1;
         final boolean hasSkull = playerNametagHiderEntities.containsKey(entityId);
@@ -218,20 +220,28 @@ public class EntityTracker1_8 extends EntityTrackerBase {
     public void checkNametagVisbility(final String username) {
         final GameProfileStorage profileStorage = user().get(GameProfileStorage.class);
         final GameProfileStorage.GameProfile profile = profileStorage.get(username, false);
-        if (profile == null) return;
+        if (profile == null) {
+            return;
+        }
 
         final int entityId = getPlayerEntityId(profile.uuid);
-        if (entityId == -1) return;
+        if (entityId == -1) {
+            return;
+        }
 
         checkNametagVisibility(entityId);
     }
 
     private boolean isPlayerNametagHidden(final int entityId) {
         final UUID uuid = entityIdToUUID.get(entityId);
-        if (uuid == null) return false;
+        if (uuid == null) {
+            return false;
+        }
         final GameProfileStorage profileStorage = user().get(GameProfileStorage.class);
         final GameProfileStorage.GameProfile profile = profileStorage.get(uuid);
-        if (profile == null) return false;
+        if (profile == null) {
+            return false;
+        }
         return user().get(ScoreboardTracker.class).isNametagHidden(profile.name);
     }
 

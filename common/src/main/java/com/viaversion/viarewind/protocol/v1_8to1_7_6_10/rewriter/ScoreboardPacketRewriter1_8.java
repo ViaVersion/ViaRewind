@@ -193,7 +193,7 @@ public class ScoreboardPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6
                 scoreboard.addTeam(team);
             } else if (mode == 1) {
                 // Team removed, nametag visibility might have changed
-                for (String member : scoreboard.getTeamMembers(team)) {
+                for (final String member : scoreboard.getTeamMembers(team)) {
                     tracker.checkNametagVisbility(member);
                 }
                 scoreboard.removeTeam(team);
@@ -220,7 +220,7 @@ public class ScoreboardPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6
 
                 // Re-evaluate nametag visibility for all team members when visibility changes
                 if (mode == 2 && !nameTagVisibility.equals(previousVisibility)) {
-                    for (String member : scoreboard.getTeamMembers(team)) {
+                    for (final String member : scoreboard.getTeamMembers(team)) {
                         tracker.checkNametagVisbility(member);
                     }
                 }

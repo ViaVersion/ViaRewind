@@ -340,7 +340,7 @@ public class EntityPacketRewriter1_8 extends VREntityRewriter<ClientboundPackets
                 handler(wrapper -> {
                     final int entityId = wrapper.get(Types.VAR_INT, 0);
                     final EntityTracker1_8 tracker = tracker(wrapper.user());
-                    tracker.checkNametagVisibility(entityId);;
+                    tracker.checkNametagVisibility(entityId);
                 });
             }
         });
