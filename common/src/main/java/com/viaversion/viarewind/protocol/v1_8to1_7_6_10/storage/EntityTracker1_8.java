@@ -37,18 +37,26 @@ import com.viaversion.viaversion.libs.fastutil.objects.Object2IntMap;
 import com.viaversion.viaversion.libs.fastutil.objects.Object2IntOpenHashMap;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_8;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
+
+import com.viaversion.viarewind.api.minecraft.entitydata.EntityDataTypes1_7_6_10;
+import com.viaversion.viarewind.api.type.RewindTypes;
+import com.viaversion.viarewind.protocol.v1_7_6_10to1_7_2_5.packet.ClientboundPackets1_7_2_5;
 
 public class EntityTracker1_8 extends EntityTrackerBase {
 
     private final Int2ObjectMap<VirtualHologramEntity> holograms = new Int2ObjectArrayMap<>();
+    private final Int2IntMap extraHologramIds = new Int2IntArrayMap();
     private final Int2IntMap vehicles = new Int2IntArrayMap();
     private final Int2ObjectMap<UUID> entityIdToUUID = new Int2ObjectArrayMap<>();
     private final Object2IntMap<UUID> entityUUIDToId = new Object2IntOpenHashMap<>();
+    private final Int2IntMap playerNametagHiderEntities = new Int2IntArrayMap();
 
     private final List<EntityData> entityData = new ArrayList<>();
 
@@ -77,6 +85,10 @@ public class EntityTracker1_8 extends EntityTrackerBase {
             holograms.remove(entityId);
         }
 
+        if (playerNametagHiderEntities.containsKey(entityId)) {
+            despawnNametagHiderEntity(entityId);
+        }
+
         if (entityIdToUUID.containsKey(entityId)) {
             final UUID playerId = entityIdToUUID.remove(entityId);
 
@@ -88,7 +100,10 @@ public class EntityTracker1_8 extends EntityTrackerBase {
     @Override
     public void clearEntities() {
         super.clearEntities();
+        holograms.clear();
+        extraHologramIds.clear();
         vehicles.clear();
+        playerNametagHiderEntities.clear();
     }
 
     @Override
@@ -155,6 +170,11 @@ public class EntityTracker1_8 extends EntityTrackerBase {
         } else {
             vehicles.put(vehicleId, passengerId);
         }
+
+        // Re-evaluate nametag visibility when a player entity's passenger changes
+        if (vehicleId != -1 && entityIdToUUID.containsKey(vehicleId)) {
+            checkNametagVisibility(vehicleId);
+        }
     }
 
     protected void attachEntity(final int target) {
@@ -185,8 +205,110 @@ public class EntityTracker1_8 extends EntityTrackerBase {
         }
     }
 
+    public void checkNametagVisibility(final int entityId) {
+        if (!entityIdToUUID.containsKey(entityId)) {
+            return;
+        }
+        final boolean shouldHide = isPlayerNametagHidden(entityId);
+        final boolean hasServerPassenger = getPassenger(entityId) != -1;
+        final boolean hasSkull = playerNametagHiderEntities.containsKey(entityId);
+
+        if (shouldHide && !hasServerPassenger && !hasSkull) {
+            spawnNametagHiderEntity(entityId);
+        } else if ((!shouldHide || hasServerPassenger) && hasSkull) {
+            despawnNametagHiderEntity(entityId);
+        }
+    }
+
+    public void checkNametagVisbility(final String username) {
+        final GameProfileStorage profileStorage = user().get(GameProfileStorage.class);
+        final GameProfileStorage.GameProfile profile = profileStorage.get(username, false);
+        if (profile == null) {
+            return;
+        }
+
+        final int entityId = getPlayerEntityId(profile.uuid);
+        if (entityId == -1) {
+            return;
+        }
+
+        checkNametagVisibility(entityId);
+    }
+
+    private boolean isPlayerNametagHidden(final int entityId) {
+        final UUID uuid = entityIdToUUID.get(entityId);
+        if (uuid == null) {
+            return false;
+        }
+        final GameProfileStorage profileStorage = user().get(GameProfileStorage.class);
+        final GameProfileStorage.GameProfile profile = profileStorage.get(uuid);
+        if (profile == null) {
+            return false;
+        }
+        return user().get(ScoreboardTracker.class).isNametagHidden(profile.name);
+    }
+
+    private int getNametagHiderEntityId(final int playerEntityId) {
+        return Integer.MAX_VALUE - 32000 - playerEntityId;
+    }
+
+    private void spawnNametagHiderEntity(final int playerEntityId) {
+        final int entityId = getNametagHiderEntityId(playerEntityId);
+        playerNametagHiderEntities.put(playerEntityId, entityId);
+
+        final List<EntityData> mobData = new ArrayList<>();
+        mobData.add(new EntityData(0, EntityDataTypes1_7_6_10.BYTE, (byte) 0x20));
+        mobData.add(new EntityData(16, EntityDataTypes1_7_6_10.BYTE, (byte) 0));
+
+        final PacketWrapper spawnMob = PacketWrapper.create(ClientboundPackets1_7_2_5.ADD_MOB, user());
+        spawnMob.write(Types.VAR_INT, entityId);
+        spawnMob.write(Types.UNSIGNED_BYTE, (short) EntityTypes1_8.EntityType.MAGMA_CUBE.getId());
+        spawnMob.write(Types.INT, 0); // X
+        spawnMob.write(Types.INT, 0); // Y
+        spawnMob.write(Types.INT, 0); // Z
+        spawnMob.write(Types.BYTE, (byte) 0); // Yaw
+        spawnMob.write(Types.BYTE, (byte) 0); // Pitch
+        spawnMob.write(Types.BYTE, (byte) 0); // Head yaw
+        spawnMob.write(Types.SHORT, (short) 0); // Velocity x
+        spawnMob.write(Types.SHORT, (short) 0); // Velocity y
+        spawnMob.write(Types.SHORT, (short) 0); // Velocity z
+        spawnMob.write(RewindTypes.ENTITY_DATA_LIST1_7, mobData);
+        spawnMob.scheduleSend(Protocol1_8To1_7_6_10.class);
+
+        final PacketWrapper attach = PacketWrapper.create(ClientboundPackets1_7_2_5.SET_ENTITY_LINK, user());
+        attach.write(Types.INT, entityId);
+        attach.write(Types.INT, playerEntityId);
+        attach.write(Types.BOOLEAN, false);
+        attach.scheduleSend(Protocol1_8To1_7_6_10.class);
+    }
+
+    private void despawnNametagHiderEntity(final int playerEntityId) {
+        if (!playerNametagHiderEntities.containsKey(playerEntityId)) return;
+        final int mobId = playerNametagHiderEntities.remove(playerEntityId);
+
+        final PacketWrapper despawn = PacketWrapper.create(ClientboundPackets1_7_2_5.REMOVE_ENTITIES, user());
+        despawn.write(Types.BYTE, (byte) 1);
+        despawn.write(Types.INT, mobId);
+        despawn.scheduleSend(Protocol1_8To1_7_6_10.class);
+    }
+
     public Int2ObjectMap<VirtualHologramEntity> getHolograms() {
         return holograms;
+    }
+
+    public void setExtraHologramId(final int entityId, final int extraId) {
+        extraHologramIds.put(extraId, entityId);
+    }
+
+    public void removeExtraHologramId(int extraId) {
+        extraHologramIds.remove(extraId);
+    }
+
+    public int getHologramIdWithExtra(final int id) {
+        if (holograms.containsKey(id)) {
+            return id;
+        }
+        return extraHologramIds.getOrDefault(id, -1);
     }
 
     public boolean isSpectator() {

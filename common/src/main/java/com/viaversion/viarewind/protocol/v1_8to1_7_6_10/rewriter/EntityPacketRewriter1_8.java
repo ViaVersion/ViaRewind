@@ -337,6 +337,11 @@ public class EntityPacketRewriter1_8 extends VREntityRewriter<ClientboundPackets
                 map(Types.ENTITY_DATA_LIST1_8, RewindTypes.ENTITY_DATA_LIST1_7); // Entity data
 
                 handler(getTrackerAndDataHandler(RewindTypes.ENTITY_DATA_LIST1_7, EntityTypes1_8.EntityType.PLAYER));
+                handler(wrapper -> {
+                    final int entityId = wrapper.get(Types.VAR_INT, 0);
+                    final EntityTracker1_8 tracker = tracker(wrapper.user());
+                    tracker.checkNametagVisibility(entityId);
+                });
             }
         });
         protocol.registerClientbound(ClientboundPackets1_8.SET_EQUIPPED_ITEM, new PacketHandlers() {

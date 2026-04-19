@@ -19,6 +19,7 @@ package com.viaversion.viarewind.protocol.v1_8to1_7_6_10.rewriter;
 
 import com.viaversion.viarewind.protocol.v1_7_6_10to1_7_2_5.packet.ClientboundPackets1_7_2_5;
 import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.Protocol1_8To1_7_6_10;
+import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.storage.EntityTracker1_8;
 import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.storage.ScoreboardTracker;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
@@ -173,6 +174,7 @@ public class ScoreboardPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6
             }
 
             final ScoreboardTracker scoreboard = wrapper.user().get(ScoreboardTracker.class);
+            final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_7_6_10.class);
 
             final byte mode = wrapper.passthrough(Types.BYTE);
             if (mode != 0 && !scoreboard.teamExists(team)) {
@@ -190,6 +192,10 @@ public class ScoreboardPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6
             if (mode == 0) {
                 scoreboard.addTeam(team);
             } else if (mode == 1) {
+                // Team removed, nametag visibility might have changed
+                for (final String member : scoreboard.getTeamMembers(team)) {
+                    tracker.checkNametagVisbility(member);
+                }
                 scoreboard.removeTeam(team);
             }
 
@@ -198,7 +204,9 @@ public class ScoreboardPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6
                 wrapper.passthrough(Types.STRING); // Prefix
                 wrapper.passthrough(Types.STRING); // Suffix
                 wrapper.passthrough(Types.BYTE); // Friendly fire
-                wrapper.read(Types.STRING); // Name tag visibility
+                final String nameTagVisibility = wrapper.read(Types.STRING);
+                final String previousVisibility = scoreboard.getTeamNameTagVisibility(team);
+                scoreboard.setTeamNameTagVisibility(team, nameTagVisibility);
                 byte color = wrapper.read(Types.BYTE);
                 if (mode == 2 && scoreboard.getTeamColor(team).get() != color) {
                     final String sidebar = scoreboard.getColorDependentSidebar().get(color);
@@ -209,6 +217,13 @@ public class ScoreboardPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6
                     sidebarPacket.scheduleSend(Protocol1_8To1_7_6_10.class);
                 }
                 scoreboard.setTeamColor(team, color);
+
+                // Re-evaluate nametag visibility for all team members when visibility changes
+                if (mode == 2 && !nameTagVisibility.equals(previousVisibility)) {
+                    for (final String member : scoreboard.getTeamMembers(team)) {
+                        tracker.checkNametagVisbility(member);
+                    }
+                }
             }
             if (mode == 0 || mode == 3 || mode == 4) {
                 byte color = scoreboard.getTeamColor(team).get();
@@ -223,6 +238,8 @@ public class ScoreboardPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6
                             continue;
                         }
                         scoreboard.removePlayerFromTeam(entry, team);
+                        // Player left team, nametag visibility may change
+                        tracker.checkNametagVisbility(entry);
                         if (entry.equals(username)) {
                             final PacketWrapper sidebarPacket = PacketWrapper.create(ClientboundPackets1_7_2_5.SET_DISPLAY_OBJECTIVE, wrapper.user());
                             sidebarPacket.write(Types.BYTE, (byte) 1);
@@ -231,6 +248,8 @@ public class ScoreboardPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6
                         }
                     } else {
                         scoreboard.addPlayerToTeam(entry, team);
+                        // Player joined team, nametag visibility may change
+                        tracker.checkNametagVisbility(entry);
                         if (entry.equals(username) && scoreboard.getColorDependentSidebar().containsKey(color)) {
                             final PacketWrapper displayObjective = PacketWrapper.create(ClientboundPackets1_7_2_5.SET_DISPLAY_OBJECTIVE, wrapper.user());
                             displayObjective.write(Types.BYTE, (byte) 1);
