@@ -19,7 +19,6 @@ package com.viaversion.viarewind.api.compression;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
-import io.netty.util.internal.FastThreadLocal;
 
 import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
@@ -48,11 +47,6 @@ public final class ThreadLocalCompressionProvider {
 
     // ThreadLocal for Java's Inflater (used when Velocity natives are not available)
     private static final ThreadLocal<Inflater> JAVA_INFLATER = ThreadLocal.withInitial(Inflater::new);
-
-    // ThreadLocal for Velocity's compressor (used when Velocity natives are available)
-    private static final ThreadLocal<Object> VELOCITY_COMPRESSOR = VELOCITY_NATIVES_AVAILABLE
-            ? ThreadLocal.withInitial(() -> com.velocitypowered.natives.util.Natives.compress.get().create(-1))
-            : null;
 
     private ThreadLocalCompressionProvider() {
     }
@@ -138,18 +132,26 @@ public final class ThreadLocalCompressionProvider {
     }
 
     // Velocity native implementation
-
     private static void deflateVelocity(final ByteBuf source, final ByteBuf destination) throws DataFormatException {
-        final com.velocitypowered.natives.compression.VelocityCompressor compressor =
-                (com.velocitypowered.natives.compression.VelocityCompressor) VELOCITY_COMPRESSOR.get();
-        compressor.deflate(source, destination);
+        VelocityHolder.deflate(source, destination);
     }
 
-
     private static void inflateVelocity(final ByteBuf source, final ByteBuf destination, final int expectedSize) throws DataFormatException {
-        final com.velocitypowered.natives.compression.VelocityCompressor compressor =
-                (com.velocitypowered.natives.compression.VelocityCompressor) VELOCITY_COMPRESSOR.get();
-        compressor.inflate(source, destination, expectedSize);
+        VelocityHolder.inflate(source, destination, expectedSize);
+    }
+
+    private static final class VelocityHolder {
+
+        private static final ThreadLocal<com.velocitypowered.natives.compression.VelocityCompressor> COMPRESSOR =
+                ThreadLocal.withInitial(() -> com.velocitypowered.natives.util.Natives.compress.get().create(-1));
+
+        static void deflate(final ByteBuf source, final ByteBuf destination) throws DataFormatException {
+            COMPRESSOR.get().deflate(source, destination);
+        }
+
+        static void inflate(final ByteBuf source, final ByteBuf destination, final int expectedSize) throws DataFormatException {
+            COMPRESSOR.get().inflate(source, destination, expectedSize);
+        }
     }
 }
 
