@@ -37,6 +37,7 @@ public class ScoreboardTracker extends StoredObject {
     private final HashMap<String, Byte> teamColors = new HashMap<>();
     private final HashSet<String> scoreTeamNames = new HashSet<>();
     private final HashMap<Byte, String> colorDependentSidebar = new HashMap<>();
+    private final HashMap<String, String> teamNameTagVisibilities = new HashMap<>();
     private String colorIndependentSidebar;
 
     public ScoreboardTracker(UserConnection user) {
@@ -63,6 +64,7 @@ public class ScoreboardTracker extends StoredObject {
         teams.remove(team);
         scoreTeams.remove(team);
         teamColors.remove(team);
+        teamNameTagVisibilities.remove(team);
     }
 
     public boolean teamExists(String team) {
@@ -96,6 +98,27 @@ public class ScoreboardTracker extends StoredObject {
             if (entry.getValue().contains(player))
                 return Optional.of(entry.getKey());
         return Optional.empty();
+    }
+
+    public void setTeamNameTagVisibility(String team, String visibility) {
+        teamNameTagVisibilities.put(team, visibility);
+    }
+
+    public String getTeamNameTagVisibility(String team) {
+        return teamNameTagVisibilities.getOrDefault(team, "always");
+    }
+
+    public boolean isNametagHidden(String username) {
+        for (Map.Entry<String, List<String>> entry : teams.entrySet()) {
+            if (entry.getValue().contains(username)) {
+                return "never".equalsIgnoreCase(teamNameTagVisibilities.getOrDefault(entry.getKey(), "always"));
+            }
+        }
+        return false;
+    }
+
+    public List<String> getTeamMembers(String team) {
+        return teams.getOrDefault(team, new ArrayList<>());
     }
 
     public void addObjective(String name) {
