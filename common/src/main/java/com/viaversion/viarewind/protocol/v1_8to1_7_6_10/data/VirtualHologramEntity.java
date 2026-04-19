@@ -24,6 +24,7 @@ import com.viaversion.viarewind.api.type.RewindTypes;
 import com.viaversion.viarewind.protocol.v1_7_6_10to1_7_2_5.packet.ClientboundPackets1_7_2_5;
 import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.Protocol1_8To1_7_6_10;
 import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.rewriter.EntityPacketRewriter1_8;
+import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.storage.EntityTracker1_8;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_8;
 import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
@@ -46,6 +47,8 @@ public class VirtualHologramEntity {
     private String name = null;
     private float yaw, pitch;
     private float headYaw;
+    private byte flags = 0;
+    private byte armorStandFlags = 0;
     private boolean small = false;
     private boolean marker = false;
     private boolean sneaking = false;
@@ -99,8 +102,6 @@ public class VirtualHologramEntity {
         }
 
         // Filter armor stand data to calculate emulation
-        byte flags = 0;
-        byte armorStandFlags = 0;
         for (EntityData entityData : entityDataTracker) {
             if (entityData.id() == 0 && entityData.dataType() == EntityDataTypes1_8.BYTE) {
                 flags = ((Number) entityData.getValue()).byteValue();
@@ -166,6 +167,18 @@ public class VirtualHologramEntity {
                 return baseOffset + 0.9875;
             } else {
                 return baseOffset + (0.9875 * 2);
+            }
+        } else if (currentState == State.ZOMBIE_NO_GRAVITY) {
+            // 1.7 ride stack offset sum: Squid (0.95 * 0.75) + Zombie (1.8 * 0.75) = 2.0625
+            // By starting at -2.0625, we zero out the 1.7 passenger height so we can apply 1.8's offsets.
+            double baseOffset = -2.0625;
+
+            if (marker) {
+                // 1.8 Marker ArmorStand height is 0.0 -> mounted offset 0.0
+                return baseOffset;
+            } else {
+                // 1.8 Normal ArmorStand height is 1.975 -> mounted offset 1.975 * 0.75 = 1.48125
+                return baseOffset + 1.48125;
             }
         } else {
             return -0.4;
@@ -291,6 +304,13 @@ public class VirtualHologramEntity {
             this.entityIds = entityIds;
         }
 
+        for (int extraId : entityIds) {
+            if (extraId != entityId) {
+                ((EntityTracker1_8) user.getEntityTracker(Protocol1_8To1_7_6_10.class)).setExtraHologramId(entityId, extraId);
+            }
+        }
+
+
         sendEntityDataUpdate(entityRewriter);
         if (entityIds == null) {
             return;
@@ -326,6 +346,13 @@ public class VirtualHologramEntity {
         if (entityIds == null) {
             return;
         }
+
+        for (int extraId : entityIds) {
+            if (extraId != entityId) {
+                ((EntityTracker1_8) user.getEntityTracker(Protocol1_8To1_7_6_10.class)).removeExtraHologramId(extraId);
+            }
+        }
+
         final PacketWrapper despawn = PacketWrapper.create(ClientboundPackets1_7_2_5.REMOVE_ENTITIES, user);
         despawn.write(Types.BYTE, (byte) entityIds.length);
         for (int id : entityIds) {

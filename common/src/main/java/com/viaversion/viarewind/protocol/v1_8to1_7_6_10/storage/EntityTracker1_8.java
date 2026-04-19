@@ -46,6 +46,7 @@ import java.util.logging.Level;
 public class EntityTracker1_8 extends EntityTrackerBase {
 
     private final Int2ObjectMap<VirtualHologramEntity> holograms = new Int2ObjectArrayMap<>();
+    private final Int2IntMap extraHologramIds = new Int2IntArrayMap();
     private final Int2IntMap vehicles = new Int2IntArrayMap();
     private final Int2ObjectMap<UUID> entityIdToUUID = new Int2ObjectArrayMap<>();
     private final Object2IntMap<UUID> entityUUIDToId = new Object2IntOpenHashMap<>();
@@ -88,6 +89,8 @@ public class EntityTracker1_8 extends EntityTrackerBase {
     @Override
     public void clearEntities() {
         super.clearEntities();
+        holograms.clear();
+        extraHologramIds.clear();
         vehicles.clear();
     }
 
@@ -187,6 +190,21 @@ public class EntityTracker1_8 extends EntityTrackerBase {
 
     public Int2ObjectMap<VirtualHologramEntity> getHolograms() {
         return holograms;
+    }
+
+    public void setExtraHologramId(final int entityId, final int extraId) {
+        extraHologramIds.put(extraId, entityId);
+    }
+
+    public void removeExtraHologramId(int extraId) {
+        extraHologramIds.remove(extraId);
+    }
+
+    public int getHologramIdWithExtra(final int id) {
+        if (holograms.containsKey(id)) {
+            return id;
+        }
+        return extraHologramIds.getOrDefault(id, -1);
     }
 
     public boolean isSpectator() {
