@@ -130,7 +130,6 @@ public class Protocol1_8To1_7_6_10 extends BackwardsProtocol<ClientboundPackets1
         connection.put(new GameProfileStorage(connection));
         connection.put(new ScoreboardTracker(connection));
         connection.put(new CompressionStatusTracker(connection));
-        connection.put(new WorldBorderEmulator(connection));
     }
 
     @Override

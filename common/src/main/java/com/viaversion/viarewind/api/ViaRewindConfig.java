@@ -54,14 +54,14 @@ public interface ViaRewindConfig extends Config {
     /**
      * Max amount of pages for written books before a client gets kicked
      *
-     * @return the max amount of pages
+     * @return the end amount of pages
      */
     int getMaxBookPages();
 
     /**
      * Max amount of characters in the json (!) string of a book page before a client gets kicked
      *
-     * @return the max amount of characters
+     * @return the end amount of characters
      */
     int getMaxBookPageSize();
 

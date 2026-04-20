@@ -24,6 +24,7 @@ import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.Protocol1_8To1_7_6_10;
 import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.data.Particles1_8;
 import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.storage.WorldBorderEmulator;
 import com.viaversion.viarewind.utils.ChatUtil;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
 import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
@@ -224,12 +225,7 @@ public class WorldPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6_10> 
                         columnData[i + 3] = data[column + i * columns];
                     }
 
-                    final PacketWrapper mapData = PacketWrapper.create(ClientboundPackets1_8.MAP_ITEM_DATA, wrapper.user());
-                    mapData.write(Types.VAR_INT, id); // map id
-                    mapData.write(Types.SHORT, (short) columnData.length); // data length
-                    mapData.write(new FixedByteArrayType(columnData.length), columnData); // data
-
-                    mapData.send(Protocol1_8To1_7_6_10.class);
+                    sendMapItemData(wrapper.user(), id, columnData);
                 }
             }
 
@@ -242,12 +238,7 @@ public class WorldPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6_10> 
                     iconData[i * 3 + 3] = icons[i * 4 + 2];
                 }
 
-                final PacketWrapper mapData = PacketWrapper.create(ClientboundPackets1_8.MAP_ITEM_DATA, wrapper.user());
-                mapData.write(Types.VAR_INT, id); // map id
-                mapData.write(Types.SHORT, (short) iconData.length); // data length
-                mapData.write(new FixedByteArrayType(iconData.length), iconData); // data
-
-                mapData.send(Protocol1_8To1_7_6_10.class);
+                sendMapItemData(wrapper.user(), id, iconData);
             }
 
             // Update scale
@@ -259,35 +250,55 @@ public class WorldPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6_10> 
             mapData.send(Protocol1_8To1_7_6_10.class);
         });
 
-        protocol.registerClientbound(ClientboundPackets1_8.BLOCK_ENTITY_DATA, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Types.BLOCK_POSITION1_8, RewindTypes.SHORT_POSITION); // position
-                map(Types.UNSIGNED_BYTE); // action
-                map(Types.NAMED_COMPOUND_TAG, RewindTypes.COMPRESSED_NBT); // nbt
-            }
+        protocol.registerClientbound(ClientboundPackets1_8.BLOCK_ENTITY_DATA, wrapper -> {
+            wrapper.passthroughAndMap(Types.BLOCK_POSITION1_8, RewindTypes.SHORT_POSITION); // Position
+            wrapper.passthrough(Types.UNSIGNED_BYTE); // Action
+            wrapper.passthroughAndMap(Types.NAMED_COMPOUND_TAG, RewindTypes.COMPRESSED_NBT); // Tag
         });
 
         protocol.cancelClientbound(ClientboundPackets1_8.CHANGE_DIFFICULTY);
 
         protocol.registerClientbound(ClientboundPackets1_8.SET_BORDER, null, wrapper -> {
-            final WorldBorderEmulator emulator = wrapper.user().get(WorldBorderEmulator.class);
             wrapper.cancel();
-
             final int action = wrapper.read(Types.VAR_INT);
+            if (action == 3) { // initialize
+                final double x = wrapper.read(Types.DOUBLE);
+                final double z = wrapper.read(Types.DOUBLE);
+                final double oldRadius = wrapper.read(Types.DOUBLE);
+                final double newRadius = wrapper.read(Types.DOUBLE);
+                final long speed = wrapper.read(Types.VAR_LONG);
+
+                wrapper.user().put(new WorldBorderEmulator(wrapper.user(), x, z, oldRadius, newRadius, speed));
+            }
+
+            final WorldBorderEmulator emulator = wrapper.user().get(WorldBorderEmulator.class);
+            if (emulator == null) {
+                return;
+            }
+
             if (action == 0) { // set size
-                emulator.setSize(wrapper.read(Types.DOUBLE)); // radius
-            } else if (action == 1) { // lerp size
-                emulator.lerpSize(wrapper.read(Types.DOUBLE), wrapper.read(Types.DOUBLE), wrapper.read(Types.VAR_LONG)); // old radius, new radius, speed
+                final double radius = wrapper.read(Types.DOUBLE);
+                emulator.setSize(radius);
+            } else if (action == 1) { // delta size
+                final double oldRadius = wrapper.read(Types.DOUBLE);
+                final double newRadius = wrapper.read(Types.DOUBLE);
+                final long speed = wrapper.read(Types.VAR_LONG);
+                emulator.updateDeltaTime(oldRadius, newRadius, speed);
             } else if (action == 2) { // set center
-                emulator.setCenter(wrapper.read(Types.DOUBLE), wrapper.read(Types.DOUBLE)); // x, z
-            } else if (action == 3) { // initialize
-                emulator.init(
-                    wrapper.read(Types.DOUBLE), wrapper.read(Types.DOUBLE), // x, z
-                    wrapper.read(Types.DOUBLE), wrapper.read(Types.DOUBLE), // old radius, new radius
-                    wrapper.read(Types.VAR_LONG) // speed
-                );
+                final double x = wrapper.read(Types.DOUBLE);
+                final double z = wrapper.read(Types.DOUBLE);
+                emulator.setCenter(x, z);
             }
         });
     }
+
+    private void sendMapItemData(final UserConnection connection, final int id, final byte[] columnData) {
+        final PacketWrapper mapData = PacketWrapper.create(ClientboundPackets1_8.MAP_ITEM_DATA, connection);
+        mapData.write(Types.VAR_INT, id); // map id
+        mapData.write(Types.SHORT, (short) columnData.length); // data length
+        mapData.write(new FixedByteArrayType(columnData.length), columnData); // data
+
+        mapData.send(Protocol1_8To1_7_6_10.class);
+    }
+
 }

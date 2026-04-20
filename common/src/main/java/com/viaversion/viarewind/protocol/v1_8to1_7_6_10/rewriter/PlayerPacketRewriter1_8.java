@@ -21,10 +21,8 @@ import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.viarewind.ViaRewind;
-import com.viaversion.viarewind.api.minecraft.math.AABB;
-import com.viaversion.viarewind.api.minecraft.math.Ray3d;
+import com.viaversion.viarewind.api.minecraft.math.Box;
 import com.viaversion.viarewind.api.minecraft.math.RayTracing;
-import com.viaversion.viarewind.api.minecraft.math.Vector3d;
 import com.viaversion.viarewind.api.type.RewindTypes;
 import com.viaversion.viarewind.protocol.v1_7_6_10to1_7_2_5.packet.ClientboundPackets1_7_2_5;
 import com.viaversion.viarewind.protocol.v1_7_6_10to1_7_2_5.packet.ServerboundPackets1_7_2_5;
@@ -146,8 +144,8 @@ public class PlayerPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6_10>
                         return;
                     }
 
-                    // On 1.8 clients when the player respawns it keeps all metadata and sets player back to max HP
-                    // 1.7 clients do not copy the metadata but do set the health to max HP
+                    // On 1.8 clients when the player respawns it keeps all metadata and sets player back to end HP
+                    // 1.7 clients do not copy the metadata but do set the health to end HP
                     // to match the same client logic we remove the HP metadata as otherwise the client would be set to their old HP before respawning
                     final List<EntityData> entityDataList = new ArrayList<>(tracker.getEntityData());
                     entityDataList.removeIf(entityData -> entityData.id() == 6);
@@ -541,20 +539,20 @@ public class PlayerPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6_10>
                     }
 
                     wrapper.set(Types.VAR_INT, 0, entityId);
-                    final AABB boundingBox = tracker.getHolograms().get(entityId).getBoundingBox();
+                    final Box boundingBox = tracker.getHolograms().get(entityId).getBoundingBox();
 
                     Vector3d pos = new Vector3d(position.getPosX(), position.getPosY() + 1.8, position.getPosZ());
                     double yaw = Math.toRadians(position.yaw);
                     double pitch = Math.toRadians(position.pitch);
 
                     Vector3d dir = new Vector3d(-Math.cos(pitch) * Math.sin(yaw), -Math.sin(pitch), Math.cos(pitch) * Math.cos(yaw));
-                    Ray3d ray = new Ray3d(pos, dir);
+                    Rotation ray = new Rotation(pos, dir);
                     Vector3d intersection = RayTracing.trace(ray, boundingBox, 5.0);
 
                     if (intersection == null) {
                         return;
                     }
-                    intersection.substract(boundingBox.getMin());
+                    intersection.substract(boundingBox.start());
 
                     wrapper.set(Types.VAR_INT, 1, 2);
                     wrapper.write(Types.FLOAT, (float) intersection.getX());

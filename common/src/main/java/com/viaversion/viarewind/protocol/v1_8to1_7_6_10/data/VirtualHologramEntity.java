@@ -18,14 +18,14 @@
 package com.viaversion.viarewind.protocol.v1_8to1_7_6_10.data;
 
 import com.viaversion.viarewind.api.minecraft.entitydata.EntityDataTypes1_7_6_10;
-import com.viaversion.viarewind.api.minecraft.math.AABB;
-import com.viaversion.viarewind.api.minecraft.math.Vector3d;
+import com.viaversion.viarewind.api.minecraft.math.Box;
 import com.viaversion.viarewind.api.type.RewindTypes;
 import com.viaversion.viarewind.protocol.v1_7_6_10to1_7_2_5.packet.ClientboundPackets1_7_2_5;
 import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.Protocol1_8To1_7_6_10;
 import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.rewriter.EntityPacketRewriter1_8;
 import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.storage.EntityTracker1_8;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.Vector3d;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_8;
 import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
 import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes1_8;
@@ -328,14 +328,14 @@ public class VirtualHologramEntity {
         }
     }
 
-    public AABB getBoundingBox() {
+    public Box getBoundingBox() {
         final double width = this.small ? 0.25 : 0.5;
         final double height = this.small ? 0.9875 : 1.975;
 
         final Vector3d min = new Vector3d(this.locX - width / 2, this.locY, this.locZ - width / 2);
         final Vector3d max = new Vector3d(this.locX + width / 2, this.locY + height, this.locZ + width / 2);
 
-        return new AABB(min, max);
+        return new Box(min, max);
     }
 
     private int additionalEntityId() {

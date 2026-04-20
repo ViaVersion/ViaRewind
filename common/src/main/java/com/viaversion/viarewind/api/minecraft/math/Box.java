@@ -17,20 +17,8 @@
  */
 package com.viaversion.viarewind.api.minecraft.math;
 
-public class AABB {
-    Vector3d min;
-    Vector3d max;
+import com.viaversion.viaversion.api.minecraft.Vector3d;
 
-    public AABB(Vector3d min, Vector3d max) {
-        this.min = min;
-        this.max = max;
-    }
+public record Box(Vector3d start, Vector3d end) {
 
-    public Vector3d getMin() {
-        return this.min;
-    }
-
-    public Vector3d getMax() {
-        return this.max;
-    }
 }

@@ -30,7 +30,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class ScoreboardTracker extends StoredObject {
+public final class ScoreboardTracker extends StoredObject {
+
     private final HashMap<String, List<String>> teams = new HashMap<>();
     private final HashSet<String> objectives = new HashSet<>();
     private final HashMap<String, ScoreTeam> scoreTeams = new HashMap<>();
@@ -40,76 +41,74 @@ public class ScoreboardTracker extends StoredObject {
     private final HashMap<String, String> teamNameTagVisibilities = new HashMap<>();
     private String colorIndependentSidebar;
 
-    public ScoreboardTracker(UserConnection user) {
+    public ScoreboardTracker(final UserConnection user) {
         super(user);
     }
 
-    public void addPlayerToTeam(String player, String team) {
+    public void addPlayerToTeam(final String player, final String team) {
         teams.computeIfAbsent(team, key -> new ArrayList<>()).add(player);
     }
 
-    public void setTeamColor(String team, Byte color) {
+    public void setTeamColor(final String team, final Byte color) {
         teamColors.put(team, color);
     }
 
-    public Optional<Byte> getTeamColor(String team) {
+    public Optional<Byte> getTeamColor(final String team) {
         return Optional.ofNullable(teamColors.get(team));
     }
 
-    public void addTeam(String team) {
+    public void addTeam(final String team) {
         teams.computeIfAbsent(team, key -> new ArrayList<>());
     }
 
-    public void removeTeam(String team) {
+    public void removeTeam(final String team) {
         teams.remove(team);
         scoreTeams.remove(team);
         teamColors.remove(team);
         teamNameTagVisibilities.remove(team);
     }
 
-    public boolean teamExists(String team) {
+    public boolean teamExists(final String team) {
         return teams.containsKey(team);
     }
 
     public void removePlayerFromTeam(String player, String team) {
-        List<String> teamPlayers = teams.get(team);
-        if (teamPlayers != null) teamPlayers.remove(player);
+        final List<String> teamPlayers = teams.get(team);
+        if (teamPlayers != null) {
+            teamPlayers.remove(player);
+        }
     }
 
-    public boolean isPlayerInTeam(String player, String team) {
-        List<String> teamPlayers = teams.get(team);
+    public boolean isPlayerInTeam(final String player, final String team) {
+        final List<String> teamPlayers = teams.get(team);
         return teamPlayers != null && teamPlayers.contains(player);
     }
 
-    public boolean isPlayerInTeam(String player) {
-        for (List<String> teamPlayers : teams.values()) {
-            if (teamPlayers.contains(player)) return true;
-        }
-        return false;
+
+    public Optional<Byte> getPlayerTeamColor(final String player) {
+        final Optional<String> team = getTeam(player);
+        return team.flatMap(this::getTeamColor);
     }
 
-    public Optional<Byte> getPlayerTeamColor(String player) {
-        Optional<String> team = getTeam(player);
-        return team.isPresent() ? getTeamColor(team.get()) : Optional.empty();
-    }
-
-    public Optional<String> getTeam(String player) {
-        for (Map.Entry<String, List<String>> entry : teams.entrySet())
-            if (entry.getValue().contains(player))
+    public Optional<String> getTeam(final String player) {
+        for (Map.Entry<String, List<String>> entry : teams.entrySet()) {
+            if (entry.getValue().contains(player)) {
                 return Optional.of(entry.getKey());
+            }
+        }
         return Optional.empty();
     }
 
-    public void setTeamNameTagVisibility(String team, String visibility) {
+    public void setTeamNameTagVisibility(final String team, final String visibility) {
         teamNameTagVisibilities.put(team, visibility);
     }
 
-    public String getTeamNameTagVisibility(String team) {
+    public String getTeamNameTagVisibility(final String team) {
         return teamNameTagVisibilities.getOrDefault(team, "always");
     }
 
-    public boolean isNametagHidden(String username) {
-        for (Map.Entry<String, List<String>> entry : teams.entrySet()) {
+    public boolean isNametagHidden(final String username) {
+        for (final Map.Entry<String, List<String>> entry : teams.entrySet()) {
             if (entry.getValue().contains(username)) {
                 return "never".equalsIgnoreCase(teamNameTagVisibilities.getOrDefault(entry.getKey(), "always"));
             }
@@ -117,15 +116,15 @@ public class ScoreboardTracker extends StoredObject {
         return false;
     }
 
-    public List<String> getTeamMembers(String team) {
+    public List<String> getTeamMembers(final String team) {
         return teams.getOrDefault(team, new ArrayList<>());
     }
 
-    public void addObjective(String name) {
+    public void addObjective(final String name) {
         objectives.add(name);
     }
 
-    public void removeObjective(String name) {
+    public void removeObjective(final String name) {
         objectives.remove(name);
         colorDependentSidebar.values().remove(name);
         if (name.equals(colorIndependentSidebar)) {
@@ -133,13 +132,19 @@ public class ScoreboardTracker extends StoredObject {
         }
     }
 
-    public boolean objectiveExists(String name) {
+    public boolean objectiveExists(final String name) {
         return objectives.contains(name);
     }
 
-    public String sendTeamForScore(String score) {
-        if (score.length() <= 16) return score;
-        if (scoreTeams.containsKey(score)) return scoreTeams.get(score).name;
+    public String sendTeamForScore(final String score) {
+        if (score.length() <= 16) {
+            return score;
+        }
+
+        if (scoreTeams.containsKey(score)) {
+            return scoreTeams.get(score).name;
+        }
+
         int l = 16;
         int i = Math.min(16, score.length() - 16);
         String name = score.substring(i, i + l);
@@ -147,19 +152,21 @@ public class ScoreboardTracker extends StoredObject {
             i--;
             while (score.length() - l - i > 16) {
                 l--;
-                if (l < 1) return score;
+                if (l < 1) {
+                    return score;
+                }
                 i = Math.min(16, score.length() - l);
             }
             name = score.substring(i, i + l);
         }
-        String prefix = score.substring(0, i);
-        String suffix = i + l >= score.length() ? "" : score.substring(i + l);
+        final String prefix = score.substring(0, i);
+        final String suffix = i + l >= score.length() ? "" : score.substring(i + l);
 
-        ScoreTeam scoreTeam = new ScoreTeam(name, prefix, suffix);
+        final ScoreTeam scoreTeam = new ScoreTeam(name, prefix, suffix);
         scoreTeams.put(score, scoreTeam);
         scoreTeamNames.add(name);
 
-        PacketWrapper teamPacket = PacketWrapper.create(ClientboundPackets1_7_2_5.SET_PLAYER_TEAM, getUser());
+        PacketWrapper teamPacket = PacketWrapper.create(ClientboundPackets1_7_2_5.SET_PLAYER_TEAM, user());
         teamPacket.write(Types.STRING, name);
         teamPacket.write(Types.BYTE, (byte) 0);
         teamPacket.write(Types.STRING, "ViaRewind");
@@ -173,12 +180,15 @@ public class ScoreboardTracker extends StoredObject {
         return name;
     }
 
-    public String removeTeamForScore(String score) {
-        ScoreTeam scoreTeam = scoreTeams.remove(score);
-        if (scoreTeam == null) return score;
+    public String removeTeamForScore(final String score) {
+        final ScoreTeam scoreTeam = scoreTeams.remove(score);
+        if (scoreTeam == null) {
+            return score;
+        }
+
         scoreTeamNames.remove(scoreTeam.name);
 
-        PacketWrapper teamPacket = PacketWrapper.create(ClientboundPackets1_7_2_5.SET_PLAYER_TEAM, getUser());
+        final PacketWrapper teamPacket = PacketWrapper.create(ClientboundPackets1_7_2_5.SET_PLAYER_TEAM, user());
         teamPacket.write(Types.STRING, scoreTeam.name);
         teamPacket.write(Types.BYTE, (byte) 1);
         teamPacket.send(Protocol1_8To1_7_6_10.class);
@@ -190,7 +200,7 @@ public class ScoreboardTracker extends StoredObject {
         return this.colorIndependentSidebar;
     }
 
-    public void setColorIndependentSidebar(String colorIndependentSidebar) {
+    public void setColorIndependentSidebar(final String colorIndependentSidebar) {
         this.colorIndependentSidebar = colorIndependentSidebar;
     }
 
@@ -198,15 +208,6 @@ public class ScoreboardTracker extends StoredObject {
         return this.colorDependentSidebar;
     }
 
-    private static class ScoreTeam {
-        private final String prefix;
-        private final String suffix;
-        private final String name;
-
-        public ScoreTeam(String name, String prefix, String suffix) {
-            this.prefix = prefix;
-            this.suffix = suffix;
-            this.name = name;
-        }
+    private record ScoreTeam(String name, String prefix, String suffix) {
     }
 }

@@ -22,14 +22,13 @@ import com.viaversion.viarewind.ViaRewind;
 import java.io.File;
 import java.util.logging.Logger;
 
-public class RewindMappingDataLoader extends BackwardsMappingDataLoader {
+public final class RewindMappingDataLoader extends BackwardsMappingDataLoader {
 
     public static final RewindMappingDataLoader INSTANCE = new RewindMappingDataLoader();
 
     public RewindMappingDataLoader() {
         super(RewindMappingDataLoader.class, "assets/viarewind/data/");
     }
-
 
     @Override
     public Logger getLogger() {
@@ -40,4 +39,5 @@ public class RewindMappingDataLoader extends BackwardsMappingDataLoader {
     public File getDataFolder() {
         return ViaRewind.getPlatform().getDataFolder();
     }
+
 }

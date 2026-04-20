@@ -23,6 +23,7 @@ import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.Types;
 
 public enum EntityDataTypes1_7_6_10 implements EntityDataType {
+
     BYTE(0, Types.BYTE),
     SHORT(1, Types.SHORT),
     INT(2, Types.INT),
@@ -34,12 +35,12 @@ public enum EntityDataTypes1_7_6_10 implements EntityDataType {
     private final int typeID;
     private final Type<?> type;
 
-    EntityDataTypes1_7_6_10(int typeID, Type<?> type) {
+    EntityDataTypes1_7_6_10(final int typeID, final Type<?> type) {
         this.typeID = typeID;
         this.type = type;
     }
 
-    public static EntityDataTypes1_7_6_10 byId(int id) {
+    public static EntityDataTypes1_7_6_10 byId(final int id) {
         return values()[id];
     }
 
@@ -52,4 +53,5 @@ public enum EntityDataTypes1_7_6_10 implements EntityDataType {
     public Type<?> type() {
         return this.type;
     }
+
 }

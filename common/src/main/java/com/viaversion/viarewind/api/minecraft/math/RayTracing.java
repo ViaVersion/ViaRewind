@@ -17,42 +17,58 @@
  */
 package com.viaversion.viarewind.api.minecraft.math;
 
-public class RayTracing {
+import com.viaversion.viaversion.api.minecraft.Vector3d;
 
-    public static Vector3d trace(Ray3d ray, AABB aabb, double distance) {
-        Vector3d invDir = new Vector3d(1f / ray.dir.x, 1f / ray.dir.y, 1f / ray.dir.z);
+public final class RayTracing {
 
-        boolean signDirX = invDir.x < 0;
-        boolean signDirY = invDir.y < 0;
-        boolean signDirZ = invDir.z < 0;
+    public static Vector3d trace(final Box ray, final Box box, final double distance) {
+        final Vector3d invDir = new Vector3d(1f / ray.end().x(), 1f / ray.end().y(), 1f / ray.end().z());
 
-        Vector3d bbox = signDirX ? aabb.max : aabb.min;
-        double tmin = (bbox.x - ray.start.x) * invDir.x;
-        bbox = signDirX ? aabb.min : aabb.max;
-        double tmax = (bbox.x - ray.start.x) * invDir.x;
-        bbox = signDirY ? aabb.max : aabb.min;
-        double tymin = (bbox.y - ray.start.y) * invDir.y;
-        bbox = signDirY ? aabb.min : aabb.max;
-        double tymax = (bbox.y - ray.start.y) * invDir.y;
+        final boolean signDirX = invDir.x() < 0;
+        final boolean signDirY = invDir.y() < 0;
+        final boolean signDirZ = invDir.z() < 0;
 
-        if (tmin > tymax || tymin > tmax) return null;
+        Vector3d boundingBox = signDirX ? box.end() : box.start();
+        double tmin = (boundingBox.x() - ray.start().x()) * invDir.x();
+        boundingBox = signDirX ? box.start() : box.end();
+        double tmax = (boundingBox.x() - ray.start().x()) * invDir.x();
+        boundingBox = signDirY ? box.end() : box.start();
+        final double tymin = (boundingBox.y() - ray.start().y()) * invDir.y();
+        boundingBox = signDirY ? box.start() : box.end();
+        final double tymax = (boundingBox.y() - ray.start().y()) * invDir.y();
 
-        if (tymin > tmin) tmin = tymin;
+        if (tmin > tymax || tymin > tmax) {
+            return null;
+        }
 
-        if (tymax < tmax) tmax = tymax;
+        if (tymin > tmin) {
+            tmin = tymin;
+        }
+        if (tymax < tmax) {
+            tmax = tymax;
+        }
 
-        bbox = signDirZ ? aabb.max : aabb.min;
-        double tzmin = (bbox.z - ray.start.z) * invDir.z;
-        bbox = signDirZ ? aabb.min : aabb.max;
-        double tzmax = (bbox.z - ray.start.z) * invDir.z;
+        boundingBox = signDirZ ? box.end() : box.start();
+        double tzmin = (boundingBox.z() - ray.start().z()) * invDir.z();
+        boundingBox = signDirZ ? box.start() : box.end();
+        double tzmax = (boundingBox.z() - ray.start().z()) * invDir.z();
 
-        if (tmin > tzmax || tzmin > tmax) return null;
+        if (tmin > tzmax || tzmin > tmax) {
+            return null;
+        }
 
-        if (tzmin > tmin) tmin = tzmin;
+        if (tzmin > tmin) {
+            tmin = tzmin;
+        }
+        if (tzmax < tmax) {
+            tmax = tzmax;
+        }
 
-        if (tzmax < tmax) tmax = tzmax;
+        if (tmin <= distance && tmax > 0) {
+            // ray.start().clone().add(ray.dir().clone().normalize().multiply(tmin))
+        }
 
-        return tmin <= distance && tmax > 0 ? ray.start.clone().add(ray.dir.clone().normalize().multiply(tmin)) : null;
+        return null;
     }
 
 }

@@ -55,8 +55,8 @@ public class ViaRewindConfig extends Config implements com.viaversion.viarewind.
         cooldownIndicator = CooldownIndicator.valueOf(getString("cooldown-indicator", "TITLE").toUpperCase());
         replaceAdventureMode = getBoolean("replace-adventure", false);
         replaceParticles = getBoolean("replace-particles", false);
-        maxBookPages = getInt("max-book-pages", 100);
-        maxBookPageSize = getInt("max-book-page-length", 5000);
+        maxBookPages = getInt("end-book-pages", 100);
+        maxBookPageSize = getInt("end-book-page-length", 5000);
         emulateWorldBorder = getBoolean("emulate-world-border", true);
         alwaysShowOriginalMobName = getBoolean("always-show-original-mob-name", true);
         worldBorderParticle = getString("world-border-particle", "fireworksSpark");

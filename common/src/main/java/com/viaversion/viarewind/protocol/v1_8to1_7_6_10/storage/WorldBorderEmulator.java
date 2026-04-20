@@ -19,63 +19,54 @@ package com.viaversion.viarewind.protocol.v1_8to1_7_6_10.storage;
 
 import com.viaversion.viaversion.api.connection.StoredObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.util.MathUtil;
 
-public class WorldBorderEmulator extends StoredObject {
+public final class WorldBorderEmulator extends StoredObject {
+
     private double x, z;
     private double oldDiameter, newDiameter;
 
-    private long lerpTime;
-    private long lerpStartTime;
+    private long deltaTime;
+    private long deltaStartTime;
 
-    private boolean init = false;
-
-    public WorldBorderEmulator(UserConnection user) {
+    public WorldBorderEmulator(UserConnection user, final double x, final double z, final double oldDiameter, final double newDiameter, final long deltaTime) {
         super(user);
-    }
 
-    public void init(double x, double z, double oldDiameter, double newDiameter, long lerpTime) {
         this.x = x;
         this.z = z;
 
         this.oldDiameter = oldDiameter;
         this.newDiameter = newDiameter;
 
-        this.lerpTime = lerpTime;
-
-        init = true;
+        this.deltaTime = deltaTime;
     }
 
-    public void setCenter(double x, double z) {
+    public void setCenter(final double x, final double z) {
         this.x = x;
         this.z = z;
     }
 
-    public void lerpSize(double oldDiameter, double newDiameter, long lerpTime) {
+    public void updateDeltaTime(final double oldDiameter, final double newDiameter, final long deltaTime) {
         this.oldDiameter = oldDiameter;
         this.newDiameter = newDiameter;
-        this.lerpTime = lerpTime;
-        this.lerpStartTime = System.currentTimeMillis();
+        this.deltaTime = deltaTime;
+        this.deltaStartTime = System.currentTimeMillis();
     }
 
     public double getSize() {
-        if (lerpTime == 0) {
+        if (deltaTime == 0) {
             return newDiameter;
         }
 
-        double percent = ((double) (System.currentTimeMillis() - lerpStartTime) / (double) (lerpTime));
-
-        // Clamp value
-        if (percent > 1.0D) percent = 1.0d;
-        else if (percent < 0.0D) percent = 0.0d;
-
-        return oldDiameter + (newDiameter - oldDiameter) * percent;
+        final double percent = ((double) (System.currentTimeMillis() - deltaStartTime) / (double) (deltaTime));
+        return oldDiameter + (newDiameter - oldDiameter) * MathUtil.clamp(percent, 0D, 1D);
     }
 
-    public void setSize(double size) {
+    public void setSize(final double size) {
         this.oldDiameter = size;
         this.newDiameter = size;
 
-        this.lerpTime = 0;
+        this.deltaTime = 0;
     }
 
     public double getX() {
@@ -84,10 +75,6 @@ public class WorldBorderEmulator extends StoredObject {
 
     public double getZ() {
         return z;
-    }
-
-    public boolean isInit() {
-        return init;
     }
 
     public enum Side {
@@ -105,3 +92,4 @@ public class WorldBorderEmulator extends StoredObject {
         }
     }
 }
+
