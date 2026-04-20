@@ -52,11 +52,11 @@ public class WindowTracker extends StoredObject {
         openWindow.write(Types.UNSIGNED_BYTE, windowId);
         openWindow.write(Types.STRING, "minecraft:brewing_stand");
 
-        TextComponent title = new StringComponent().
-            append(new TranslationComponent("container.brewing")).
-            append(new StringComponent(": " + TextFormatting.DARK_GRAY)).
-            append(new StringComponent(amount + " " + TextFormatting.DARK_RED)).
-            append(new TranslationComponent("item.blazePowder.name", TextFormatting.DARK_RED));
+        TextComponent title = new StringComponent()
+            .append(new TranslationComponent("container.brewing"))
+            .append(new StringComponent(": ").formatted(TextFormatting.DARK_GRAY))
+            .append(new StringComponent(amount + " ").formatted(TextFormatting.DARK_RED))
+            .append(new TranslationComponent("item.blazePowder.name").formatted(TextFormatting.DARK_RED));
 
         openWindow.write(Types.COMPONENT, TextComponentSerializer.V1_8.serializeJson(title));
         openWindow.write(Types.UNSIGNED_BYTE, (short) 420);
