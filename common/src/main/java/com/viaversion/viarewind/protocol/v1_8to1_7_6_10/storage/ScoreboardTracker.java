@@ -140,37 +140,43 @@ public class ScoreboardTracker extends StoredObject {
     public String sendTeamForScore(String score) {
         if (score.length() <= 16) return score;
         if (scoreTeams.containsKey(score)) return scoreTeams.get(score).name;
-        int l = 16;
-        int i = Math.min(16, score.length() - 16);
-        String name = score.substring(i, i + l);
-        while (scoreTeamNames.contains(name) || teams.containsKey(name)) {
-            i--;
-            while (score.length() - l - i > 16) {
-                l--;
-                if (l < 1) return score;
-                i = Math.min(16, score.length() - l);
+
+        // Find the longest window score[i, i+l) that:
+        // - is not already claimed as a team name
+        // - keeps prefix (score[0,i)) at most 16 chars i <= 16
+        // - keeps suffix (score[i+l, end)) at most 16 chars score.length()-l-i <= 16
+        for (int l = 16; l >= 1; l--) {
+            final int iMax = Math.min(16, score.length() - l);
+            final int iMin = Math.max(0, score.length() - l - 16);
+            for (int i = iMax; i >= iMin; i--) {
+                final String name = score.substring(i, i + l);
+                if (scoreTeamNames.contains(name) || teams.containsKey(name)) {
+                    continue;
+                }
+
+                final String prefix = score.substring(0, i);
+                final String suffix = i + l >= score.length() ? "" : score.substring(i + l);
+
+                final ScoreTeam scoreTeam = new ScoreTeam(name, prefix, suffix);
+                scoreTeams.put(score, scoreTeam);
+                scoreTeamNames.add(name);
+
+                final PacketWrapper teamPacket = PacketWrapper.create(ClientboundPackets1_7_2_5.SET_PLAYER_TEAM, getUser());
+                teamPacket.write(Types.STRING, name);
+                teamPacket.write(Types.BYTE, (byte) 0);
+                teamPacket.write(Types.STRING, "ViaRewind");
+                teamPacket.write(Types.STRING, prefix);
+                teamPacket.write(Types.STRING, suffix);
+                teamPacket.write(Types.BYTE, (byte) 0);
+                teamPacket.write(Types.SHORT, (short) 1);
+                teamPacket.write(Types.STRING, name);
+                teamPacket.send(Protocol1_8To1_7_6_10.class);
+
+                return name;
             }
-            name = score.substring(i, i + l);
         }
-        String prefix = score.substring(0, i);
-        String suffix = i + l >= score.length() ? "" : score.substring(i + l);
 
-        ScoreTeam scoreTeam = new ScoreTeam(name, prefix, suffix);
-        scoreTeams.put(score, scoreTeam);
-        scoreTeamNames.add(name);
-
-        PacketWrapper teamPacket = PacketWrapper.create(ClientboundPackets1_7_2_5.SET_PLAYER_TEAM, getUser());
-        teamPacket.write(Types.STRING, name);
-        teamPacket.write(Types.BYTE, (byte) 0);
-        teamPacket.write(Types.STRING, "ViaRewind");
-        teamPacket.write(Types.STRING, prefix);
-        teamPacket.write(Types.STRING, suffix);
-        teamPacket.write(Types.BYTE, (byte) 0);
-        teamPacket.write(Types.SHORT, (short) 1);
-        teamPacket.write(Types.STRING, name);
-        teamPacket.send(Protocol1_8To1_7_6_10.class);
-
-        return name;
+        return score;
     }
 
     public String removeTeamForScore(String score) {
