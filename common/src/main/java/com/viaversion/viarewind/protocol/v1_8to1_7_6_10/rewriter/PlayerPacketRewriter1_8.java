@@ -608,6 +608,16 @@ public class PlayerPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6_10>
             protected void register() {
                 map(Types.VAR_INT); // Status
                 map(RewindTypes.U_BYTE_POSITION, Types.BLOCK_POSITION1_8); // Position
+                handler(wrapper -> {
+                    // 1.7 uses 255 as "no face"
+                    // 1.8 changed this to only be in the range EnumFacing range (0-5) and uses DOWN when no face is used
+                    // This properly rewrites invalid values to the 1.8 equivalent
+                    int face = wrapper.read(Types.UNSIGNED_BYTE);
+                    if (face > 5) {
+                        face = 0;
+                    }
+                    wrapper.write(Types.UNSIGNED_BYTE, (short) face);
+                });
             }
         });
 
