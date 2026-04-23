@@ -222,17 +222,16 @@ public class EntityTracker1_8 extends EntityTrackerBase {
 
     public void checkNametagVisbility(final String username) {
         final GameProfileStorage profileStorage = user().get(GameProfileStorage.class);
-        final GameProfileStorage.GameProfile profile = profileStorage.get(username, false);
-        if (profile == null) {
-            return;
-        }
+        final List<GameProfileStorage.GameProfile> profiles = profileStorage.get(username, false);
 
-        final int entityId = getPlayerEntityId(profile.uuid);
-        if (entityId == -1) {
-            return;
-        }
+        for (GameProfileStorage.GameProfile profile : profiles) {
+            final int entityId = getPlayerEntityId(profile.uuid);
+            if (entityId == -1) {
+                return;
+            }
 
-        checkNametagVisibility(entityId);
+            checkNametagVisibility(entityId);
+        }
     }
 
     private boolean isPlayerNametagHidden(final int entityId) {

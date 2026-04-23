@@ -511,7 +511,13 @@ public class PlayerPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6_10>
                 String username = message.split(" ")[1];
                 final GameProfileStorage storage = wrapper.user().get(GameProfileStorage.class);
 
-                final GameProfileStorage.GameProfile profile = storage.get(username, true);
+                // Multiple players with the same name may exist. This will only represent
+                // fake players so it's fine to just pick the first one.
+                List<GameProfileStorage.GameProfile> profiles = storage.get(username, true);
+                if (profiles.isEmpty()) {
+                    return;
+                }
+                final GameProfileStorage.GameProfile profile = profiles.get(0);
                 if (profile != null && profile.uuid != null) {
                     wrapper.cancel();
 
