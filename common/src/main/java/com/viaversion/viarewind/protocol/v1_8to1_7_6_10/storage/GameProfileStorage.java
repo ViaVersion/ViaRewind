@@ -17,6 +17,10 @@
  */
 package com.viaversion.viarewind.protocol.v1_8to1_7_6_10.storage;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ListMultimap;
+import com.google.common.collect.Multimap;
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.nbt.tag.StringTag;
@@ -34,6 +38,7 @@ import java.util.UUID;
 
 public class GameProfileStorage extends StoredObject {
     private final Map<UUID, GameProfile> properties = new HashMap<>();
+    private final ListMultimap<String, GameProfile> nameToProfile = ArrayListMultimap.create();
 
     public GameProfileStorage(UserConnection user) {
         super(user);
@@ -42,6 +47,7 @@ public class GameProfileStorage extends StoredObject {
     public GameProfile put(UUID uuid, String name, String displayName, int ping, int gamemode) {
         GameProfile gameProfile = new GameProfile(uuid, name, displayName, ping, gamemode);
         properties.put(uuid, gameProfile);
+        nameToProfile.put(name, gameProfile);
         return gameProfile;
     }
 
@@ -49,19 +55,9 @@ public class GameProfileStorage extends StoredObject {
         return properties.get(uuid);
     }
 
-    public GameProfile get(String name, boolean ignoreCase) {
+    public List<GameProfile> get(String name, boolean ignoreCase) {
         if (ignoreCase) name = name.toLowerCase();
-
-        for (GameProfile profile : properties.values()) {
-            if (profile.name == null) continue;
-
-            String n = ignoreCase ? profile.name.toLowerCase() : profile.name;
-
-            if (n.equals(name)) {
-                return profile;
-            }
-        }
-        return null;
+        return nameToProfile.get(name);
     }
 
     public List<GameProfile> getAllWithPrefix(String prefix, boolean ignoreCase) {
@@ -81,7 +77,9 @@ public class GameProfileStorage extends StoredObject {
     }
 
     public GameProfile remove(UUID uuid) {
-        return properties.remove(uuid);
+        GameProfile removedProfile = properties.remove(uuid);
+        nameToProfile.get(removedProfile.name).remove(removedProfile);
+        return removedProfile;
     }
 
 
