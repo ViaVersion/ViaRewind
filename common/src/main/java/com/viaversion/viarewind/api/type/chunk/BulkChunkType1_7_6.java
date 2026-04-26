@@ -17,11 +17,13 @@
  */
 package com.viaversion.viarewind.api.type.chunk;
 
+import com.viaversion.viarewind.api.compression.ThreadLocalCompressionProvider;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.type.Type;
 import io.netty.buffer.ByteBuf;
 
-import java.util.zip.Deflater;
+import java.util.zip.DataFormatException;
+
 
 public class BulkChunkType1_7_6 extends Type<Chunk[]> {
 
@@ -63,40 +65,47 @@ public class BulkChunkType1_7_6 extends Type<Chunk[]> {
             );
         }
 
-        final byte[] data = new byte[totalSize];
-        int offset = 0;
+        final ByteBuf uncompressed = buffer.alloc().buffer(totalSize);
 
-        for (int i = 0; i < chunkCount; i++) {
-            Chunk chunk = chunks[i];
-            boolean biomes = chunk.isFullChunk() && chunk.getBiomeData() != null;
-
-            offset = ChunkType1_7_6.serialize(
-                chunk,
-                data,
-                offset,
-                addBitMasks[i],
-                anySkyLight,
-                biomes
-            );
-        }
-
-        buffer.writeShort(chunkCount);
-
-        final Deflater deflater = new Deflater();
-        byte[] compressedData;
-        int compressedSize;
         try {
-            deflater.setInput(data, 0, data.length);
-            deflater.finish();
-            compressedData = new byte[data.length];
-            compressedSize = deflater.deflate(compressedData);
-        } finally {
-            deflater.end();
-        }
+            for (int i = 0; i < chunkCount; i++) {
+                Chunk chunk = chunks[i];
+                boolean biomes = chunk.isFullChunk() && chunk.getBiomeData() != null;
 
-        buffer.writeInt(compressedSize);
-        buffer.writeBoolean(anySkyLight);
-        buffer.writeBytes(compressedData, 0, compressedSize);
+                ChunkType1_7_6.serialize(
+                    chunk,
+                    uncompressed,
+                    addBitMasks[i],
+                    anySkyLight,
+                    biomes
+                );
+            }
+
+            buffer.writeShort(chunkCount);
+
+            // Reserve 4 bytes for the compressed size
+            final int sizeIndex = buffer.writerIndex();
+            buffer.writeInt(0); // Placeholder for compressed size
+
+            buffer.writeBoolean(anySkyLight);
+
+            // Write compressed data directly to output buffer
+            final int compressedStart = buffer.writerIndex();
+            try {
+                ThreadLocalCompressionProvider.deflate(uncompressed, buffer);
+            } catch (DataFormatException e) {
+                throw new RuntimeException("Failed to compress bulk chunk data", e);
+            }
+            final int compressedSize = buffer.writerIndex() - compressedStart;
+
+            // Go back and write the compressed size
+            final int endIndex = buffer.writerIndex();
+            buffer.writerIndex(sizeIndex);
+            buffer.writeInt(compressedSize);
+            buffer.writerIndex(endIndex);
+        } finally {
+            uncompressed.release();
+        }
 
         for (int i = 0; i < chunkCount; i++) {
             Chunk chunk = chunks[i];
