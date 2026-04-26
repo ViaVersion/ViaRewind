@@ -535,9 +535,6 @@ public class PlayerPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6_10>
                 map(Types.BYTE, Types.VAR_INT); // Mode
                 handler(wrapper -> {
                     final int mode = wrapper.get(Types.VAR_INT, 1);
-                    if (mode != 0) {
-                        return;
-                    }
                     final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_7_6_10.class);
                     final int entityId = tracker.getHologramIdWithExtra(wrapper.get(Types.VAR_INT, 0));
                     final PlayerSessionStorage position = wrapper.user().get(PlayerSessionStorage.class);
@@ -547,6 +544,11 @@ public class PlayerPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6_10>
                     }
 
                     wrapper.set(Types.VAR_INT, 0, entityId);
+
+                    if (mode != 0) {
+                        return;
+                    }
+
                     final AABB boundingBox = tracker.getHolograms().get(entityId).getBoundingBox();
 
                     Vector3d pos = new Vector3d(position.getPosX(), position.getPosY() + 1.8, position.getPosZ());
