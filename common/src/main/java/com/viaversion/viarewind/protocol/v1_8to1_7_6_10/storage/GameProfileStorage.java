@@ -78,7 +78,9 @@ public class GameProfileStorage extends StoredObject {
 
     public GameProfile remove(UUID uuid) {
         GameProfile removedProfile = properties.remove(uuid);
-        nameToProfile.get(removedProfile.name).remove(removedProfile);
+        if (removedProfile != null) {
+            nameToProfile.get(removedProfile.name).remove(removedProfile);
+        }
         return removedProfile;
     }
 
