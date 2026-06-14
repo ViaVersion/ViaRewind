@@ -83,6 +83,17 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
             wrapper.write(Types.ENTITY_DATA_LIST1_8, entityData);
         });
 
+        // 1.8 tracks arrows with sendVelocity=false, so the client predicts the trajectory locally from the
+        // spawn velocity. Modern servers send periodic arrow velocity (trackDeltas) that overwrites this
+        // prediction and desyncs the client's block-collision raytrace. Drop in-flight velocity to match 1.8.
+        protocol.registerClientbound(ClientboundPackets1_9.SET_ENTITY_MOTION, wrapper -> {
+            final int entityId = wrapper.passthrough(Types.VAR_INT);
+            final EntityType type = wrapper.user().getEntityTracker(Protocol1_9To1_8.class).entityType(entityId);
+            if (type != null && type.isOrHasParent(EntityTypes1_9.EntityType.ARROW)) {
+                wrapper.cancel();
+            }
+        });
+
         protocol.registerClientbound(ClientboundPackets1_9.ADD_ENTITY, new PacketHandlers() {
             @Override
             public void register() {
