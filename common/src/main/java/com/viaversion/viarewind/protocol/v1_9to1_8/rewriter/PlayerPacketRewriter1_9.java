@@ -23,6 +23,7 @@ import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.viarewind.ViaRewind;
 import com.viaversion.viarewind.api.type.RewindTypes;
 import com.viaversion.viarewind.protocol.v1_9to1_8.Protocol1_9To1_8;
+import com.viaversion.viarewind.protocol.v1_9to1_8.cooldown.TitleCooldownVisualization;
 import com.viaversion.viarewind.protocol.v1_9to1_8.provider.InventoryProvider;
 import com.viaversion.viarewind.protocol.v1_9to1_8.storage.BlockPlaceDestroyTracker;
 import com.viaversion.viarewind.protocol.v1_9to1_8.storage.BossBarStorage;
@@ -106,6 +107,8 @@ public class PlayerPacketRewriter1_9 extends RewriterBase<Protocol1_9To1_8> {
         });
 
         protocol.cancelClientbound(ClientboundPackets1_9.COOLDOWN);
+
+        protocol.registerClientbound(ClientboundPackets1_9.SET_TITLES, TitleCooldownVisualization::trackTitle);
 
         protocol.registerClientbound(ClientboundPackets1_9.CUSTOM_PAYLOAD, new PacketHandlers() {
             @Override
