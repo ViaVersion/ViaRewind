@@ -22,7 +22,9 @@ import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.nbt.tag.Tag;
 import com.viaversion.viarewind.ViaRewind;
 import com.viaversion.viarewind.protocol.v1_9to1_8.Protocol1_9To1_8;
+import com.viaversion.viarewind.protocol.v1_9to1_8.data.CommandBlockState;
 import com.viaversion.viarewind.protocol.v1_9to1_8.data.EffectIdMappings1_8;
+import com.viaversion.viarewind.protocol.v1_9to1_8.storage.CommandBlockStateStorage;
 import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.minecraft.Environment;
 import com.viaversion.viaversion.api.minecraft.chunks.BaseChunk;
@@ -57,6 +59,12 @@ public class WorldPacketRewriter1_9 extends RewriterBase<Protocol1_9To1_8> {
                 map(Types.NAMED_COMPOUND_TAG); // Tag
                 handler(wrapper -> {
                     final CompoundTag tag = wrapper.get(Types.NAMED_COMPOUND_TAG, 0);
+                    final short action = wrapper.get(Types.UNSIGNED_BYTE, 0);
+
+                    if (action == 2) {
+                        final BlockPosition position = wrapper.get(Types.BLOCK_POSITION1_8, 0);
+                        CommandBlockState.decorateCommand(tag, wrapper.user().get(CommandBlockStateStorage.class).state(position));
+                    }
 
                     if (tag.remove("SpawnData") instanceof CompoundTag spawnData) {
                         final Tag id = spawnData.remove("id");
@@ -111,9 +119,11 @@ public class WorldPacketRewriter1_9 extends RewriterBase<Protocol1_9To1_8> {
             public void register() {
                 handler(wrapper -> {
                     final Environment environment = wrapper.user().getClientWorld(Protocol1_9To1_8.class).getEnvironment();
+                    final CommandBlockStateStorage commandBlockStates = wrapper.user().get(CommandBlockStateStorage.class);
 
                     final int chunkX = wrapper.read(Types.INT);
                     final int chunkZ = wrapper.read(Types.INT);
+                    commandBlockStates.unloadChunk(chunkX, chunkZ);
 
                     wrapper.write(ChunkType1_8.forEnvironment(environment), new BaseChunk(chunkX, chunkZ, true, false, 0, new ChunkSection[16], null, new ArrayList<>()));
                 });
@@ -125,8 +135,23 @@ public class WorldPacketRewriter1_9 extends RewriterBase<Protocol1_9To1_8> {
             public void register() {
                 handler(wrapper -> {
                     final Environment environment = wrapper.user().getClientWorld(Protocol1_9To1_8.class).getEnvironment();
+                    final CommandBlockStateStorage commandBlockStates = wrapper.user().get(CommandBlockStateStorage.class);
 
                     Chunk chunk = wrapper.read(ChunkType1_9_1.forEnvironment(environment));
+                    final Chunk originalChunk = chunk;
+
+                    chunk.getBlockEntities().forEach(nbt -> {
+                        if (!nbt.contains("x") || !nbt.contains("y") || !nbt.contains("z")) {
+                            return;
+                        }
+
+                        final BlockPosition position = new BlockPosition((int) nbt.get("x").getValue(), (int) nbt.get("y").getValue(), (int) nbt.get("z").getValue());
+                        final int blockState = blockStateAt(originalChunk, position);
+                        if (CommandBlockState.isCommandBlock(blockState)) {
+                            commandBlockStates.storeOrRemove(position, blockState);
+                            CommandBlockState.decorateCommand(nbt, blockState);
+                        }
+                    });
 
                     for (ChunkSection section : chunk.getSections()) {
                         if (section == null) continue;
@@ -266,5 +291,19 @@ public class WorldPacketRewriter1_9 extends RewriterBase<Protocol1_9To1_8> {
                 map(Types.UNSIGNED_BYTE); // Pitch
             }
         });
+    }
+
+    private static int blockStateAt(final Chunk chunk, final BlockPosition position) {
+        final int sectionY = position.y() >> 4;
+        if (sectionY < 0 || sectionY >= chunk.getSections().length) {
+            return -1;
+        }
+
+        final ChunkSection section = chunk.getSections()[sectionY];
+        if (section == null) {
+            return -1;
+        }
+
+        return section.palette(PaletteType.BLOCKS).idAt(position.x() & 0xF, position.y() & 0xF, position.z() & 0xF);
     }
 }
