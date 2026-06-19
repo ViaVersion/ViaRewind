@@ -292,7 +292,7 @@ public class BlockItemPacketRewriter1_9 extends VRBlockItemRewriter<ClientboundP
                 tag.put("display", display = new CompoundTag());
             }
             display.put("color", new IntTag(0x737373)); // Gray
-            tag.put(nbtTagName() + "|elytra_color", new ByteTag(true));
+            tag.put(nbtTagName() + "|noDisplay", new ByteTag(true));
         }
 
         // Makes the fake banner for a shield brown if it has no banner patterns
@@ -304,7 +304,7 @@ public class BlockItemPacketRewriter1_9 extends VRBlockItemRewriter<ClientboundP
                 if (tag == null) {
                     item.setTag(tag = new CompoundTag());
                 }
-                tag.put(nbtTagName() + "|shield_color", new ByteTag(true));
+                tag.put(nbtTagName() + "|noData", new ByteTag(true));
             }
         }
 
@@ -317,19 +317,6 @@ public class BlockItemPacketRewriter1_9 extends VRBlockItemRewriter<ClientboundP
         super.handleItemToServer(connection, item);
 
         CompoundTag tag = item.tag();
-
-        // Removes the gray color code from the fake leather armor for an elytra
-        if (tag != null && tag.remove(nbtTagName() + "|elytra_color") != null) {
-            final CompoundTag display = tag.getCompoundTag("display");
-            if (display != null) {
-                display.remove("color");
-            }
-        }
-
-        // Restores the original data of a shield whose banner color was changed to brown
-        if (tag != null && tag.remove(nbtTagName() + "|shield_color") != null) {
-            item.setData((short) 0);
-        }
 
         enchantmentRewriter.handleToServer(item);
 
@@ -362,6 +349,9 @@ public class BlockItemPacketRewriter1_9 extends VRBlockItemRewriter<ClientboundP
 
         if (tag == null) {
             return item;
+        }
+        if (tag.remove(nbtTagName() + "|noData") != null) {
+            item.setData((short) 0);
         }
         final Tag noDisplayTag = tag.remove(nbtTagName() + "|noDisplay");
         if (noDisplayTag != null) {
