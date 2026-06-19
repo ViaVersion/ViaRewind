@@ -19,6 +19,7 @@ package com.viaversion.viarewind.protocol.v1_9to1_8.rewriter;
 
 import com.viaversion.nbt.tag.ByteTag;
 import com.viaversion.nbt.tag.CompoundTag;
+import com.viaversion.nbt.tag.IntTag;
 import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.nbt.tag.Tag;
@@ -194,6 +195,7 @@ public class BlockItemPacketRewriter1_9 extends VRBlockItemRewriter<ClientboundP
     @Override
     public Item handleItemToClient(UserConnection connection, Item item) {
         if (item == null) return null;
+        final int originalId = item.identifier();
         super.handleItemToClient(connection, item);
 
         CompoundTag tag = item.tag();
@@ -280,6 +282,32 @@ public class BlockItemPacketRewriter1_9 extends VRBlockItemRewriter<ClientboundP
             });
         }
 
+        // Colors the fake leather armor for an elytra gray
+        if (originalId == 443) {
+            if (tag == null) {
+                item.setTag(tag = new CompoundTag());
+            }
+            CompoundTag display = tag.getCompoundTag("display");
+            if (display == null) {
+                tag.put("display", display = new CompoundTag());
+            }
+            display.put("color", new IntTag(0x737373)); // Gray
+            tag.put(nbtTagName() + "|elytra_color", new ByteTag(true));
+        }
+
+        // Makes the fake banner for a shield brown if it has no banner patterns
+        if (originalId == 442) {
+            final CompoundTag blockEntityTag = tag == null ? null : tag.getCompoundTag("BlockEntityTag");
+            final ListTag<CompoundTag> patterns = blockEntityTag == null ? null : blockEntityTag.getListTag("Patterns", CompoundTag.class);
+            if (patterns == null || patterns.isEmpty()) {
+                item.setData((short) 3); // Brown
+                if (tag == null) {
+                    item.setTag(tag = new CompoundTag());
+                }
+                tag.put(nbtTagName() + "|shield_color", new ByteTag(true));
+            }
+        }
+
         return item;
     }
 
@@ -289,6 +317,19 @@ public class BlockItemPacketRewriter1_9 extends VRBlockItemRewriter<ClientboundP
         super.handleItemToServer(connection, item);
 
         CompoundTag tag = item.tag();
+
+        // Removes the gray color code from the fake leather armor for an elytra
+        if (tag != null && tag.remove(nbtTagName() + "|elytra_color") != null) {
+            final CompoundTag display = tag.getCompoundTag("display");
+            if (display != null) {
+                display.remove("color");
+            }
+        }
+
+        // Restores the original data of a shield whose banner color was changed to brown
+        if (tag != null && tag.remove(nbtTagName() + "|shield_color") != null) {
+            item.setData((short) 0);
+        }
 
         enchantmentRewriter.handleToServer(item);
 
