@@ -839,7 +839,7 @@ public class PlayerPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6_10>
                         case "MC|BEdit":
                         case "MC|BSign": {
                             final boolean signBook = channel.equals("MC|BSign");
-                            Item book = wrapper.read(RewindTypes.COMPRESSED_NBT_ITEM);
+                            final Item book = wrapper.read(RewindTypes.COMPRESSED_NBT_ITEM);
                             wrapper.read(Types.REMAINING_BYTES); // Discard remaining bytes
 
                             if (book == null) {
@@ -847,19 +847,19 @@ public class PlayerPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6_10>
                                 break;
                             }
 
-                            CompoundTag tag = book.tag();
+                            final CompoundTag tag = book.tag();
                             if (signBook && tag != null && tag.contains("pages")) {
-                                ListTag<StringTag> pages = tag.getListTag("pages", StringTag.class);
+                                final ListTag<StringTag> pages = tag.getListTag("pages", StringTag.class);
                                 if (pages != null) {
                                     for (int i = 0; i < pages.size(); i++) {
-                                        StringTag page = pages.get(i);
+                                        final StringTag page = pages.get(i);
                                         String value = page.getValue();
                                         value = new JsonPrimitive(value).toString();
                                         page.setValue(value);
                                     }
                                 }
                             }
-                            book = protocol.getItemRewriter().handleItemToServer(wrapper.user(), book);
+                            protocol.getItemRewriter().handleItemToServer(wrapper.user(), book);
                             wrapper.write(Types.ITEM1_8, book);
                             break;
                         }
