@@ -334,7 +334,12 @@ public class PlayerPacketRewriter1_9 extends RewriterBase<Protocol1_9To1_8> {
             final PlayerPositionTracker storage = wrapper.user().get(PlayerPositionTracker.class);
             storage.sendAnimations();
             if (storage.getConfirmId() != -1) {
-                if (storage.getPosX() == x && storage.getPosY() == y && storage.getPosZ() == z && storage.getYaw() == yaw && storage.getPitch() == pitch) {
+                // 1.7 uses resynced hitbox minY for y however this can have small floating point error due to the calculations it does to get there on teleport confirm
+                // This Y error gets propagated from 1.7 to 1.8 to 1.9 which causes teleport confirmation to not properly be detected
+                // This fixes it similarly to how anticheats detect teleports: https://github.com/GrimAnticheat/Grim/blob/67aa3a9483a9b2a6987d594092697b4104c781f0/common/src/main/java/ac/grim/grimac/manager/SetbackTeleportUtil.java#L315
+                boolean closeEnoughY = Math.abs(storage.getPosY() - y) <= 1e-7;
+
+                if (storage.getPosX() == x && closeEnoughY && storage.getPosZ() == z && storage.getYaw() == yaw && storage.getPitch() == pitch) {
                     final PacketWrapper confirmTeleport = PacketWrapper.create(ServerboundPackets1_9.ACCEPT_TELEPORTATION, wrapper.user());
                     confirmTeleport.write(Types.VAR_INT, storage.getConfirmId());
                     confirmTeleport.sendToServer(Protocol1_9To1_8.class);
