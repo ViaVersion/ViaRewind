@@ -48,6 +48,7 @@ import com.viaversion.viaversion.api.rewriter.RewriterBase;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.libs.gson.JsonElement;
 import com.viaversion.viaversion.libs.gson.JsonObject;
+import com.viaversion.viaversion.libs.gson.JsonPrimitive;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ServerboundPackets1_8;
 import com.viaversion.viaversion.util.ComponentUtil;
@@ -788,6 +789,8 @@ public class PlayerPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6_10>
             }
         });
 
+        // 1.7.10 custom payload constructor (String, ByteBuf) uses byteBuf.array(), so it sends the whole backing array capacity, not only the written bytes
+        // After reading the proper packet data we discard the remaining bytes
         protocol.registerServerbound(ServerboundPackets1_7_2_5.CUSTOM_PAYLOAD, new PacketHandlers() {
             @Override
             public void register() {
@@ -798,7 +801,27 @@ public class PlayerPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6_10>
                     switch (channel) {
                         case "MC|TrSel": {
                             wrapper.passthrough(Types.INT);
-                            wrapper.read(Types.REMAINING_BYTES); // unused data ???
+                            wrapper.read(Types.REMAINING_BYTES); // Discard remaining bytes
+                            break;
+                        }
+                        case "MC|AdvCdm": {
+                            final byte commandBlockType = wrapper.passthrough(Types.BYTE);
+                            if (commandBlockType == 0) { // Block
+                                wrapper.passthrough(Types.INT); // X
+                                wrapper.passthrough(Types.INT); // Y
+                                wrapper.passthrough(Types.INT); // Z
+                            } else if (commandBlockType == 1) { // Minecart
+                                wrapper.passthrough(Types.INT); // Entity id
+                            }
+                            wrapper.passthrough(Types.STRING); // Command
+                            wrapper.write(Types.BOOLEAN, true); // Track output, added in 1.8, default to true
+                            wrapper.read(Types.REMAINING_BYTES); // Discard remaining bytes
+                            break;
+                        }
+                        case "MC|Beacon": {
+                            wrapper.passthrough(Types.INT); // Primary effect
+                            wrapper.passthrough(Types.INT); // Secondary effect
+                            wrapper.read(Types.REMAINING_BYTES); // Discard remaining bytes
                             break;
                         }
                         case "MC|ItemName": {
@@ -816,6 +839,7 @@ public class PlayerPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6_10>
                         case "MC|BEdit":
                         case "MC|BSign": {
                             final Item book = wrapper.read(RewindTypes.COMPRESSED_NBT_ITEM);
+                            wrapper.read(Types.REMAINING_BYTES); // Discard remaining bytes
                             CompoundTag tag = book.tag();
                             if (tag != null && tag.contains("pages")) {
                                 ListTag<StringTag> pages = tag.getListTag("pages", StringTag.class);
