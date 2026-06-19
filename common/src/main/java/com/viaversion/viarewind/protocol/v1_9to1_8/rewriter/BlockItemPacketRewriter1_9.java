@@ -291,7 +291,16 @@ public class BlockItemPacketRewriter1_9 extends VRBlockItemRewriter<ClientboundP
             if (display == null) {
                 tag.put("display", display = new CompoundTag());
             }
-            display.put("color", new IntTag(0x737373)); // Grey
+            display.put("color", new IntTag(0x737373)); // Gray
+        }
+
+        // Makes the fake banner for a shield brown if it has no banner patterns
+        if (originalId == 442) {
+            final CompoundTag blockEntityTag = tag == null ? null : tag.getCompoundTag("BlockEntityTag");
+            final ListTag<CompoundTag> patterns = blockEntityTag == null ? null : blockEntityTag.getListTag("Patterns", CompoundTag.class);
+            if (patterns == null || patterns.isEmpty()) {
+                item.setData((short) 3); // Brown
+            }
         }
 
         return item;
