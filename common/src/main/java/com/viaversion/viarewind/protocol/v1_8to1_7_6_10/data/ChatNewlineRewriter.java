@@ -26,6 +26,18 @@ import java.util.List;
 import java.util.Map;
 
 public class ChatNewlineRewriter {
+    private static final String[] STYLE_KEYS = {
+            "color",
+            "bold",
+            "italic",
+            "underlined",
+            "strikethrough",
+            "obfuscated",
+            "clickEvent",
+            "hoverEvent",
+            "insertion"
+    };
+
     public static List<JsonObject> splitChatComponentByNewline(JsonElement element) {
         return splitChatComponentByNewline(element, new JsonObject());
     }
@@ -47,8 +59,28 @@ public class ChatNewlineRewriter {
         }
 
         if (element.isJsonArray()) {
+            List<JsonObject> currentLine = new ArrayList<>();
+            JsonObject siblingStyle = inheritedStyle;
+            boolean foundRoot = false;
+
             for (JsonElement child : element.getAsJsonArray()) {
-                results.addAll(splitChatComponentByNewline(child, inheritedStyle));
+                List<JsonObject> splitParts = splitChatComponentByNewline(child, siblingStyle);
+                for (int i = 0; i < splitParts.size(); i++) {
+                    currentLine.add(splitParts.get(i));
+                    if (i < splitParts.size() - 1) {
+                        results.add(mergeLine(currentLine));
+                        currentLine.clear();
+                    }
+                }
+
+                if (!foundRoot && child != null && !child.isJsonNull()) {
+                    siblingStyle = rootStyle(inheritedStyle, child);
+                    foundRoot = true;
+                }
+            }
+
+            if (!currentLine.isEmpty()) {
+                results.add(mergeLine(currentLine));
             }
             return results;
         }
@@ -60,13 +92,7 @@ public class ChatNewlineRewriter {
         JsonObject obj = element.getAsJsonObject();
 
         // Build the style for this node: inherit first, then override with this object's style
-        JsonObject currentStyle = inheritedStyle.deepCopy();
-        for (Map.Entry<String, JsonElement> entry : obj.entrySet()) {
-            String key = entry.getKey();
-            if (!"text".equals(key) && !"extra".equals(key)) {
-                currentStyle.add(key, entry.getValue());
-            }
-        }
+        JsonObject currentStyle = mergeStyle(inheritedStyle, obj);
 
         // Gather components in order: base text then extra array
         List<JsonElement> ordered = new ArrayList<>();
@@ -81,12 +107,19 @@ public class ChatNewlineRewriter {
 
         // If there is no text/extra, return a single object with the style
         if (ordered.isEmpty()) {
-            results.add(currentStyle);
+            JsonObject baseComponent = copyComponentWithoutExtra(obj, currentStyle);
+            results.add(baseComponent != null ? baseComponent : currentStyle);
             return results;
         }
 
         // Build lines by concatenating split pieces
         List<JsonObject> currentLine = new ArrayList<>();
+        if (!obj.has("text")) {
+            JsonObject baseComponent = copyComponentWithoutExtra(obj, currentStyle);
+            if (baseComponent != null) {
+                currentLine.add(baseComponent);
+            }
+        }
         for (JsonElement part : ordered) {
             if (part == null || part.isJsonNull()) {
                 continue;
@@ -127,6 +160,55 @@ public class ChatNewlineRewriter {
         return results;
     }
 
+    private static JsonObject rootStyle(JsonObject inheritedStyle, JsonElement element) {
+        if (element == null || element.isJsonNull()) {
+            return inheritedStyle;
+        }
+        if (element.isJsonObject()) {
+            return mergeStyle(inheritedStyle, element.getAsJsonObject());
+        }
+        if (element.isJsonArray()) {
+            for (JsonElement child : element.getAsJsonArray()) {
+                if (child != null && !child.isJsonNull()) {
+                    return rootStyle(inheritedStyle, child);
+                }
+            }
+        }
+        return inheritedStyle;
+    }
+
+    private static JsonObject mergeStyle(JsonObject inheritedStyle, JsonObject obj) {
+        JsonObject currentStyle = inheritedStyle.deepCopy();
+        for (String key : STYLE_KEYS) {
+            if (obj.has(key)) {
+                currentStyle.add(key, obj.get(key).deepCopy());
+            }
+        }
+        return currentStyle;
+    }
+
+    private static JsonObject copyComponentWithoutExtra(JsonObject obj, JsonObject currentStyle) {
+        JsonObject component = currentStyle.deepCopy();
+        for (Map.Entry<String, JsonElement> entry : obj.entrySet()) {
+            String key = entry.getKey();
+            if ("extra".equals(key) || isStyleKey(key)) {
+                continue;
+            }
+
+            component.add(key, entry.getValue().deepCopy());
+        }
+        return component.size() == currentStyle.size() ? null : component;
+    }
+
+    private static boolean isStyleKey(String key) {
+        for (String styleKey : STYLE_KEYS) {
+            if (styleKey.equals(key)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private static JsonObject mergeLine(List<JsonObject> lineParts) {
         if (lineParts.isEmpty()) {
             JsonObject empty = new JsonObject();
@@ -139,11 +221,14 @@ public class ChatNewlineRewriter {
             return first;
         }
 
+        JsonObject merged = new JsonObject();
+        merged.addProperty("text", "");
+
         JsonArray extra = new JsonArray();
-        for (int i = 1; i < lineParts.size(); i++) {
-            extra.add(lineParts.get(i));
+        for (JsonObject linePart : lineParts) {
+            extra.add(linePart);
         }
-        first.add("extra", extra);
-        return first;
+        merged.add("extra", extra);
+        return merged;
     }
 }
