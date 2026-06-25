@@ -116,6 +116,21 @@ public class BlockItemPacketRewriter1_9 extends VRBlockItemRewriter<ClientboundP
             final Item item = wrapper.passthrough(Types.ITEM1_8);
 
             handleItemToClient(wrapper.user(), item);
+            if (windowId == -2) {
+                // 1.8 has no window -2 (set player-inventory slot directly); remap to window 0 with the menu slot.
+                final int windowSlot;
+                if (slot >= 0 && slot <= 8) windowSlot = slot + 36;
+                else if (slot >= 36 && slot <= 39) windowSlot = 44 - slot;
+                else if (slot == 40) windowSlot = 45;
+                else windowSlot = slot;
+                if (windowSlot == 45) {
+                    wrapper.cancel();
+                    return;
+                }
+                wrapper.set(Types.BYTE, 0, (byte) 0);
+                wrapper.set(Types.SHORT, 0, (short) windowSlot);
+                return;
+            }
             if (windowId == 0 && slot == 45) {
                 wrapper.cancel();
                 return;
