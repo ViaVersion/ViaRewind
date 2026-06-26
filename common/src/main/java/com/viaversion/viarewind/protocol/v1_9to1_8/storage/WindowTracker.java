@@ -38,6 +38,9 @@ public class WindowTracker extends StoredObject {
     private final HashMap<Short, Item[]> brewingItems = new HashMap<>();
     private final Map<Short, Short> enchantmentProperties = new HashMap<>();
 
+    private short openWindowId = 0; // 0 = none open
+    private int openWindowSize = 0; // open window's container slots, excluding the player inventory
+
     public WindowTracker(UserConnection user) {
         super(user);
     }
@@ -83,6 +86,23 @@ public class WindowTracker extends StoredObject {
     public void remove(short windowId) {
         types.remove(windowId);
         brewingItems.remove(windowId);
+        if (windowId == openWindowId) {
+            openWindowId = 0;
+            openWindowSize = 0;
+        }
+    }
+
+    public void openWindow(short windowId, int slotCount) {
+        openWindowId = windowId;
+        openWindowSize = slotCount;
+    }
+
+    public short openWindowId() {
+        return openWindowId;
+    }
+
+    public int openWindowSize() {
+        return openWindowSize;
     }
 
     public Item[] getBrewingItems(short windowId) {
