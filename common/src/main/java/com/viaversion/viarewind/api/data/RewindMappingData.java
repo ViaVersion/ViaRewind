@@ -20,6 +20,10 @@ package com.viaversion.viarewind.api.data;
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.viabackwards.api.data.BackwardsMappingData;
 import com.viaversion.viarewind.ViaRewind;
+import com.viaversion.viaversion.api.data.FullMappings;
+import com.viaversion.viaversion.api.data.LegacyFullStringMappingsBase;
+import com.viaversion.viaversion.api.data.MappingDataLoader;
+import com.viaversion.viaversion.api.data.Mappings;
 import java.util.logging.Logger;
 
 public class RewindMappingData extends BackwardsMappingData {
@@ -36,5 +40,10 @@ public class RewindMappingData extends BackwardsMappingData {
     @Override
     protected CompoundTag readMappingsFile(String name) {
         return RewindMappingDataLoader.INSTANCE.loadNBTFromDir(name);
+    }
+
+    @Override
+    protected FullMappings createFullMappings(MappingDataLoader.IdentifiersPair identifiersPair, Mappings mappings) {
+        return new LegacyFullStringMappingsBase(identifiersPair, mappings);
     }
 }
