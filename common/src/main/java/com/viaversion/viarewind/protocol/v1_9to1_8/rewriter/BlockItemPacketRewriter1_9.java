@@ -79,8 +79,14 @@ public class BlockItemPacketRewriter1_9 extends VRBlockItemRewriter<ClientboundP
         protocol.registerClientbound(ClientboundPackets1_9.OPEN_SCREEN, wrapper -> {
             final short windowId = wrapper.passthrough(Types.UNSIGNED_BYTE);
             final String windowType = wrapper.passthrough(Types.STRING);
+            wrapper.passthrough(Types.COMPONENT); // title
+            final short slotCount = wrapper.passthrough(Types.UNSIGNED_BYTE);
 
-            wrapper.user().get(WindowTracker.class).put(windowId, windowType);
+            final WindowTracker tracker = wrapper.user().get(WindowTracker.class);
+            tracker.put(windowId, windowType);
+            // 1.8 brewing has no fuel slot; ViaRewind drops it, so the client sees one fewer.
+            final boolean brewing = windowType.equalsIgnoreCase("minecraft:brewing_stand");
+            tracker.openWindow(windowId, brewing ? slotCount - 1 : slotCount);
         });
 
         protocol.registerClientbound(ClientboundPackets1_9.CONTAINER_SET_CONTENT, wrapper -> {
@@ -116,6 +122,37 @@ public class BlockItemPacketRewriter1_9 extends VRBlockItemRewriter<ClientboundP
             final Item item = wrapper.passthrough(Types.ITEM1_8);
 
             handleItemToClient(wrapper.user(), item);
+            if (windowId == -2) {
+                // 1.8 has no window -2 (set a player-inv slot by raw index, ignoring the open container) — retarget it.
+                final WindowTracker tracker = wrapper.user().get(WindowTracker.class);
+                final short openWindow = tracker.openWindowId();
+                if (openWindow != 0) {
+                    // Foreign container open: 1.8 only applies player-inv changes through it (main=size.., hotbar=size+27..).
+                    final int size = tracker.openWindowSize();
+                    final int containerSlot;
+                    if (slot >= 0 && slot <= 8) containerSlot = size + 27 + slot;
+                    else if (slot >= 9 && slot <= 35) containerSlot = size + slot - 9;
+                    else { // armor/offhand: no slot in a foreign container
+                        wrapper.cancel();
+                        return;
+                    }
+                    wrapper.set(Types.BYTE, 0, (byte) openWindow);
+                    wrapper.set(Types.SHORT, 0, (short) containerSlot);
+                    return;
+                }
+                // Otherwise window 0 with the menu slot.
+                final int windowSlot;
+                if (slot >= 0 && slot <= 8) windowSlot = slot + 36;
+                else if (slot >= 9 && slot <= 35) windowSlot = slot;
+                else if (slot >= 36 && slot <= 39) windowSlot = 44 - slot;
+                else { // offhand/body/saddle: no 1.8 equivalent
+                    wrapper.cancel();
+                    return;
+                }
+                wrapper.set(Types.BYTE, 0, (byte) 0);
+                wrapper.set(Types.SHORT, 0, (short) windowSlot);
+                return;
+            }
             if (windowId == 0 && slot == 45) {
                 wrapper.cancel();
                 return;
