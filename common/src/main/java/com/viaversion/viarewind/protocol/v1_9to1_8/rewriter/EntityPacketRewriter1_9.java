@@ -138,6 +138,16 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
                         wrapper.passthrough(Types.SHORT); // Velocity x
                         wrapper.passthrough(Types.SHORT); // Velocity y
                         wrapper.passthrough(Types.SHORT); // Velocity z
+                        if (type.is(EntityTypes1_9.EntityType.POTION)) {
+                            // 1.8 clients read the potion type from the object data, but newer versions only
+                            // send it in the entity data - the next packet. Held until then, see handleEntityData
+                            wrapper.cancel();
+                            final EntityTracker1_9 entityTracker = tracker(wrapper.user());
+                            entityTracker.getPendingPotionSpawns().put(entityId, new EntityTracker1_9.PotionSpawn(
+                                wrapper.get(Types.INT, 0), wrapper.get(Types.INT, 1), wrapper.get(Types.INT, 2),
+                                wrapper.get(Types.BYTE, 1), wrapper.get(Types.BYTE, 2),
+                                wrapper.get(Types.SHORT, 0), wrapper.get(Types.SHORT, 1), wrapper.get(Types.SHORT, 2)));
+                        }
                     } else {
                         final short velocityX = wrapper.read(Types.SHORT);
                         final short velocityY = wrapper.read(Types.SHORT);
@@ -541,8 +551,40 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
         filter().handler(this::handleEntityData);
     }
 
+    private void sendDelayedPotionSpawn(EntityDataHandlerEvent event, EntityTracker1_9 tracker, Item item) {
+        final EntityTracker1_9.PotionSpawn spawn = tracker.getPendingPotionSpawns().remove(event.entityId());
+        if (spawn == null) {
+            return;
+        }
+        final Item converted = protocol.getItemRewriter().handleItemToClient(event.user(), item);
+        short data = converted == null ? 0 : converted.data();
+        if (data <= 0) {
+            data = 16384; // Unmapped potion, at least display a splash bottle
+        }
+
+        final PacketWrapper addEntity = PacketWrapper.create(ClientboundPackets1_8.ADD_ENTITY, event.user());
+        addEntity.write(Types.VAR_INT, event.entityId());
+        addEntity.write(Types.BYTE, (byte) EntityTypes1_9.ObjectType.POTION.getId());
+        addEntity.write(Types.INT, spawn.x());
+        addEntity.write(Types.INT, spawn.y());
+        addEntity.write(Types.INT, spawn.z());
+        addEntity.write(Types.BYTE, spawn.pitch());
+        addEntity.write(Types.BYTE, spawn.yaw());
+        addEntity.write(Types.INT, (int) data);
+        addEntity.write(Types.SHORT, spawn.velocityX());
+        addEntity.write(Types.SHORT, spawn.velocityY());
+        addEntity.write(Types.SHORT, spawn.velocityZ());
+        addEntity.send(Protocol1_9To1_8.class); // Before the entity data is sent
+    }
+
     private void handleEntityData(EntityDataHandlerEvent event, EntityData entityData) {
         final EntityTracker1_9 tracker = tracker(event.user());
+        if (event.entityType() == EntityTypes1_9.EntityType.POTION && entityData.value() instanceof Item potionItem) {
+            // No 1.8 equivalent; supplies the object data of the held-back spawn. Matched by value type as the index is version dependent
+            sendDelayedPotionSpawn(event, tracker, potionItem);
+            event.cancel();
+            return;
+        }
         if (entityData.id() == EntityDataIndex1_9.ENTITY_STATUS.getIndex()) {
             tracker.getStatus().put(event.entityId(), (Byte) entityData.value());
         }

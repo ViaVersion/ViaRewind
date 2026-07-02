@@ -332,7 +332,8 @@ public class BlockItemPacketRewriter1_9 extends VRBlockItemRewriter<ClientboundP
             item.setData((short) 0);
         }
 
-        if (item.identifier() == 373 && (tag == null || !tag.contains("Potion"))) { // Potions
+        if (item.identifier() == 373) { // Potions
+            // Restore the splash id even when a Potion tag is present (e.g. items re-sent by a creative mode client)
             if (item.data() >= 16384) {
                 item.setIdentifier(438);
                 item.setData((short) (item.data() - 8192));
