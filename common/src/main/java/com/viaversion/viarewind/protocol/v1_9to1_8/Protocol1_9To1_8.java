@@ -26,6 +26,7 @@ import com.viaversion.viarewind.protocol.v1_9to1_8.rewriter.PlayerPacketRewriter
 import com.viaversion.viarewind.protocol.v1_9to1_8.rewriter.WorldPacketRewriter1_9;
 import com.viaversion.viarewind.protocol.v1_9to1_8.storage.BlockPlaceDestroyTracker;
 import com.viaversion.viarewind.protocol.v1_9to1_8.storage.BossBarStorage;
+import com.viaversion.viarewind.protocol.v1_9to1_8.storage.CommandBlockStateStorage;
 import com.viaversion.viarewind.protocol.v1_9to1_8.storage.CooldownStorage;
 import com.viaversion.viarewind.protocol.v1_9to1_8.storage.EntityTracker1_9;
 import com.viaversion.viarewind.protocol.v1_9to1_8.storage.LevitationStorage;
@@ -89,6 +90,7 @@ public class Protocol1_9To1_8 extends BackwardsProtocol<ClientboundPackets1_9, C
         connection.put(new CooldownStorage());
         connection.put(new BlockPlaceDestroyTracker());
         connection.put(new BossBarStorage(connection));
+        connection.put(new CommandBlockStateStorage());
     }
 
     @Override

@@ -27,8 +27,11 @@ import com.viaversion.viabackwards.api.rewriters.LegacyEnchantmentRewriter;
 import com.viaversion.viarewind.api.rewriter.VRBlockItemRewriter;
 import com.viaversion.viarewind.protocol.v1_9to1_8.Protocol1_9To1_8;
 import com.viaversion.viarewind.protocol.v1_9to1_8.data.PotionIdMappings1_8;
+import com.viaversion.viarewind.protocol.v1_9to1_8.storage.CommandBlockStateStorage;
 import com.viaversion.viarewind.protocol.v1_9to1_8.storage.WindowTracker;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Types;
@@ -60,8 +63,8 @@ public class BlockItemPacketRewriter1_9 extends VRBlockItemRewriter<ClientboundP
 
     @Override
     protected void registerPackets() {
-        registerBlockChange(ClientboundPackets1_9.BLOCK_UPDATE);
-        registerMultiBlockChange(ClientboundPackets1_9.CHUNK_BLOCKS_UPDATE);
+        registerBlockChangeWithCommandBlockStorage(ClientboundPackets1_9.BLOCK_UPDATE);
+        registerMultiBlockChangeWithCommandBlockStorage(ClientboundPackets1_9.CHUNK_BLOCKS_UPDATE);
         registerSetCreativeModeSlot(ServerboundPackets1_8.SET_CREATIVE_MODE_SLOT);
 
         protocol.registerClientbound(ClientboundPackets1_9.CONTAINER_CLOSE, wrapper -> {
@@ -182,6 +185,46 @@ public class BlockItemPacketRewriter1_9 extends VRBlockItemRewriter<ClientboundP
             }
             wrapper.write(Types.SHORT, key);
             wrapper.write(Types.SHORT, value);
+        });
+    }
+
+    private void registerBlockChangeWithCommandBlockStorage(final ClientboundPackets1_9 packetType) {
+        protocol.registerClientbound(packetType, new PacketHandlers() {
+            @Override
+            public void register() {
+                map(Types.BLOCK_POSITION1_8); // Block Position
+                map(Types.VAR_INT); // Block
+
+                handler(wrapper -> {
+                    final int blockState = wrapper.get(Types.VAR_INT, 0);
+                    wrapper.user().get(CommandBlockStateStorage.class).storeOrRemove(wrapper.get(Types.BLOCK_POSITION1_8, 0), blockState);
+                    wrapper.set(Types.VAR_INT, 0, handleBlockId(blockState));
+                });
+            }
+        });
+    }
+
+    private void registerMultiBlockChangeWithCommandBlockStorage(final ClientboundPackets1_9 packetType) {
+        protocol.registerClientbound(packetType, new PacketHandlers() {
+            @Override
+            public void register() {
+                map(Types.INT); // Chunk X
+                map(Types.INT); // Chunk Z
+                map(Types.BLOCK_CHANGE_ARRAY);
+
+                handler(wrapper -> {
+                    final int chunkX = wrapper.get(Types.INT, 0);
+                    final int chunkZ = wrapper.get(Types.INT, 1);
+                    final CommandBlockStateStorage storage = wrapper.user().get(CommandBlockStateStorage.class);
+
+                    for (BlockChangeRecord record : wrapper.get(Types.BLOCK_CHANGE_ARRAY, 0)) {
+                        final int blockState = record.getBlockId();
+                        final BlockPosition position = new BlockPosition((chunkX << 4) + record.getSectionX(), record.getY(), (chunkZ << 4) + record.getSectionZ());
+                        storage.storeOrRemove(position, blockState);
+                        record.setBlockId(handleBlockId(blockState));
+                    }
+                });
+            }
         });
     }
 

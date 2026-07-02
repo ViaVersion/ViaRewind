@@ -23,6 +23,7 @@ import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.viarewind.ViaRewind;
 import com.viaversion.viarewind.api.type.RewindTypes;
 import com.viaversion.viarewind.protocol.v1_9to1_8.Protocol1_9To1_8;
+import com.viaversion.viarewind.protocol.v1_9to1_8.data.CommandBlockState;
 import com.viaversion.viarewind.protocol.v1_9to1_8.provider.InventoryProvider;
 import com.viaversion.viarewind.protocol.v1_9to1_8.storage.BlockPlaceDestroyTracker;
 import com.viaversion.viarewind.protocol.v1_9to1_8.storage.BossBarStorage;
@@ -529,7 +530,39 @@ public class PlayerPacketRewriter1_9 extends RewriterBase<Protocol1_9To1_8> {
                             pageTag.setValue(ChatUtil.jsonToLegacy(value));
                         }
                     } else if (channel.equals("MC|AdvCdm")) {
-                        wrapper.set(Types.STRING, 0, "MC|AdvCmd");
+                        final byte type = wrapper.read(Types.BYTE);
+                        if (type == 0) {
+                            final int x = wrapper.read(Types.INT);
+                            final int y = wrapper.read(Types.INT);
+                            final int z = wrapper.read(Types.INT);
+                            final CommandBlockState.ParsedCommand command = CommandBlockState.parseDecoratedCommand(wrapper.read(Types.STRING));
+                            final boolean trackOutput = wrapper.read(Types.BOOLEAN);
+                            if (command.prefixed()) {
+                                wrapper.set(Types.STRING, 0, "MC|AutoCmd");
+                                wrapper.write(Types.INT, x);
+                                wrapper.write(Types.INT, y);
+                                wrapper.write(Types.INT, z);
+                                wrapper.write(Types.STRING, command.command());
+                                wrapper.write(Types.BOOLEAN, trackOutput);
+                                wrapper.write(Types.STRING, command.mode());
+                                wrapper.write(Types.BOOLEAN, command.conditional());
+                                wrapper.write(Types.BOOLEAN, command.automatic());
+                            } else {
+                                wrapper.set(Types.STRING, 0, "MC|AdvCmd");
+                                wrapper.write(Types.BYTE, type);
+                                wrapper.write(Types.INT, x);
+                                wrapper.write(Types.INT, y);
+                                wrapper.write(Types.INT, z);
+                                wrapper.write(Types.STRING, command.command());
+                                wrapper.write(Types.BOOLEAN, trackOutput);
+                            }
+                        } else {
+                            wrapper.set(Types.STRING, 0, "MC|AdvCmd");
+                            wrapper.write(Types.BYTE, type);
+                            wrapper.passthrough(Types.INT); // Entity id
+                            wrapper.passthrough(Types.STRING); // Command
+                            wrapper.passthrough(Types.BOOLEAN); // Track output
+                        }
                     }
                 });
             }
