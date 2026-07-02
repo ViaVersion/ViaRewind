@@ -35,6 +35,7 @@ public class EntityTracker1_9 extends EntityTrackerBase {
     private final Int2ObjectMap<IntList> vehicles = new Int2ObjectOpenHashMap<>();
     private final Int2ObjectMap<Vector> offsets = new Int2ObjectOpenHashMap<>();
     private final Int2IntMap status = new Int2IntOpenHashMap();
+    private final Int2ObjectMap<PotionSpawn> pendingPotionSpawns = new Int2ObjectOpenHashMap<>();
 
     public EntityTracker1_9(UserConnection connection) {
         super(connection, EntityTypes1_9.EntityType.PLAYER);
@@ -45,6 +46,7 @@ public class EntityTracker1_9 extends EntityTrackerBase {
         vehicles.remove(id);
         offsets.remove(id);
         status.remove(id);
+        pendingPotionSpawns.remove(id);
 
         vehicles.forEach((vehicle, passengers) -> passengers.rem(id));
         vehicles.int2ObjectEntrySet().removeIf(entry -> entry.getValue().isEmpty());
@@ -87,5 +89,13 @@ public class EntityTracker1_9 extends EntityTrackerBase {
 
     public Int2IntMap getStatus() {
         return status;
+    }
+
+    public Int2ObjectMap<PotionSpawn> getPendingPotionSpawns() {
+        return pendingPotionSpawns;
+    }
+
+    /** Spawn packet values of a thrown potion, held until its item entity data supplies the 1.8 object data. */
+    public record PotionSpawn(int x, int y, int z, byte pitch, byte yaw, short velocityX, short velocityY, short velocityZ) {
     }
 }
