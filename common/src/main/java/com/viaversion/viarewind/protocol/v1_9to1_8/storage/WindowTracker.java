@@ -39,7 +39,7 @@ public class WindowTracker extends StoredObject {
     private final Map<Short, Short> enchantmentProperties = new HashMap<>();
 
     private short openWindowId = 0; // 0 = none open
-    private int openWindowSize = 0; // open window's container slots, excluding the player inventory
+    private int openWindowSize = 0; // Translated client container slots, excluding the player inventory
 
     public WindowTracker(UserConnection user) {
         super(user);

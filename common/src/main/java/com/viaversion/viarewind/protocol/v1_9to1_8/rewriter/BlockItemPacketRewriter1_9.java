@@ -84,9 +84,7 @@ public class BlockItemPacketRewriter1_9 extends VRBlockItemRewriter<ClientboundP
 
             final WindowTracker tracker = wrapper.user().get(WindowTracker.class);
             tracker.put(windowId, windowType);
-            // 1.8 brewing has no fuel slot; ViaRewind drops it, so the client sees one fewer.
-            final boolean brewing = windowType.equalsIgnoreCase("minecraft:brewing_stand");
-            tracker.openWindow(windowId, brewing ? slotCount - 1 : slotCount);
+            tracker.openWindow(windowId, clientInventorySize(windowType, slotCount));
         });
 
         protocol.registerClientbound(ClientboundPackets1_9.CONTAINER_SET_CONTENT, wrapper -> {
@@ -227,6 +225,22 @@ public class BlockItemPacketRewriter1_9 extends VRBlockItemRewriter<ClientboundP
         enchantmentRewriter = new LegacyEnchantmentRewriter(nbtTagName());
         enchantmentRewriter.registerEnchantment(9, "§7Frost Walker");
         enchantmentRewriter.registerEnchantment(70, "§7Mending");
+    }
+
+    static int clientInventorySize(String windowType, int packetSlotCount) {
+        // The client only uses the packet's slot count when constructing dynamic inventories.
+        // Fixed menus construct their own slots; use the translated 1.8 layout for those.
+        return switch (windowType) {
+            case "minecraft:furnace", "minecraft:villager", "minecraft:anvil" -> 3;
+            case "minecraft:brewing_stand" -> 4;
+            case "minecraft:beacon" -> 1;
+            case "minecraft:dispenser", "minecraft:dropper" -> 9;
+            case "minecraft:enchanting_table" -> 2;
+            case "minecraft:crafting_table" -> 10;
+            case "minecraft:hopper" -> packetSlotCount;
+            case "EntityHorse" -> packetSlotCount > 2 ? 17 : 2;
+            default -> packetSlotCount / 9 * 9;
+        };
     }
 
     @Override
