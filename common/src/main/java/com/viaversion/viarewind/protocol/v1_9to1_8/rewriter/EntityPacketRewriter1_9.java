@@ -454,6 +454,19 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
             }
         });
 
+        // Passthrough except while a potion spawn is held - then folded into it
+        protocol.registerClientbound(ClientboundPackets1_9.SET_ENTITY_MOTION, wrapper -> {
+            final int entityId = wrapper.passthrough(Types.VAR_INT);
+            final EntityTracker1_9 tracker = tracker(wrapper.user());
+            final EntityTracker1_9.PotionSpawn pending = tracker.getPendingPotionSpawns().get(entityId);
+            if (pending == null) {
+                return;
+            }
+            tracker.getPendingPotionSpawns().put(entityId,
+                pending.withVelocity(wrapper.read(Types.SHORT), wrapper.read(Types.SHORT), wrapper.read(Types.SHORT)));
+            wrapper.cancel();
+        });
+
         protocol.registerClientbound(ClientboundPackets1_9.TELEPORT_ENTITY, new PacketHandlers() {
             @Override
             public void register() {
@@ -468,6 +481,14 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
                     final int entityId = wrapper.get(Types.VAR_INT, 0);
 
                     final EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
+                    final EntityTracker1_9.PotionSpawn pending = tracker.getPendingPotionSpawns().get(entityId);
+                    if (pending != null) {
+                        tracker.getPendingPotionSpawns().put(entityId, pending.withPosition(
+                            wrapper.get(Types.INT, 0), wrapper.get(Types.INT, 1), wrapper.get(Types.INT, 2),
+                            wrapper.get(Types.BYTE, 1), wrapper.get(Types.BYTE, 0)));
+                        wrapper.cancel();
+                        return;
+                    }
                     if (tracker.entityType(entityId) == EntityTypes1_9.EntityType.BOAT) {
                         byte yaw = wrapper.get(Types.BYTE, 0);
                         yaw -= 64;

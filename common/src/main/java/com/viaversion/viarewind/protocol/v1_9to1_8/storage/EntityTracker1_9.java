@@ -96,7 +96,16 @@ public class EntityTracker1_9 extends EntityTrackerBase {
         return pendingPotionSpawns;
     }
 
-    /** Spawn packet values of a thrown potion, held until its item entity data supplies the 1.8 object data. */
+    /** Spawn packet values of a thrown potion, held until its item entity data supplies the 1.8 object data.
+     *  Motion/teleports arriving while held are folded in - the released spawn carries the latest state. */
     public record PotionSpawn(int x, int y, int z, byte pitch, byte yaw, short velocityX, short velocityY, short velocityZ) {
+
+        public PotionSpawn withPosition(int x, int y, int z, byte pitch, byte yaw) {
+            return new PotionSpawn(x, y, z, pitch, yaw, velocityX, velocityY, velocityZ);
+        }
+
+        public PotionSpawn withVelocity(short velocityX, short velocityY, short velocityZ) {
+            return new PotionSpawn(x, y, z, pitch, yaw, velocityX, velocityY, velocityZ);
+        }
     }
 }
