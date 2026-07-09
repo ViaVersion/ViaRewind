@@ -18,6 +18,7 @@
 package com.viaversion.viarewind.protocol.v1_9to1_8.storage;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.data.entity.TrackedEntity;
 import com.viaversion.viaversion.api.minecraft.Vector;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_9;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
@@ -41,14 +42,14 @@ public class EntityTracker1_9 extends EntityTrackerBase {
     }
 
     @Override
-    public void removeEntity(int id) {
+    public TrackedEntity removeEntity(int id) {
         vehicles.remove(id);
         offsets.remove(id);
         status.remove(id);
 
         vehicles.forEach((vehicle, passengers) -> passengers.rem(id));
         vehicles.int2ObjectEntrySet().removeIf(entry -> entry.getValue().isEmpty());
-        super.removeEntity(id);
+        return super.removeEntity(id);
     }
 
     public void resetEntityOffset(final int id) {
