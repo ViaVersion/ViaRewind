@@ -61,7 +61,7 @@ public class Protocol1_9To1_8 extends BackwardsProtocol<ClientboundPackets1_9, C
         }
     };
 
-    public static final RewindMappingData MAPPINGS = new RewindMappingData("1.9.4", "1.8");
+    public static final RewindMappingData MAPPINGS = new RewindMappingData("1.9", "1.8");
 
     private final BlockItemPacketRewriter1_9 itemRewriter = new BlockItemPacketRewriter1_9(this);
     private final EntityPacketRewriter1_9 entityRewriter = new EntityPacketRewriter1_9(this);
