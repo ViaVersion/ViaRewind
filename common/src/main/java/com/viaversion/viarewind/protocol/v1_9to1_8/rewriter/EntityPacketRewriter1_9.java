@@ -248,6 +248,11 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
                         wrapper.cancel();
                         return;
                     }
+                    // 1.8 drops its own inventory on its player's death event; the death screen still shows from health
+                    if (status == 3 && wrapper.get(Types.INT, 0) == tracker(wrapper.user()).clientEntityId()) {
+                        wrapper.cancel();
+                        return;
+                    }
                     wrapper.write(Types.BYTE, status);
                 });
             }
