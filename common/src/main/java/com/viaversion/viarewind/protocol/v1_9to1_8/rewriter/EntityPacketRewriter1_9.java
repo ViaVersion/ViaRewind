@@ -404,7 +404,10 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
             public void register() {
                 map(Types.VAR_INT); // Entity id
                 handler(wrapper -> {
-                    // todo check if this is correct for the own player
+                    // 1.8 never gets its own equipment (viewer-only); a modern self-send would clobber the render
+                    if (wrapper.get(Types.VAR_INT, 0) == tracker(wrapper.user()).clientEntityId()) {
+                        wrapper.cancel();
+                    }
                     int slot = wrapper.read(Types.VAR_INT);
                     if (slot == 1) {
                         wrapper.cancel();
