@@ -30,6 +30,7 @@ import com.viaversion.viarewind.protocol.v1_9to1_8.storage.CooldownStorage;
 import com.viaversion.viarewind.protocol.v1_9to1_8.storage.EntityTracker1_9;
 import com.viaversion.viarewind.protocol.v1_9to1_8.storage.LevitationStorage;
 import com.viaversion.viarewind.protocol.v1_9to1_8.storage.PlayerPositionTracker;
+import com.viaversion.viarewind.protocol.v1_9to1_8.storage.LastTitle;
 import com.viaversion.viarewind.protocol.v1_9to1_8.storage.WindowTracker;
 import com.viaversion.viarewind.protocol.v1_9to1_8.task.CooldownIndicatorTask;
 import com.viaversion.viarewind.protocol.v1_9to1_8.task.LevitationUpdateTask;
@@ -51,7 +52,7 @@ public class Protocol1_9To1_8 extends BackwardsProtocol<ClientboundPackets1_9, C
     public static final ValueTransformer<Double, Integer> DOUBLE_TO_INT_TIMES_32 = new ValueTransformer<>(Types.INT) {
         @Override
         public Integer transform(PacketWrapper wrapper, Double inputValue) {
-            return (int) (inputValue * 32.0D);
+            return (int) Math.round(inputValue * 32.0D);
         }
     };
     public static final ValueTransformer<Float, Byte> DEGREES_TO_ANGLE = new ValueTransformer<>(Types.BYTE) {
@@ -87,6 +88,7 @@ public class Protocol1_9To1_8 extends BackwardsProtocol<ClientboundPackets1_9, C
         connection.put(new LevitationStorage());
         connection.put(new PlayerPositionTracker());
         connection.put(new CooldownStorage());
+        connection.put(new LastTitle());
         connection.put(new BlockPlaceDestroyTracker());
         connection.put(new BossBarStorage(connection));
     }

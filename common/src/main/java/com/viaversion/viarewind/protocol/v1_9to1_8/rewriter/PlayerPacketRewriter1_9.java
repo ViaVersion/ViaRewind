@@ -21,13 +21,13 @@ import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.viarewind.ViaRewind;
-import com.viaversion.viarewind.api.type.RewindTypes;
 import com.viaversion.viarewind.protocol.v1_9to1_8.Protocol1_9To1_8;
 import com.viaversion.viarewind.protocol.v1_9to1_8.provider.InventoryProvider;
 import com.viaversion.viarewind.protocol.v1_9to1_8.storage.BlockPlaceDestroyTracker;
 import com.viaversion.viarewind.protocol.v1_9to1_8.storage.BossBarStorage;
 import com.viaversion.viarewind.protocol.v1_9to1_8.storage.CooldownStorage;
 import com.viaversion.viarewind.protocol.v1_9to1_8.storage.EntityTracker1_9;
+import com.viaversion.viarewind.protocol.v1_9to1_8.storage.LastTitle;
 import com.viaversion.viarewind.protocol.v1_9to1_8.storage.PlayerPositionTracker;
 import com.viaversion.viarewind.utils.ChatUtil;
 import com.viaversion.viaversion.api.Via;
@@ -43,7 +43,6 @@ import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.rewriter.RewriterBase;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.libs.gson.JsonElement;
-import com.viaversion.viaversion.libs.gson.JsonParser;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ServerboundPackets1_8;
@@ -52,6 +51,12 @@ import com.viaversion.viaversion.util.StringUtil;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+import static com.viaversion.viarewind.protocol.v1_9to1_8.cooldown.TitleCooldownVisualization.ACTION_HIDE;
+import static com.viaversion.viarewind.protocol.v1_9to1_8.cooldown.TitleCooldownVisualization.ACTION_RESET;
+import static com.viaversion.viarewind.protocol.v1_9to1_8.cooldown.TitleCooldownVisualization.ACTION_SET_SUBTITLE;
+import static com.viaversion.viarewind.protocol.v1_9to1_8.cooldown.TitleCooldownVisualization.ACTION_SET_TIMES_AND_DISPLAY;
+import static com.viaversion.viarewind.protocol.v1_9to1_8.cooldown.TitleCooldownVisualization.ACTION_SET_TITLE;
 
 public class PlayerPacketRewriter1_9 extends RewriterBase<Protocol1_9To1_8> {
 
@@ -107,6 +112,26 @@ public class PlayerPacketRewriter1_9 extends RewriterBase<Protocol1_9To1_8> {
 
         protocol.cancelClientbound(ClientboundPackets1_9.COOLDOWN);
 
+        protocol.registerClientbound(ClientboundPackets1_9.SET_TITLES, wrapper -> {
+            final int action = wrapper.passthrough(Types.VAR_INT);
+            if (action == ACTION_SET_TITLE) {
+                final JsonElement title = wrapper.passthrough(Types.COMPONENT);
+                wrapper.user().get(LastTitle.class).setTitle(title);
+            } else if (action == ACTION_SET_SUBTITLE) {
+                final JsonElement subtitle = wrapper.passthrough(Types.COMPONENT);
+                wrapper.user().get(LastTitle.class).setSubtitle(subtitle);
+            } else if (action == ACTION_SET_TIMES_AND_DISPLAY) {
+                final int fadeIn = wrapper.passthrough(Types.INT);
+                final int stay = wrapper.passthrough(Types.INT);
+                final int fadeOut = wrapper.passthrough(Types.INT);
+                wrapper.user().get(LastTitle.class).setTimes(fadeIn, stay, fadeOut);
+            } else if (action == ACTION_HIDE) {
+                wrapper.user().get(LastTitle.class).hide();
+            } else if (action == ACTION_RESET) {
+                wrapper.user().get(LastTitle.class).reset();
+            }
+        });
+
         protocol.registerClientbound(ClientboundPackets1_9.CUSTOM_PAYLOAD, new PacketHandlers() {
             @Override
             public void register() {
@@ -133,8 +158,7 @@ public class PlayerPacketRewriter1_9 extends RewriterBase<Protocol1_9To1_8> {
                 map(Types.BYTE); // Relative arguments
                 handler(wrapper -> {
                     final PlayerPositionTracker pos = wrapper.user().get(PlayerPositionTracker.class);
-
-                    pos.setConfirmId(wrapper.read(Types.VAR_INT));
+                    final int teleportId = wrapper.read(Types.VAR_INT);
 
                     byte flags = wrapper.get(Types.BYTE, 0);
                     double x = wrapper.get(Types.DOUBLE, 0);
@@ -171,6 +195,7 @@ public class PlayerPacketRewriter1_9 extends RewriterBase<Protocol1_9To1_8> {
                     pos.setPos(x, y, z);
                     pos.setYaw(yaw);
                     pos.setPitch(pitch);
+                    pos.queueTeleport(teleportId, x, y, z, pos.getYaw(), pos.getPitch());
                 });
             }
         });
@@ -291,7 +316,7 @@ public class PlayerPacketRewriter1_9 extends RewriterBase<Protocol1_9To1_8> {
                 handler(wrapper -> {
                     final PlayerPositionTracker storage = wrapper.user().get(PlayerPositionTracker.class);
                     storage.sendAnimations();
-                    if (storage.getConfirmId() != -1) {
+                    if (storage.hasPendingTeleports()) {
                         return;
                     }
 
@@ -311,7 +336,7 @@ public class PlayerPacketRewriter1_9 extends RewriterBase<Protocol1_9To1_8> {
                 handler(wrapper -> {
                     final PlayerPositionTracker storage = wrapper.user().get(PlayerPositionTracker.class);
                     storage.sendAnimations();
-                    if (storage.getConfirmId() != -1) {
+                    if (storage.hasPendingTeleports()) {
                         return;
                     }
 
@@ -333,18 +358,19 @@ public class PlayerPacketRewriter1_9 extends RewriterBase<Protocol1_9To1_8> {
 
             final PlayerPositionTracker storage = wrapper.user().get(PlayerPositionTracker.class);
             storage.sendAnimations();
-            if (storage.getConfirmId() != -1) {
+            final PlayerPositionTracker.PendingTeleport teleport = storage.peekTeleport();
+            if (teleport != null) {
                 // 1.7 uses resynced hitbox minY for y however this can have small floating point error due to the calculations it does to get there on teleport confirm
                 // This Y error gets propagated from 1.7 to 1.8 to 1.9 which causes teleport confirmation to not properly be detected
                 // This fixes it similarly to how anticheats detect teleports: https://github.com/GrimAnticheat/Grim/blob/67aa3a9483a9b2a6987d594092697b4104c781f0/common/src/main/java/ac/grim/grimac/manager/SetbackTeleportUtil.java#L315
-                boolean closeEnoughY = Math.abs(storage.getPosY() - y) <= 1e-7;
+                boolean closeEnoughY = Math.abs(teleport.y() - y) <= 1e-7;
 
-                if (storage.getPosX() == x && closeEnoughY && storage.getPosZ() == z && storage.getYaw() == yaw && storage.getPitch() == pitch) {
+                if (teleport.x() == x && closeEnoughY && teleport.z() == z && teleport.yaw() == yaw && teleport.pitch() == pitch) {
                     final PacketWrapper confirmTeleport = PacketWrapper.create(ServerboundPackets1_9.ACCEPT_TELEPORTATION, wrapper.user());
-                    confirmTeleport.write(Types.VAR_INT, storage.getConfirmId());
+                    confirmTeleport.write(Types.VAR_INT, teleport.id());
                     confirmTeleport.sendToServer(Protocol1_9To1_8.class);
 
-                    storage.setConfirmId(-1);
+                    storage.confirmTeleport();
                 }
             } else {
                 storage.setPos(x, y, z);
