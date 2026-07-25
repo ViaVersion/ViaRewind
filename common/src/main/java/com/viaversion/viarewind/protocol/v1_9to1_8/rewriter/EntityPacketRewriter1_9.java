@@ -545,6 +545,9 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
         final EntityTracker1_9 tracker = tracker(event.user());
         if (entityData.id() == EntityDataIndex1_9.ENTITY_STATUS.getIndex()) {
             tracker.getStatus().put(event.entityId(), (Byte) entityData.value());
+            if (tracker.isHandActive(event.entityId())) {
+                entityData.setValue((byte) ((byte) entityData.value() | 1 << STATUS_USE_BIT));
+            }
         }
         final EntityDataIndex1_9 metaIndex = EntityDataIndex1_8.searchIndex(event.entityType(), entityData.id());
         if (metaIndex == null) {
@@ -554,8 +557,10 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
         }
         if (metaIndex.getOldType() == null || metaIndex.getNewType() == null) {
             if (metaIndex == EntityDataIndex1_9.PLAYER_HAND) { // Player eating/aiming/drinking
+                final boolean handActive = (((byte) entityData.value()) & 1 << HAND_ACTIVE_BIT) != 0;
+                tracker.setHandActive(event.entityId(), handActive);
                 byte status = (byte) tracker.getStatus().getOrDefault(event.entityId(), 0);
-                if ((((byte) entityData.value()) & 1 << HAND_ACTIVE_BIT) != 0) {
+                if (handActive) {
                     status = (byte) (status | 1 << STATUS_USE_BIT);
                 } else {
                     status = (byte) (status & ~(1 << STATUS_USE_BIT));
