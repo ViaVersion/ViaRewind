@@ -133,8 +133,7 @@ public class PlayerPacketRewriter1_9 extends RewriterBase<Protocol1_9To1_8> {
                 map(Types.BYTE); // Relative arguments
                 handler(wrapper -> {
                     final PlayerPositionTracker pos = wrapper.user().get(PlayerPositionTracker.class);
-
-                    pos.setConfirmId(wrapper.read(Types.VAR_INT));
+                    final int teleportId = wrapper.read(Types.VAR_INT);
 
                     byte flags = wrapper.get(Types.BYTE, 0);
                     double x = wrapper.get(Types.DOUBLE, 0);
@@ -171,6 +170,7 @@ public class PlayerPacketRewriter1_9 extends RewriterBase<Protocol1_9To1_8> {
                     pos.setPos(x, y, z);
                     pos.setYaw(yaw);
                     pos.setPitch(pitch);
+                    pos.queueTeleport(teleportId, x, y, z, pos.getYaw(), pos.getPitch());
                 });
             }
         });
@@ -291,7 +291,7 @@ public class PlayerPacketRewriter1_9 extends RewriterBase<Protocol1_9To1_8> {
                 handler(wrapper -> {
                     final PlayerPositionTracker storage = wrapper.user().get(PlayerPositionTracker.class);
                     storage.sendAnimations();
-                    if (storage.getConfirmId() != -1) {
+                    if (storage.hasPendingTeleports()) {
                         return;
                     }
 
@@ -311,7 +311,7 @@ public class PlayerPacketRewriter1_9 extends RewriterBase<Protocol1_9To1_8> {
                 handler(wrapper -> {
                     final PlayerPositionTracker storage = wrapper.user().get(PlayerPositionTracker.class);
                     storage.sendAnimations();
-                    if (storage.getConfirmId() != -1) {
+                    if (storage.hasPendingTeleports()) {
                         return;
                     }
 
@@ -333,18 +333,19 @@ public class PlayerPacketRewriter1_9 extends RewriterBase<Protocol1_9To1_8> {
 
             final PlayerPositionTracker storage = wrapper.user().get(PlayerPositionTracker.class);
             storage.sendAnimations();
-            if (storage.getConfirmId() != -1) {
+            final PlayerPositionTracker.PendingTeleport teleport = storage.peekTeleport();
+            if (teleport != null) {
                 // 1.7 uses resynced hitbox minY for y however this can have small floating point error due to the calculations it does to get there on teleport confirm
                 // This Y error gets propagated from 1.7 to 1.8 to 1.9 which causes teleport confirmation to not properly be detected
                 // This fixes it similarly to how anticheats detect teleports: https://github.com/GrimAnticheat/Grim/blob/67aa3a9483a9b2a6987d594092697b4104c781f0/common/src/main/java/ac/grim/grimac/manager/SetbackTeleportUtil.java#L315
-                boolean closeEnoughY = Math.abs(storage.getPosY() - y) <= 1e-7;
+                boolean closeEnoughY = Math.abs(teleport.y() - y) <= 1e-7;
 
-                if (storage.getPosX() == x && closeEnoughY && storage.getPosZ() == z && storage.getYaw() == yaw && storage.getPitch() == pitch) {
+                if (teleport.x() == x && closeEnoughY && teleport.z() == z && teleport.yaw() == yaw && teleport.pitch() == pitch) {
                     final PacketWrapper confirmTeleport = PacketWrapper.create(ServerboundPackets1_9.ACCEPT_TELEPORTATION, wrapper.user());
-                    confirmTeleport.write(Types.VAR_INT, storage.getConfirmId());
+                    confirmTeleport.write(Types.VAR_INT, teleport.id());
                     confirmTeleport.sendToServer(Protocol1_9To1_8.class);
 
-                    storage.setConfirmId(-1);
+                    storage.confirmTeleport();
                 }
             } else {
                 storage.setPos(x, y, z);

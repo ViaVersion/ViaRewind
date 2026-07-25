@@ -26,10 +26,10 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class PlayerPositionTracker implements StorableObject {
 
     private final Queue<PacketWrapper> animations = new ConcurrentLinkedQueue<>();
+    private final Queue<PendingTeleport> pendingTeleports = new ConcurrentLinkedQueue<>();
     private double posX, posY, posZ;
     private float yaw, pitch;
     private boolean onGround;
-    private int confirmId = -1;
 
     public void setPos(double x, double y, double z) {
         this.posX = x;
@@ -84,12 +84,23 @@ public class PlayerPositionTracker implements StorableObject {
         this.onGround = onGround;
     }
 
-    public int getConfirmId() {
-        return this.confirmId;
+    public boolean hasPendingTeleports() {
+        return !this.pendingTeleports.isEmpty();
     }
 
-    public void setConfirmId(int confirmId) {
-        this.confirmId = confirmId;
+    public void queueTeleport(final int id, final double x, final double y, final double z, final float yaw, final float pitch) {
+        this.pendingTeleports.add(new PendingTeleport(id, x, y, z, yaw, pitch));
+    }
+
+    public PendingTeleport peekTeleport() {
+        return this.pendingTeleports.peek();
+    }
+
+    public void confirmTeleport() {
+        this.pendingTeleports.poll();
+    }
+
+    public record PendingTeleport(int id, double x, double y, double z, float yaw, float pitch) {
     }
 
 }
