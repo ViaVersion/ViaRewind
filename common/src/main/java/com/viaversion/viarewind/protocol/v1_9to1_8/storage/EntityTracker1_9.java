@@ -36,7 +36,7 @@ public class EntityTracker1_9 extends EntityTrackerBase {
     private final Int2ObjectMap<IntList> vehicles = new Int2ObjectOpenHashMap<>();
     private final Int2ObjectMap<Vector> offsets = new Int2ObjectOpenHashMap<>();
     private final Int2IntMap status = new Int2IntOpenHashMap();
-    private final Int2ObjectMap<PotionSpawn> pendingPotionSpawns = new Int2ObjectOpenHashMap<>();
+    private final Int2ObjectMap<PendingPotionEntity> pendingPotions = new Int2ObjectOpenHashMap<>();
 
     public EntityTracker1_9(UserConnection connection) {
         super(connection, EntityTypes1_9.EntityType.PLAYER);
@@ -47,7 +47,7 @@ public class EntityTracker1_9 extends EntityTrackerBase {
         vehicles.remove(id);
         offsets.remove(id);
         status.remove(id);
-        pendingPotionSpawns.remove(id);
+        pendingPotions.remove(id);
 
         vehicles.forEach((vehicle, passengers) -> passengers.rem(id));
         vehicles.int2ObjectEntrySet().removeIf(entry -> entry.getValue().isEmpty());
@@ -92,20 +92,20 @@ public class EntityTracker1_9 extends EntityTrackerBase {
         return status;
     }
 
-    public Int2ObjectMap<PotionSpawn> getPendingPotionSpawns() {
-        return pendingPotionSpawns;
+    public Int2ObjectMap<PendingPotionEntity> getPendingPotions() {
+        return pendingPotions;
     }
 
-    /** Spawn packet values of a thrown potion, held until its item entity data supplies the 1.8 object data.
-     *  Motion/teleports arriving while held are folded in - the released spawn carries the latest state. */
-    public record PotionSpawn(int x, int y, int z, byte pitch, byte yaw, short velocityX, short velocityY, short velocityZ) {
+    public record PendingPotionEntity(int x, int y, int z, byte pitch, byte yaw, short velocityX, short velocityY, short velocityZ) {
 
-        public PotionSpawn withPosition(int x, int y, int z, byte pitch, byte yaw) {
-            return new PotionSpawn(x, y, z, pitch, yaw, velocityX, velocityY, velocityZ);
+        public PendingPotionEntity withPosition(final int x, final int y, final int z, final byte pitch, final byte yaw) {
+            return new PendingPotionEntity(x, y, z, pitch, yaw, velocityX, velocityY, velocityZ);
         }
 
-        public PotionSpawn withVelocity(short velocityX, short velocityY, short velocityZ) {
-            return new PotionSpawn(x, y, z, pitch, yaw, velocityX, velocityY, velocityZ);
+        public PendingPotionEntity withVelocity(final short velocityX, final short velocityY, final short velocityZ) {
+            return new PendingPotionEntity(x, y, z, pitch, yaw, velocityX, velocityY, velocityZ);
         }
+
     }
+
 }
