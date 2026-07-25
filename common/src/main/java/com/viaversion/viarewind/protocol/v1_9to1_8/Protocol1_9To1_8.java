@@ -19,7 +19,6 @@ package com.viaversion.viarewind.protocol.v1_9to1_8;
 
 import com.viaversion.viabackwards.api.BackwardsProtocol;
 import com.viaversion.viarewind.api.data.RewindMappingData;
-import com.viaversion.viarewind.protocol.v1_9to1_8.cooldown.TitleCooldownVisualization;
 import com.viaversion.viarewind.protocol.v1_9to1_8.provider.InventoryProvider;
 import com.viaversion.viarewind.protocol.v1_9to1_8.rewriter.BlockItemPacketRewriter1_9;
 import com.viaversion.viarewind.protocol.v1_9to1_8.rewriter.EntityPacketRewriter1_9;
@@ -31,6 +30,7 @@ import com.viaversion.viarewind.protocol.v1_9to1_8.storage.CooldownStorage;
 import com.viaversion.viarewind.protocol.v1_9to1_8.storage.EntityTracker1_9;
 import com.viaversion.viarewind.protocol.v1_9to1_8.storage.LevitationStorage;
 import com.viaversion.viarewind.protocol.v1_9to1_8.storage.PlayerPositionTracker;
+import com.viaversion.viarewind.protocol.v1_9to1_8.storage.LastTitle;
 import com.viaversion.viarewind.protocol.v1_9to1_8.storage.WindowTracker;
 import com.viaversion.viarewind.protocol.v1_9to1_8.task.CooldownIndicatorTask;
 import com.viaversion.viarewind.protocol.v1_9to1_8.task.LevitationUpdateTask;
@@ -88,7 +88,7 @@ public class Protocol1_9To1_8 extends BackwardsProtocol<ClientboundPackets1_9, C
         connection.put(new LevitationStorage());
         connection.put(new PlayerPositionTracker());
         connection.put(new CooldownStorage());
-        connection.put(new TitleCooldownVisualization.StoredTitle());
+        connection.put(new LastTitle());
         connection.put(new BlockPlaceDestroyTracker());
         connection.put(new BossBarStorage(connection));
     }
