@@ -92,9 +92,12 @@ public class WorldPacketRewriter1_9 extends RewriterBase<Protocol1_9To1_8> {
                     String name = wrapper.get(Types.STRING, 0);
                     name = protocol.getMappingData().getMappedNamedSound(name);
                     if (name == null) {
-                        wrapper.cancel();
-                    } else {
+                        return;
+                    }
+                    if (!name.isEmpty()) {
                         wrapper.set(Types.STRING, 0, name);
+                    } else {
+                        wrapper.cancel();
                     }
                 });
                 read(Types.VAR_INT); // Sound category
