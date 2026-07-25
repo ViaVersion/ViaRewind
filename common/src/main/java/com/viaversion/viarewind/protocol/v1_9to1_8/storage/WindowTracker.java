@@ -38,6 +38,9 @@ public class WindowTracker extends StoredObject {
     private final HashMap<Short, Item[]> brewingItems = new HashMap<>();
     private final Map<Short, Short> enchantmentProperties = new HashMap<>();
 
+    private short openWindowId = 0;
+    private int openWindowSize = 0; // Translated client container slots, excluding the player inventory
+
     public WindowTracker(UserConnection user) {
         super(user);
     }
@@ -83,6 +86,36 @@ public class WindowTracker extends StoredObject {
     public void remove(short windowId) {
         types.remove(windowId);
         brewingItems.remove(windowId);
+        if (windowId == openWindowId) {
+            openWindowId = 0;
+            openWindowSize = 0;
+        }
+    }
+
+    public void openWindow(final short windowId, final String windowType, final int slotCount) {
+        openWindowId = windowId;
+
+        // The client only uses the packet's slot count when constructing dynamic inventories.
+        // Fixed menus construct their own slots; use the translated 1.8 layout for those.
+        openWindowSize = switch (windowType) {
+            case "minecraft:furnace", "minecraft:villager", "minecraft:anvil" -> 3;
+            case "minecraft:brewing_stand" -> 4;
+            case "minecraft:beacon" -> 1;
+            case "minecraft:dispenser", "minecraft:dropper" -> 9;
+            case "minecraft:enchanting_table" -> 2;
+            case "minecraft:crafting_table" -> 10;
+            case "minecraft:hopper" -> slotCount;
+            case "EntityHorse" -> slotCount > 2 ? 17 : 2;
+            default -> slotCount / 9 * 9;
+        };
+    }
+
+    public short openWindowId() {
+        return openWindowId;
+    }
+
+    public int openWindowSize() {
+        return openWindowSize;
     }
 
     public Item[] getBrewingItems(short windowId) {
