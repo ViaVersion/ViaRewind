@@ -134,11 +134,24 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
                         }
                     }
 
-                    if (data > 0) {
-                        wrapper.passthrough(Types.SHORT); // Velocity x
-                        wrapper.passthrough(Types.SHORT); // Velocity y
-                        wrapper.passthrough(Types.SHORT); // Velocity z
-                    } else {
+                    if (type.is(EntityTypes1_9.EntityType.POTION) && data > 0) {
+                        // 1.8 clients read the potion type from the object data, but newer versions only
+                        // send it in the entity data - the next packet. Held until then, see handleEntityData
+                        wrapper.cancel();
+                        final int x = wrapper.get(Types.INT, 0);
+                        final int y = wrapper.get(Types.INT, 1);
+                        final int z = wrapper.get(Types.INT, 2);
+                        final byte pitch = wrapper.get(Types.BYTE, 1);
+                        final byte yaw = wrapper.get(Types.BYTE, 2);
+                        final short velocityX = wrapper.passthrough(Types.SHORT);
+                        final short velocityY = wrapper.passthrough(Types.SHORT);
+                        final short velocityZ = wrapper.passthrough(Types.SHORT);
+                        final EntityTracker1_9 tracker = tracker(wrapper.user());
+                        tracker.getPendingPotions().put(entityId, new EntityTracker1_9.PendingPotionEntity(x, y, z, pitch, yaw, velocityX, velocityY, velocityZ));
+                        return;
+                    }
+
+                    if (data <= 0) {
                         final short velocityX = wrapper.read(Types.SHORT);
                         final short velocityY = wrapper.read(Types.SHORT);
                         final short velocityZ = wrapper.read(Types.SHORT);
@@ -444,6 +457,19 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
             }
         });
 
+        protocol.registerClientbound(ClientboundPackets1_9.SET_ENTITY_MOTION, wrapper -> {
+            final int entityId = wrapper.passthrough(Types.VAR_INT);
+            final EntityTracker1_9 tracker = tracker(wrapper.user());
+            final EntityTracker1_9.PendingPotionEntity pending = tracker.getPendingPotions().get(entityId);
+            if (pending != null) {
+                wrapper.cancel();
+                final short velocityX = wrapper.read(Types.SHORT);
+                final short velocityY = wrapper.read(Types.SHORT);
+                final short velocityZ = wrapper.read(Types.SHORT);
+                tracker.getPendingPotions().put(entityId, pending.withVelocity(velocityX, velocityY, velocityZ));
+            }
+        });
+
         protocol.registerClientbound(ClientboundPackets1_9.TELEPORT_ENTITY, new PacketHandlers() {
             @Override
             public void register() {
@@ -458,6 +484,18 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
                     final int entityId = wrapper.get(Types.VAR_INT, 0);
 
                     final EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
+                    final EntityTracker1_9.PendingPotionEntity pending = tracker.getPendingPotions().get(entityId);
+                    if (pending != null) {
+                        wrapper.cancel();
+                        final int x = wrapper.get(Types.INT, 0);
+                        final int y = wrapper.get(Types.INT, 1);
+                        final int z = wrapper.get(Types.INT, 2);
+                        final byte yaw = wrapper.get(Types.BYTE, 0);
+                        final byte pitch = wrapper.get(Types.BYTE, 1);
+                        tracker.getPendingPotions().put(entityId, pending.withPosition(x, y, z, pitch, yaw));
+                        return;
+                    }
+
                     if (tracker.entityType(entityId) == EntityTypes1_9.EntityType.BOAT) {
                         byte yaw = wrapper.get(Types.BYTE, 0);
                         yaw -= 64;
@@ -541,8 +579,42 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
         filter().handler(this::handleEntityData);
     }
 
+    private void sendDelayedPotionSpawn(final EntityDataHandlerEvent event, final EntityTracker1_9 tracker, final Item item) {
+        final EntityTracker1_9.PendingPotionEntity spawn = tracker.getPendingPotions().remove(event.entityId());
+        if (spawn == null) {
+            return;
+        }
+
+        final Item converted = protocol.getItemRewriter().handleItemToClient(event.user(), item);
+        short data = converted == null ? 0 : converted.data();
+        if (data <= 0) {
+            data = 16384; // Unmapped potion, at least display a splash bottle
+        }
+
+        final PacketWrapper addEntity = PacketWrapper.create(ClientboundPackets1_8.ADD_ENTITY, event.user());
+        addEntity.write(Types.VAR_INT, event.entityId());
+        addEntity.write(Types.BYTE, (byte) EntityTypes1_9.ObjectType.POTION.getId());
+        addEntity.write(Types.INT, spawn.x());
+        addEntity.write(Types.INT, spawn.y());
+        addEntity.write(Types.INT, spawn.z());
+        addEntity.write(Types.BYTE, spawn.pitch());
+        addEntity.write(Types.BYTE, spawn.yaw());
+        addEntity.write(Types.INT, (int) data);
+        addEntity.write(Types.SHORT, spawn.velocityX());
+        addEntity.write(Types.SHORT, spawn.velocityY());
+        addEntity.write(Types.SHORT, spawn.velocityZ());
+        addEntity.send(Protocol1_9To1_8.class); // Before the entity data is sent
+    }
+
     private void handleEntityData(EntityDataHandlerEvent event, EntityData entityData) {
         final EntityTracker1_9 tracker = tracker(event.user());
+        if (event.entityType() == EntityTypes1_9.EntityType.POTION && entityData.value() instanceof Item potionItem) {
+            // No 1.8 equivalent; supplies the object data of the held-back spawn. Matched by value type as the index is version dependent
+            this.sendDelayedPotionSpawn(event, tracker, potionItem);
+            event.cancel();
+            return;
+        }
+
         if (entityData.id() == EntityDataIndex1_9.ENTITY_STATUS.getIndex()) {
             tracker.getStatus().put(event.entityId(), (Byte) entityData.value());
             if (tracker.isHandActive(event.entityId())) {

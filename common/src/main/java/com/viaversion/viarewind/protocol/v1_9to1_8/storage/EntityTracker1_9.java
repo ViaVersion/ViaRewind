@@ -39,6 +39,7 @@ public class EntityTracker1_9 extends EntityTrackerBase {
     private final Int2ObjectMap<Vector> offsets = new Int2ObjectOpenHashMap<>();
     private final Int2IntMap status = new Int2IntOpenHashMap();
     private final IntSet handActive = new IntOpenHashSet();
+    private final Int2ObjectMap<PendingPotionEntity> pendingPotions = new Int2ObjectOpenHashMap<>();
 
     public EntityTracker1_9(UserConnection connection) {
         super(connection, EntityTypes1_9.EntityType.PLAYER);
@@ -50,6 +51,7 @@ public class EntityTracker1_9 extends EntityTrackerBase {
         offsets.remove(id);
         status.remove(id);
         handActive.remove(id);
+        pendingPotions.remove(id);
 
         vehicles.forEach((vehicle, passengers) -> passengers.rem(id));
         vehicles.int2ObjectEntrySet().removeIf(entry -> entry.getValue().isEmpty());
@@ -105,4 +107,21 @@ public class EntityTracker1_9 extends EntityTrackerBase {
             handActive.remove(id);
         }
     }
+
+    public Int2ObjectMap<PendingPotionEntity> getPendingPotions() {
+        return pendingPotions;
+    }
+
+    public record PendingPotionEntity(int x, int y, int z, byte pitch, byte yaw, short velocityX, short velocityY, short velocityZ) {
+
+        public PendingPotionEntity withPosition(final int x, final int y, final int z, final byte pitch, final byte yaw) {
+            return new PendingPotionEntity(x, y, z, pitch, yaw, velocityX, velocityY, velocityZ);
+        }
+
+        public PendingPotionEntity withVelocity(final short velocityX, final short velocityY, final short velocityZ) {
+            return new PendingPotionEntity(x, y, z, pitch, yaw, velocityX, velocityY, velocityZ);
+        }
+
+    }
+
 }
