@@ -21,13 +21,13 @@ import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.viarewind.ViaRewind;
-import com.viaversion.viarewind.api.type.RewindTypes;
 import com.viaversion.viarewind.protocol.v1_9to1_8.Protocol1_9To1_8;
 import com.viaversion.viarewind.protocol.v1_9to1_8.provider.InventoryProvider;
 import com.viaversion.viarewind.protocol.v1_9to1_8.storage.BlockPlaceDestroyTracker;
 import com.viaversion.viarewind.protocol.v1_9to1_8.storage.BossBarStorage;
 import com.viaversion.viarewind.protocol.v1_9to1_8.storage.CooldownStorage;
 import com.viaversion.viarewind.protocol.v1_9to1_8.storage.EntityTracker1_9;
+import com.viaversion.viarewind.protocol.v1_9to1_8.storage.LastTitle;
 import com.viaversion.viarewind.protocol.v1_9to1_8.storage.PlayerPositionTracker;
 import com.viaversion.viarewind.utils.ChatUtil;
 import com.viaversion.viaversion.api.Via;
@@ -43,7 +43,6 @@ import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.rewriter.RewriterBase;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.libs.gson.JsonElement;
-import com.viaversion.viaversion.libs.gson.JsonParser;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ServerboundPackets1_8;
@@ -52,6 +51,12 @@ import com.viaversion.viaversion.util.StringUtil;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+import static com.viaversion.viarewind.protocol.v1_9to1_8.cooldown.TitleCooldownVisualization.ACTION_HIDE;
+import static com.viaversion.viarewind.protocol.v1_9to1_8.cooldown.TitleCooldownVisualization.ACTION_RESET;
+import static com.viaversion.viarewind.protocol.v1_9to1_8.cooldown.TitleCooldownVisualization.ACTION_SET_SUBTITLE;
+import static com.viaversion.viarewind.protocol.v1_9to1_8.cooldown.TitleCooldownVisualization.ACTION_SET_TIMES_AND_DISPLAY;
+import static com.viaversion.viarewind.protocol.v1_9to1_8.cooldown.TitleCooldownVisualization.ACTION_SET_TITLE;
 
 public class PlayerPacketRewriter1_9 extends RewriterBase<Protocol1_9To1_8> {
 
@@ -106,6 +111,26 @@ public class PlayerPacketRewriter1_9 extends RewriterBase<Protocol1_9To1_8> {
         });
 
         protocol.cancelClientbound(ClientboundPackets1_9.COOLDOWN);
+
+        protocol.registerClientbound(ClientboundPackets1_9.SET_TITLES, wrapper -> {
+            final int action = wrapper.passthrough(Types.VAR_INT);
+            if (action == ACTION_SET_TITLE) {
+                final JsonElement title = wrapper.passthrough(Types.COMPONENT);
+                wrapper.user().get(LastTitle.class).setTitle(title);
+            } else if (action == ACTION_SET_SUBTITLE) {
+                final JsonElement subtitle = wrapper.passthrough(Types.COMPONENT);
+                wrapper.user().get(LastTitle.class).setSubtitle(subtitle);
+            } else if (action == ACTION_SET_TIMES_AND_DISPLAY) {
+                final int fadeIn = wrapper.passthrough(Types.INT);
+                final int stay = wrapper.passthrough(Types.INT);
+                final int fadeOut = wrapper.passthrough(Types.INT);
+                wrapper.user().get(LastTitle.class).setTimes(fadeIn, stay, fadeOut);
+            } else if (action == ACTION_HIDE) {
+                wrapper.user().get(LastTitle.class).hide();
+            } else if (action == ACTION_RESET) {
+                wrapper.user().get(LastTitle.class).reset();
+            }
+        });
 
         protocol.registerClientbound(ClientboundPackets1_9.CUSTOM_PAYLOAD, new PacketHandlers() {
             @Override

@@ -18,21 +18,23 @@
 package com.viaversion.viarewind.protocol.v1_9to1_8.cooldown;
 
 import com.viaversion.viarewind.protocol.v1_9to1_8.Protocol1_9To1_8;
+import com.viaversion.viarewind.protocol.v1_9to1_8.storage.LastTitle;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.libs.gson.JsonPrimitive;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_8;
-import java.util.function.Consumer;
 
 public class TitleCooldownVisualization implements CooldownVisualization {
 
-    private static final int ACTION_SET_TITLE = 0;
-    private static final int ACTION_SET_SUBTITLE = 1;
-    private static final int ACTION_SET_TIMES_AND_DISPLAY = 2;
-    private static final int ACTION_HIDE = 3;
+    public static final int ACTION_SET_TITLE = 0;
+    public static final int ACTION_SET_SUBTITLE = 1;
+    public static final int ACTION_SET_TIMES_AND_DISPLAY = 2;
+    public static final int ACTION_HIDE = 3;
+    public static final int ACTION_RESET = 4;
 
     private final UserConnection user;
+    private boolean visible;
 
     public TitleCooldownVisualization(UserConnection user) {
         this.user = user;
@@ -40,28 +42,71 @@ public class TitleCooldownVisualization implements CooldownVisualization {
 
     @Override
     public void show(double progress) throws Exception {
-        final String text = CooldownVisualization.buildProgressText("˙", progress);
+        final LastTitle title = this.user.get(LastTitle.class);
+        if (this.visible && title.isVisible()) {
+            this.restoreTitle(title);
+            return;
+        }
 
-        sendTitlePacket(ACTION_SET_TITLE, wrapper -> wrapper.write(Types.COMPONENT, new JsonPrimitive("")));
-        sendTitlePacket(ACTION_SET_SUBTITLE, wrapper -> wrapper.write(Types.COMPONENT, new JsonPrimitive(text)));
-        sendTitlePacket(ACTION_SET_TIMES_AND_DISPLAY, wrapper -> {
-            wrapper.write(Types.INT, 0);
-            wrapper.write(Types.INT, 2);
-            wrapper.write(Types.INT, 5);
-        });
+        final PacketWrapper setTitle = PacketWrapper.create(ClientboundPackets1_8.SET_TITLES, user);
+        setTitle.write(Types.VAR_INT, ACTION_SET_TITLE);
+        setTitle.write(Types.COMPONENT, new JsonPrimitive(""));
+        setTitle.send(Protocol1_9To1_8.class);
+
+        final PacketWrapper setSubtitle = PacketWrapper.create(ClientboundPackets1_8.SET_TITLES, user);
+        setSubtitle.write(Types.VAR_INT, ACTION_SET_SUBTITLE);
+        setSubtitle.write(Types.COMPONENT, new JsonPrimitive(CooldownVisualization.buildProgressText("˙", progress)));
+        setSubtitle.send(Protocol1_9To1_8.class);
+
+        final PacketWrapper setTitleTimes = PacketWrapper.create(ClientboundPackets1_8.SET_TITLES, user);
+        setTitleTimes.write(Types.VAR_INT, ACTION_SET_TIMES_AND_DISPLAY);
+        setTitleTimes.write(Types.INT, 0);
+        setTitleTimes.write(Types.INT, 2);
+        setTitleTimes.write(Types.INT, 5);
+        setTitleTimes.send(Protocol1_9To1_8.class);
+        this.visible = true;
     }
 
     @Override
     public void hide() throws Exception {
-        sendTitlePacket(ACTION_HIDE, wrapper -> {
-        });
+        if (!this.visible) {
+            return;
+        }
+
+        final LastTitle title = this.user.get(LastTitle.class);
+        if (title.isVisible()) {
+            this.restoreTitle(title);
+            return;
+        }
+
+        final PacketWrapper hideTitle = PacketWrapper.create(ClientboundPackets1_8.SET_TITLES, user);
+        hideTitle.write(Types.VAR_INT, ACTION_HIDE);
+        hideTitle.send(Protocol1_9To1_8.class);
+        this.visible = false;
     }
 
-    private void sendTitlePacket(int action, Consumer<PacketWrapper> writer) {
-        final PacketWrapper title = PacketWrapper.create(ClientboundPackets1_8.SET_TITLES, user);
-        title.write(Types.VAR_INT, action);
-        writer.accept(title);
-        title.scheduleSend(Protocol1_9To1_8.class);
+    private void restoreTitle(final LastTitle title) {
+        final PacketWrapper setTitleTimes = PacketWrapper.create(ClientboundPackets1_8.SET_TITLES, user);
+        setTitleTimes.write(Types.VAR_INT, ACTION_SET_TIMES_AND_DISPLAY);
+        final int[] times = title.remainingTimes();
+        setTitleTimes.write(Types.INT, times[0]);
+        setTitleTimes.write(Types.INT, times[1]);
+        setTitleTimes.write(Types.INT, times[2]);
+        setTitleTimes.send(Protocol1_9To1_8.class);
+
+        if (title.subtitle() != null) {
+            final PacketWrapper setSubtitle = PacketWrapper.create(ClientboundPackets1_8.SET_TITLES, user);
+            setSubtitle.write(Types.VAR_INT, ACTION_SET_SUBTITLE);
+            setSubtitle.write(Types.COMPONENT, title.subtitle());
+            setSubtitle.send(Protocol1_9To1_8.class);
+        }
+
+        final PacketWrapper setTitle = PacketWrapper.create(ClientboundPackets1_8.SET_TITLES, user);
+        setTitle.write(Types.VAR_INT, ACTION_SET_TITLE);
+        setTitle.write(Types.COMPONENT, title.title());
+        setTitle.send(Protocol1_9To1_8.class);
+
+        this.visible = false;
     }
 
 }
