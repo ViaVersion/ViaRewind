@@ -84,7 +84,7 @@ public class BlockItemPacketRewriter1_9 extends VRBlockItemRewriter<ClientboundP
 
             final WindowTracker tracker = wrapper.user().get(WindowTracker.class);
             tracker.put(windowId, windowType);
-            tracker.openWindow(windowId, clientInventorySize(windowType, slotCount));
+            tracker.openWindow(windowId, windowType, slotCount);
         });
 
         protocol.registerClientbound(ClientboundPackets1_9.CONTAINER_SET_CONTENT, wrapper -> {
@@ -128,9 +128,11 @@ public class BlockItemPacketRewriter1_9 extends VRBlockItemRewriter<ClientboundP
                     // Foreign container open: 1.8 only applies player-inv changes through it (main=size.., hotbar=size+27..).
                     final int size = tracker.openWindowSize();
                     final int containerSlot;
-                    if (slot >= 0 && slot <= 8) containerSlot = size + 27 + slot;
-                    else if (slot >= 9 && slot <= 35) containerSlot = size + slot - 9;
-                    else { // armor/offhand: no slot in a foreign container
+                    if (slot >= 0 && slot <= 8) {
+                        containerSlot = size + 27 + slot;
+                    } else if (slot >= 9 && slot <= 35) {
+                        containerSlot = size + slot - 9;
+                    } else { // armor/offhand: no slot in a foreign container
                         wrapper.cancel();
                         return;
                     }
@@ -138,12 +140,16 @@ public class BlockItemPacketRewriter1_9 extends VRBlockItemRewriter<ClientboundP
                     wrapper.set(Types.SHORT, 0, (short) containerSlot);
                     return;
                 }
+
                 // Otherwise window 0 with the menu slot.
                 final int windowSlot;
-                if (slot >= 0 && slot <= 8) windowSlot = slot + 36;
-                else if (slot >= 9 && slot <= 35) windowSlot = slot;
-                else if (slot >= 36 && slot <= 39) windowSlot = 44 - slot;
-                else { // offhand/body/saddle: no 1.8 equivalent
+                if (slot >= 0 && slot <= 8) {
+                    windowSlot = slot + 36;
+                } else if (slot >= 9 && slot <= 35) {
+                    windowSlot = slot;
+                } else if (slot >= 36 && slot <= 39) {
+                    windowSlot = 44 - slot;
+                } else { // offhand/body/saddle: no 1.8 equivalent
                     wrapper.cancel();
                     return;
                 }
@@ -151,10 +157,12 @@ public class BlockItemPacketRewriter1_9 extends VRBlockItemRewriter<ClientboundP
                 wrapper.set(Types.SHORT, 0, (short) windowSlot);
                 return;
             }
+
             if (windowId == 0 && slot == 45) {
                 wrapper.cancel();
                 return;
             }
+
             final WindowTracker windowTracker = wrapper.user().get(WindowTracker.class);
             final String windowType = windowTracker.get(windowId);
             if (windowType != null && windowType.equalsIgnoreCase("minecraft:brewing_stand")) {
@@ -225,22 +233,6 @@ public class BlockItemPacketRewriter1_9 extends VRBlockItemRewriter<ClientboundP
         enchantmentRewriter = new LegacyEnchantmentRewriter(nbtTagName());
         enchantmentRewriter.registerEnchantment(9, "§7Frost Walker");
         enchantmentRewriter.registerEnchantment(70, "§7Mending");
-    }
-
-    static int clientInventorySize(String windowType, int packetSlotCount) {
-        // The client only uses the packet's slot count when constructing dynamic inventories.
-        // Fixed menus construct their own slots; use the translated 1.8 layout for those.
-        return switch (windowType) {
-            case "minecraft:furnace", "minecraft:villager", "minecraft:anvil" -> 3;
-            case "minecraft:brewing_stand" -> 4;
-            case "minecraft:beacon" -> 1;
-            case "minecraft:dispenser", "minecraft:dropper" -> 9;
-            case "minecraft:enchanting_table" -> 2;
-            case "minecraft:crafting_table" -> 10;
-            case "minecraft:hopper" -> packetSlotCount;
-            case "EntityHorse" -> packetSlotCount > 2 ? 17 : 2;
-            default -> packetSlotCount / 9 * 9;
-        };
     }
 
     @Override
