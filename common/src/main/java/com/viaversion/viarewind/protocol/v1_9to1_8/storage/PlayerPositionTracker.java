@@ -88,8 +88,8 @@ public class PlayerPositionTracker implements StorableObject {
         return !this.pendingTeleports.isEmpty();
     }
 
-    public void queueTeleport(final int id, final double x, final double y, final double z, final float yaw, final float pitch) {
-        this.pendingTeleports.add(new PendingTeleport(id, x, y, z, yaw, pitch));
+    public void queueTeleport(final int id, final double x, final double y, final double z, final float yaw, final float pitch, final boolean viewRelative) {
+        this.pendingTeleports.add(new PendingTeleport(id, x, y, z, yaw, pitch, viewRelative));
     }
 
     public PendingTeleport peekTeleport() {
@@ -100,7 +100,7 @@ public class PlayerPositionTracker implements StorableObject {
         this.pendingTeleports.poll();
     }
 
-    public record PendingTeleport(int id, double x, double y, double z, float yaw, float pitch) {
+    public record PendingTeleport(int id, double x, double y, double z, float yaw, float pitch, boolean viewRelative) {
     }
 
 }
