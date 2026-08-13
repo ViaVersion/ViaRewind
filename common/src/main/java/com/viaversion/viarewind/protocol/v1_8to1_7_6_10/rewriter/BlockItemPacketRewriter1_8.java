@@ -113,7 +113,7 @@ public class BlockItemPacketRewriter1_8 extends VRBlockItemRewriter<ClientboundP
                     final Item item = wrapper.get(RewindTypes.COMPRESSED_NBT_ITEM, 0);
                     playerSession.setPlayerEquipment(wrapper.user().getProtocolInfo().getUuid(), item, 8 - slot);
 
-                    final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_7_6_10.class);
+                    final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(protocol);
                     if (tracker.isSpectator()) { // Spectator mode didn't exist in 1.7.10
                         wrapper.cancel();
                     }
@@ -148,7 +148,7 @@ public class BlockItemPacketRewriter1_8 extends VRBlockItemRewriter<ClientboundP
                     if (windowId != 0) {
                         return;
                     }
-                    final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_7_6_10.class);
+                    final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(protocol);
                     final UUID userId = wrapper.user().getProtocolInfo().getUuid();
 
                     final Item[] items = wrapper.get(RewindTypes.COMPRESSED_NBT_ITEM_ARRAY, 0);

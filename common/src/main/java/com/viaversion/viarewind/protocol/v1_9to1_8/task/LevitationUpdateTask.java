@@ -44,7 +44,7 @@ public class LevitationUpdateTask implements Runnable {
             }
 
             final PacketWrapper velocityPacket = PacketWrapper.create(ClientboundPackets1_8.SET_ENTITY_MOTION, connection);
-            velocityPacket.write(Types.VAR_INT, connection.getEntityTracker(Protocol1_9To1_8.class).clientEntityId());
+            velocityPacket.write(Types.VAR_INT, connection.storables(Protocol1_9To1_8.class).entityTracker().clientEntityId());
             velocityPacket.write(Types.SHORT, (short) 0);
             velocityPacket.write(Types.SHORT, (short) ((levitation.getAmplifier() + 1) * 360));
             velocityPacket.write(Types.SHORT, (short) 0);

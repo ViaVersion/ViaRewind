@@ -76,7 +76,7 @@ public class EntityPacketRewriter1_8 extends VREntityRewriter<ClientboundPackets
                         }
                     }
 
-                    final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_7_6_10.class);
+                    final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(protocol);
                     tracker.addPlayer(entityId, wrapper.user().getProtocolInfo().getUuid());
 
                     tracker.setClientEntityGameMode(wrapper.get(Types.UNSIGNED_BYTE, 0));
@@ -275,7 +275,7 @@ public class EntityPacketRewriter1_8 extends VREntityRewriter<ClientboundPackets
                         final byte pitch = wrapper.get(Types.BYTE, 1);
                         final byte yaw = wrapper.get(Types.BYTE, 0);
                         final byte headYaw = wrapper.get(Types.BYTE, 2);
-                        final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_7_6_10.class);
+                        final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(protocol);
                         final VirtualHologramEntity hologram = tracker.getHolograms().get(entityId);
 
                         hologram.setPosition(x / 32.0, y / 32.0, z / 32.0);
@@ -314,7 +314,7 @@ public class EntityPacketRewriter1_8 extends VREntityRewriter<ClientboundPackets
 
                     final int entityId = wrapper.get(Types.VAR_INT, 0);
 
-                    final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_7_6_10.class);
+                    final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(protocol);
                     if (gameProfile != null && gameProfile.gamemode == 3) { // Spectator mode
                         for (short i = 0; i < 5; i++) {
                             final PacketWrapper entityEquipment = PacketWrapper.create(ClientboundPackets1_7_2_5.SET_EQUIPPED_ITEM, wrapper.user());
@@ -354,7 +354,7 @@ public class EntityPacketRewriter1_8 extends VREntityRewriter<ClientboundPackets
                 handler(wrapper -> protocol.getItemRewriter().handleItemToClient(wrapper.user(), wrapper.get(RewindTypes.COMPRESSED_NBT_ITEM, 0)));
 
                 handler(wrapper -> {
-                    final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_7_6_10.class);
+                    final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(protocol);
                     final int id = wrapper.get(Types.INT, 0);
 
                     final int limit = tracker.clientEntityId() == id ? 3 : 4;
@@ -364,7 +364,7 @@ public class EntityPacketRewriter1_8 extends VREntityRewriter<ClientboundPackets
                 });
 
                 handler(wrapper -> {
-                    final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_7_6_10.class);
+                    final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(protocol);
                     final short slot = wrapper.get(Types.SHORT, 0);
                     final UUID uuid = tracker.getPlayerUUID(wrapper.get(Types.INT, 0));
                     if (uuid == null) {
@@ -396,7 +396,7 @@ public class EntityPacketRewriter1_8 extends VREntityRewriter<ClientboundPackets
                 map(Types.VAR_INT, Types.INT); // Collected Entity id
                 map(Types.VAR_INT, Types.INT); // Collector Entity id
 
-                handler(wrapper -> wrapper.user().getEntityTracker(Protocol1_8To1_7_6_10.class).removeEntity(wrapper.get(Types.INT, 0)));
+                handler(wrapper -> wrapper.user().getEntityTracker(protocol).removeEntity(wrapper.get(Types.INT, 0)));
             }
         });
 
@@ -424,7 +424,7 @@ public class EntityPacketRewriter1_8 extends VREntityRewriter<ClientboundPackets
                 read(Types.BOOLEAN); // On ground
 
                 handler(wrapper -> {
-                    final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_7_6_10.class);
+                    final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(protocol);
 
                     final VirtualHologramEntity hologram = tracker.getHolograms().get(wrapper.get(Types.INT, 0));
                     if (hologram != null) {
@@ -448,7 +448,7 @@ public class EntityPacketRewriter1_8 extends VREntityRewriter<ClientboundPackets
                 read(Types.BOOLEAN); // On ground
 
                 handler(wrapper -> {
-                    final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_7_6_10.class);
+                    final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(protocol);
 
                     final VirtualHologramEntity hologram = tracker.getHolograms().get(wrapper.get(Types.INT, 0));
                     if (hologram != null) {
@@ -474,7 +474,7 @@ public class EntityPacketRewriter1_8 extends VREntityRewriter<ClientboundPackets
                 read(Types.BOOLEAN); // On ground
 
                 handler(wrapper -> {
-                    final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_7_6_10.class);
+                    final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(protocol);
 
                     final VirtualHologramEntity hologram = tracker.getHolograms().get(wrapper.get(Types.INT, 0));
                     if (hologram != null) {
@@ -506,7 +506,7 @@ public class EntityPacketRewriter1_8 extends VREntityRewriter<ClientboundPackets
                 handler(wrapper -> {
                     final int entityId = wrapper.get(Types.INT, 0);
 
-                    final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_7_6_10.class);
+                    final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(protocol);
                     if (tracker.entityType(entityId) == EntityTypes1_8.EntityType.ABSTRACT_MINECART) { // TODO | Realign all entities?
                         int y = wrapper.get(Types.INT, 2);
                         y += 12;
@@ -537,7 +537,7 @@ public class EntityPacketRewriter1_8 extends VREntityRewriter<ClientboundPackets
                 map(Types.BYTE); // Head yaw
 
                 handler(wrapper -> {
-                    final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_7_6_10.class);
+                    final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(protocol);
 
                     final VirtualHologramEntity hologram = tracker.getHolograms().get(wrapper.get(Types.INT, 0));
                     if (hologram != null) {
@@ -559,7 +559,7 @@ public class EntityPacketRewriter1_8 extends VREntityRewriter<ClientboundPackets
                 handler(wrapper -> {
                     final boolean leash = wrapper.get(Types.BOOLEAN, 0);
                     if (!leash) {
-                        final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_7_6_10.class);
+                        final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(protocol);
 
                         final int passenger = wrapper.get(Types.INT, 0);
                         final int vehicle = wrapper.get(Types.INT, 1);
@@ -594,7 +594,7 @@ public class EntityPacketRewriter1_8 extends VREntityRewriter<ClientboundPackets
             public void register() {
                 map(Types.VAR_INT, Types.INT); // Entity id
                 handler(wrapper -> {
-                    final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_7_6_10.class);
+                    final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(protocol);
                     if (tracker.getHolograms().containsKey(wrapper.get(Types.INT, 0))) { // Don't handle properties for hologram emulation
                         wrapper.cancel();
                         return;

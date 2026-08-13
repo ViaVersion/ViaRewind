@@ -47,7 +47,7 @@ public class WorldPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6_10> 
     @Override
     protected void registerPackets() {
         protocol.registerClientbound(ClientboundPackets1_8.LEVEL_CHUNK, wrapper -> {
-            final ClientWorld world = wrapper.user().getClientWorld(Protocol1_8To1_7_6_10.class);
+            final ClientWorld world = wrapper.user().storables(protocol).clientWorld();
             final Chunk chunk = wrapper.read(ChunkType1_8.forEnvironment(world.getEnvironment()));
             protocol.getItemRewriter().handleChunk(chunk);
 

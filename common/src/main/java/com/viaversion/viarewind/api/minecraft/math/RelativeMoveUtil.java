@@ -17,17 +17,13 @@
  */
 package com.viaversion.viarewind.api.minecraft.math;
 
-import com.viaversion.viarewind.protocol.v1_9to1_8.Protocol1_9To1_8;
 import com.viaversion.viarewind.protocol.v1_9to1_8.storage.EntityTracker1_9;
-import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.Vector;
 
 @Deprecated // ?????????
 public class RelativeMoveUtil {
 
-    public static Vector[] calculateRelativeMoves(UserConnection user, int entityId, int relX, int relY, int relZ) {
-        EntityTracker1_9 tracker = user.getEntityTracker(Protocol1_9To1_8.class);
-
+    public static Vector[] calculateRelativeMoves(EntityTracker1_9 tracker, int entityId, int relX, int relY, int relZ) {
         int x;
         int y;
         int z;

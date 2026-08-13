@@ -128,13 +128,13 @@ public class PlayerPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6_10>
                         }
                     }
 
-                    final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_7_6_10.class);
+                    final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(protocol);
                     tracker.setClientEntityGameMode(wrapper.get(Types.UNSIGNED_BYTE, 1));
 
                     final int dimension = wrapper.get(Types.INT, 0);
 
                     // Clear entities on dimension change and re-track player
-                    final ClientWorld world = wrapper.user().getClientWorld(Protocol1_8To1_7_6_10.class);
+                    final ClientWorld world = wrapper.user().storables(protocol).clientWorld();
                     if (world.setEnvironment(dimension)) {
                         tracker.clearEntities();
                         tracker.addPlayer(tracker.clientEntityId(), wrapper.user().getProtocolInfo().getUuid());
@@ -195,7 +195,7 @@ public class PlayerPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6_10>
 
                     wrapper.write(Types.BOOLEAN, playerSession.onGround);
 
-                    final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_7_6_10.class);
+                    final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(protocol);
                     if (!Objects.equals(tracker.spectatingClientEntityId, tracker.clientEntityIdOrNull())) {
                         wrapper.cancel();
                     }
@@ -221,7 +221,7 @@ public class PlayerPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6_10>
                     if (wrapper.get(Types.UNSIGNED_BYTE, 0) != 3) return; // Change game mode
                     int gameMode = wrapper.get(Types.FLOAT, 0).intValue();
 
-                    final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_7_6_10.class);
+                    final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(protocol);
                     if (gameMode == 3 || tracker.isSpectator()) {
                         UUID myId = wrapper.user().getProtocolInfo().getUuid();
                         Item[] equipment = new Item[4];
@@ -293,7 +293,7 @@ public class PlayerPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6_10>
                     }
 
                     if (gamemode == 3 || gameProfile.gamemode == 3) {
-                        EntityTracker1_8 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_7_6_10.class);
+                        EntityTracker1_8 tracker = wrapper.user().getEntityTracker(protocol);
                         int entityId = tracker.getPlayerEntityId(uuid);
                         boolean isOwnPlayer = entityId == tracker.clientEntityId();
                         if (entityId != -1) {
@@ -446,7 +446,7 @@ public class PlayerPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6_10>
             wrapper.cancel();
             final int entityId = wrapper.read(Types.VAR_INT);
 
-            final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_7_6_10.class);
+            final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(protocol);
             if (tracker.spectatingClientEntityId != entityId) {
                 tracker.setSpectating(entityId);
             }
@@ -507,7 +507,7 @@ public class PlayerPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6_10>
 
         protocol.registerServerbound(ServerboundPackets1_7_2_5.CHAT, wrapper -> {
             final String message = wrapper.passthrough(Types.STRING);
-            final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_7_6_10.class);
+            final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(protocol);
             if (tracker.isSpectator() && message.toLowerCase().startsWith("/stp ")) { // TODO add setting
                 String username = message.split(" ")[1];
                 final GameProfileStorage storage = wrapper.user().get(GameProfileStorage.class);
@@ -536,7 +536,7 @@ public class PlayerPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6_10>
                 map(Types.BYTE, Types.VAR_INT); // Mode
                 handler(wrapper -> {
                     final int mode = wrapper.get(Types.VAR_INT, 1);
-                    final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_7_6_10.class);
+                    final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(protocol);
                     final int entityId = tracker.getHologramIdWithExtra(wrapper.get(Types.VAR_INT, 0));
                     final PlayerSessionStorage position = wrapper.user().get(PlayerSessionStorage.class);
 
@@ -709,7 +709,7 @@ public class PlayerPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6_10>
                     if (!unmount) {
                         return;
                     }
-                    final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_7_6_10.class);
+                    final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(protocol);
                     if (tracker.spectatingClientEntityId != tracker.clientEntityId()) {
                         PacketWrapper sneakPacket = PacketWrapper.create(ServerboundPackets1_8.PLAYER_COMMAND, wrapper.user());
                         sneakPacket.write(Types.VAR_INT, tracker.clientEntityId());

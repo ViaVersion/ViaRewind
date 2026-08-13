@@ -35,6 +35,7 @@ import com.viaversion.viarewind.protocol.v1_9to1_8.storage.WindowTracker;
 import com.viaversion.viarewind.protocol.v1_9to1_8.task.CooldownIndicatorTask;
 import com.viaversion.viarewind.protocol.v1_9to1_8.task.LevitationUpdateTask;
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.connection.ProtocolStorables;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.platform.providers.ViaProviders;
@@ -81,8 +82,9 @@ public class Protocol1_9To1_8 extends BackwardsProtocol<ClientboundPackets1_9, C
 
     @Override
     public void init(UserConnection connection) {
-        connection.addEntityTracker(this.getClass(), new EntityTracker1_9(connection));
-        connection.addClientWorld(this.getClass(), new ClientWorld());
+        final ProtocolStorables storables = connection.storables(this);
+        storables.setEntityTracker(new EntityTracker1_9(connection));
+        storables.setClientWorld(new ClientWorld());
 
         connection.put(new WindowTracker(connection));
         connection.put(new LevitationStorage());

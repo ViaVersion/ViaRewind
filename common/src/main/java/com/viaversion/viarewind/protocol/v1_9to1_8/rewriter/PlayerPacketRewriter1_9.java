@@ -205,11 +205,11 @@ public class PlayerPacketRewriter1_9 extends RewriterBase<Protocol1_9To1_8> {
             public void register() {
                 map(Types.INT); // Dimension
                 handler(wrapper -> {
-                    final ClientWorld world = wrapper.user().getClientWorld(Protocol1_9To1_8.class);
+                    final ClientWorld world = wrapper.user().storables(protocol).clientWorld();
                     final int dimension = wrapper.get(Types.INT, 0);
 
                     if (world.setEnvironment(dimension)) {
-                        final EntityTracker tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
+                        final EntityTracker tracker = wrapper.user().getEntityTracker(protocol);
                         tracker.clearEntities();
                         wrapper.user().get(BossBarStorage.class).reset();
                     }
@@ -228,7 +228,7 @@ public class PlayerPacketRewriter1_9 extends RewriterBase<Protocol1_9To1_8> {
                 return;
             }
 
-            final EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
+            final EntityTracker1_9 tracker = wrapper.user().getEntityTracker(protocol);
             final int entityId = wrapper.passthrough(Types.VAR_INT);
             wrapper.passthrough(Types.INT); // Killer id
 
@@ -298,7 +298,7 @@ public class PlayerPacketRewriter1_9 extends RewriterBase<Protocol1_9To1_8> {
                 handler(wrapper -> {
                     wrapper.user().get(PlayerPositionTracker.class).sendAnimations();
 
-                    final EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
+                    final EntityTracker1_9 tracker = wrapper.user().getEntityTracker(protocol);
                     if (tracker.isInsideVehicle(tracker.clientEntityId())) {
                         wrapper.cancel();
                     }
@@ -461,7 +461,7 @@ public class PlayerPacketRewriter1_9 extends RewriterBase<Protocol1_9To1_8> {
             final float sideways = wrapper.passthrough(Types.FLOAT);
             final float forward = wrapper.passthrough(Types.FLOAT);
 
-            final EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
+            final EntityTracker1_9 tracker = wrapper.user().getEntityTracker(protocol);
             final Integer vehicle = tracker.getVehicle(tracker.clientEntityId());
 
             if (vehicle != null && tracker.entityType(vehicle) == EntityTypes1_9.EntityType.BOAT) {
@@ -511,7 +511,7 @@ public class PlayerPacketRewriter1_9 extends RewriterBase<Protocol1_9To1_8> {
                     final short flags = wrapper.get(Types.UNSIGNED_BYTE, 0);
 
                     final PacketWrapper updateSkin = PacketWrapper.create(ClientboundPackets1_8.SET_ENTITY_DATA, wrapper.user());
-                    updateSkin.write(Types.VAR_INT, wrapper.user().getEntityTracker(Protocol1_9To1_8.class).clientEntityId());
+                    updateSkin.write(Types.VAR_INT, wrapper.user().getEntityTracker(protocol).clientEntityId());
 
                     final List<EntityData> entityData = new ArrayList<>();
                     entityData.add(new EntityData(10, EntityDataTypes1_8.BYTE, (byte) flags));

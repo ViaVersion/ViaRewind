@@ -38,6 +38,7 @@ import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.storage.ScoreboardTracke
 import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.storage.WorldBorderEmulator;
 import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.task.WorldBorderUpdateTask;
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.connection.ProtocolStorables;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.platform.providers.ViaProviders;
@@ -122,8 +123,9 @@ public class Protocol1_8To1_7_6_10 extends BackwardsProtocol<ClientboundPackets1
 
     @Override
     public void init(UserConnection connection) {
-        connection.addEntityTracker(this.getClass(), new EntityTracker1_8(connection));
-        connection.addClientWorld(this.getClass(), new ClientWorld());
+        final ProtocolStorables storables = connection.storables(this);
+        storables.setEntityTracker(new EntityTracker1_8(connection));
+        storables.setClientWorld(new ClientWorld());
 
         connection.put(new InventoryTracker(connection));
         connection.put(new PlayerSessionStorage(connection));

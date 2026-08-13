@@ -113,7 +113,7 @@ public class WorldPacketRewriter1_9 extends RewriterBase<Protocol1_9To1_8> {
             @Override
             public void register() {
                 handler(wrapper -> {
-                    final Environment environment = wrapper.user().getClientWorld(Protocol1_9To1_8.class).getEnvironment();
+                    final Environment environment = wrapper.user().storables(protocol).clientWorld().getEnvironment();
 
                     final int chunkX = wrapper.read(Types.INT);
                     final int chunkZ = wrapper.read(Types.INT);
@@ -127,7 +127,7 @@ public class WorldPacketRewriter1_9 extends RewriterBase<Protocol1_9To1_8> {
             @Override
             public void register() {
                 handler(wrapper -> {
-                    final Environment environment = wrapper.user().getClientWorld(Protocol1_9To1_8.class).getEnvironment();
+                    final Environment environment = wrapper.user().storables(protocol).clientWorld().getEnvironment();
 
                     Chunk chunk = wrapper.read(ChunkType1_9_1.forEnvironment(environment));
 

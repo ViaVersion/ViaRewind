@@ -68,7 +68,7 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
             final int dimension = wrapper.passthrough(Types.BYTE);
 
             trackPlayer(wrapper.user(), entityId);
-            final ClientWorld clientWorld = wrapper.user().getClientWorld(Protocol1_9To1_8.class);
+            final ClientWorld clientWorld = wrapper.user().storables(protocol).clientWorld();
             clientWorld.setEnvironment(dimension);
         });
         protocol.registerClientbound(ClientboundPackets1_9.SET_ENTITY_DATA, wrapper -> {
@@ -177,7 +177,7 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
                 map(Types.SHORT); // Count
                 handler(wrapper -> {
                     final int entityId = wrapper.get(Types.VAR_INT, 0);
-                    wrapper.user().getEntityTracker(Protocol1_9To1_8.class).addEntity(entityId, EntityTypes1_9.EntityType.EXPERIENCE_ORB);
+                    wrapper.user().getEntityTracker(protocol).addEntity(entityId, EntityTypes1_9.EntityType.EXPERIENCE_ORB);
                 });
             }
         });
@@ -192,7 +192,7 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
                 map(Types.DOUBLE, Protocol1_9To1_8.DOUBLE_TO_INT_TIMES_32); // Z
                 handler(wrapper -> {
                     final int entityId = wrapper.get(Types.VAR_INT, 0);
-                    wrapper.user().getEntityTracker(Protocol1_9To1_8.class).addEntity(entityId, EntityTypes1_9.EntityType.LIGHTNING_BOLT);
+                    wrapper.user().getEntityTracker(protocol).addEntity(entityId, EntityTypes1_9.EntityType.LIGHTNING_BOLT);
                 });
             }
         });
@@ -229,7 +229,7 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
                 map(Types.BYTE, Types.UNSIGNED_BYTE); // Direction
                 handler(wrapper -> {
                     final int entityId = wrapper.get(Types.VAR_INT, 0);
-                    wrapper.user().getEntityTracker(Protocol1_9To1_8.class).addEntity(entityId, EntityTypes1_9.EntityType.PAINTING);
+                    wrapper.user().getEntityTracker(protocol).addEntity(entityId, EntityTypes1_9.EntityType.PAINTING);
                 });
             }
         });
@@ -272,7 +272,7 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
             final int deltaY = wrapper.read(Types.SHORT);
             final int deltaZ = wrapper.read(Types.SHORT);
 
-            final Vector[] moves = RelativeMoveUtil.calculateRelativeMoves(wrapper.user(), entityId, deltaX, deltaY, deltaZ);
+            final Vector[] moves = RelativeMoveUtil.calculateRelativeMoves(tracker(wrapper.user()), entityId, deltaX, deltaY, deltaZ);
 
             wrapper.write(Types.BYTE, (byte) moves[0].blockX());
             wrapper.write(Types.BYTE, (byte) moves[0].blockY());
@@ -298,7 +298,7 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
             final int deltaY = wrapper.read(Types.SHORT);
             final int deltaZ = wrapper.read(Types.SHORT);
 
-            final Vector[] moves = RelativeMoveUtil.calculateRelativeMoves(wrapper.user(), entityId, deltaX, deltaY, deltaZ);
+            final Vector[] moves = RelativeMoveUtil.calculateRelativeMoves(tracker(wrapper.user()), entityId, deltaX, deltaY, deltaZ);
 
             wrapper.write(Types.BYTE, (byte) moves[0].blockX());
             wrapper.write(Types.BYTE, (byte) moves[0].blockY());
@@ -308,7 +308,7 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
             final byte pitch = wrapper.passthrough(Types.BYTE);
             final boolean onGround = wrapper.passthrough(Types.BOOLEAN);
 
-            com.viaversion.viaversion.api.minecraft.entities.EntityType type = wrapper.user().getEntityTracker(Protocol1_9To1_8.class).entityType(entityId);
+            com.viaversion.viaversion.api.minecraft.entities.EntityType type = wrapper.user().getEntityTracker(protocol).entityType(entityId);
             if (type == EntityTypes1_9.EntityType.BOAT) {
                 yaw -= 64;
                 wrapper.set(Types.BYTE, 3, yaw);
@@ -330,7 +330,7 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
 
         protocol.registerClientbound(ClientboundPackets1_9.MOVE_ENTITY_ROT, wrapper -> {
             final int entityId = wrapper.passthrough(Types.VAR_INT);
-            final com.viaversion.viaversion.api.minecraft.entities.EntityType type = wrapper.user().getEntityTracker(Protocol1_9To1_8.class).entityType(entityId);
+            final com.viaversion.viaversion.api.minecraft.entities.EntityType type = wrapper.user().getEntityTracker(protocol).entityType(entityId);
             if (type == EntityTypes1_9.EntityType.BOAT) {
                 byte yaw = wrapper.read(Types.BYTE);
                 yaw -= 64;
@@ -342,7 +342,7 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
             @Override
             public void register() {
                 handler(wrapper -> {
-                    final EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
+                    final EntityTracker1_9 tracker = wrapper.user().getEntityTracker(protocol);
                     final Integer vehicle = tracker.getVehicle(tracker.clientEntityId());
                     if (vehicle == null) {
                         wrapper.cancel();
@@ -373,7 +373,7 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
                     }
 
                     final int entityId = wrapper.get(Types.VAR_INT, 0);
-                    final EntityType type = wrapper.user().getEntityTracker(Protocol1_9To1_8.class).entityType(entityId);
+                    final EntityType type = wrapper.user().getEntityTracker(protocol).entityType(entityId);
                     if (type == EntityTypes1_9.EntityType.BOAT) {
                         byte yaw = wrapper.get(Types.BYTE, 0);
                         yaw -= 64;
@@ -392,7 +392,7 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
             if (effectId > 23) { // Throw away new effects
                 wrapper.cancel();
             }
-            final EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
+            final EntityTracker1_9 tracker = wrapper.user().getEntityTracker(protocol);
             if (effectId == 25 && entityId == tracker.clientEntityId()) {
                 wrapper.user().get(LevitationStorage.class).setActive(false);
             }
@@ -429,7 +429,7 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
         protocol.registerClientbound(ClientboundPackets1_9.SET_PASSENGERS, null, wrapper -> {
             wrapper.cancel();
 
-            final EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
+            final EntityTracker1_9 tracker = wrapper.user().getEntityTracker(protocol);
             final int vehicle = wrapper.read(Types.VAR_INT);
             final IntList oldPassengers = tracker.getPassengers(vehicle);
 
@@ -483,7 +483,7 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
                 handler(wrapper -> {
                     final int entityId = wrapper.get(Types.VAR_INT, 0);
 
-                    final EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
+                    final EntityTracker1_9 tracker = wrapper.user().getEntityTracker(protocol);
                     final EntityTracker1_9.PendingPotionEntity pending = tracker.getPendingPotions().get(entityId);
                     if (pending != null) {
                         wrapper.cancel();
@@ -513,7 +513,7 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
         protocol.registerClientbound(ClientboundPackets1_9.UPDATE_ATTRIBUTES, wrapper -> {
             final int entityId = wrapper.passthrough(Types.VAR_INT);
 
-            final EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
+            final EntityTracker1_9 tracker = wrapper.user().getEntityTracker(protocol);
             final boolean player = entityId == tracker.clientEntityId();
 
             // Throw away new attributes and track attack speed
@@ -560,7 +560,7 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
             if (effectId > 23) { // Throw away new effects
                 wrapper.cancel();
             }
-            final EntityTracker1_9 tracker = wrapper.user().getEntityTracker(Protocol1_9To1_8.class);
+            final EntityTracker1_9 tracker = wrapper.user().getEntityTracker(protocol);
             if (effectId == 25 && entityId == tracker.clientEntityId()) {
                 final LevitationStorage levitation = wrapper.user().get(LevitationStorage.class);
                 levitation.setActive(true);
