@@ -38,6 +38,7 @@ import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.storage.InventoryTracker
 import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.storage.PlayerSessionStorage;
 import com.viaversion.viarewind.utils.ChatUtil;
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.minecraft.GameProfile;
 import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
@@ -637,6 +638,16 @@ public class PlayerPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6_10>
                 map(Types.BYTE); // Direction
                 map(RewindTypes.COMPRESSED_NBT_ITEM, Types.ITEM1_8); // Item
 
+                handler(wrapper -> {
+                    final BlockPosition position = wrapper.get(Types.BLOCK_POSITION1_8, 0);
+                    final byte direction = wrapper.get(Types.BYTE, 0);
+                    // 1.7 serializes the Y component as an unsigned byte, turning the
+                    // use-in-air position from (-1, -1, -1) into (-1, 255, -1).
+                    // we change that back to -1 for Y like 1.8 clients
+                    if (position.x() == -1 && position.y() == 255 && position.z() == -1 && direction == -1) {
+                        wrapper.set(Types.BLOCK_POSITION1_8, 0, new BlockPosition(-1, -1, -1));
+                    }
+                });
                 handler(wrapper -> protocol.getItemRewriter().handleItemToServer(wrapper.user(), wrapper.get(Types.ITEM1_8, 0)));
             }
         });
