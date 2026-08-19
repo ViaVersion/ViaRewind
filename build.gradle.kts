@@ -1,4 +1,9 @@
-import de.florianreuth.baseproject.*
+import de.florianreuth.baseproject.core.configureEmbeddedDependencies
+import de.florianreuth.baseproject.integration.branchName
+import de.florianreuth.baseproject.integration.latestCommitHash
+import de.florianreuth.baseproject.integration.latestCommitMessage
+import de.florianreuth.baseproject.setupProject
+import de.florianreuth.baseproject.setupViaPublishing
 
 plugins {
     `java-library`
@@ -13,7 +18,6 @@ allprojects {
     setupViaPublishing()
 
     repositories {
-        mavenCentral()
         maven("https://repo.viaversion.com")
         maven("https://repo.papermc.io/repository/maven-public")
         maven("https://maven.fabricmc.net")
@@ -40,11 +44,7 @@ subprojects {
 
 }
 
-base {
-    archivesName.set("ViaRewind")
-}
-
-val shade = configureShadedDependencies(false) // Only shade, don't add them as dependency
+val shade = configureEmbeddedDependencies()
 
 dependencies {
     subprojects.forEach {
