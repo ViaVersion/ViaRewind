@@ -4,12 +4,14 @@ import de.florianreuth.baseproject.integration.latestCommitHash
 import de.florianreuth.baseproject.integration.latestCommitMessage
 import de.florianreuth.baseproject.setupProject
 import de.florianreuth.baseproject.setupViaPublishing
+import net.raphimc.classtokenreplacer.extension.ClassTokenReplacerExtension
 
 plugins {
     `java-library`
     id("io.papermc.hangar-publish-plugin")
     id("com.modrinth.minotaur")
     id("de.florianreuth.baseproject")
+    id("net.raphimc.class-token-replacer") apply false
 }
 
 allprojects {
@@ -25,11 +27,22 @@ allprojects {
 
 }
 
+val commitHash = latestCommitHash()
+
 subprojects {
+
+    apply(plugin = "net.raphimc.class-token-replacer")
 
     dependencies {
         compileOnly("com.viaversion:viaversion:5.12.0-SNAPSHOT")
         compileOnly("com.viaversion:viabackwards:5.12.0-SNAPSHOT")
+    }
+
+    extensions.getByType<SourceSetContainer>().configureEach {
+        extensions.getByType(ClassTokenReplacerExtension::class.java).apply {
+            property("\${version}", project.version)
+            property("\${impl_version}", "git-ViaRewind-${project.version}:${commitHash}")
+        }
     }
 
     tasks {

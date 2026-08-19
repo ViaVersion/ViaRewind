@@ -1,9 +1,3 @@
-import de.florianreuth.baseproject.integration.latestCommitHash
-
-plugins {
-    id("net.raphimc.class-token-replacer")
-}
-
 val viaProxy: Configuration by configurations.creating
 
 dependencies {
@@ -13,15 +7,6 @@ dependencies {
 
     viaProxy("net.raphimc:ViaProxy:[3.0.0,4.0.0)") {
         isTransitive = false
-    }
-}
-
-sourceSets.configureEach {
-    classTokenReplacer {
-        replaceInPlace.set(true)
-
-        property("\${version}", project.version)
-        property("\${impl_version}", "git-ViaRewind-${project.version}:${latestCommitHash()}")
     }
 }
 
