@@ -45,6 +45,7 @@ import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_
 import com.viaversion.viaversion.rewriter.entitydata.EntityDataHandlerEvent;
 import com.viaversion.viaversion.util.IdAndData;
 import com.viaversion.viaversion.util.Pair;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -230,6 +231,65 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
                 handler(wrapper -> {
                     final int entityId = wrapper.get(Types.VAR_INT, 0);
                     wrapper.user().getEntityTracker(protocol).addEntity(entityId, EntityTypes1_9.EntityType.PAINTING);
+
+                    final BlockPosition position = wrapper.get(Types.BLOCK_POSITION1_8, 0);
+                    short dir = wrapper.get(Types.UNSIGNED_BYTE, 0);
+                    double width = 0, height = 0;
+                    switch (wrapper.get(Types.STRING, 0)) {
+                        case "Kebab", "Aztec", "Alban", "Aztec2", "Bomb", "Plant", "Wasteland" -> {
+                            width = 16;
+                            height = 16;
+                        }
+                        case "Pool", "Courbet", "Sea", "Sunset", "Creebet" -> {
+                            width = 32;
+                            height = 16;
+                        }
+                        case "Wanderer", "Graham" -> {
+                            width = 16;
+                            height = 32;
+                        }
+                        case "Match", "Bust", "Stage", "Void", "SkullAndRoses", "Wither" -> {
+                            width = 32;
+                            height = 32;
+                        }
+                        case "Fighters" -> {
+                            width = 64;
+                            height = 32;
+                        }
+                        case "Pointer", "Pigscene", "BurningSkull" -> {
+                            width = 64;
+                            height = 64;
+                        }
+                        case "Skeleton", "DonkeyKong" -> {
+                            width = 64;
+                            height = 48;
+                        }
+                    }
+
+                    // Calculate painting entity coords
+                    double resX = position.x() + 0.5, resY = position.y() + 0.5, resZ = position.z() + 0.5;
+                    double againstWall = -0.46875;
+                    switch (dir) {
+                        case 2 -> resZ -= againstWall; // North -z
+                        case 0 -> resZ += againstWall; // South +z
+                        case 1 -> resX -= againstWall; // West -x
+                        case 3 -> resX += againstWall; // East +x
+                    }
+
+                    double horizontalOffset = width % 32 == 0 ? 0.5 : 0.0;
+                    double verticalOffset = height % 32 == 0 ? 0.5 : 0.0;
+                    resY += verticalOffset;
+                    switch (dir) {
+                        case 3 -> resZ -= horizontalOffset; // East -> North -z
+                        case 1 -> resZ += horizontalOffset; // West -> South +z
+                        case 2 -> resX -= horizontalOffset; // North -> West -x
+                        case 0 -> resX += horizontalOffset; // South -> East +x
+                    }
+
+                    // Can't use the position from the spawn packet here, the same-block teleport bug
+                    // depends on the entity coordinates
+                    wrapper.user().<EntityTracker1_9>getEntityTracker(protocol).getPaintings().put(entityId,
+                            new BlockPosition((int) Math.floor(resX), (int) Math.floor(resY), (int) Math.floor(resZ)));
                 });
             }
         });
@@ -505,6 +565,20 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
                         y += 6;
                         wrapper.set(Types.INT, 1, y);
                     }
+
+                    if (tracker.entityType(entityId) == EntityTypes1_9.EntityType.PAINTING) {
+                        // Paintings break in 1.8 if teleported to the same block
+                        final BlockPosition storedPos = tracker.getPaintings().get(entityId);
+                        final int newX = Math.floorDiv(wrapper.get(Types.INT, 0), 32);
+                        final int newY = Math.floorDiv(wrapper.get(Types.INT, 1), 32);
+                        final int newZ = Math.floorDiv(wrapper.get(Types.INT, 2), 32);
+                        if (storedPos != null && newX == storedPos.x() && newY == storedPos.y() && newZ == storedPos.z()) {
+                            wrapper.cancel();
+                        } else {
+                            tracker.getPaintings().put(entityId, new BlockPosition(newX, newY, newZ));
+                        }
+                    }
+
                     tracker.resetEntityOffset(entityId);
                 });
             }
