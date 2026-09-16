@@ -604,6 +604,15 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
         addEntity.write(Types.SHORT, spawn.velocityY());
         addEntity.write(Types.SHORT, spawn.velocityZ());
         addEntity.send(Protocol1_9To1_8.class); // Before the entity data is sent
+
+        // 1.8 clients never apply a potion spawn's velocity - vanilla servers send it in a separate
+        // velocity packet after the spawn, so do the same
+        final PacketWrapper setEntityMotion = PacketWrapper.create(ClientboundPackets1_8.SET_ENTITY_MOTION, event.user());
+        setEntityMotion.write(Types.VAR_INT, event.entityId());
+        setEntityMotion.write(Types.SHORT, spawn.velocityX());
+        setEntityMotion.write(Types.SHORT, spawn.velocityY());
+        setEntityMotion.write(Types.SHORT, spawn.velocityZ());
+        setEntityMotion.send(Protocol1_9To1_8.class);
     }
 
     private void handleEntityData(EntityDataHandlerEvent event, EntityData entityData) {
