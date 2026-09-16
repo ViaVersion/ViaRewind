@@ -174,7 +174,7 @@ public class ScoreboardPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6
             }
 
             final ScoreboardTracker scoreboard = wrapper.user().get(ScoreboardTracker.class);
-            final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_7_6_10.class);
+            final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(protocol);
 
             final byte mode = wrapper.passthrough(Types.BYTE);
             if (mode != 0 && !scoreboard.teamExists(team)) {

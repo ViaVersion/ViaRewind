@@ -26,14 +26,17 @@ import com.viaversion.viarewind.protocol.v1_9to1_8.rewriter.PlayerPacketRewriter
 import com.viaversion.viarewind.protocol.v1_9to1_8.rewriter.WorldPacketRewriter1_9;
 import com.viaversion.viarewind.protocol.v1_9to1_8.storage.BlockPlaceDestroyTracker;
 import com.viaversion.viarewind.protocol.v1_9to1_8.storage.BossBarStorage;
+import com.viaversion.viarewind.protocol.v1_9to1_8.storage.CommandBlockStateStorage;
 import com.viaversion.viarewind.protocol.v1_9to1_8.storage.CooldownStorage;
 import com.viaversion.viarewind.protocol.v1_9to1_8.storage.EntityTracker1_9;
 import com.viaversion.viarewind.protocol.v1_9to1_8.storage.LevitationStorage;
 import com.viaversion.viarewind.protocol.v1_9to1_8.storage.PlayerPositionTracker;
+import com.viaversion.viarewind.protocol.v1_9to1_8.storage.LastTitle;
 import com.viaversion.viarewind.protocol.v1_9to1_8.storage.WindowTracker;
 import com.viaversion.viarewind.protocol.v1_9to1_8.task.CooldownIndicatorTask;
 import com.viaversion.viarewind.protocol.v1_9to1_8.task.LevitationUpdateTask;
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.connection.ProtocolStorables;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.platform.providers.ViaProviders;
@@ -51,7 +54,7 @@ public class Protocol1_9To1_8 extends BackwardsProtocol<ClientboundPackets1_9, C
     public static final ValueTransformer<Double, Integer> DOUBLE_TO_INT_TIMES_32 = new ValueTransformer<>(Types.INT) {
         @Override
         public Integer transform(PacketWrapper wrapper, Double inputValue) {
-            return (int) (inputValue * 32.0D);
+            return (int) Math.round(inputValue * 32.0D);
         }
     };
     public static final ValueTransformer<Float, Byte> DEGREES_TO_ANGLE = new ValueTransformer<>(Types.BYTE) {
@@ -80,15 +83,18 @@ public class Protocol1_9To1_8 extends BackwardsProtocol<ClientboundPackets1_9, C
 
     @Override
     public void init(UserConnection connection) {
-        connection.addEntityTracker(this.getClass(), new EntityTracker1_9(connection));
-        connection.addClientWorld(this.getClass(), new ClientWorld());
+        final ProtocolStorables storables = connection.storables(this);
+        storables.setEntityTracker(new EntityTracker1_9(connection));
+        storables.setClientWorld(new ClientWorld());
 
         connection.put(new WindowTracker(connection));
         connection.put(new LevitationStorage());
         connection.put(new PlayerPositionTracker());
         connection.put(new CooldownStorage());
+        connection.put(new LastTitle());
         connection.put(new BlockPlaceDestroyTracker());
         connection.put(new BossBarStorage(connection));
+        connection.put(new CommandBlockStateStorage());
     }
 
     @Override

@@ -22,6 +22,7 @@ import com.viaversion.viarewind.protocol.v1_7_6_10to1_7_2_5.packet.ServerboundPa
 import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.Protocol1_8To1_7_6_10;
 import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.data.VirtualHologramEntity;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.data.entity.TrackedEntity;
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_8;
 import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
@@ -68,17 +69,15 @@ public class EntityTracker1_8 extends EntityTrackerBase {
     }
 
     @Override
-    public void addEntity(int id, EntityType type) {
-        super.addEntity(id, type);
+    public TrackedEntity addEntity(int id, EntityType type) {
         if (type == EntityTypes1_8.EntityType.ARMOR_STAND) {
             holograms.put(id, new VirtualHologramEntity(user(), id));
         }
+        return super.addEntity(id, type);
     }
 
     @Override
-    public void removeEntity(int entityId) {
-        super.removeEntity(entityId);
-
+    public TrackedEntity removeEntity(int entityId) {
         final VirtualHologramEntity hologram = holograms.get(entityId);
         if (hologram != null) {
             hologram.deleteEntity();
@@ -95,6 +94,7 @@ public class EntityTracker1_8 extends EntityTrackerBase {
             entityUUIDToId.removeInt(playerId);
             user().get(PlayerSessionStorage.class).getPlayerEquipment().remove(playerId);
         }
+        return super.removeEntity(entityId);
     }
 
     @Override

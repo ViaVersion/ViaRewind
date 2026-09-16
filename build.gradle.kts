@@ -1,10 +1,17 @@
-import de.florianreuth.baseproject.*
+import de.florianreuth.baseproject.core.configureEmbeddedDependencies
+import de.florianreuth.baseproject.integration.branchName
+import de.florianreuth.baseproject.integration.latestCommitHash
+import de.florianreuth.baseproject.integration.latestCommitMessage
+import de.florianreuth.baseproject.setupProject
+import de.florianreuth.baseproject.setupViaPublishing
+import net.raphimc.classtokenreplacer.extension.ClassTokenReplacerExtension
 
 plugins {
     `java-library`
     id("io.papermc.hangar-publish-plugin")
     id("com.modrinth.minotaur")
     id("de.florianreuth.baseproject")
+    id("net.raphimc.class-token-replacer") apply false
 }
 
 allprojects {
@@ -13,7 +20,6 @@ allprojects {
     setupViaPublishing()
 
     repositories {
-        mavenCentral()
         maven("https://repo.viaversion.com")
         maven("https://repo.papermc.io/repository/maven-public")
         maven("https://maven.fabricmc.net")
@@ -21,11 +27,22 @@ allprojects {
 
 }
 
+val commitHash = latestCommitHash()
+
 subprojects {
 
+    apply(plugin = "net.raphimc.class-token-replacer")
+
     dependencies {
-        compileOnly("com.viaversion:viaversion:5.7.2")
-        compileOnly("com.viaversion:viabackwards:5.7.2")
+        compileOnly("com.viaversion:viaversion:5.12.0-SNAPSHOT")
+        compileOnly("com.viaversion:viabackwards:5.12.0-SNAPSHOT")
+    }
+
+    extensions.getByType<SourceSetContainer>().configureEach {
+        extensions.getByType(ClassTokenReplacerExtension::class.java).apply {
+            property("\${version}", project.version)
+            property("\${impl_version}", "git-ViaRewind-${project.version}:${commitHash}")
+        }
     }
 
     tasks {
@@ -40,11 +57,7 @@ subprojects {
 
 }
 
-base {
-    archivesName.set("ViaRewind")
-}
-
-val shade = configureShadedDependencies(false) // Only shade, don't add them as dependency
+val shade = configureEmbeddedDependencies()
 
 dependencies {
     subprojects.forEach {

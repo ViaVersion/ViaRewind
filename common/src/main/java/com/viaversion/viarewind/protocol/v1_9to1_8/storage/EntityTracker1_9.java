@@ -18,6 +18,7 @@
 package com.viaversion.viarewind.protocol.v1_9to1_8.storage;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.data.entity.TrackedEntity;
 import com.viaversion.viaversion.api.minecraft.Vector;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_9;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
@@ -27,6 +28,8 @@ import com.viaversion.viaversion.libs.fastutil.ints.Int2ObjectMap;
 import com.viaversion.viaversion.libs.fastutil.ints.Int2ObjectOpenHashMap;
 import com.viaversion.viaversion.libs.fastutil.ints.IntArrayList;
 import com.viaversion.viaversion.libs.fastutil.ints.IntList;
+import com.viaversion.viaversion.libs.fastutil.ints.IntOpenHashSet;
+import com.viaversion.viaversion.libs.fastutil.ints.IntSet;
 import java.util.List;
 import java.util.Map;
 
@@ -35,20 +38,24 @@ public class EntityTracker1_9 extends EntityTrackerBase {
     private final Int2ObjectMap<IntList> vehicles = new Int2ObjectOpenHashMap<>();
     private final Int2ObjectMap<Vector> offsets = new Int2ObjectOpenHashMap<>();
     private final Int2IntMap status = new Int2IntOpenHashMap();
+    private final IntSet handActive = new IntOpenHashSet();
+    private final Int2ObjectMap<PendingPotionEntity> pendingPotions = new Int2ObjectOpenHashMap<>();
 
     public EntityTracker1_9(UserConnection connection) {
         super(connection, EntityTypes1_9.EntityType.PLAYER);
     }
 
     @Override
-    public void removeEntity(int id) {
+    public TrackedEntity removeEntity(int id) {
         vehicles.remove(id);
         offsets.remove(id);
         status.remove(id);
+        handActive.remove(id);
+        pendingPotions.remove(id);
 
         vehicles.forEach((vehicle, passengers) -> passengers.rem(id));
         vehicles.int2ObjectEntrySet().removeIf(entry -> entry.getValue().isEmpty());
-        super.removeEntity(id);
+        return super.removeEntity(id);
     }
 
     public void resetEntityOffset(final int id) {
@@ -88,4 +95,33 @@ public class EntityTracker1_9 extends EntityTrackerBase {
     public Int2IntMap getStatus() {
         return status;
     }
+
+    public boolean isHandActive(final int id) {
+        return handActive.contains(id);
+    }
+
+    public void setHandActive(final int id, final boolean active) {
+        if (active) {
+            handActive.add(id);
+        } else {
+            handActive.remove(id);
+        }
+    }
+
+    public Int2ObjectMap<PendingPotionEntity> getPendingPotions() {
+        return pendingPotions;
+    }
+
+    public record PendingPotionEntity(int x, int y, int z, byte pitch, byte yaw, short velocityX, short velocityY, short velocityZ) {
+
+        public PendingPotionEntity withPosition(final int x, final int y, final int z, final byte pitch, final byte yaw) {
+            return new PendingPotionEntity(x, y, z, pitch, yaw, velocityX, velocityY, velocityZ);
+        }
+
+        public PendingPotionEntity withVelocity(final short velocityX, final short velocityY, final short velocityZ) {
+            return new PendingPotionEntity(x, y, z, pitch, yaw, velocityX, velocityY, velocityZ);
+        }
+
+    }
+
 }

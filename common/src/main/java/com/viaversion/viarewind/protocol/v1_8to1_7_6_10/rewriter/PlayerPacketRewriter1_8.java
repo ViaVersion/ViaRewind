@@ -38,6 +38,7 @@ import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.storage.InventoryTracker
 import com.viaversion.viarewind.protocol.v1_8to1_7_6_10.storage.PlayerSessionStorage;
 import com.viaversion.viarewind.utils.ChatUtil;
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.minecraft.GameProfile;
 import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
@@ -48,6 +49,7 @@ import com.viaversion.viaversion.api.rewriter.RewriterBase;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.libs.gson.JsonElement;
 import com.viaversion.viaversion.libs.gson.JsonObject;
+import com.viaversion.viaversion.libs.gson.JsonPrimitive;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ServerboundPackets1_8;
 import com.viaversion.viaversion.util.ComponentUtil;
@@ -127,13 +129,13 @@ public class PlayerPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6_10>
                         }
                     }
 
-                    final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_7_6_10.class);
+                    final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(protocol);
                     tracker.setClientEntityGameMode(wrapper.get(Types.UNSIGNED_BYTE, 1));
 
                     final int dimension = wrapper.get(Types.INT, 0);
 
                     // Clear entities on dimension change and re-track player
-                    final ClientWorld world = wrapper.user().getClientWorld(Protocol1_8To1_7_6_10.class);
+                    final ClientWorld world = wrapper.user().storables(protocol).clientWorld();
                     if (world.setEnvironment(dimension)) {
                         tracker.clearEntities();
                         tracker.addPlayer(tracker.clientEntityId(), wrapper.user().getProtocolInfo().getUuid());
@@ -194,7 +196,7 @@ public class PlayerPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6_10>
 
                     wrapper.write(Types.BOOLEAN, playerSession.onGround);
 
-                    final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_7_6_10.class);
+                    final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(protocol);
                     if (!Objects.equals(tracker.spectatingClientEntityId, tracker.clientEntityIdOrNull())) {
                         wrapper.cancel();
                     }
@@ -220,7 +222,7 @@ public class PlayerPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6_10>
                     if (wrapper.get(Types.UNSIGNED_BYTE, 0) != 3) return; // Change game mode
                     int gameMode = wrapper.get(Types.FLOAT, 0).intValue();
 
-                    final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_7_6_10.class);
+                    final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(protocol);
                     if (gameMode == 3 || tracker.isSpectator()) {
                         UUID myId = wrapper.user().getProtocolInfo().getUuid();
                         Item[] equipment = new Item[4];
@@ -292,7 +294,7 @@ public class PlayerPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6_10>
                     }
 
                     if (gamemode == 3 || gameProfile.gamemode == 3) {
-                        EntityTracker1_8 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_7_6_10.class);
+                        EntityTracker1_8 tracker = wrapper.user().getEntityTracker(protocol);
                         int entityId = tracker.getPlayerEntityId(uuid);
                         boolean isOwnPlayer = entityId == tracker.clientEntityId();
                         if (entityId != -1) {
@@ -445,7 +447,7 @@ public class PlayerPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6_10>
             wrapper.cancel();
             final int entityId = wrapper.read(Types.VAR_INT);
 
-            final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_7_6_10.class);
+            final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(protocol);
             if (tracker.spectatingClientEntityId != entityId) {
                 tracker.setSpectating(entityId);
             }
@@ -506,7 +508,7 @@ public class PlayerPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6_10>
 
         protocol.registerServerbound(ServerboundPackets1_7_2_5.CHAT, wrapper -> {
             final String message = wrapper.passthrough(Types.STRING);
-            final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_7_6_10.class);
+            final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(protocol);
             if (tracker.isSpectator() && message.toLowerCase().startsWith("/stp ")) { // TODO add setting
                 String username = message.split(" ")[1];
                 final GameProfileStorage storage = wrapper.user().get(GameProfileStorage.class);
@@ -535,7 +537,7 @@ public class PlayerPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6_10>
                 map(Types.BYTE, Types.VAR_INT); // Mode
                 handler(wrapper -> {
                     final int mode = wrapper.get(Types.VAR_INT, 1);
-                    final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_7_6_10.class);
+                    final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(protocol);
                     final int entityId = tracker.getHologramIdWithExtra(wrapper.get(Types.VAR_INT, 0));
                     final PlayerSessionStorage position = wrapper.user().get(PlayerSessionStorage.class);
 
@@ -636,6 +638,16 @@ public class PlayerPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6_10>
                 map(Types.BYTE); // Direction
                 map(RewindTypes.COMPRESSED_NBT_ITEM, Types.ITEM1_8); // Item
 
+                handler(wrapper -> {
+                    final BlockPosition position = wrapper.get(Types.BLOCK_POSITION1_8, 0);
+                    final byte direction = wrapper.get(Types.BYTE, 0);
+                    // 1.7 serializes the Y component as an unsigned byte, turning the
+                    // use-in-air position from (-1, -1, -1) into (-1, 255, -1).
+                    // we change that back to -1 for Y like 1.8 clients
+                    if (position.x() == -1 && position.y() == 255 && position.z() == -1 && direction == -1) {
+                        wrapper.set(Types.BLOCK_POSITION1_8, 0, new BlockPosition(-1, -1, -1));
+                    }
+                });
                 handler(wrapper -> protocol.getItemRewriter().handleItemToServer(wrapper.user(), wrapper.get(Types.ITEM1_8, 0)));
             }
         });
@@ -708,7 +720,7 @@ public class PlayerPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6_10>
                     if (!unmount) {
                         return;
                     }
-                    final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(Protocol1_8To1_7_6_10.class);
+                    final EntityTracker1_8 tracker = wrapper.user().getEntityTracker(protocol);
                     if (tracker.spectatingClientEntityId != tracker.clientEntityId()) {
                         PacketWrapper sneakPacket = PacketWrapper.create(ServerboundPackets1_8.PLAYER_COMMAND, wrapper.user());
                         sneakPacket.write(Types.VAR_INT, tracker.clientEntityId());
@@ -788,6 +800,8 @@ public class PlayerPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6_10>
             }
         });
 
+        // 1.7.10 custom payload constructor (String, ByteBuf) uses byteBuf.array(), so it sends the whole backing array capacity, not only the written bytes
+        // After reading the proper packet data we discard the remaining bytes
         protocol.registerServerbound(ServerboundPackets1_7_2_5.CUSTOM_PAYLOAD, new PacketHandlers() {
             @Override
             public void register() {
@@ -798,7 +812,27 @@ public class PlayerPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6_10>
                     switch (channel) {
                         case "MC|TrSel": {
                             wrapper.passthrough(Types.INT);
-                            wrapper.read(Types.REMAINING_BYTES); // unused data ???
+                            wrapper.read(Types.REMAINING_BYTES); // Discard remaining bytes
+                            break;
+                        }
+                        case "MC|AdvCdm": {
+                            final byte commandBlockType = wrapper.passthrough(Types.BYTE);
+                            if (commandBlockType == 0) { // Block
+                                wrapper.passthrough(Types.INT); // X
+                                wrapper.passthrough(Types.INT); // Y
+                                wrapper.passthrough(Types.INT); // Z
+                            } else if (commandBlockType == 1) { // Minecart
+                                wrapper.passthrough(Types.INT); // Entity id
+                            }
+                            wrapper.passthrough(Types.STRING); // Command
+                            wrapper.write(Types.BOOLEAN, true); // Track output, added in 1.8, default to true
+                            wrapper.read(Types.REMAINING_BYTES); // Discard remaining bytes
+                            break;
+                        }
+                        case "MC|Beacon": {
+                            wrapper.passthrough(Types.INT); // Primary effect
+                            wrapper.passthrough(Types.INT); // Secondary effect
+                            wrapper.read(Types.REMAINING_BYTES); // Discard remaining bytes
                             break;
                         }
                         case "MC|ItemName": {
@@ -815,17 +849,28 @@ public class PlayerPacketRewriter1_8 extends RewriterBase<Protocol1_8To1_7_6_10>
                         }
                         case "MC|BEdit":
                         case "MC|BSign": {
+                            final boolean signBook = channel.equals("MC|BSign");
                             final Item book = wrapper.read(RewindTypes.COMPRESSED_NBT_ITEM);
-                            CompoundTag tag = book.tag();
-                            if (tag != null && tag.contains("pages")) {
-                                ListTag<StringTag> pages = tag.getListTag("pages", StringTag.class);
-                                for (int i = 0; i < pages.size(); i++) {
-                                    StringTag page = pages.get(i);
-                                    String value = page.getValue();
-                                    value = ComponentUtil.legacyToJsonString(value);
-                                    page.setValue(value);
+                            wrapper.read(Types.REMAINING_BYTES); // Discard remaining bytes
+
+                            if (book == null) {
+                                wrapper.write(Types.ITEM1_8, null);
+                                break;
+                            }
+
+                            final CompoundTag tag = book.tag();
+                            if (signBook && tag != null && tag.contains("pages")) {
+                                final ListTag<StringTag> pages = tag.getListTag("pages", StringTag.class);
+                                if (pages != null) {
+                                    for (int i = 0; i < pages.size(); i++) {
+                                        final StringTag page = pages.get(i);
+                                        String value = page.getValue();
+                                        value = new JsonPrimitive(value).toString();
+                                        page.setValue(value);
+                                    }
                                 }
                             }
+                            protocol.getItemRewriter().handleItemToServer(wrapper.user(), book);
                             wrapper.write(Types.ITEM1_8, book);
                             break;
                         }

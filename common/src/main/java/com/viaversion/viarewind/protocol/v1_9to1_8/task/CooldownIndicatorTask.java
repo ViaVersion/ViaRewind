@@ -26,7 +26,11 @@ public class CooldownIndicatorTask implements Runnable {
     @Override
     public void run() {
         for (UserConnection connection : Via.getManager().getConnectionManager().getConnections()) {
-            connection.get(CooldownStorage.class).tick(connection);
+            final CooldownStorage cooldown = connection.get(CooldownStorage.class);
+            if (cooldown == null) {
+                continue;
+            }
+            cooldown.tick(connection);
         }
     }
 }

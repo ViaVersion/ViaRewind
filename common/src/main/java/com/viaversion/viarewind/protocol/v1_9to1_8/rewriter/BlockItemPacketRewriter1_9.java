@@ -19,6 +19,7 @@ package com.viaversion.viarewind.protocol.v1_9to1_8.rewriter;
 
 import com.viaversion.nbt.tag.ByteTag;
 import com.viaversion.nbt.tag.CompoundTag;
+import com.viaversion.nbt.tag.IntTag;
 import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.nbt.tag.Tag;
@@ -26,8 +27,11 @@ import com.viaversion.viabackwards.api.rewriters.LegacyEnchantmentRewriter;
 import com.viaversion.viarewind.api.rewriter.VRBlockItemRewriter;
 import com.viaversion.viarewind.protocol.v1_9to1_8.Protocol1_9To1_8;
 import com.viaversion.viarewind.protocol.v1_9to1_8.data.PotionIdMappings1_8;
+import com.viaversion.viarewind.protocol.v1_9to1_8.storage.CommandBlockStateStorage;
 import com.viaversion.viarewind.protocol.v1_9to1_8.storage.WindowTracker;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Types;
@@ -59,8 +63,26 @@ public class BlockItemPacketRewriter1_9 extends VRBlockItemRewriter<ClientboundP
 
     @Override
     protected void registerPackets() {
-        registerBlockChange(ClientboundPackets1_9.BLOCK_UPDATE);
-        registerMultiBlockChange(ClientboundPackets1_9.CHUNK_BLOCKS_UPDATE);
+        protocol.registerClientbound(ClientboundPackets1_9.BLOCK_UPDATE, wrapper -> {
+            final BlockPosition position = wrapper.passthrough(Types.BLOCK_POSITION1_8);
+            final int blockState = wrapper.passthrough(Types.VAR_INT);
+            wrapper.user().get(CommandBlockStateStorage.class).storeOrRemove(position, blockState);
+            wrapper.set(Types.VAR_INT, 0, handleBlockId(blockState));
+        });
+
+        protocol.registerClientbound(ClientboundPackets1_9.CHUNK_BLOCKS_UPDATE, wrapper -> {
+            final int chunkX = wrapper.passthrough(Types.INT);
+            final int chunkZ = wrapper.passthrough(Types.INT);
+            final BlockChangeRecord[] records = wrapper.passthrough(Types.BLOCK_CHANGE_ARRAY);
+            final CommandBlockStateStorage storage = wrapper.user().get(CommandBlockStateStorage.class);
+
+            for (BlockChangeRecord record : records) {
+                final int blockState = record.getBlockId();
+                final BlockPosition position = new BlockPosition((chunkX << 4) + record.getSectionX(), record.getY(), (chunkZ << 4) + record.getSectionZ());
+                storage.storeOrRemove(position, blockState);
+                record.setBlockId(handleBlockId(blockState));
+            }
+        });
         registerSetCreativeModeSlot(ServerboundPackets1_8.SET_CREATIVE_MODE_SLOT);
 
         protocol.registerClientbound(ClientboundPackets1_9.CONTAINER_CLOSE, wrapper -> {
@@ -78,8 +100,12 @@ public class BlockItemPacketRewriter1_9 extends VRBlockItemRewriter<ClientboundP
         protocol.registerClientbound(ClientboundPackets1_9.OPEN_SCREEN, wrapper -> {
             final short windowId = wrapper.passthrough(Types.UNSIGNED_BYTE);
             final String windowType = wrapper.passthrough(Types.STRING);
+            wrapper.passthrough(Types.COMPONENT); // title
+            final short slotCount = wrapper.passthrough(Types.UNSIGNED_BYTE);
 
-            wrapper.user().get(WindowTracker.class).put(windowId, windowType);
+            final WindowTracker tracker = wrapper.user().get(WindowTracker.class);
+            tracker.put(windowId, windowType);
+            tracker.openWindow(windowId, windowType, slotCount);
         });
 
         protocol.registerClientbound(ClientboundPackets1_9.CONTAINER_SET_CONTENT, wrapper -> {
@@ -115,10 +141,49 @@ public class BlockItemPacketRewriter1_9 extends VRBlockItemRewriter<ClientboundP
             final Item item = wrapper.passthrough(Types.ITEM1_8);
 
             handleItemToClient(wrapper.user(), item);
+            if (windowId == -2) {
+                // 1.8 has no window -2 (set a player-inv slot by raw index, ignoring the open container) — retarget it.
+                final WindowTracker tracker = wrapper.user().get(WindowTracker.class);
+                final short openWindow = tracker.openWindowId();
+                if (openWindow != 0) {
+                    // Foreign container open: 1.8 only applies player-inv changes through it (main=size.., hotbar=size+27..).
+                    final int size = tracker.openWindowSize();
+                    final int containerSlot;
+                    if (slot >= 0 && slot <= 8) {
+                        containerSlot = size + 27 + slot;
+                    } else if (slot >= 9 && slot <= 35) {
+                        containerSlot = size + slot - 9;
+                    } else { // armor/offhand: no slot in a foreign container
+                        wrapper.cancel();
+                        return;
+                    }
+                    wrapper.set(Types.BYTE, 0, (byte) openWindow);
+                    wrapper.set(Types.SHORT, 0, (short) containerSlot);
+                    return;
+                }
+
+                // Otherwise window 0 with the menu slot.
+                final int windowSlot;
+                if (slot >= 0 && slot <= 8) {
+                    windowSlot = slot + 36;
+                } else if (slot >= 9 && slot <= 35) {
+                    windowSlot = slot;
+                } else if (slot >= 36 && slot <= 39) {
+                    windowSlot = 44 - slot;
+                } else { // offhand/body/saddle: no 1.8 equivalent
+                    wrapper.cancel();
+                    return;
+                }
+                wrapper.set(Types.BYTE, 0, (byte) 0);
+                wrapper.set(Types.SHORT, 0, (short) windowSlot);
+                return;
+            }
+
             if (windowId == 0 && slot == 45) {
                 wrapper.cancel();
                 return;
             }
+
             final WindowTracker windowTracker = wrapper.user().get(WindowTracker.class);
             final String windowType = windowTracker.get(windowId);
             if (windowType != null && windowType.equalsIgnoreCase("minecraft:brewing_stand")) {
@@ -194,6 +259,7 @@ public class BlockItemPacketRewriter1_9 extends VRBlockItemRewriter<ClientboundP
     @Override
     public Item handleItemToClient(UserConnection connection, Item item) {
         if (item == null) return null;
+        final int originalId = item.identifier();
         super.handleItemToClient(connection, item);
 
         CompoundTag tag = item.tag();
@@ -280,6 +346,32 @@ public class BlockItemPacketRewriter1_9 extends VRBlockItemRewriter<ClientboundP
             });
         }
 
+        // Colors the fake leather armor for an elytra gray
+        if (originalId == 443) {
+            if (tag == null) {
+                item.setTag(tag = new CompoundTag());
+            }
+            CompoundTag display = tag.getCompoundTag("display");
+            if (display == null) {
+                tag.put("display", display = new CompoundTag());
+            }
+            display.put("color", new IntTag(0x737373)); // Gray
+            tag.put(nbtTagName() + "|noDisplay", new ByteTag(true));
+        }
+
+        // Makes the fake banner for a shield brown if it has no banner patterns
+        if (originalId == 442) {
+            final CompoundTag blockEntityTag = tag == null ? null : tag.getCompoundTag("BlockEntityTag");
+            final ListTag<CompoundTag> patterns = blockEntityTag == null ? null : blockEntityTag.getListTag("Patterns", CompoundTag.class);
+            if (patterns == null || patterns.isEmpty()) {
+                item.setData((short) 3); // Brown
+                if (tag == null) {
+                    item.setTag(tag = new CompoundTag());
+                }
+                tag.put(nbtTagName() + "|noData", new ByteTag(true));
+            }
+        }
+
         return item;
     }
 
@@ -304,7 +396,8 @@ public class BlockItemPacketRewriter1_9 extends VRBlockItemRewriter<ClientboundP
             item.setData((short) 0);
         }
 
-        if (item.identifier() == 373 && (tag == null || !tag.contains("Potion"))) { // Potions
+        if (item.identifier() == 373) { // Potions
+            // Restore the splash id even when a Potion tag is present (e.g. items re-sent by a creative mode client)
             if (item.data() >= 16384) {
                 item.setIdentifier(438);
                 item.setData((short) (item.data() - 8192));
@@ -321,6 +414,9 @@ public class BlockItemPacketRewriter1_9 extends VRBlockItemRewriter<ClientboundP
 
         if (tag == null) {
             return item;
+        }
+        if (tag.remove(nbtTagName() + "|noData") != null) {
+            item.setData((short) 0);
         }
         final Tag noDisplayTag = tag.remove(nbtTagName() + "|noDisplay");
         if (noDisplayTag != null) {

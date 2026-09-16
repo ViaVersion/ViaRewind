@@ -35,6 +35,9 @@ public class WorldBorderUpdateTask implements Runnable {
     public void run() {
         for (UserConnection connection : Via.getManager().getConnectionManager().getConnections()) {
             final WorldBorderEmulator worldBorderEmulatorTracker = connection.get(WorldBorderEmulator.class);
+            if (worldBorderEmulatorTracker == null) {
+                continue;
+            }
             if (!worldBorderEmulatorTracker.isInit()) continue;
 
             final PlayerSessionStorage playerSession = connection.get(PlayerSessionStorage.class);
