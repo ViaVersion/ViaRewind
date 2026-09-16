@@ -167,7 +167,11 @@ public class PlayerPacketRewriter1_9 extends RewriterBase<Protocol1_9To1_8> {
                     float yaw = wrapper.get(Types.FLOAT, 0);
                     float pitch = wrapper.get(Types.FLOAT, 1);
 
-                    wrapper.set(Types.BYTE, 0, (byte) 0);
+                    // 1.8 supports the rotation-relative flags (0x08/0x10) natively, and resolving them here
+                    // would snap the camera to the tracked rotation, which lags the client's live look. Keep
+                    // them on the wire and only resolve the position bits (native 1.8 servers use zero-delta
+                    // rotation-relative teleports to leave the camera untouched).
+                    wrapper.set(Types.BYTE, 0, (byte) (flags & 0x18));
 
                     if (flags != 0) {
                         if ((flags & 0x01) != 0) {
@@ -183,19 +187,17 @@ public class PlayerPacketRewriter1_9 extends RewriterBase<Protocol1_9To1_8> {
                             wrapper.set(Types.DOUBLE, 2, z);
                         }
                         if ((flags & 0x08) != 0) {
-                            yaw += pos.getYaw();
-                            wrapper.set(Types.FLOAT, 0, yaw);
+                            yaw += pos.getYaw(); // tracked estimate only; the wire keeps the delta
                         }
                         if ((flags & 0x10) != 0) {
                             pitch += pos.getPitch();
-                            wrapper.set(Types.FLOAT, 1, pitch);
                         }
                     }
 
                     pos.setPos(x, y, z);
                     pos.setYaw(yaw);
                     pos.setPitch(pitch);
-                    pos.queueTeleport(teleportId, x, y, z, pos.getYaw(), pos.getPitch());
+                    pos.queueTeleport(teleportId, x, y, z, pos.getYaw(), pos.getPitch(), (flags & 0x18) != 0);
                 });
             }
         });
@@ -364,12 +366,19 @@ public class PlayerPacketRewriter1_9 extends RewriterBase<Protocol1_9To1_8> {
                 // This Y error gets propagated from 1.7 to 1.8 to 1.9 which causes teleport confirmation to not properly be detected
                 // This fixes it similarly to how anticheats detect teleports: https://github.com/GrimAnticheat/Grim/blob/67aa3a9483a9b2a6987d594092697b4104c781f0/common/src/main/java/ac/grim/grimac/manager/SetbackTeleportUtil.java#L315
                 boolean closeEnoughY = Math.abs(teleport.y() - y) <= 1e-7;
+                // A view-relative teleport keeps its rotation deltas on the wire, so the client applies them
+                // to its own live look and echoes that - match on position only and adopt the echoed rotation
+                final boolean rotationMatches = teleport.viewRelative() || (teleport.yaw() == yaw && teleport.pitch() == pitch);
 
-                if (teleport.x() == x && closeEnoughY && teleport.z() == z && teleport.yaw() == yaw && teleport.pitch() == pitch) {
+                if (teleport.x() == x && closeEnoughY && teleport.z() == z && rotationMatches) {
                     final PacketWrapper confirmTeleport = PacketWrapper.create(ServerboundPackets1_9.ACCEPT_TELEPORTATION, wrapper.user());
                     confirmTeleport.write(Types.VAR_INT, teleport.id());
                     confirmTeleport.sendToServer(Protocol1_9To1_8.class);
 
+                    if (teleport.viewRelative()) {
+                        storage.setYaw(yaw);
+                        storage.setPitch(pitch);
+                    }
                     storage.confirmTeleport();
                 }
             } else {
