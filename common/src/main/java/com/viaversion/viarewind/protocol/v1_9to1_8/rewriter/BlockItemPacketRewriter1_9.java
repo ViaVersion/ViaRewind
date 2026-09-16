@@ -27,8 +27,11 @@ import com.viaversion.viabackwards.api.rewriters.LegacyEnchantmentRewriter;
 import com.viaversion.viarewind.api.rewriter.VRBlockItemRewriter;
 import com.viaversion.viarewind.protocol.v1_9to1_8.Protocol1_9To1_8;
 import com.viaversion.viarewind.protocol.v1_9to1_8.data.PotionIdMappings1_8;
+import com.viaversion.viarewind.protocol.v1_9to1_8.storage.CommandBlockStateStorage;
 import com.viaversion.viarewind.protocol.v1_9to1_8.storage.WindowTracker;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Types;
@@ -60,8 +63,26 @@ public class BlockItemPacketRewriter1_9 extends VRBlockItemRewriter<ClientboundP
 
     @Override
     protected void registerPackets() {
-        registerBlockChange(ClientboundPackets1_9.BLOCK_UPDATE);
-        registerMultiBlockChange(ClientboundPackets1_9.CHUNK_BLOCKS_UPDATE);
+        protocol.registerClientbound(ClientboundPackets1_9.BLOCK_UPDATE, wrapper -> {
+            final BlockPosition position = wrapper.passthrough(Types.BLOCK_POSITION1_8);
+            final int blockState = wrapper.passthrough(Types.VAR_INT);
+            wrapper.user().get(CommandBlockStateStorage.class).storeOrRemove(position, blockState);
+            wrapper.set(Types.VAR_INT, 0, handleBlockId(blockState));
+        });
+
+        protocol.registerClientbound(ClientboundPackets1_9.CHUNK_BLOCKS_UPDATE, wrapper -> {
+            final int chunkX = wrapper.passthrough(Types.INT);
+            final int chunkZ = wrapper.passthrough(Types.INT);
+            final BlockChangeRecord[] records = wrapper.passthrough(Types.BLOCK_CHANGE_ARRAY);
+            final CommandBlockStateStorage storage = wrapper.user().get(CommandBlockStateStorage.class);
+
+            for (BlockChangeRecord record : records) {
+                final int blockState = record.getBlockId();
+                final BlockPosition position = new BlockPosition((chunkX << 4) + record.getSectionX(), record.getY(), (chunkZ << 4) + record.getSectionZ());
+                storage.storeOrRemove(position, blockState);
+                record.setBlockId(handleBlockId(blockState));
+            }
+        });
         registerSetCreativeModeSlot(ServerboundPackets1_8.SET_CREATIVE_MODE_SLOT);
 
         protocol.registerClientbound(ClientboundPackets1_9.CONTAINER_CLOSE, wrapper -> {
