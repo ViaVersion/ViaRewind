@@ -34,8 +34,8 @@ subprojects {
     apply(plugin = "net.raphimc.class-token-replacer")
 
     dependencies {
-        compileOnly("com.viaversion:viaversion:5.12.0-SNAPSHOT")
-        compileOnly("com.viaversion:viabackwards:5.12.0-SNAPSHOT")
+        compileOnly("com.viaversion:viaversion:5.12.0")
+        compileOnly("com.viaversion:viabackwards:5.12.0")
     }
 
     extensions.getByType<SourceSetContainer>().configureEach {
