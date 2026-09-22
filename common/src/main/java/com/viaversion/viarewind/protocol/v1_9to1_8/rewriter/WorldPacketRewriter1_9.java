@@ -24,6 +24,7 @@ import com.viaversion.viarewind.ViaRewind;
 import com.viaversion.viarewind.protocol.v1_9to1_8.Protocol1_9To1_8;
 import com.viaversion.viarewind.protocol.v1_9to1_8.data.CommandBlockState;
 import com.viaversion.viarewind.protocol.v1_9to1_8.data.EffectIdMappings1_8;
+import com.viaversion.viarewind.protocol.v1_9to1_8.data.PotionIdMappings1_8;
 import com.viaversion.viarewind.protocol.v1_9to1_8.storage.CommandBlockStateStorage;
 import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.minecraft.Environment;
@@ -237,6 +238,11 @@ public class WorldPacketRewriter1_9 extends RewriterBase<Protocol1_9To1_8> {
                     if (id == 2001) {
                         int replacedBlock = protocol.getItemRewriter().handleBlockId(wrapper.get(Types.INT, 1));
                         wrapper.set(Types.INT, 1, replacedBlock);
+                    } else if (id == 2002) {
+                        final int mappedSplash = PotionIdMappings1_8.getIdForSplash(wrapper.get(Types.INT, 1));
+                        if (mappedSplash != -1) {
+                            wrapper.set(Types.INT, 1, mappedSplash);
+                        }
                     }
                 });
             }
