@@ -1,5 +1,9 @@
+plugins {
+    id("via.addon_subproject")
+}
+
 dependencies {
-    compileOnly(project(":viarewind-common"))
-    compileOnly("net.fabricmc:fabric-loader:0.11.3")
-    compileOnly("org.apache.logging.log4j:log4j-api:2.17.1")
+    compileOnly(projects.viarewindCommon)
+    compileOnly(libs.fabric.loader)
+    compileOnly(libs.log4j.api)
 }

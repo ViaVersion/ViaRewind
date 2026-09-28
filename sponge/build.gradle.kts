@@ -1,3 +1,7 @@
+plugins {
+    id("via.addon_subproject")
+}
+
 dependencies {
-    compileOnly(project(":viarewind-common"))
+    compileOnly(projects.viarewindCommon)
 }

@@ -1,68 +1,20 @@
-import de.florianreuth.baseproject.core.configureEmbeddedDependencies
-import de.florianreuth.baseproject.integration.branchName
-import de.florianreuth.baseproject.integration.latestCommitHash
-import de.florianreuth.baseproject.integration.latestCommitMessage
-import de.florianreuth.baseproject.setupProject
-import de.florianreuth.baseproject.setupViaPublishing
-import net.raphimc.classtokenreplacer.extension.ClassTokenReplacerExtension
+import de.florianreuth.baseproject.viaRelease
 
 plugins {
     `java-library`
-    id("io.papermc.hangar-publish-plugin")
-    id("com.modrinth.minotaur")
-    id("de.florianreuth.baseproject")
-    id("net.raphimc.class-token-replacer") apply false
+    alias(libs.plugins.hangar.publish)
+    alias(libs.plugins.minotaur)
+    id("base.java")
+    id("via.maven_publish")
+    id("configuration.embedded_dependencies")
 }
-
-allprojects {
-
-    setupProject()
-    setupViaPublishing()
-
-    repositories {
-        maven("https://repo.viaversion.com")
-        maven("https://repo.papermc.io/repository/maven-public")
-        maven("https://maven.fabricmc.net")
-    }
-
-}
-
-val commitHash = latestCommitHash()
-
-subprojects {
-
-    apply(plugin = "net.raphimc.class-token-replacer")
-
-    dependencies {
-        compileOnly("com.viaversion:viaversion:5.12.0")
-        compileOnly("com.viaversion:viabackwards:5.12.0")
-    }
-
-    extensions.getByType<SourceSetContainer>().configureEach {
-        extensions.getByType(ClassTokenReplacerExtension::class.java).apply {
-            property("\${version}", project.version)
-            property("\${impl_version}", "git-ViaRewind-${project.version}:${commitHash}")
-        }
-    }
-
-    tasks {
-        processResources {
-            val projectVersion = project.version
-            val projectDescription = project.description
-            filesMatching(listOf("plugin.yml", "fabric.mod.json", "META-INF/sponge_plugins.json")) {
-                expand(mapOf("version" to projectVersion, "description" to projectDescription))
-            }
-        }
-    }
-
-}
-
-val shade = configureEmbeddedDependencies()
 
 dependencies {
-    subprojects.forEach {
-        shade(it)
-    }
+    embeddedDependencies(projects.viarewindCommon)
+    embeddedDependencies(projects.viarewindBukkit)
+    embeddedDependencies(projects.viarewindFabric)
+    embeddedDependencies(projects.viarewindSponge)
+    embeddedDependencies(projects.viarewindVelocity)
 }
 
 tasks {
@@ -73,29 +25,18 @@ tasks {
     }
 }
 
-val branch = branchName()
-val baseVersion = version as String
-val isRelease = !baseVersion.contains('-')
-val isMainBranch = branch == "master"
-if (!isRelease || isMainBranch) { // Only publish releases from the main branch
-    val suffixedVersion = if (isRelease) baseVersion else baseVersion + "+" + System.getenv("GITHUB_RUN_NUMBER")
-    val changelogContent = if (isRelease) {
-        "See [GitHub](https://github.com/ViaVersion/ViaRewind) for release notes."
-    } else {
-        val commitHash = latestCommitHash()
-        "[$commitHash](https://github.com/ViaVersion/ViaRewind/commit/$commitHash) ${latestCommitMessage()}"
-    }
-
+val release = viaRelease("master")
+if (!release.isRelease || release.isMainBranch) { // Only publish releases from the main branch
     modrinth {
         val mcVersions: List<String> = (property("minecraft_versions") as String)
             .split(",")
             .map { it.trim() }
         token.set(System.getenv("MODRINTH_TOKEN"))
         projectId.set("viarewind")
-        versionType.set(if (isRelease) "release" else if (isMainBranch) "beta" else "alpha")
-        versionNumber.set(suffixedVersion)
-        versionName.set(suffixedVersion)
-        changelog.set(changelogContent)
+        versionType.set(release.modrinthVersionType)
+        versionNumber.set(release.version)
+        versionName.set(release.version)
+        changelog.set(release.changelog)
         uploadFile.set(tasks.jar.flatMap { it.archiveFile })
         gameVersions.set(mcVersions)
         loaders.add("fabric")
@@ -116,10 +57,10 @@ if (!isRelease || isMainBranch) { // Only publish releases from the main branch
 
     hangarPublish {
         publications.register("plugin") {
-            version.set(suffixedVersion)
+            version.set(release.version)
             id.set("ViaRewind")
-            channel.set(if (isRelease) "Release" else if (isMainBranch) "Snapshot" else "Alpha")
-            changelog.set(changelogContent)
+            channel.set(release.hangarChannel)
+            changelog.set(release.changelog)
             apiKey.set(System.getenv("HANGAR_TOKEN"))
             platforms {
                 paper {
