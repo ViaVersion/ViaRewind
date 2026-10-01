@@ -1,6 +1,6 @@
 [versions]
 viaversion = "5.12.0"
-velocity = "3.4.0"
+velocity = "4.2.0"
 
 [libraries]
 foojay-resolver-convention-plugin = { module = "org.gradle.toolchains.foojay-resolver-convention:org.gradle.toolchains.foojay-resolver-convention.gradle.plugin", version = "1.0.0" }
@@ -8,12 +8,12 @@ classtokenreplacer-plugin = { module = "net.raphimc.class-token-replacer:net.rap
 viaproxy = { module = "net.raphimc:ViaProxy", version = "[3.0.0,4.0.0)" }
 viaversion = { module = "com.viaversion:viaversion", version.ref = "viaversion" }
 viabackwards = { module = "com.viaversion:viabackwards", version.ref = "viaversion" }
-netty-all = { module = "io.netty:netty-all", version = "4.0.20.Final" }
-guava = { module = "com.google.guava:guava", version = "17.0" }
-velocity-native = { module = "com.velocitypowered:velocity-native", version = "3.4.0-SNAPSHOT" }
-spigot-api = { module = "org.spigotmc:spigot-api", version = "1.12.2-R0.1-SNAPSHOT" }
-fabric-loader = { module = "net.fabricmc:fabric-loader", version = "0.11.3" }
-log4j-api = { module = "org.apache.logging.log4j:log4j-api", version = "2.17.1" }
+netty-all = { module = "io.netty:netty-all", version = "4.2.18.Final" }
+guava = { module = "com.google.guava:guava", version = "23.0" }
+velocity-native = { module = "com.velocitypowered:velocity-native", version = "4.2.0" }
+spigot-api = { module = "org.spigotmc:spigot-api", version = "26.2-R0.1-SNAPSHOT" }
+fabric-loader = { module = "net.fabricmc:fabric-loader", version = "0.19.5" }
+log4j-api = { module = "org.apache.logging.log4j:log4j-api", version = "2.26.1" }
 velocity-api = { module = "com.velocitypowered:velocity-api", version.ref = "velocity" }
 
 [plugins]
