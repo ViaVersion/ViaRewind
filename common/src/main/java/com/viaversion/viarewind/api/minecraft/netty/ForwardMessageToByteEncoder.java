@@ -17,6 +17,7 @@
  */
 package com.viaversion.viarewind.api.minecraft.netty;
 
+import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
@@ -25,6 +26,7 @@ public class ForwardMessageToByteEncoder extends MessageToByteEncoder<ByteBuf> {
 
     @Override
     protected void encode(ChannelHandlerContext ctx, ByteBuf msg, ByteBuf out) {
+        Types.VAR_INT.writePrimitive(out, msg.readableBytes());
         out.writeBytes(msg);
     }
 }
