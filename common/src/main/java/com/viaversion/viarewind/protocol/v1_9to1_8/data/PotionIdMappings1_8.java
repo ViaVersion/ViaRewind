@@ -17,6 +17,8 @@
  */
 package com.viaversion.viarewind.protocol.v1_9to1_8.data;
 
+import com.viaversion.viaversion.libs.fastutil.ints.Int2ObjectMap;
+import com.viaversion.viaversion.libs.fastutil.ints.Int2ObjectOpenHashMap;
 import com.viaversion.viaversion.protocols.v1_8to1_9.data.PotionIdMappings1_9;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,6 +26,7 @@ import java.util.Map;
 public class PotionIdMappings1_8 {
     public static final Map<String, String> POTION_NAME_INDEX = new HashMap<>();
     public static final Map<String, Integer> POTION_NAME_TO_ID = new HashMap<>();
+    public static final Int2ObjectMap<String> SPLASH_MAPPINGS = new Int2ObjectOpenHashMap<>();
 
     static {
         POTION_NAME_TO_ID.putAll(PotionIdMappings1_9.POTION_NAME_TO_ID);
@@ -75,5 +78,28 @@ public class PotionIdMappings1_8 {
         POTION_NAME_INDEX.put("luck_lingering", "§rLingering Potion of Luck");
         POTION_NAME_INDEX.put("luck", "§rPotion of Luck");
         POTION_NAME_INDEX.put("luck_splash", "§rSplash Potion of Luck");
+
+        SPLASH_MAPPINGS.put(5, "night_vision");
+        SPLASH_MAPPINGS.put(7, "invisibility");
+        SPLASH_MAPPINGS.put(9, "leaping");
+        SPLASH_MAPPINGS.put(12, "fire_resistance");
+        SPLASH_MAPPINGS.put(14, "swiftness");
+        SPLASH_MAPPINGS.put(17, "slowness");
+        SPLASH_MAPPINGS.put(19, "water_breathing");
+        SPLASH_MAPPINGS.put(21, "healing");
+        SPLASH_MAPPINGS.put(23, "harming");
+        SPLASH_MAPPINGS.put(25, "poison");
+        SPLASH_MAPPINGS.put(28, "regeneration");
+        SPLASH_MAPPINGS.put(31, "strength");
+        SPLASH_MAPPINGS.put(34, "weakness");
+        SPLASH_MAPPINGS.put(36, "luck");
+    }
+
+    public static int getIdForSplash(int id1_9) {
+        final String key = SPLASH_MAPPINGS.get(id1_9);
+        if (key == null) {
+            return -1;
+        }
+        return POTION_NAME_TO_ID.getOrDefault(key, -1);
     }
 }
