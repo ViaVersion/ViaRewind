@@ -573,7 +573,7 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
     protected void registerRewrites() {
         // Handle new entities
         mapEntityTypeWithData(EntityTypes1_9.EntityType.SHULKER, EntityTypes1_9.EntityType.MAGMA_CUBE).plainName();
-        mapEntityTypeWithData(EntityTypes1_9.EntityType.SHULKER_BULLET, EntityTypes1_9.EntityType.WITCH).plainName();
+        mapObjectType(EntityTypes1_9.ObjectType.SHULKER_BULLET, EntityTypes1_9.ObjectType.WITHER_SKULL, -1).plainName();
 
         // Entity data rewrite
         filter().handler(this::handleEntityData);
