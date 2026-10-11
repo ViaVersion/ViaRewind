@@ -24,9 +24,17 @@ import io.netty.handler.codec.MessageToByteEncoder;
 
 public class ForwardMessageToByteEncoder extends MessageToByteEncoder<ByteBuf> {
 
+    private final boolean writeLength;
+
+    public ForwardMessageToByteEncoder(final boolean writeLength) {
+        this.writeLength = writeLength;
+    }
+
     @Override
     protected void encode(ChannelHandlerContext ctx, ByteBuf msg, ByteBuf out) {
-        Types.VAR_INT.writePrimitive(out, msg.readableBytes());
+        if (writeLength) {
+            Types.VAR_INT.writePrimitive(out, msg.readableBytes());
+        }
         out.writeBytes(msg);
     }
 }

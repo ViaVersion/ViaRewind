@@ -66,7 +66,7 @@ public class TrackingCompressionHandlerProvider extends CompressionHandlerProvid
 
             if (compressor != null) { // We can neutralize the effect of compressor to the client
                 pipeline.replace(decompressor, decompressor, new EmptyChannelHandler());
-                pipeline.replace(compressor, compressor, new ForwardMessageToByteEncoder());
+                pipeline.replace(compressor, compressor, new ForwardMessageToByteEncoder(ViaRewind.getPlatform().compressHandlerWritesLength()));
             } else {
                 throw new IllegalStateException("Couldn't remove compression for 1.7!");
             }
