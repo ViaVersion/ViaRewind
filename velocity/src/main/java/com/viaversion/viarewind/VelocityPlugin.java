@@ -79,4 +79,9 @@ public class VelocityPlugin implements ViaRewindPlatform {
         return "compression-decoder";
     }
 
+    @Override
+    public boolean compressHandlerWritesLength() {
+        return true;
+    }
+
 }

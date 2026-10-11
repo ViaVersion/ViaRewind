@@ -91,4 +91,13 @@ public interface ViaRewindPlatform {
         return "decompress";
     }
 
+    /**
+     * Returns whether the platform's compression handler also writes the packet length. Only used in the 1.8 -> 1.7 protocol.
+     *
+     * @return true if the compression handler writes the packet length
+     */
+    default boolean compressHandlerWritesLength() {
+        return false;
+    }
+
 }
