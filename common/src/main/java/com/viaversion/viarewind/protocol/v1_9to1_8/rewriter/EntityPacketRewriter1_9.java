@@ -412,9 +412,11 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
             public void register() {
                 map(Types.VAR_INT); // Entity id
                 handler(wrapper -> {
-                    // todo check if this is correct for the own player
+                    // 1.8 clients write their own equipment to armorInventory[slot] without the -1 offset,
+                    // shifting armor up one slot; the window 0 set slot packets already carry it.
+                    final int entityId = wrapper.get(Types.VAR_INT, 0);
                     int slot = wrapper.read(Types.VAR_INT);
-                    if (slot == 1) {
+                    if (slot == 1 || entityId == wrapper.user().getEntityTracker(protocol).clientEntityId()) {
                         wrapper.cancel();
                     } else if (slot > 1) {
                         slot -= 1;
