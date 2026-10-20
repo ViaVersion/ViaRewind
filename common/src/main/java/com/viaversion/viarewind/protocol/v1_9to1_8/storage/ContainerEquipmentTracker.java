@@ -59,8 +59,8 @@ public class ContainerEquipmentTracker implements StorableObject {
     }
   }
 
-  public void invalidate() {
-    Arrays.fill(equipment, null);
+  public void invalidate(int count) {
+    Arrays.fill(equipment, 0, Math.min(count, equipment.length), null);
   }
 
   private record Slot(Item item) {}
