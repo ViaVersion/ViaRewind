@@ -28,6 +28,7 @@ import com.viaversion.viarewind.api.rewriter.VRBlockItemRewriter;
 import com.viaversion.viarewind.protocol.v1_9to1_8.Protocol1_9To1_8;
 import com.viaversion.viarewind.protocol.v1_9to1_8.data.PotionIdMappings1_8;
 import com.viaversion.viarewind.protocol.v1_9to1_8.storage.CommandBlockStateStorage;
+import com.viaversion.viarewind.protocol.v1_9to1_8.storage.ContainerEquipmentTracker;
 import com.viaversion.viarewind.protocol.v1_9to1_8.storage.WindowTracker;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
@@ -95,6 +96,11 @@ public class BlockItemPacketRewriter1_9 extends VRBlockItemRewriter<ClientboundP
                 tracker.clearEnchantmentProperties();
             }
             tracker.remove(windowId);
+
+            if (windowId != 0) {
+                final ContainerEquipmentTracker equipment = wrapper.user().get(ContainerEquipmentTracker.class);
+                equipment.sendAll(wrapper.user());
+            }
         });
 
         protocol.registerClientbound(ClientboundPackets1_9.OPEN_SCREEN, wrapper -> {
@@ -114,6 +120,11 @@ public class BlockItemPacketRewriter1_9 extends VRBlockItemRewriter<ClientboundP
             Item[] items = wrapper.read(Types.ITEM1_8_SHORT_ARRAY);
             for (int i = 0; i < items.length; i++) {
                 items[i] = handleItemToClient(wrapper.user(), items[i]);
+            }
+
+            if (windowId == 0 && items.length > 5) {
+                // 1.8 clients handle it fine even when another container is open, clear equipment to send
+                wrapper.user().get(ContainerEquipmentTracker.class).invalidate(items.length - 5);
             }
 
             if (windowId == 0 && items.length == 46) {
@@ -154,6 +165,10 @@ public class BlockItemPacketRewriter1_9 extends VRBlockItemRewriter<ClientboundP
                     } else if (slot >= 9 && slot <= 35) {
                         containerSlot = size + slot - 9;
                     } else { // armor/offhand: no slot in a foreign container
+                        if (slot <= 39) {
+                            final ContainerEquipmentTracker equipment = wrapper.user().get(ContainerEquipmentTracker.class);
+                            equipment.setEquipment(39 - slot, item);
+                        }
                         wrapper.cancel();
                         return;
                     }
@@ -201,6 +216,11 @@ public class BlockItemPacketRewriter1_9 extends VRBlockItemRewriter<ClientboundP
         protocol.registerServerbound(ServerboundPackets1_8.CONTAINER_CLOSE, wrapper -> {
             final byte windowId = wrapper.passthrough(Types.BYTE);
             wrapper.user().get(WindowTracker.class).remove(windowId);
+
+            if (windowId != 0) {
+                final ContainerEquipmentTracker equipment = wrapper.user().get(ContainerEquipmentTracker.class);
+                equipment.sendAll(wrapper.user());
+            }
         });
 
         protocol.registerServerbound(ServerboundPackets1_8.CONTAINER_CLICK, new PacketHandlers() {
