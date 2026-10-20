@@ -122,9 +122,9 @@ public class BlockItemPacketRewriter1_9 extends VRBlockItemRewriter<ClientboundP
                 items[i] = handleItemToClient(wrapper.user(), items[i]);
             }
 
-            if (windowId == 0) {
+            if (windowId == 0 && items.length > 5) {
                 // 1.8 clients handle it fine even when another container is open, clear equipment to send
-                wrapper.user().get(ContainerEquipmentTracker.class).invalidate();
+                wrapper.user().get(ContainerEquipmentTracker.class).invalidate(items.length - 5);
             }
 
             if (windowId == 0 && items.length == 46) {
