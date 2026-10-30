@@ -114,6 +114,14 @@ public interface ViaRewindConfig extends Config {
      */
     boolean handlePlayerCombatPacket();
 
+    /**
+     * Caches the legacy text conversion of boss bar titles for 1.8 players.
+     * Plugins often resend the same title to every online player, so most conversions can be reused.
+     *
+     * @return true if enabled
+     */
+    boolean cacheBossBarTextConversion();
+
     enum CooldownIndicator {
         TITLE, ACTION_BAR, BOSS_BAR, DISABLED
     }

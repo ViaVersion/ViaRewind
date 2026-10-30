@@ -42,3 +42,7 @@ emulate-levitation-effect: true
 #
 # If enabled, 1.8 players will handle the player combat packet added in 1.9 by showing the custom death message above the hotbar.
 handle-player-combat-packet: true
+#
+# Caches the text conversion of boss bar titles for 1.8 players.
+# Plugins often resend the same title to every online player, so this saves a lot of work. Disable if you see wrong boss bar titles.
+cache-bossbar-text-conversion: true

@@ -26,6 +26,8 @@ import com.viaversion.viaversion.libs.gson.JsonParser;
 import com.viaversion.viaversion.protocols.v1_12_2to1_13.Protocol1_12_2To1_13;
 import com.viaversion.viaversion.rewriter.text.JsonNBTComponentRewriter;
 import com.viaversion.viaversion.util.ComponentUtil;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
 
@@ -41,6 +43,8 @@ public class ChatUtil {
             }
         }
     };
+    private static final int LEGACY_CACHE_SIZE = 2048;
+    private static final Map<String, String> LEGACY_CACHE = new ConcurrentHashMap<>();
 
     public static String jsonToLegacy(String json) {
         if (json == null || json.equals("null") || json.isEmpty()) {
@@ -77,6 +81,25 @@ public class ChatUtil {
             }
             return "";
         }
+    }
+
+    /**
+     * Same as {@link #jsonToLegacy(JsonElement)}, but caches the result by the serialized component.
+     * The conversion does not depend on the connection, so the result is shared between all players.
+     * Once full, the cache is cleared as a whole.
+     */
+    public static String cachedJsonToLegacy(JsonElement component) {
+        // Use the serialized text as key, JsonPrimitive#equals treats e.g. 1 and 1.0 as equal
+        final String key = component.toString();
+        String legacy = LEGACY_CACHE.get(key);
+        if (legacy == null) {
+            legacy = jsonToLegacy(component);
+            if (LEGACY_CACHE.size() >= LEGACY_CACHE_SIZE) {
+                LEGACY_CACHE.clear();
+            }
+            LEGACY_CACHE.put(key, legacy);
+        }
+        return legacy;
     }
 
     public static String removeUnusedColor(String legacy, char last) {

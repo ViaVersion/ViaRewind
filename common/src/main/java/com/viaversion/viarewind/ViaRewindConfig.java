@@ -40,6 +40,7 @@ public class ViaRewindConfig extends Config implements com.viaversion.viarewind.
     private String offhandCommand;
     private boolean emulateLevitationEffect;
     private boolean handlePlayerCombatPacket;
+    private boolean cacheBossBarTextConversion;
 
     public ViaRewindConfig(File configFile, Logger logger) {
         super(configFile, logger);
@@ -64,6 +65,7 @@ public class ViaRewindConfig extends Config implements com.viaversion.viarewind.
         offhandCommand = getString("offhand-command", "/offhand");
         emulateLevitationEffect = getBoolean("emulate-levitation-effect", true);
         handlePlayerCombatPacket = getBoolean("handle-player-combat-packet", true);
+        cacheBossBarTextConversion = getBoolean("cache-bossbar-text-conversion", true);
     }
 
     @Override
@@ -124,6 +126,11 @@ public class ViaRewindConfig extends Config implements com.viaversion.viarewind.
     @Override
     public boolean handlePlayerCombatPacket() {
         return handlePlayerCombatPacket;
+    }
+
+    @Override
+    public boolean cacheBossBarTextConversion() {
+        return cacheBossBarTextConversion;
     }
 
     @Override

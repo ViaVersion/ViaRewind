@@ -80,7 +80,7 @@ public class PlayerPacketRewriter1_9 extends RewriterBase<Protocol1_9To1_8> {
                 wrapper.read(Types.VAR_INT); // Division
                 wrapper.read(Types.UNSIGNED_BYTE); // Flags
 
-                bossbar.add(uuid, ChatUtil.jsonToLegacy(title), health);
+                bossbar.add(uuid, bossBarTitleToLegacy(title), health);
             } else if (action == 1 /* remove */) {
                 bossbar.remove(uuid);
             } else if (action == 2 /* update health */) {
@@ -88,7 +88,7 @@ public class PlayerPacketRewriter1_9 extends RewriterBase<Protocol1_9To1_8> {
                 bossbar.updateHealth(uuid, health);
             } else if (action == 3 /* update title */) {
                 final JsonElement title = wrapper.read(Types.COMPONENT);
-                bossbar.updateTitle(uuid, ChatUtil.jsonToLegacy(title));
+                bossbar.updateTitle(uuid, bossBarTitleToLegacy(title));
             }
         });
 
@@ -604,4 +604,7 @@ public class PlayerPacketRewriter1_9 extends RewriterBase<Protocol1_9To1_8> {
         });
     }
 
+    private static String bossBarTitleToLegacy(final JsonElement title) {
+        return ViaRewind.getConfig().cacheBossBarTextConversion() ? ChatUtil.cachedJsonToLegacy(title) : ChatUtil.jsonToLegacy(title);
+    }
 }
