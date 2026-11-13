@@ -21,10 +21,7 @@ import com.viaversion.viarewind.api.minecraft.math.RelativeMoveUtil;
 import com.viaversion.viarewind.api.rewriter.VREntityRewriter;
 import com.viaversion.viarewind.protocol.v1_9to1_8.Protocol1_9To1_8;
 import com.viaversion.viarewind.protocol.v1_9to1_8.data.EntityDataIndex1_8;
-import com.viaversion.viarewind.protocol.v1_9to1_8.storage.CooldownStorage;
-import com.viaversion.viarewind.protocol.v1_9to1_8.storage.EntityTracker1_9;
-import com.viaversion.viarewind.protocol.v1_9to1_8.storage.LevitationStorage;
-import com.viaversion.viarewind.protocol.v1_9to1_8.storage.PlayerPositionTracker;
+import com.viaversion.viarewind.protocol.v1_9to1_8.storage.*;
 import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.minecraft.EulerAngle;
@@ -412,11 +409,8 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
             public void register() {
                 map(Types.VAR_INT); // Entity id
                 handler(wrapper -> {
-                    // 1.8 clients write their own equipment to armorInventory[slot] without the -1 offset,
-                    // shifting armor up one slot; the window 0 set slot packets already carry it.
-                    final int entityId = wrapper.get(Types.VAR_INT, 0);
                     int slot = wrapper.read(Types.VAR_INT);
-                    if (slot == 1 || entityId == wrapper.user().getEntityTracker(protocol).clientEntityId()) {
+                    if (slot == 1) {
                         wrapper.cancel();
                     } else if (slot > 1) {
                         slot -= 1;
@@ -425,6 +419,21 @@ public class EntityPacketRewriter1_9 extends VREntityRewriter<ClientboundPackets
                 });
                 map(Types.ITEM1_8); // Item
                 handler(wrapper -> protocol.getItemRewriter().handleItemToClient(wrapper.user(), wrapper.get(Types.ITEM1_8, 0)));
+                handler(wrapper -> {
+                    if (wrapper.get(Types.VAR_INT, 0) == tracker(wrapper.user()).clientEntityId()) {
+                        // Vanilla 1.8.9 doesn't properly handle this and Forge handles it differently, use set
+                        // slot packets instead
+                        final Item item = wrapper.get(Types.ITEM1_8, 0);
+                        final int slot = 4 - wrapper.get(Types.SHORT, 0);
+                        wrapper.cancel();
+                        final ContainerEquipmentTracker equipment = wrapper.user().get(ContainerEquipmentTracker.class);
+                        final WindowTracker window = wrapper.user().get(WindowTracker.class);
+                        equipment.setEquipment(slot, item);
+                        if (window.openWindowId() == 0) {
+                            equipment.sendAsSlot(wrapper.user(), slot);
+                        }
+                    }
+                });
             }
         });
 
