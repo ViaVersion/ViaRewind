@@ -19,17 +19,12 @@ package com.viaversion.viarewind.protocol.v1_9to1_8.storage;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.data.entity.TrackedEntity;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.minecraft.Vector;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_9;
 import com.viaversion.viaversion.data.entity.EntityTrackerBase;
-import com.viaversion.viaversion.libs.fastutil.ints.Int2IntMap;
-import com.viaversion.viaversion.libs.fastutil.ints.Int2IntOpenHashMap;
-import com.viaversion.viaversion.libs.fastutil.ints.Int2ObjectMap;
-import com.viaversion.viaversion.libs.fastutil.ints.Int2ObjectOpenHashMap;
-import com.viaversion.viaversion.libs.fastutil.ints.IntArrayList;
-import com.viaversion.viaversion.libs.fastutil.ints.IntList;
-import com.viaversion.viaversion.libs.fastutil.ints.IntOpenHashSet;
-import com.viaversion.viaversion.libs.fastutil.ints.IntSet;
+import com.viaversion.viaversion.libs.fastutil.ints.*;
+
 import java.util.List;
 import java.util.Map;
 
@@ -40,6 +35,7 @@ public class EntityTracker1_9 extends EntityTrackerBase {
     private final Int2IntMap status = new Int2IntOpenHashMap();
     private final IntSet handActive = new IntOpenHashSet();
     private final Int2ObjectMap<PendingPotionEntity> pendingPotions = new Int2ObjectOpenHashMap<>();
+    private final Int2ObjectMap<BlockPosition> paintings = new Int2ObjectOpenHashMap<>();
 
     public EntityTracker1_9(UserConnection connection) {
         super(connection, EntityTypes1_9.EntityType.PLAYER);
@@ -52,6 +48,7 @@ public class EntityTracker1_9 extends EntityTrackerBase {
         status.remove(id);
         handActive.remove(id);
         pendingPotions.remove(id);
+        paintings.remove(id);
 
         vehicles.forEach((vehicle, passengers) -> passengers.rem(id));
         vehicles.int2ObjectEntrySet().removeIf(entry -> entry.getValue().isEmpty());
@@ -110,6 +107,10 @@ public class EntityTracker1_9 extends EntityTrackerBase {
 
     public Int2ObjectMap<PendingPotionEntity> getPendingPotions() {
         return pendingPotions;
+    }
+
+    public Int2ObjectMap<BlockPosition> getPaintings() {
+        return paintings;
     }
 
     public record PendingPotionEntity(int x, int y, int z, byte pitch, byte yaw, short velocityX, short velocityY, short velocityZ) {
