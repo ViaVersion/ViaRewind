@@ -240,9 +240,7 @@ public class WorldPacketRewriter1_9 extends RewriterBase<Protocol1_9To1_8> {
                         wrapper.set(Types.INT, 1, replacedBlock);
                     } else if (id == 2002) {
                         final int mappedSplash = PotionIdMappings1_8.getIdForSplash(wrapper.get(Types.INT, 1));
-                        if (mappedSplash != -1) {
-                            wrapper.set(Types.INT, 1, mappedSplash);
-                        }
+                        wrapper.set(Types.INT, 1, mappedSplash);
                     }
                 });
             }
