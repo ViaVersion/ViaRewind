@@ -17,13 +17,18 @@
  */
 package com.viaversion.viarewind.protocol.v1_9to1_8.data;
 
+import com.viaversion.viaversion.libs.fastutil.ints.Int2IntMap;
+import com.viaversion.viaversion.libs.fastutil.ints.Int2IntOpenHashMap;
 import com.viaversion.viaversion.protocols.v1_8to1_9.data.PotionIdMappings1_9;
+
 import java.util.HashMap;
 import java.util.Map;
 
 public class PotionIdMappings1_8 {
     public static final Map<String, String> POTION_NAME_INDEX = new HashMap<>();
     public static final Map<String, Integer> POTION_NAME_TO_ID = new HashMap<>();
+    public static final Int2IntMap SPLASH_MAPPINGS = new Int2IntOpenHashMap();
+    private static final int SPLASH_MASK = 16384;
 
     static {
         POTION_NAME_TO_ID.putAll(PotionIdMappings1_9.POTION_NAME_TO_ID);
@@ -75,5 +80,17 @@ public class PotionIdMappings1_8 {
         POTION_NAME_INDEX.put("luck_lingering", "§rLingering Potion of Luck");
         POTION_NAME_INDEX.put("luck", "§rPotion of Luck");
         POTION_NAME_INDEX.put("luck_splash", "§rSplash Potion of Luck");
+
+        SPLASH_MAPPINGS.defaultReturnValue(SPLASH_MASK); // splash water
+        for (Int2IntMap.Entry entry : PotionIdMappings1_9.POTION_INDEX.int2IntEntrySet()) {
+            if (entry.getIntKey() >= 0) {
+                SPLASH_MAPPINGS.put(entry.getIntValue(), entry.getIntKey() | SPLASH_MASK);
+            }
+        }
+        SPLASH_MAPPINGS.put(36, POTION_NAME_TO_ID.get("luck") | SPLASH_MASK);
+    }
+
+    public static int getIdForSplash(int id1_9) {
+        return SPLASH_MAPPINGS.get(id1_9);
     }
 }
