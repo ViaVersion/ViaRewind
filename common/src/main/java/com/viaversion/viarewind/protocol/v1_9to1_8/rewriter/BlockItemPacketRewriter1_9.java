@@ -63,6 +63,8 @@ public class BlockItemPacketRewriter1_9 extends VRBlockItemRewriter<ClientboundP
 
     @Override
     protected void registerPackets() {
+        registerLevelParticles(ClientboundPackets1_9.LEVEL_PARTICLES);
+
         protocol.registerClientbound(ClientboundPackets1_9.BLOCK_UPDATE, wrapper -> {
             final BlockPosition position = wrapper.passthrough(Types.BLOCK_POSITION1_8);
             final int blockState = wrapper.passthrough(Types.VAR_INT);
