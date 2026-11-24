@@ -97,10 +97,12 @@ public class BlockItemPacketRewriter1_9 extends VRBlockItemRewriter<ClientboundP
             }
             tracker.remove(windowId);
 
-            if (windowId != 0) {
-                final ContainerEquipmentTracker equipment = wrapper.user().get(ContainerEquipmentTracker.class);
-                equipment.sendAll(wrapper.user());
-            }
+            // resync equipment sent while container was open, must do after close is sent
+            wrapper.send(Protocol1_9To1_8.class);
+            wrapper.cancel();
+
+            final ContainerEquipmentTracker equipment = wrapper.user().get(ContainerEquipmentTracker.class);
+            equipment.sendAll(wrapper.user());
         });
 
         protocol.registerClientbound(ClientboundPackets1_9.OPEN_SCREEN, wrapper -> {
@@ -165,7 +167,7 @@ public class BlockItemPacketRewriter1_9 extends VRBlockItemRewriter<ClientboundP
                     } else if (slot >= 9 && slot <= 35) {
                         containerSlot = size + slot - 9;
                     } else { // armor/offhand: no slot in a foreign container
-                        if (slot <= 39) {
+                        if (slot >= 36 && slot <= 39) {
                             final ContainerEquipmentTracker equipment = wrapper.user().get(ContainerEquipmentTracker.class);
                             equipment.setEquipment(39 - slot, item);
                         }
