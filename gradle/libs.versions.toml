@@ -1,5 +1,5 @@
 [versions]
-viaversion = "5.12.0"
+viaversion = "5.12.3"
 velocity = "3.4.0"
 
 [libraries]

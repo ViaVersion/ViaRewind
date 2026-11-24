@@ -242,26 +242,20 @@ public class WorldPacketRewriter1_9 extends RewriterBase<Protocol1_9To1_8> {
             }
         });
 
-        protocol.registerClientbound(ClientboundPackets1_9.LEVEL_PARTICLES, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Types.INT); // Particle id
-                handler(wrapper -> {
-                    int id = wrapper.get(Types.INT, 0);
-                    if (id > 41 && !ViaRewind.getConfig().isReplaceParticles()) {
-                        wrapper.cancel();
-                        return;
-                    }
-                    if (id == 42) { // Dragon Breath
-                        wrapper.set(Types.INT, 0, 24); // Portal
-                    } else if (id == 43) { // End Rod
-                        wrapper.set(Types.INT, 0, 3); // Firework Spark
-                    } else if (id == 44) { // Damage Indicator
-                        wrapper.set(Types.INT, 0, 34); // Heart
-                    } else if (id == 45) { // Sweep Attack
-                        wrapper.set(Types.INT, 0, 1); // Large Explosion
-                    }
-                });
+        protocol.appendClientbound(ClientboundPackets1_9.LEVEL_PARTICLES, wrapper -> {
+            final int id = wrapper.get(Types.INT, 0);
+            if (id > 41 && !ViaRewind.getConfig().isReplaceParticles()) {
+                wrapper.cancel();
+                return;
+            }
+            if (id == 42) { // Dragon Breath
+                wrapper.set(Types.INT, 0, 24); // Portal
+            } else if (id == 43) { // End Rod
+                wrapper.set(Types.INT, 0, 3); // Firework Spark
+            } else if (id == 44) { // Damage Indicator
+                wrapper.set(Types.INT, 0, 34); // Heart
+            } else if (id == 45) { // Sweep Attack
+                wrapper.set(Types.INT, 0, 1); // Large Explosion
             }
         });
 
